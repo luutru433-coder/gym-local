@@ -2,6 +2,10 @@
 
 Gym Local là ứng dụng PWA theo dõi tập luyện và dinh dưỡng dành cho một người dùng. App không cần tài khoản, không có máy chủ riêng, không thu phí và lưu dữ liệu cá nhân ngay trên thiết bị.
 
+- Dùng app: https://luutru433-coder.github.io/gym-local/
+- Mã nguồn: https://github.com/luutru433-coder/gym-local
+- Gói dinh dưỡng: https://github.com/luutru433-coder/gym-local/releases/tag/nutrition-v2026.04
+
 ## Điểm chính
 
 - 50 nhóm động tác với 199 biến thể thiết bị đã review: máy, cable, tạ đơn, tạ đòn, Smith, dây kháng lực và bodyweight.
@@ -36,7 +40,7 @@ pnpm nutrition:verify-pack
 
 `pnpm run verify` chạy lint, typecheck, kiểm tra nội dung, test và production build. Lệnh kiểm tra gói xác nhận SHA-256, SQLite integrity, số lượng bản ghi và tìm kiếm FTS5.
 
-## Triển khai miễn phí lên GitHub Pages
+## Tự triển khai miễn phí lên GitHub Pages
 
 1. Tạo GitHub Release tag `nutrition-v2026.04` và upload tệp SQLite từ `outputs/`.
 2. Push mã nguồn lên nhánh `main`.

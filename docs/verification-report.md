@@ -36,7 +36,15 @@
 - The real 16.4 MB pack installed into browser OPFS and reported version `2026.04`.
 - Explicit offline search for `ức gà` returned USDA foods and Vietnamese recipe estimates; selecting a result displayed kcal, fiber/sugar, minerals, and available vitamins with USDA/CC0 attribution.
 
-## Device/repository checks
+## Remote release checks
 
-- GitHub publication, Release upload, and live Pages URL are completed as part of the release step and must be recorded here after the remote workflow succeeds.
-- Physical iPhone Home Screen/offline relaunch and camera accept/decline remain device checks in `docs/release-checklist.md`.
+- Public repository: <https://github.com/luutru433-coder/gym-local>
+- Nutrition release: <https://github.com/luutru433-coder/gym-local/releases/tag/nutrition-v2026.04>
+- The release asset downloaded back from GitHub as 16,445,440 bytes with SHA-256 `4f844b93c1c8d0540c34038cbc5b69096c92a3982fe884b2ac877c5df7bdc88f`.
+- Pages workflow run `31349834535` passed the full verification suite, verified the release asset checksum, and completed both build and deploy jobs for app commit `bf68d790203bd05aa6eb0c07054f13f016206ab1`.
+- Live app: <https://luutru433-coder.github.io/gym-local/> returned HTTP 200 with title `Gym Local`; the deployed nutrition manifest also returned HTTP 200.
+- A fresh live-browser profile completed onboarding and reached all five main navigation areas. The live catalog reported 50 movement families; horizontal chest press showed six equipment variants, switching to the machine selected the Tim Bullici machine guide, and play created one privacy-enhanced iframe for direct video ID `gNBU7hmW2EU`.
+
+## Remaining physical-device checks
+
+- Physical iPhone Home Screen/offline relaunch and camera accept/decline require the target device and remain listed in `docs/release-checklist.md`.
