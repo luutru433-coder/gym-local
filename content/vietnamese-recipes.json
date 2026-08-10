@@ -1,0 +1,7502 @@
+[
+  {
+    "id": "vi_recipe_001",
+    "nameVi": "Cơm trắng ức gà nướng rau cải",
+    "nameEn": "White rice bowl with grilled chicken breast and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_002",
+    "nameVi": "Cơm trắng ức gà nướng rau củ",
+    "nameEn": "White rice bowl with grilled chicken breast and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_003",
+    "nameVi": "Cơm trắng bò xào rau cải",
+    "nameEn": "White rice bowl with stir-fried beef and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_004",
+    "nameVi": "Cơm trắng bò xào rau củ",
+    "nameEn": "White rice bowl with stir-fried beef and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_005",
+    "nameVi": "Cơm trắng thịt heo luộc rau cải",
+    "nameEn": "White rice bowl with boiled pork and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_006",
+    "nameVi": "Cơm trắng thịt heo luộc rau củ",
+    "nameEn": "White rice bowl with boiled pork and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_007",
+    "nameVi": "Cơm trắng cá hồi áp chảo rau cải",
+    "nameEn": "White rice bowl with pan-seared salmon and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_008",
+    "nameVi": "Cơm trắng cá hồi áp chảo rau củ",
+    "nameEn": "White rice bowl with pan-seared salmon and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_009",
+    "nameVi": "Cơm trắng cá ngừ rau cải",
+    "nameEn": "White rice bowl with tuna and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_010",
+    "nameVi": "Cơm trắng cá ngừ rau củ",
+    "nameEn": "White rice bowl with tuna and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_011",
+    "nameVi": "Cơm trắng tôm hấp rau cải",
+    "nameEn": "White rice bowl with steamed shrimp and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_012",
+    "nameVi": "Cơm trắng tôm hấp rau củ",
+    "nameEn": "White rice bowl with steamed shrimp and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_013",
+    "nameVi": "Cơm trắng trứng luộc rau cải",
+    "nameEn": "White rice bowl with boiled egg and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_014",
+    "nameVi": "Cơm trắng trứng luộc rau củ",
+    "nameEn": "White rice bowl with boiled egg and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_015",
+    "nameVi": "Cơm trắng đậu hũ rau cải",
+    "nameEn": "White rice bowl with tofu and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_016",
+    "nameVi": "Cơm trắng đậu hũ rau củ",
+    "nameEn": "White rice bowl with tofu and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_017",
+    "nameVi": "Cơm trắng cá rô phi hấp rau cải",
+    "nameEn": "White rice bowl with steamed tilapia and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_018",
+    "nameVi": "Cơm trắng cá rô phi hấp rau củ",
+    "nameEn": "White rice bowl with steamed tilapia and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_019",
+    "nameVi": "Cơm trắng đậu đen rau cải",
+    "nameEn": "White rice bowl with black beans and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_020",
+    "nameVi": "Cơm trắng đậu đen rau củ",
+    "nameEn": "White rice bowl with black beans and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_021",
+    "nameVi": "Cơm gạo lứt ức gà nướng rau cải",
+    "nameEn": "Brown rice bowl with grilled chicken breast and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_022",
+    "nameVi": "Cơm gạo lứt ức gà nướng rau củ",
+    "nameEn": "Brown rice bowl with grilled chicken breast and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_023",
+    "nameVi": "Cơm gạo lứt bò xào rau cải",
+    "nameEn": "Brown rice bowl with stir-fried beef and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_024",
+    "nameVi": "Cơm gạo lứt bò xào rau củ",
+    "nameEn": "Brown rice bowl with stir-fried beef and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_025",
+    "nameVi": "Cơm gạo lứt thịt heo luộc rau cải",
+    "nameEn": "Brown rice bowl with boiled pork and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_026",
+    "nameVi": "Cơm gạo lứt thịt heo luộc rau củ",
+    "nameEn": "Brown rice bowl with boiled pork and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_027",
+    "nameVi": "Cơm gạo lứt cá hồi áp chảo rau cải",
+    "nameEn": "Brown rice bowl with pan-seared salmon and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_028",
+    "nameVi": "Cơm gạo lứt cá hồi áp chảo rau củ",
+    "nameEn": "Brown rice bowl with pan-seared salmon and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_029",
+    "nameVi": "Cơm gạo lứt cá ngừ rau cải",
+    "nameEn": "Brown rice bowl with tuna and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_030",
+    "nameVi": "Cơm gạo lứt cá ngừ rau củ",
+    "nameEn": "Brown rice bowl with tuna and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_031",
+    "nameVi": "Cơm gạo lứt tôm hấp rau cải",
+    "nameEn": "Brown rice bowl with steamed shrimp and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_032",
+    "nameVi": "Cơm gạo lứt tôm hấp rau củ",
+    "nameEn": "Brown rice bowl with steamed shrimp and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_033",
+    "nameVi": "Cơm gạo lứt trứng luộc rau cải",
+    "nameEn": "Brown rice bowl with boiled egg and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_034",
+    "nameVi": "Cơm gạo lứt trứng luộc rau củ",
+    "nameEn": "Brown rice bowl with boiled egg and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_035",
+    "nameVi": "Cơm gạo lứt đậu hũ rau cải",
+    "nameEn": "Brown rice bowl with tofu and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_036",
+    "nameVi": "Cơm gạo lứt đậu hũ rau củ",
+    "nameEn": "Brown rice bowl with tofu and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_037",
+    "nameVi": "Cơm gạo lứt cá rô phi hấp rau cải",
+    "nameEn": "Brown rice bowl with steamed tilapia and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_038",
+    "nameVi": "Cơm gạo lứt cá rô phi hấp rau củ",
+    "nameEn": "Brown rice bowl with steamed tilapia and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_039",
+    "nameVi": "Cơm gạo lứt đậu đen rau cải",
+    "nameEn": "Brown rice bowl with black beans and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_040",
+    "nameVi": "Cơm gạo lứt đậu đen rau củ",
+    "nameEn": "Brown rice bowl with black beans and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, brown, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_041",
+    "nameVi": "Cơm tấm ức gà nướng rau cải",
+    "nameEn": "Broken rice plate with grilled chicken breast and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_042",
+    "nameVi": "Cơm tấm ức gà nướng rau củ",
+    "nameEn": "Broken rice plate with grilled chicken breast and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_043",
+    "nameVi": "Cơm tấm bò xào rau cải",
+    "nameEn": "Broken rice plate with stir-fried beef and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_044",
+    "nameVi": "Cơm tấm bò xào rau củ",
+    "nameEn": "Broken rice plate with stir-fried beef and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_045",
+    "nameVi": "Cơm tấm thịt heo luộc rau cải",
+    "nameEn": "Broken rice plate with boiled pork and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_046",
+    "nameVi": "Cơm tấm thịt heo luộc rau củ",
+    "nameEn": "Broken rice plate with boiled pork and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_047",
+    "nameVi": "Cơm tấm cá hồi áp chảo rau cải",
+    "nameEn": "Broken rice plate with pan-seared salmon and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_048",
+    "nameVi": "Cơm tấm cá hồi áp chảo rau củ",
+    "nameEn": "Broken rice plate with pan-seared salmon and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_049",
+    "nameVi": "Cơm tấm cá ngừ rau cải",
+    "nameEn": "Broken rice plate with tuna and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_050",
+    "nameVi": "Cơm tấm cá ngừ rau củ",
+    "nameEn": "Broken rice plate with tuna and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_051",
+    "nameVi": "Cơm tấm tôm hấp rau cải",
+    "nameEn": "Broken rice plate with steamed shrimp and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_052",
+    "nameVi": "Cơm tấm tôm hấp rau củ",
+    "nameEn": "Broken rice plate with steamed shrimp and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_053",
+    "nameVi": "Cơm tấm trứng luộc rau cải",
+    "nameEn": "Broken rice plate with boiled egg and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_054",
+    "nameVi": "Cơm tấm trứng luộc rau củ",
+    "nameEn": "Broken rice plate with boiled egg and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_055",
+    "nameVi": "Cơm tấm đậu hũ rau cải",
+    "nameEn": "Broken rice plate with tofu and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_056",
+    "nameVi": "Cơm tấm đậu hũ rau củ",
+    "nameEn": "Broken rice plate with tofu and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_057",
+    "nameVi": "Cơm tấm cá rô phi hấp rau cải",
+    "nameEn": "Broken rice plate with steamed tilapia and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_058",
+    "nameVi": "Cơm tấm cá rô phi hấp rau củ",
+    "nameEn": "Broken rice plate with steamed tilapia and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_059",
+    "nameVi": "Cơm tấm đậu đen rau cải",
+    "nameEn": "Broken rice plate with black beans and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_060",
+    "nameVi": "Cơm tấm đậu đen rau củ",
+    "nameEn": "Broken rice plate with black beans and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_061",
+    "nameVi": "Xôi ức gà nướng rau cải",
+    "nameEn": "Sticky rice bowl with grilled chicken breast and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_062",
+    "nameVi": "Xôi ức gà nướng rau củ",
+    "nameEn": "Sticky rice bowl with grilled chicken breast and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_063",
+    "nameVi": "Xôi bò xào rau cải",
+    "nameEn": "Sticky rice bowl with stir-fried beef and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_064",
+    "nameVi": "Xôi bò xào rau củ",
+    "nameEn": "Sticky rice bowl with stir-fried beef and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_065",
+    "nameVi": "Xôi thịt heo luộc rau cải",
+    "nameEn": "Sticky rice bowl with boiled pork and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_066",
+    "nameVi": "Xôi thịt heo luộc rau củ",
+    "nameEn": "Sticky rice bowl with boiled pork and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_067",
+    "nameVi": "Xôi cá hồi áp chảo rau cải",
+    "nameEn": "Sticky rice bowl with pan-seared salmon and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_068",
+    "nameVi": "Xôi cá hồi áp chảo rau củ",
+    "nameEn": "Sticky rice bowl with pan-seared salmon and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_069",
+    "nameVi": "Xôi cá ngừ rau cải",
+    "nameEn": "Sticky rice bowl with tuna and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_070",
+    "nameVi": "Xôi cá ngừ rau củ",
+    "nameEn": "Sticky rice bowl with tuna and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_071",
+    "nameVi": "Xôi tôm hấp rau cải",
+    "nameEn": "Sticky rice bowl with steamed shrimp and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_072",
+    "nameVi": "Xôi tôm hấp rau củ",
+    "nameEn": "Sticky rice bowl with steamed shrimp and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_073",
+    "nameVi": "Xôi trứng luộc rau cải",
+    "nameEn": "Sticky rice bowl with boiled egg and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_074",
+    "nameVi": "Xôi trứng luộc rau củ",
+    "nameEn": "Sticky rice bowl with boiled egg and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_075",
+    "nameVi": "Xôi đậu hũ rau cải",
+    "nameEn": "Sticky rice bowl with tofu and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_076",
+    "nameVi": "Xôi đậu hũ rau củ",
+    "nameEn": "Sticky rice bowl with tofu and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_077",
+    "nameVi": "Xôi cá rô phi hấp rau cải",
+    "nameEn": "Sticky rice bowl with steamed tilapia and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_078",
+    "nameVi": "Xôi cá rô phi hấp rau củ",
+    "nameEn": "Sticky rice bowl with steamed tilapia and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_079",
+    "nameVi": "Xôi đậu đen rau cải",
+    "nameEn": "Sticky rice bowl with black beans and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_080",
+    "nameVi": "Xôi đậu đen rau củ",
+    "nameEn": "Sticky rice bowl with black beans and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice, glutinous, cooked",
+        "grams": 150
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_081",
+    "nameVi": "Bún ức gà nướng rau cải",
+    "nameEn": "Rice vermicelli bowl with grilled chicken breast and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_082",
+    "nameVi": "Bún ức gà nướng rau củ",
+    "nameEn": "Rice vermicelli bowl with grilled chicken breast and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_083",
+    "nameVi": "Bún bò xào rau cải",
+    "nameEn": "Rice vermicelli bowl with stir-fried beef and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_084",
+    "nameVi": "Bún bò xào rau củ",
+    "nameEn": "Rice vermicelli bowl with stir-fried beef and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_085",
+    "nameVi": "Bún thịt heo luộc rau cải",
+    "nameEn": "Rice vermicelli bowl with boiled pork and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_086",
+    "nameVi": "Bún thịt heo luộc rau củ",
+    "nameEn": "Rice vermicelli bowl with boiled pork and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_087",
+    "nameVi": "Bún cá hồi áp chảo rau cải",
+    "nameEn": "Rice vermicelli bowl with pan-seared salmon and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_088",
+    "nameVi": "Bún cá hồi áp chảo rau củ",
+    "nameEn": "Rice vermicelli bowl with pan-seared salmon and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_089",
+    "nameVi": "Bún cá ngừ rau cải",
+    "nameEn": "Rice vermicelli bowl with tuna and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_090",
+    "nameVi": "Bún cá ngừ rau củ",
+    "nameEn": "Rice vermicelli bowl with tuna and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_091",
+    "nameVi": "Bún tôm hấp rau cải",
+    "nameEn": "Rice vermicelli bowl with steamed shrimp and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_092",
+    "nameVi": "Bún tôm hấp rau củ",
+    "nameEn": "Rice vermicelli bowl with steamed shrimp and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_093",
+    "nameVi": "Bún trứng luộc rau cải",
+    "nameEn": "Rice vermicelli bowl with boiled egg and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_094",
+    "nameVi": "Bún trứng luộc rau củ",
+    "nameEn": "Rice vermicelli bowl with boiled egg and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_095",
+    "nameVi": "Bún đậu hũ rau cải",
+    "nameEn": "Rice vermicelli bowl with tofu and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_096",
+    "nameVi": "Bún đậu hũ rau củ",
+    "nameEn": "Rice vermicelli bowl with tofu and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_097",
+    "nameVi": "Bún cá rô phi hấp rau cải",
+    "nameEn": "Rice vermicelli bowl with steamed tilapia and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_098",
+    "nameVi": "Bún cá rô phi hấp rau củ",
+    "nameEn": "Rice vermicelli bowl with steamed tilapia and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_099",
+    "nameVi": "Bún đậu đen rau cải",
+    "nameEn": "Rice vermicelli bowl with black beans and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_100",
+    "nameVi": "Bún đậu đen rau củ",
+    "nameEn": "Rice vermicelli bowl with black beans and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_101",
+    "nameVi": "Phở ức gà nướng rau cải",
+    "nameEn": "Pho noodle bowl with grilled chicken breast and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_102",
+    "nameVi": "Phở ức gà nướng rau củ",
+    "nameEn": "Pho noodle bowl with grilled chicken breast and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_103",
+    "nameVi": "Phở bò xào rau cải",
+    "nameEn": "Pho noodle bowl with stir-fried beef and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_104",
+    "nameVi": "Phở bò xào rau củ",
+    "nameEn": "Pho noodle bowl with stir-fried beef and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_105",
+    "nameVi": "Phở thịt heo luộc rau cải",
+    "nameEn": "Pho noodle bowl with boiled pork and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_106",
+    "nameVi": "Phở thịt heo luộc rau củ",
+    "nameEn": "Pho noodle bowl with boiled pork and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_107",
+    "nameVi": "Phở cá hồi áp chảo rau cải",
+    "nameEn": "Pho noodle bowl with pan-seared salmon and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_108",
+    "nameVi": "Phở cá hồi áp chảo rau củ",
+    "nameEn": "Pho noodle bowl with pan-seared salmon and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_109",
+    "nameVi": "Phở cá ngừ rau cải",
+    "nameEn": "Pho noodle bowl with tuna and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_110",
+    "nameVi": "Phở cá ngừ rau củ",
+    "nameEn": "Pho noodle bowl with tuna and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_111",
+    "nameVi": "Phở tôm hấp rau cải",
+    "nameEn": "Pho noodle bowl with steamed shrimp and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_112",
+    "nameVi": "Phở tôm hấp rau củ",
+    "nameEn": "Pho noodle bowl with steamed shrimp and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_113",
+    "nameVi": "Phở trứng luộc rau cải",
+    "nameEn": "Pho noodle bowl with boiled egg and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_114",
+    "nameVi": "Phở trứng luộc rau củ",
+    "nameEn": "Pho noodle bowl with boiled egg and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_115",
+    "nameVi": "Phở đậu hũ rau cải",
+    "nameEn": "Pho noodle bowl with tofu and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_116",
+    "nameVi": "Phở đậu hũ rau củ",
+    "nameEn": "Pho noodle bowl with tofu and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_117",
+    "nameVi": "Phở cá rô phi hấp rau cải",
+    "nameEn": "Pho noodle bowl with steamed tilapia and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_118",
+    "nameVi": "Phở cá rô phi hấp rau củ",
+    "nameEn": "Pho noodle bowl with steamed tilapia and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_119",
+    "nameVi": "Phở đậu đen rau cải",
+    "nameEn": "Pho noodle bowl with black beans and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_120",
+    "nameVi": "Phở đậu đen rau củ",
+    "nameEn": "Pho noodle bowl with black beans and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_121",
+    "nameVi": "Hủ tiếu ức gà nướng rau cải",
+    "nameEn": "Rice noodle soup bowl with grilled chicken breast and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_122",
+    "nameVi": "Hủ tiếu ức gà nướng rau củ",
+    "nameEn": "Rice noodle soup bowl with grilled chicken breast and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_123",
+    "nameVi": "Hủ tiếu bò xào rau cải",
+    "nameEn": "Rice noodle soup bowl with stir-fried beef and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_124",
+    "nameVi": "Hủ tiếu bò xào rau củ",
+    "nameEn": "Rice noodle soup bowl with stir-fried beef and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_125",
+    "nameVi": "Hủ tiếu thịt heo luộc rau cải",
+    "nameEn": "Rice noodle soup bowl with boiled pork and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_126",
+    "nameVi": "Hủ tiếu thịt heo luộc rau củ",
+    "nameEn": "Rice noodle soup bowl with boiled pork and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_127",
+    "nameVi": "Hủ tiếu cá hồi áp chảo rau cải",
+    "nameEn": "Rice noodle soup bowl with pan-seared salmon and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_128",
+    "nameVi": "Hủ tiếu cá hồi áp chảo rau củ",
+    "nameEn": "Rice noodle soup bowl with pan-seared salmon and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_129",
+    "nameVi": "Hủ tiếu cá ngừ rau cải",
+    "nameEn": "Rice noodle soup bowl with tuna and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_130",
+    "nameVi": "Hủ tiếu cá ngừ rau củ",
+    "nameEn": "Rice noodle soup bowl with tuna and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_131",
+    "nameVi": "Hủ tiếu tôm hấp rau cải",
+    "nameEn": "Rice noodle soup bowl with steamed shrimp and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_132",
+    "nameVi": "Hủ tiếu tôm hấp rau củ",
+    "nameEn": "Rice noodle soup bowl with steamed shrimp and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_133",
+    "nameVi": "Hủ tiếu trứng luộc rau cải",
+    "nameEn": "Rice noodle soup bowl with boiled egg and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_134",
+    "nameVi": "Hủ tiếu trứng luộc rau củ",
+    "nameEn": "Rice noodle soup bowl with boiled egg and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_135",
+    "nameVi": "Hủ tiếu đậu hũ rau cải",
+    "nameEn": "Rice noodle soup bowl with tofu and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_136",
+    "nameVi": "Hủ tiếu đậu hũ rau củ",
+    "nameEn": "Rice noodle soup bowl with tofu and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_137",
+    "nameVi": "Hủ tiếu cá rô phi hấp rau cải",
+    "nameEn": "Rice noodle soup bowl with steamed tilapia and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_138",
+    "nameVi": "Hủ tiếu cá rô phi hấp rau củ",
+    "nameEn": "Rice noodle soup bowl with steamed tilapia and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_139",
+    "nameVi": "Hủ tiếu đậu đen rau cải",
+    "nameEn": "Rice noodle soup bowl with black beans and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_140",
+    "nameVi": "Hủ tiếu đậu đen rau củ",
+    "nameEn": "Rice noodle soup bowl with black beans and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_141",
+    "nameVi": "Miến ức gà nướng rau cải",
+    "nameEn": "Glass noodle bowl with grilled chicken breast and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_142",
+    "nameVi": "Miến ức gà nướng rau củ",
+    "nameEn": "Glass noodle bowl with grilled chicken breast and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_143",
+    "nameVi": "Miến bò xào rau cải",
+    "nameEn": "Glass noodle bowl with stir-fried beef and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_144",
+    "nameVi": "Miến bò xào rau củ",
+    "nameEn": "Glass noodle bowl with stir-fried beef and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_145",
+    "nameVi": "Miến thịt heo luộc rau cải",
+    "nameEn": "Glass noodle bowl with boiled pork and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_146",
+    "nameVi": "Miến thịt heo luộc rau củ",
+    "nameEn": "Glass noodle bowl with boiled pork and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_147",
+    "nameVi": "Miến cá hồi áp chảo rau cải",
+    "nameEn": "Glass noodle bowl with pan-seared salmon and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_148",
+    "nameVi": "Miến cá hồi áp chảo rau củ",
+    "nameEn": "Glass noodle bowl with pan-seared salmon and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_149",
+    "nameVi": "Miến cá ngừ rau cải",
+    "nameEn": "Glass noodle bowl with tuna and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_150",
+    "nameVi": "Miến cá ngừ rau củ",
+    "nameEn": "Glass noodle bowl with tuna and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_151",
+    "nameVi": "Miến tôm hấp rau cải",
+    "nameEn": "Glass noodle bowl with steamed shrimp and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_152",
+    "nameVi": "Miến tôm hấp rau củ",
+    "nameEn": "Glass noodle bowl with steamed shrimp and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_153",
+    "nameVi": "Miến trứng luộc rau cải",
+    "nameEn": "Glass noodle bowl with boiled egg and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_154",
+    "nameVi": "Miến trứng luộc rau củ",
+    "nameEn": "Glass noodle bowl with boiled egg and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_155",
+    "nameVi": "Miến đậu hũ rau cải",
+    "nameEn": "Glass noodle bowl with tofu and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_156",
+    "nameVi": "Miến đậu hũ rau củ",
+    "nameEn": "Glass noodle bowl with tofu and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_157",
+    "nameVi": "Miến cá rô phi hấp rau cải",
+    "nameEn": "Glass noodle bowl with steamed tilapia and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_158",
+    "nameVi": "Miến cá rô phi hấp rau củ",
+    "nameEn": "Glass noodle bowl with steamed tilapia and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_159",
+    "nameVi": "Miến đậu đen rau cải",
+    "nameEn": "Glass noodle bowl with black beans and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_160",
+    "nameVi": "Miến đậu đen rau củ",
+    "nameEn": "Glass noodle bowl with black beans and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "mung bean noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_161",
+    "nameVi": "Mì trứng ức gà nướng rau cải",
+    "nameEn": "Egg noodle bowl with grilled chicken breast and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_162",
+    "nameVi": "Mì trứng ức gà nướng rau củ",
+    "nameEn": "Egg noodle bowl with grilled chicken breast and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_163",
+    "nameVi": "Mì trứng bò xào rau cải",
+    "nameEn": "Egg noodle bowl with stir-fried beef and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_164",
+    "nameVi": "Mì trứng bò xào rau củ",
+    "nameEn": "Egg noodle bowl with stir-fried beef and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_165",
+    "nameVi": "Mì trứng thịt heo luộc rau cải",
+    "nameEn": "Egg noodle bowl with boiled pork and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_166",
+    "nameVi": "Mì trứng thịt heo luộc rau củ",
+    "nameEn": "Egg noodle bowl with boiled pork and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_167",
+    "nameVi": "Mì trứng cá hồi áp chảo rau cải",
+    "nameEn": "Egg noodle bowl with pan-seared salmon and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_168",
+    "nameVi": "Mì trứng cá hồi áp chảo rau củ",
+    "nameEn": "Egg noodle bowl with pan-seared salmon and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_169",
+    "nameVi": "Mì trứng cá ngừ rau cải",
+    "nameEn": "Egg noodle bowl with tuna and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_170",
+    "nameVi": "Mì trứng cá ngừ rau củ",
+    "nameEn": "Egg noodle bowl with tuna and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_171",
+    "nameVi": "Mì trứng tôm hấp rau cải",
+    "nameEn": "Egg noodle bowl with steamed shrimp and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_172",
+    "nameVi": "Mì trứng tôm hấp rau củ",
+    "nameEn": "Egg noodle bowl with steamed shrimp and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_173",
+    "nameVi": "Mì trứng trứng luộc rau cải",
+    "nameEn": "Egg noodle bowl with boiled egg and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_174",
+    "nameVi": "Mì trứng trứng luộc rau củ",
+    "nameEn": "Egg noodle bowl with boiled egg and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_175",
+    "nameVi": "Mì trứng đậu hũ rau cải",
+    "nameEn": "Egg noodle bowl with tofu and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_176",
+    "nameVi": "Mì trứng đậu hũ rau củ",
+    "nameEn": "Egg noodle bowl with tofu and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_177",
+    "nameVi": "Mì trứng cá rô phi hấp rau cải",
+    "nameEn": "Egg noodle bowl with steamed tilapia and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_178",
+    "nameVi": "Mì trứng cá rô phi hấp rau củ",
+    "nameEn": "Egg noodle bowl with steamed tilapia and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_179",
+    "nameVi": "Mì trứng đậu đen rau cải",
+    "nameEn": "Egg noodle bowl with black beans and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_180",
+    "nameVi": "Mì trứng đậu đen rau củ",
+    "nameEn": "Egg noodle bowl with black beans and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "egg noodles, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_181",
+    "nameVi": "Nui ức gà nướng rau cải",
+    "nameEn": "Macaroni bowl with grilled chicken breast and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_182",
+    "nameVi": "Nui ức gà nướng rau củ",
+    "nameEn": "Macaroni bowl with grilled chicken breast and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_183",
+    "nameVi": "Nui bò xào rau cải",
+    "nameEn": "Macaroni bowl with stir-fried beef and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_184",
+    "nameVi": "Nui bò xào rau củ",
+    "nameEn": "Macaroni bowl with stir-fried beef and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_185",
+    "nameVi": "Nui thịt heo luộc rau cải",
+    "nameEn": "Macaroni bowl with boiled pork and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_186",
+    "nameVi": "Nui thịt heo luộc rau củ",
+    "nameEn": "Macaroni bowl with boiled pork and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_187",
+    "nameVi": "Nui cá hồi áp chảo rau cải",
+    "nameEn": "Macaroni bowl with pan-seared salmon and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_188",
+    "nameVi": "Nui cá hồi áp chảo rau củ",
+    "nameEn": "Macaroni bowl with pan-seared salmon and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_189",
+    "nameVi": "Nui cá ngừ rau cải",
+    "nameEn": "Macaroni bowl with tuna and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_190",
+    "nameVi": "Nui cá ngừ rau củ",
+    "nameEn": "Macaroni bowl with tuna and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_191",
+    "nameVi": "Nui tôm hấp rau cải",
+    "nameEn": "Macaroni bowl with steamed shrimp and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_192",
+    "nameVi": "Nui tôm hấp rau củ",
+    "nameEn": "Macaroni bowl with steamed shrimp and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_193",
+    "nameVi": "Nui trứng luộc rau cải",
+    "nameEn": "Macaroni bowl with boiled egg and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_194",
+    "nameVi": "Nui trứng luộc rau củ",
+    "nameEn": "Macaroni bowl with boiled egg and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_195",
+    "nameVi": "Nui đậu hũ rau cải",
+    "nameEn": "Macaroni bowl with tofu and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_196",
+    "nameVi": "Nui đậu hũ rau củ",
+    "nameEn": "Macaroni bowl with tofu and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_197",
+    "nameVi": "Nui cá rô phi hấp rau cải",
+    "nameEn": "Macaroni bowl with steamed tilapia and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_198",
+    "nameVi": "Nui cá rô phi hấp rau củ",
+    "nameEn": "Macaroni bowl with steamed tilapia and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_199",
+    "nameVi": "Nui đậu đen rau cải",
+    "nameEn": "Macaroni bowl with black beans and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_200",
+    "nameVi": "Nui đậu đen rau củ",
+    "nameEn": "Macaroni bowl with black beans and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "macaroni, cooked",
+        "grams": 160
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_201",
+    "nameVi": "Cháo ức gà nướng rau cải",
+    "nameEn": "Rice porridge with grilled chicken breast and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_202",
+    "nameVi": "Cháo ức gà nướng rau củ",
+    "nameEn": "Rice porridge with grilled chicken breast and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_203",
+    "nameVi": "Cháo bò xào rau cải",
+    "nameEn": "Rice porridge with stir-fried beef and greens",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_204",
+    "nameVi": "Cháo bò xào rau củ",
+    "nameEn": "Rice porridge with stir-fried beef and vegetables",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_205",
+    "nameVi": "Cháo thịt heo luộc rau cải",
+    "nameEn": "Rice porridge with boiled pork and greens",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_206",
+    "nameVi": "Cháo thịt heo luộc rau củ",
+    "nameEn": "Rice porridge with boiled pork and vegetables",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_207",
+    "nameVi": "Cháo cá hồi áp chảo rau cải",
+    "nameEn": "Rice porridge with pan-seared salmon and greens",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_208",
+    "nameVi": "Cháo cá hồi áp chảo rau củ",
+    "nameEn": "Rice porridge with pan-seared salmon and vegetables",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_209",
+    "nameVi": "Cháo cá ngừ rau cải",
+    "nameEn": "Rice porridge with tuna and greens",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_210",
+    "nameVi": "Cháo cá ngừ rau củ",
+    "nameEn": "Rice porridge with tuna and vegetables",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_211",
+    "nameVi": "Cháo tôm hấp rau cải",
+    "nameEn": "Rice porridge with steamed shrimp and greens",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_212",
+    "nameVi": "Cháo tôm hấp rau củ",
+    "nameEn": "Rice porridge with steamed shrimp and vegetables",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_213",
+    "nameVi": "Cháo trứng luộc rau cải",
+    "nameEn": "Rice porridge with boiled egg and greens",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_214",
+    "nameVi": "Cháo trứng luộc rau củ",
+    "nameEn": "Rice porridge with boiled egg and vegetables",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_215",
+    "nameVi": "Cháo đậu hũ rau cải",
+    "nameEn": "Rice porridge with tofu and greens",
+    "servingGrams": 295,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_216",
+    "nameVi": "Cháo đậu hũ rau củ",
+    "nameEn": "Rice porridge with tofu and vegetables",
+    "servingGrams": 295,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_217",
+    "nameVi": "Cháo cá rô phi hấp rau cải",
+    "nameEn": "Rice porridge with steamed tilapia and greens",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_218",
+    "nameVi": "Cháo cá rô phi hấp rau củ",
+    "nameEn": "Rice porridge with steamed tilapia and vegetables",
+    "servingGrams": 275,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_219",
+    "nameVi": "Cháo đậu đen rau cải",
+    "nameEn": "Rice porridge with black beans and greens",
+    "servingGrams": 295,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_220",
+    "nameVi": "Cháo đậu đen rau củ",
+    "nameEn": "Rice porridge with black beans and vegetables",
+    "servingGrams": 295,
+    "ingredients": [
+      {
+        "query": "rice, white, cooked",
+        "grams": 90
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_221",
+    "nameVi": "Khoai lang ức gà nướng rau cải",
+    "nameEn": "Sweet potato plate with grilled chicken breast and greens",
+    "servingGrams": 375,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_222",
+    "nameVi": "Khoai lang ức gà nướng rau củ",
+    "nameEn": "Sweet potato plate with grilled chicken breast and vegetables",
+    "servingGrams": 375,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_223",
+    "nameVi": "Khoai lang bò xào rau cải",
+    "nameEn": "Sweet potato plate with stir-fried beef and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_224",
+    "nameVi": "Khoai lang bò xào rau củ",
+    "nameEn": "Sweet potato plate with stir-fried beef and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_225",
+    "nameVi": "Khoai lang thịt heo luộc rau cải",
+    "nameEn": "Sweet potato plate with boiled pork and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_226",
+    "nameVi": "Khoai lang thịt heo luộc rau củ",
+    "nameEn": "Sweet potato plate with boiled pork and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_227",
+    "nameVi": "Khoai lang cá hồi áp chảo rau cải",
+    "nameEn": "Sweet potato plate with pan-seared salmon and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_228",
+    "nameVi": "Khoai lang cá hồi áp chảo rau củ",
+    "nameEn": "Sweet potato plate with pan-seared salmon and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_229",
+    "nameVi": "Khoai lang cá ngừ rau cải",
+    "nameEn": "Sweet potato plate with tuna and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_230",
+    "nameVi": "Khoai lang cá ngừ rau củ",
+    "nameEn": "Sweet potato plate with tuna and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_231",
+    "nameVi": "Khoai lang tôm hấp rau cải",
+    "nameEn": "Sweet potato plate with steamed shrimp and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_232",
+    "nameVi": "Khoai lang tôm hấp rau củ",
+    "nameEn": "Sweet potato plate with steamed shrimp and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_233",
+    "nameVi": "Khoai lang trứng luộc rau cải",
+    "nameEn": "Sweet potato plate with boiled egg and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_234",
+    "nameVi": "Khoai lang trứng luộc rau củ",
+    "nameEn": "Sweet potato plate with boiled egg and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_235",
+    "nameVi": "Khoai lang đậu hũ rau cải",
+    "nameEn": "Sweet potato plate with tofu and greens",
+    "servingGrams": 385,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_236",
+    "nameVi": "Khoai lang đậu hũ rau củ",
+    "nameEn": "Sweet potato plate with tofu and vegetables",
+    "servingGrams": 385,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_237",
+    "nameVi": "Khoai lang cá rô phi hấp rau cải",
+    "nameEn": "Sweet potato plate with steamed tilapia and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_238",
+    "nameVi": "Khoai lang cá rô phi hấp rau củ",
+    "nameEn": "Sweet potato plate with steamed tilapia and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_239",
+    "nameVi": "Khoai lang đậu đen rau cải",
+    "nameEn": "Sweet potato plate with black beans and greens",
+    "servingGrams": 385,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_240",
+    "nameVi": "Khoai lang đậu đen rau củ",
+    "nameEn": "Sweet potato plate with black beans and vegetables",
+    "servingGrams": 385,
+    "ingredients": [
+      {
+        "query": "sweet potato, cooked",
+        "grams": 180
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_241",
+    "nameVi": "Bánh mì ức gà nướng rau cải",
+    "nameEn": "Vietnamese bread plate with grilled chicken breast and greens",
+    "servingGrams": 295,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_242",
+    "nameVi": "Bánh mì ức gà nướng rau củ",
+    "nameEn": "Vietnamese bread plate with grilled chicken breast and vegetables",
+    "servingGrams": 295,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_243",
+    "nameVi": "Bánh mì bò xào rau cải",
+    "nameEn": "Vietnamese bread plate with stir-fried beef and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_244",
+    "nameVi": "Bánh mì bò xào rau củ",
+    "nameEn": "Vietnamese bread plate with stir-fried beef and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_245",
+    "nameVi": "Bánh mì thịt heo luộc rau cải",
+    "nameEn": "Vietnamese bread plate with boiled pork and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_246",
+    "nameVi": "Bánh mì thịt heo luộc rau củ",
+    "nameEn": "Vietnamese bread plate with boiled pork and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_247",
+    "nameVi": "Bánh mì cá hồi áp chảo rau cải",
+    "nameEn": "Vietnamese bread plate with pan-seared salmon and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_248",
+    "nameVi": "Bánh mì cá hồi áp chảo rau củ",
+    "nameEn": "Vietnamese bread plate with pan-seared salmon and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_249",
+    "nameVi": "Bánh mì cá ngừ rau cải",
+    "nameEn": "Vietnamese bread plate with tuna and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_250",
+    "nameVi": "Bánh mì cá ngừ rau củ",
+    "nameEn": "Vietnamese bread plate with tuna and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_251",
+    "nameVi": "Bánh mì tôm hấp rau cải",
+    "nameEn": "Vietnamese bread plate with steamed shrimp and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_252",
+    "nameVi": "Bánh mì tôm hấp rau củ",
+    "nameEn": "Vietnamese bread plate with steamed shrimp and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_253",
+    "nameVi": "Bánh mì trứng luộc rau cải",
+    "nameEn": "Vietnamese bread plate with boiled egg and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_254",
+    "nameVi": "Bánh mì trứng luộc rau củ",
+    "nameEn": "Vietnamese bread plate with boiled egg and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_255",
+    "nameVi": "Bánh mì đậu hũ rau cải",
+    "nameEn": "Vietnamese bread plate with tofu and greens",
+    "servingGrams": 305,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_256",
+    "nameVi": "Bánh mì đậu hũ rau củ",
+    "nameEn": "Vietnamese bread plate with tofu and vegetables",
+    "servingGrams": 305,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_257",
+    "nameVi": "Bánh mì cá rô phi hấp rau cải",
+    "nameEn": "Vietnamese bread plate with steamed tilapia and greens",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_258",
+    "nameVi": "Bánh mì cá rô phi hấp rau củ",
+    "nameEn": "Vietnamese bread plate with steamed tilapia and vegetables",
+    "servingGrams": 285,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_259",
+    "nameVi": "Bánh mì đậu đen rau cải",
+    "nameEn": "Vietnamese bread plate with black beans and greens",
+    "servingGrams": 305,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_260",
+    "nameVi": "Bánh mì đậu đen rau củ",
+    "nameEn": "Vietnamese bread plate with black beans and vegetables",
+    "servingGrams": 305,
+    "ingredients": [
+      {
+        "query": "bread, white",
+        "grams": 100
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_261",
+    "nameVi": "Bánh cuốn ức gà nướng rau cải",
+    "nameEn": "Steamed rice roll plate with grilled chicken breast and greens",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_262",
+    "nameVi": "Bánh cuốn ức gà nướng rau củ",
+    "nameEn": "Steamed rice roll plate with grilled chicken breast and vegetables",
+    "servingGrams": 365,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_263",
+    "nameVi": "Bánh cuốn bò xào rau cải",
+    "nameEn": "Steamed rice roll plate with stir-fried beef and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_264",
+    "nameVi": "Bánh cuốn bò xào rau củ",
+    "nameEn": "Steamed rice roll plate with stir-fried beef and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_265",
+    "nameVi": "Bánh cuốn thịt heo luộc rau cải",
+    "nameEn": "Steamed rice roll plate with boiled pork and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_266",
+    "nameVi": "Bánh cuốn thịt heo luộc rau củ",
+    "nameEn": "Steamed rice roll plate with boiled pork and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_267",
+    "nameVi": "Bánh cuốn cá hồi áp chảo rau cải",
+    "nameEn": "Steamed rice roll plate with pan-seared salmon and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_268",
+    "nameVi": "Bánh cuốn cá hồi áp chảo rau củ",
+    "nameEn": "Steamed rice roll plate with pan-seared salmon and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_269",
+    "nameVi": "Bánh cuốn cá ngừ rau cải",
+    "nameEn": "Steamed rice roll plate with tuna and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_270",
+    "nameVi": "Bánh cuốn cá ngừ rau củ",
+    "nameEn": "Steamed rice roll plate with tuna and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_271",
+    "nameVi": "Bánh cuốn tôm hấp rau cải",
+    "nameEn": "Steamed rice roll plate with steamed shrimp and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_272",
+    "nameVi": "Bánh cuốn tôm hấp rau củ",
+    "nameEn": "Steamed rice roll plate with steamed shrimp and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_273",
+    "nameVi": "Bánh cuốn trứng luộc rau cải",
+    "nameEn": "Steamed rice roll plate with boiled egg and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_274",
+    "nameVi": "Bánh cuốn trứng luộc rau củ",
+    "nameEn": "Steamed rice roll plate with boiled egg and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_275",
+    "nameVi": "Bánh cuốn đậu hũ rau cải",
+    "nameEn": "Steamed rice roll plate with tofu and greens",
+    "servingGrams": 375,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_276",
+    "nameVi": "Bánh cuốn đậu hũ rau củ",
+    "nameEn": "Steamed rice roll plate with tofu and vegetables",
+    "servingGrams": 375,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_277",
+    "nameVi": "Bánh cuốn cá rô phi hấp rau cải",
+    "nameEn": "Steamed rice roll plate with steamed tilapia and greens",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_278",
+    "nameVi": "Bánh cuốn cá rô phi hấp rau củ",
+    "nameEn": "Steamed rice roll plate with steamed tilapia and vegetables",
+    "servingGrams": 355,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_279",
+    "nameVi": "Bánh cuốn đậu đen rau cải",
+    "nameEn": "Steamed rice roll plate with black beans and greens",
+    "servingGrams": 375,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_280",
+    "nameVi": "Bánh cuốn đậu đen rau củ",
+    "nameEn": "Steamed rice roll plate with black beans and vegetables",
+    "servingGrams": 375,
+    "ingredients": [
+      {
+        "query": "rice noodles, cooked",
+        "grams": 170
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_281",
+    "nameVi": "Gỏi rau ức gà nướng rau cải",
+    "nameEn": "Vietnamese salad with grilled chicken breast and greens",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_282",
+    "nameVi": "Gỏi rau ức gà nướng rau củ",
+    "nameEn": "Vietnamese salad with grilled chicken breast and vegetables",
+    "servingGrams": 335,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "chicken breast, roasted",
+        "grams": 110
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_283",
+    "nameVi": "Gỏi rau bò xào rau cải",
+    "nameEn": "Vietnamese salad with stir-fried beef and greens",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_284",
+    "nameVi": "Gỏi rau bò xào rau củ",
+    "nameEn": "Vietnamese salad with stir-fried beef and vegetables",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "beef, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_285",
+    "nameVi": "Gỏi rau thịt heo luộc rau cải",
+    "nameEn": "Vietnamese salad with boiled pork and greens",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_286",
+    "nameVi": "Gỏi rau thịt heo luộc rau củ",
+    "nameEn": "Vietnamese salad with boiled pork and vegetables",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "pork loin, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_287",
+    "nameVi": "Gỏi rau cá hồi áp chảo rau cải",
+    "nameEn": "Vietnamese salad with pan-seared salmon and greens",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_288",
+    "nameVi": "Gỏi rau cá hồi áp chảo rau củ",
+    "nameEn": "Vietnamese salad with pan-seared salmon and vegetables",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "salmon, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_289",
+    "nameVi": "Gỏi rau cá ngừ rau cải",
+    "nameEn": "Vietnamese salad with tuna and greens",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_290",
+    "nameVi": "Gỏi rau cá ngừ rau củ",
+    "nameEn": "Vietnamese salad with tuna and vegetables",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "tuna, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_291",
+    "nameVi": "Gỏi rau tôm hấp rau cải",
+    "nameEn": "Vietnamese salad with steamed shrimp and greens",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_292",
+    "nameVi": "Gỏi rau tôm hấp rau củ",
+    "nameEn": "Vietnamese salad with steamed shrimp and vegetables",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "shrimp, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_293",
+    "nameVi": "Gỏi rau trứng luộc rau cải",
+    "nameEn": "Vietnamese salad with boiled egg and greens",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_294",
+    "nameVi": "Gỏi rau trứng luộc rau củ",
+    "nameEn": "Vietnamese salad with boiled egg and vegetables",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "egg, whole, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_295",
+    "nameVi": "Gỏi rau đậu hũ rau cải",
+    "nameEn": "Vietnamese salad with tofu and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_296",
+    "nameVi": "Gỏi rau đậu hũ rau củ",
+    "nameEn": "Vietnamese salad with tofu and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "tofu, firm",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_297",
+    "nameVi": "Gỏi rau cá rô phi hấp rau cải",
+    "nameEn": "Vietnamese salad with steamed tilapia and greens",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_298",
+    "nameVi": "Gỏi rau cá rô phi hấp rau củ",
+    "nameEn": "Vietnamese salad with steamed tilapia and vegetables",
+    "servingGrams": 325,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "tilapia, cooked",
+        "grams": 100
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_299",
+    "nameVi": "Gỏi rau đậu đen rau cải",
+    "nameEn": "Vietnamese salad with black beans and greens",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "broccoli, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  },
+  {
+    "id": "vi_recipe_300",
+    "nameVi": "Gỏi rau đậu đen rau củ",
+    "nameEn": "Vietnamese salad with black beans and vegetables",
+    "servingGrams": 345,
+    "ingredients": [
+      {
+        "query": "lettuce, raw",
+        "grams": 140
+      },
+      {
+        "query": "black beans, cooked",
+        "grams": 120
+      },
+      {
+        "query": "carrots, cooked",
+        "grams": 80
+      },
+      {
+        "query": "vegetable oil",
+        "grams": 5
+      }
+    ],
+    "estimationNote": "Nutrients are estimated from USDA ingredient records; cooking yield and local recipes vary."
+  }
+]

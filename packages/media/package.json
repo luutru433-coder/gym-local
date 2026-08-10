@@ -1,0 +1,6 @@
+{
+  "name": "@gym/media",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts"
+}

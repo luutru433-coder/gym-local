@@ -1,0 +1,185 @@
+import { createId, type FoodItem, type Goal, type MealEntry, type NutrientProfile, type NutritionTarget } from "@gym/contracts";
+import { z } from "zod";
+
+export * from "./offline-pack";
+
+export const NUTRITION_FORMULA_VERSION = 1;
+
+export interface NutritionEstimateInput {
+  biologicalSex: "female" | "male";
+  age: number;
+  heightCm: number;
+  weightKg: number;
+  activityFactor: 1.2 | 1.375 | 1.55 | 1.725 | 1.9;
+  goal: Goal;
+}
+
+export function estimateNutritionTarget(input: NutritionEstimateInput): NutritionTarget {
+  if (input.age < 18 || input.age > 100) throw new Error("Nutrition estimates are available for adults only");
+  if (input.heightCm < 120 || input.heightCm > 230 || input.weightKg < 35 || input.weightKg > 350) {
+    throw new Error("Profile values are outside the supported estimate range");
+  }
+  const sexConstant = input.biologicalSex === "male" ? 5 : -161;
+  const restingEnergy = 10 * input.weightKg + 6.25 * input.heightCm - 5 * input.age + sexConstant;
+  const goalFactor: Record<Goal, number> = {
+    fat_loss: 0.9,
+    general: 1,
+    strength: 1.05,
+    hypertrophy: 1.05
+  };
+  const calories = Math.round(restingEnergy * input.activityFactor * goalFactor[input.goal]);
+  const proteinPerKg = input.goal === "general" ? 1.4 : 1.6;
+  const protein = Math.round(input.weightKg * proteinPerKg);
+  const fat = Math.round((calories * 0.25) / 9);
+  const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4));
+  return {
+    calories,
+    protein,
+    carbs,
+    fat,
+    waterMl: Math.round(input.weightKg * 35),
+    formulaVersion: NUTRITION_FORMULA_VERSION
+  };
+}
+
+function scaledNutrient(value: number | null | undefined, factor: number, precision = 1): number | null | undefined {
+  if (value === null) return null;
+  if (value === undefined) return undefined;
+  const multiplier = 10 ** precision;
+  return Math.round(value * factor * multiplier) / multiplier;
+}
+
+export function nutrientsForGrams(food: FoodItem, grams: number): NutrientProfile {
+  const factor = Math.max(0, grams) / 100;
+  return {
+    calories: Math.round(food.per100g.calories * factor),
+    protein: Math.round(food.per100g.protein * factor * 10) / 10,
+    carbs: Math.round(food.per100g.carbs * factor * 10) / 10,
+    fat: Math.round(food.per100g.fat * factor * 10) / 10,
+    fiber: scaledNutrient(food.per100g.fiber, factor),
+    sugar: scaledNutrient(food.per100g.sugar, factor),
+    sodiumMg: scaledNutrient(food.per100g.sodiumMg, factor),
+    calciumMg: scaledNutrient(food.per100g.calciumMg, factor),
+    ironMg: scaledNutrient(food.per100g.ironMg, factor, 2),
+    potassiumMg: scaledNutrient(food.per100g.potassiumMg, factor),
+    magnesiumMg: scaledNutrient(food.per100g.magnesiumMg, factor),
+    zincMg: scaledNutrient(food.per100g.zincMg, factor, 2),
+    vitaminAMcg: scaledNutrient(food.per100g.vitaminAMcg, factor),
+    vitaminCMg: scaledNutrient(food.per100g.vitaminCMg, factor, 2),
+    vitaminDMcg: scaledNutrient(food.per100g.vitaminDMcg, factor, 2),
+    vitaminEMg: scaledNutrient(food.per100g.vitaminEMg, factor, 2),
+    vitaminKMcg: scaledNutrient(food.per100g.vitaminKMcg, factor, 2),
+    vitaminB6Mg: scaledNutrient(food.per100g.vitaminB6Mg, factor, 3),
+    vitaminB12Mcg: scaledNutrient(food.per100g.vitaminB12Mcg, factor, 2),
+    folateMcg: scaledNutrient(food.per100g.folateMcg, factor)
+  };
+}
+
+export function createMealEntry(food: FoodItem, grams: number, date: string, meal: MealEntry["meal"]): MealEntry {
+  return {
+    id: createId("meal"),
+    date,
+    meal,
+    foodId: food.id,
+    foodNameSnapshot: food.name,
+    grams,
+    nutrientsSnapshot: nutrientsForGrams(food, grams),
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function dailyNutrition(entries: MealEntry[], date: string) {
+  return entries.filter((entry) => entry.date === date).reduce(
+    (total, entry) => ({
+      calories: total.calories + entry.nutrientsSnapshot.calories,
+      protein: Math.round((total.protein + entry.nutrientsSnapshot.protein) * 10) / 10,
+      carbs: Math.round((total.carbs + entry.nutrientsSnapshot.carbs) * 10) / 10,
+      fat: Math.round((total.fat + entry.nutrientsSnapshot.fat) * 10) / 10
+    }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0 }
+  );
+}
+
+const openFoodFactsSchema = z.object({
+  status: z.number().optional(),
+  product: z.object({
+    code: z.string().optional(),
+    product_name: z.string().optional(),
+    product_name_vi: z.string().optional(),
+    product_name_en: z.string().optional(),
+    brands: z.string().optional(),
+    serving_size: z.string().optional(),
+    serving_quantity: z.number().optional(),
+    nutriments: z.record(z.string(), z.unknown()).optional()
+  }).optional()
+});
+
+function nutrientValue(nutriments: Record<string, unknown>, key: string, multiplier = 1): number | null {
+  const value = nutriments[`${key}_100g`];
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value * multiplier : null;
+}
+
+export async function lookupFoodByBarcode(barcode: string, signal?: AbortSignal): Promise<FoodItem | undefined> {
+  const normalized = barcode.replace(/\D/g, "");
+  if (normalized.length < 8 || normalized.length > 14) throw new Error("Invalid barcode");
+  const fields = "code,product_name,product_name_vi,product_name_en,brands,serving_size,serving_quantity,nutriments";
+  const response = await fetch(`https://world.openfoodfacts.org/api/v3/product/${normalized}?fields=${fields}`, { signal });
+  if (response.status === 404) return undefined;
+  if (response.status === 429) throw new Error("Open Food Facts rate limit reached");
+  if (!response.ok) throw new Error("Food lookup is unavailable");
+  const result = openFoodFactsSchema.parse(await response.json());
+  const product = result.product;
+  if (!product) return undefined;
+  const nutriments = product.nutriments ?? {};
+  const nameEn = product.product_name_en || product.product_name || `Product ${normalized}`;
+  const nameVi = product.product_name_vi || product.product_name || nameEn;
+  const calories = nutrientValue(nutriments, "energy-kcal");
+  const protein = nutrientValue(nutriments, "proteins");
+  const carbs = nutrientValue(nutriments, "carbohydrates");
+  const fat = nutrientValue(nutriments, "fat");
+  return {
+    id: `off_${normalized}`,
+    barcode: normalized,
+    name: { vi: nameVi, en: nameEn },
+    brand: product.brands,
+    servingLabel: product.serving_size,
+    servingGrams: product.serving_quantity,
+    per100g: {
+      calories: calories ?? 0,
+      protein: protein ?? 0,
+      carbs: carbs ?? 0,
+      fat: fat ?? 0,
+      fiber: nutrientValue(nutriments, "fiber"),
+      sugar: nutrientValue(nutriments, "sugars"),
+      sodiumMg: nutrientValue(nutriments, "sodium", 1000),
+      calciumMg: nutrientValue(nutriments, "calcium", 1000),
+      ironMg: nutrientValue(nutriments, "iron", 1000),
+      potassiumMg: nutrientValue(nutriments, "potassium", 1000),
+      magnesiumMg: nutrientValue(nutriments, "magnesium", 1000),
+      zincMg: nutrientValue(nutriments, "zinc", 1000),
+      vitaminAMcg: nutrientValue(nutriments, "vitamin-a", 1_000_000),
+      vitaminCMg: nutrientValue(nutriments, "vitamin-c", 1000),
+      vitaminDMcg: nutrientValue(nutriments, "vitamin-d", 1_000_000),
+      vitaminEMg: nutrientValue(nutriments, "vitamin-e", 1000),
+      vitaminKMcg: nutrientValue(nutriments, "vitamin-k", 1_000_000),
+      vitaminB6Mg: nutrientValue(nutriments, "vitamin-b6", 1000),
+      vitaminB12Mcg: nutrientValue(nutriments, "vitamin-b12", 1_000_000),
+      folateMcg: nutrientValue(nutriments, "folates", 1_000_000)
+    },
+    source: "open_food_facts",
+    sourceUrl: `https://world.openfoodfacts.org/product/${normalized}`,
+    dataQuality: [calories, protein, carbs, fat].every((value) => value !== null) ? "complete" : "partial",
+    updatedAt: new Date().toISOString()
+  };
+}
+
+export function createCustomFood(name: string, per100g: FoodItem["per100g"]): FoodItem {
+  return {
+    id: createId("food"),
+    name: { vi: name, en: name },
+    per100g,
+    source: "custom",
+    dataQuality: "partial",
+    updatedAt: new Date().toISOString()
+  };
+}

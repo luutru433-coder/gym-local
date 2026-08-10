@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@gym/contracts": ["packages/contracts/src/index.ts"],
+      "@gym/catalog": ["packages/catalog/src/index.ts"],
+      "@gym/workouts": ["packages/workouts/src/index.ts"],
+      "@gym/nutrition": ["packages/nutrition/src/index.ts"],
+      "@gym/progress": ["packages/progress/src/index.ts"],
+      "@gym/storage": ["packages/storage/src/index.ts"],
+      "@gym/backup": ["packages/backup/src/index.ts"],
+      "@gym/media": ["packages/media/src/index.ts"],
+      "@gym/ui": ["packages/ui/src/index.ts"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["apps", "packages", "tests"]
+}

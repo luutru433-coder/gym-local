@@ -1,0 +1,53 @@
+name: Deploy Gym Local to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.16.0
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run verify
+      - name: Stage verified nutrition pack from the GitHub Release
+        env:
+          PACK_URL: https://github.com/${{ github.repository }}/releases/download/nutrition-v2026.04/gym-local-nutrition-2026.04.sqlite3
+          PACK_SHA256: 4f844b93c1c8d0540c34038cbc5b69096c92a3982fe884b2ac877c5df7bdc88f
+        run: |
+          curl --fail --location --retry 3 "$PACK_URL" --output dist/gym-local-nutrition-2026.04.sqlite3
+          echo "$PACK_SHA256  dist/gym-local-nutrition-2026.04.sqlite3" | sha256sum --check
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

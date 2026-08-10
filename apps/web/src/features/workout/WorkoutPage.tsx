@@ -1,0 +1,217 @@
+import { useEffect, useState } from "react";
+import { ArrowLeft, Check, ChevronDown, CircleHelp, Clock3, Dumbbell, Pause, Play, Plus, RotateCcw, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button, Card, EmptyState, Modal, Notice, ProgressBar } from "@gym/ui";
+import type { ExerciseVariant, SetLog, WorkoutSession } from "@gym/contracts";
+import { EQUIPMENT_OPTIONS, getVariant, rankVariantsForEquipment } from "@gym/catalog";
+import { addSet, sessionProgress, switchExerciseVariant, updateSet } from "@gym/workouts";
+import { variantHistory } from "@gym/progress";
+import { localize } from "../../lib/i18n";
+import { useGymStore } from "../../store/useGymStore";
+import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
+
+function durationLabel(startedAt: string, now: number): string {
+  const seconds = Math.max(0, Math.floor((now - new Date(startedAt).getTime()) / 1000));
+  return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function restLabel(endsAt: string | undefined, now: number): number {
+  return endsAt ? Math.max(0, Math.ceil((new Date(endsAt).getTime() - now) / 1000)) : 0;
+}
+
+function nonNegativeNumber(value: string): number | undefined {
+  if (!value.trim()) return undefined;
+  const number = Number(value.replace(",", "."));
+  return Number.isFinite(number) ? Math.max(0, number) : undefined;
+}
+
+function nonNegativeInteger(value: string): number | undefined {
+  const number = nonNegativeNumber(value);
+  return number === undefined ? undefined : Math.round(number);
+}
+
+export function WorkoutPage() {
+  const navigate = useNavigate();
+  const profile = useGymStore((state) => state.profile)!;
+  const activeSession = useGymStore((state) => state.activeSession);
+  const sessions = useGymStore((state) => state.sessions);
+  const setActiveSession = useGymStore((state) => state.setActiveSession);
+  const completeWorkout = useGymStore((state) => state.completeWorkout);
+  const locale = profile.locale;
+  const [now, setNow] = useState(() => activeSession ? new Date(activeSession.startedAt).getTime() : 0);
+  const [expandedId, setExpandedId] = useState(activeSession?.activeExerciseId);
+  const [variantForExercise, setVariantForExercise] = useState<string>();
+  const [guideVariant, setGuideVariant] = useState<ExerciseVariant>();
+  const availableEquipment = profile.locations.find((location) => location.id === profile.activeLocationId)?.equipment ?? [];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const progress = activeSession ? sessionProgress(activeSession) : { completed: 0, total: 0, percent: 0 };
+  const restRemaining = restLabel(activeSession?.restTimerEndsAt, now);
+
+  const save = (session: WorkoutSession) => void setActiveSession(session);
+
+  const patchSet = (exerciseId: string, setId: string, values: Partial<Pick<SetLog, "weightKg" | "reps" | "rir" | "rpe" | "durationSeconds" | "distanceMeters" | "type">>) => {
+    if (!activeSession) return;
+    save(updateSet(activeSession, exerciseId, setId, values));
+  };
+
+  const toggleComplete = (exerciseId: string, setId: string) => {
+    if (!activeSession) return;
+    const exercise = activeSession.exercises.find((item) => item.id === exerciseId);
+    const set = exercise?.sets.find((item) => item.id === setId);
+    if (!set) return;
+    if (set.completedAt) {
+      const updated = structuredClone(activeSession);
+      const target = updated.exercises.find((item) => item.id === exerciseId)?.sets.find((item) => item.id === setId);
+      if (target) target.completedAt = undefined;
+      updated.restTimerEndsAt = undefined;
+      save(updated);
+    } else {
+      save(updateSet(activeSession, exerciseId, setId, {}, true));
+    }
+  };
+
+  const modifyRest = (seconds?: number) => {
+    if (!activeSession) return;
+    save({ ...activeSession, restTimerEndsAt: seconds === undefined ? undefined : new Date(Math.max(Date.now(), new Date(activeSession.restTimerEndsAt ?? Date.now()).getTime()) + seconds * 1000).toISOString() });
+  };
+
+  const chooseVariant = (exerciseId: string, variant: ExerciseVariant) => {
+    if (!activeSession) return;
+    const updated = switchExerciseVariant(activeSession, exerciseId, variant);
+    save(updated);
+    setVariantForExercise(undefined);
+    setExpandedId(updated.activeExerciseId);
+  };
+
+  const finish = async () => {
+    if (!activeSession) return;
+    const incomplete = progress.total - progress.completed;
+    const message = incomplete > 0
+      ? (locale === "vi" ? `Còn ${incomplete} set chưa hoàn tất. Kết thúc và lưu buổi tập?` : `${incomplete} sets are incomplete. Finish and save anyway?`)
+      : (locale === "vi" ? "Hoàn tất và lưu buổi tập?" : "Finish and save this workout?");
+    if (!window.confirm(message)) return;
+    await completeWorkout();
+    navigate("/progress");
+  };
+
+  if (!activeSession) {
+    return <div className="workout-empty"><EmptyState icon={<Dumbbell size={34} />} title={locale === "vi" ? "Chưa có buổi tập đang mở" : "No active workout"} body={locale === "vi" ? "Chọn một lịch tập để bắt đầu ghi set." : "Choose a routine to start logging sets."} action={<Button onClick={() => navigate("/routines")}>{locale === "vi" ? "Chọn lịch tập" : "Choose routine"}</Button>} /></div>;
+  }
+
+  const modalExercise = activeSession.exercises.find((exercise) => exercise.id === variantForExercise);
+  const modalVariants = modalExercise ? rankVariantsForEquipment(modalExercise.movementId, availableEquipment) : [];
+
+  return (
+    <div className="workout-page">
+      <header className="workout-header">
+        <button className="icon-button icon-button--dark" type="button" onClick={() => navigate("/")} aria-label="Back"><ArrowLeft size={21} /></button>
+        <div className="workout-header__title"><span className="live-dot" /> <div><small>{locale === "vi" ? "Đang tập" : "Workout live"}</small><strong>{activeSession.routineNameSnapshot ? localize(activeSession.routineNameSnapshot, locale) : "Workout"}</strong></div></div>
+        <div className="workout-header__timer"><Clock3 size={17} /><span>{durationLabel(activeSession.startedAt, now)}</span></div>
+        <Button variant="secondary" size="sm" onClick={() => void finish()}>{locale === "vi" ? "Kết thúc" : "Finish"}<Check size={16} /></Button>
+      </header>
+
+      <div className="workout-progress">
+        <div><span>{progress.completed}/{progress.total} sets</span><strong>{progress.percent}%</strong></div>
+        <ProgressBar value={progress.percent} />
+      </div>
+
+      <nav className="exercise-jump" aria-label="Workout exercises">
+        {activeSession.exercises.map((exercise, index) => {
+          const done = exercise.sets.every((set) => set.completedAt);
+          return <button type="button" key={exercise.id} className={expandedId === exercise.id ? "exercise-jump__item exercise-jump__item--active" : "exercise-jump__item"} onClick={() => { setExpandedId(exercise.id); document.getElementById(exercise.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><span>{done ? <Check size={14} /> : index + 1}</span><small>{localize(exercise.movementNameSnapshot, locale)}</small></button>;
+        })}
+      </nav>
+
+      <main className="workout-content">
+        {activeSession.exercises.map((exercise, exerciseIndex) => {
+          const expanded = expandedId === exercise.id;
+          const variant = getVariant(exercise.variantId);
+          const previous = variantHistory(sessions.filter((session) => session.id !== activeSession.id), exercise.variantId);
+          const doneCount = exercise.sets.filter((set) => set.completedAt).length;
+          const durationMode = exercise.loadEntryModeSnapshot === "duration_distance";
+          const repsOnly = exercise.loadEntryModeSnapshot === "reps_only";
+          const weightHeading = repsOnly ? "—" : exercise.loadEntryModeSnapshot === "per_hand" ? (locale === "vi" ? "KG/TAY" : "KG/HAND") : exercise.loadEntryModeSnapshot === "per_side" ? (locale === "vi" ? "KG/BÊN" : "KG/SIDE") : exercise.loadEntryModeSnapshot === "assisted" ? "ASSIST KG" : "KG";
+          return (
+            <Card id={exercise.id} key={exercise.id} className={expanded ? "workout-exercise workout-exercise--expanded" : "workout-exercise"}>
+              <button type="button" className="workout-exercise__header" onClick={() => setExpandedId(expanded ? undefined : exercise.id)}>
+                <span className="workout-exercise__index">{String(exerciseIndex + 1).padStart(2, "0")}</span>
+                <div><span className="eyebrow">{localize(exercise.movementNameSnapshot, locale)}</span><h2>{localize(exercise.variantNameSnapshot, locale)}</h2><p>{doneCount}/{exercise.sets.length} sets · {exercise.restSeconds}s {locale === "vi" ? "nghỉ" : "rest"}</p></div>
+                <span className="workout-exercise__chevron"><ChevronDown size={20} /></span>
+              </button>
+
+              {expanded ? (
+                <div className="workout-exercise__body">
+                  <div className="exercise-tools">
+                    <button type="button" onClick={() => setVariantForExercise(exercise.id)}><RotateCcw size={16} />{locale === "vi" ? "Đổi máy / dụng cụ" : "Switch equipment"}</button>
+                    {variant ? <button type="button" onClick={() => setGuideVariant(variant)}><CircleHelp size={16} />{locale === "vi" ? "Xem kỹ thuật" : "Form guide"}</button> : null}
+                    <span className="load-mode">{exercise.loadEntryModeSnapshot.replaceAll("_", " ")}</span>
+                  </div>
+
+                  <div className="set-table">
+                    <div className="set-table__head"><span>SET</span><span>{locale === "vi" ? "TRƯỚC / MỤC TIÊU" : "PREV / TARGET"}</span><span>{weightHeading}</span><span>{durationMode ? "M" : "REPS"}</span><span>{durationMode ? "GIÂY" : "RIR"}</span><span /></div>
+                    {exercise.sets.map((set, setIndex) => {
+                      const prior = previous[setIndex];
+                      const targetLabel = durationMode
+                        ? (set.targetMinReps !== undefined || set.targetMaxReps !== undefined ? `${set.targetMinReps ?? "—"}–${set.targetMaxReps ?? "—"} m` : set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : "—")
+                        : (set.targetMinReps !== undefined || set.targetMaxReps !== undefined ? `${set.targetMinReps ?? "—"}–${set.targetMaxReps ?? "—"}` : "—");
+                      const previousLabel = prior
+                        ? (durationMode ? `${prior.distanceMeters ?? "—"}m · ${prior.durationSeconds ?? "—"}s` : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`)
+                        : targetLabel;
+                      const canComplete = durationMode
+                        ? Boolean((set.distanceMeters ?? 0) > 0 || (set.durationSeconds ?? 0) > 0)
+                        : Boolean((set.reps ?? 0) > 0);
+                      return (
+                        <div className={set.completedAt ? "set-row set-row--done" : "set-row"} key={set.id}>
+                          <button type="button" className="set-type" onClick={() => patchSet(exercise.id, set.id, { type: set.type === "warmup" ? "working" : "warmup" })}>{set.type === "warmup" ? "W" : setIndex + 1}</button>
+                          <span className="previous-value">{previousLabel}</span>
+                          {repsOnly ? <span className="set-input-placeholder">—</span> : <input aria-label={`Set ${setIndex + 1} weight`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
+                          {durationMode
+                            ? <input aria-label={`Set ${setIndex + 1} distance in meters`} inputMode="decimal" min="0" step="1" value={set.distanceMeters ?? ""} placeholder="m" onChange={(event) => patchSet(exercise.id, set.id, { distanceMeters: nonNegativeNumber(event.target.value) })} />
+                            : <input aria-label={`Set ${setIndex + 1} reps`} inputMode="numeric" min="0" step="1" value={set.reps ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { reps: nonNegativeInteger(event.target.value) })} />}
+                          {durationMode
+                            ? <input aria-label={`Set ${setIndex + 1} duration in seconds`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
+                            : <input aria-label={`Set ${setIndex + 1} RIR`} inputMode="numeric" min="0" max="10" step="1" value={set.rir ?? ""} placeholder={String(set.targetRir ?? 2)} onChange={(event) => patchSet(exercise.id, set.id, { rir: nonNegativeInteger(event.target.value) })} />}
+                          <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id)} aria-label={set.completedAt ? "Undo set" : "Complete set"} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập reps, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}>{set.completedAt ? <Check size={19} /> : null}</button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <button type="button" className="add-set-button" onClick={() => save(addSet(activeSession, exercise.id))}><Plus size={17} />{locale === "vi" ? "Thêm set" : "Add set"}</button>
+                  {exercise.note ? <Notice>{exercise.note}</Notice> : null}
+                </div>
+              ) : null}
+            </Card>
+          );
+        })}
+      </main>
+
+      {activeSession.restTimerEndsAt ? (
+        <div className={restRemaining === 0 ? "rest-dock rest-dock--done" : "rest-dock"}>
+          <span className="rest-dock__icon">{restRemaining ? <Pause size={20} /> : <Play size={20} />}</span>
+          <div><small>{restRemaining ? (locale === "vi" ? "Đang nghỉ" : "Rest timer") : (locale === "vi" ? "Sẵn sàng" : "Ready")}</small><strong>{String(Math.floor(restRemaining / 60)).padStart(2, "0")}:{String(restRemaining % 60).padStart(2, "0")}</strong></div>
+          <button type="button" onClick={() => modifyRest(30)}>+30s</button>
+          <button type="button" onClick={() => modifyRest(undefined)}>{locale === "vi" ? "Bỏ qua" : "Skip"}<X size={16} /></button>
+        </div>
+      ) : null}
+
+      <Modal open={Boolean(modalExercise)} title={locale === "vi" ? "Đổi cách tập" : "Switch variation"} onClose={() => setVariantForExercise(undefined)}>
+        {modalExercise ? <div className="variant-picker">
+          <p>{locale === "vi" ? "Lịch sử được lưu riêng cho từng biến thể. Các set đã hoàn tất sẽ không bị thay đổi." : "History stays separate for each variation. Completed sets will not be changed."}</p>
+          {modalVariants.map((variant) => {
+            const ready = variant.equipment.every((item) => availableEquipment.includes(item));
+            return <button type="button" key={variant.id} className={variant.id === modalExercise.variantId ? "variant-choice variant-choice--active" : "variant-choice"} onClick={() => chooseVariant(modalExercise.id, variant)}><span className="variant-choice__icon"><Dumbbell size={19} /></span><span><strong>{localize(variant.name, locale)}</strong><small>{variant.equipment.map((item) => EQUIPMENT_OPTIONS.find((entry) => entry.id === item)?.name[locale]).join(" + ")}</small></span><em>{ready ? <><Check size={14} />{locale === "vi" ? "Sẵn sàng" : "Ready"}</> : (locale === "vi" ? "Thiếu dụng cụ" : "Unavailable")}</em></button>;
+          })}
+        </div> : null}
+      </Modal>
+
+      <Modal open={Boolean(guideVariant)} title={guideVariant ? localize(guideVariant.name, locale) : ""} onClose={() => setGuideVariant(undefined)}>
+        {guideVariant ? <div className="quick-guide">{guideVariant.videoGuides[0] ? <ExerciseVideoPlayer guide={guideVariant.videoGuides[0]} locale={locale} compact /> : null}<ol>{guideVariant.instructions.map((instruction, index) => <li key={index}><span>{index + 1}</span><p>{localize(instruction, locale)}</p></li>)}</ol><div className="cue-box"><h4>{locale === "vi" ? "Cue chính" : "Key cue"}</h4>{guideVariant.cues.map((cue, index) => <p key={index}>{localize(cue, locale)}</p>)}</div><div className="safety-box"><h4>{locale === "vi" ? "An toàn" : "Safety"}</h4>{guideVariant.safety.map((item, index) => <p key={index}>{localize(item, locale)}</p>)}</div></div> : null}
+      </Modal>
+    </div>
+  );
+}

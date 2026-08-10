@@ -1,0 +1,6 @@
+{
+  "name": "@gym/nutrition",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts"
+}

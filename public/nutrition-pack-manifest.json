@@ -1,0 +1,48 @@
+{
+  "id": "gym-local-nutrition",
+  "version": "2026.04",
+  "schemaVersion": 1,
+  "createdAt": "2026-08-09T20:16:15Z",
+  "minimumAppVersion": "0.2.0",
+  "fileName": "gym-local-nutrition-2026.04.sqlite3",
+  "downloadUrl": "./gym-local-nutrition-2026.04.sqlite3",
+  "sizeBytes": 16445440,
+  "sha256": "4f844b93c1c8d0540c34038cbc5b69096c92a3982fe884b2ac877c5df7bdc88f",
+  "foodCount": 13835,
+  "aliasCount": 24907,
+  "vietnameseRecipeCount": 300,
+  "sources": [
+    {
+      "id": "usda-foundation-2026-04",
+      "label": "USDA FoodData Central Foundation Foods 04/2026",
+      "url": "https://fdc.nal.usda.gov/download-datasets/",
+      "licenseId": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "retrievedAt": "2026-08-10"
+    },
+    {
+      "id": "usda-sr-legacy-2018-04",
+      "label": "USDA FoodData Central SR Legacy 04/2018",
+      "url": "https://fdc.nal.usda.gov/download-datasets/",
+      "licenseId": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "retrievedAt": "2026-08-10"
+    },
+    {
+      "id": "usda-fndds-2021-2023",
+      "label": "USDA FoodData Central FNDDS 2021-2023",
+      "url": "https://fdc.nal.usda.gov/download-datasets/",
+      "licenseId": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "retrievedAt": "2026-08-10"
+    },
+    {
+      "id": "gym-local-vietnamese-recipes",
+      "label": "Gym Local Vietnamese recipe estimates",
+      "url": "https://github.com/luutru433-coder/gym-local/blob/main/content/vietnamese-recipes.json",
+      "licenseId": "project-content",
+      "licenseUrl": "https://github.com/luutru433-coder/gym-local/blob/main/LICENSE",
+      "retrievedAt": "2026-08-10"
+    }
+  ]
+}
