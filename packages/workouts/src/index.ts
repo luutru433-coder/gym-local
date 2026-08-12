@@ -1,5 +1,5 @@
 import { createId, type ExerciseVariant, type LocalizedText, type Routine, type RoutineItem, type SetLog, type WorkoutSession } from "@gym/contracts";
-import { getMovement, getVariant } from "@gym/catalog";
+import { getMovement, getTrackingProfile, getVariant, trackingProfileForLoadMode } from "@gym/catalog";
 
 const now = () => new Date().toISOString();
 
@@ -13,12 +13,31 @@ function targetSets(count: number, minReps: number, maxReps: number, targetRir =
   }));
 }
 
+function durationSets(count: number, durationSeconds: number, targetRir = 2) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `target_${index + 1}`,
+    type: "working" as const,
+    durationSeconds,
+    targetRir
+  }));
+}
+
 function routineItem(movementId: string, preferredVariantId: string, count: number, min: number, max: number, restSeconds: number): RoutineItem {
   return {
     id: `item_${movementId}`,
     movementId,
     preferredVariantId,
     sets: targetSets(count, min, max),
+    restSeconds
+  };
+}
+
+function timedRoutineItem(movementId: string, preferredVariantId: string, count: number, durationSeconds: number, restSeconds: number): RoutineItem {
+  return {
+    id: `item_${movementId}`,
+    movementId,
+    preferredVariantId,
+    sets: durationSets(count, durationSeconds),
     restSeconds
   };
 }
@@ -44,7 +63,7 @@ export const ROUTINE_TEMPLATES: Routine[] = [
     routineItem("horizontal_row", "horizontal_row__cable", 3, 8, 12, 90),
     routineItem("romanian_deadlift", "romanian_deadlift__dumbbell", 3, 8, 12, 120),
     routineItem("lateral_raise", "lateral_raise__dumbbell", 2, 12, 15, 60),
-    routineItem("plank", "plank__bodyweight", 3, 20, 40, 60)
+    timedRoutineItem("plank", "plank__bodyweight", 3, 30, 60)
   ]),
   template("tpl_full_body_b", "Full Body B · Người mới", "Full Body B · Beginner", "general", 3, [
     routineItem("leg_press", "leg_press__machine", 3, 10, 15, 120),
@@ -76,7 +95,7 @@ export const ROUTINE_TEMPLATES: Routine[] = [
     routineItem("chest_press", "chest_press__barbell", 4, 3, 6, 180),
     routineItem("horizontal_row", "horizontal_row__barbell", 3, 5, 8, 120),
     routineItem("romanian_deadlift", "romanian_deadlift__barbell", 3, 5, 8, 150),
-    routineItem("plank", "plank__bodyweight", 3, 30, 60, 60)
+    timedRoutineItem("plank", "plank__bodyweight", 3, 45, 60)
   ]),
   template("tpl_strength_b", "Sức mạnh B", "Strength B", "strength", 4, [
     routineItem("deadlift", "deadlift__trap_bar", 3, 3, 5, 180),
@@ -131,6 +150,8 @@ function sessionExercise(item: RoutineItem) {
   const movement = getMovement(item.movementId);
   const variant = getVariant(item.preferredVariantId);
   if (!movement || !variant) throw new Error(`Invalid routine item: ${item.id}`);
+  const trackingProfile = getTrackingProfile(variant.id)
+    ?? trackingProfileForLoadMode(variant.id, variant.loadEntryMode);
   return {
     id: createId("session_exercise"),
     movementId: movement.id,
@@ -138,6 +159,7 @@ function sessionExercise(item: RoutineItem) {
     variantId: variant.id,
     variantNameSnapshot: variant.name,
     loadEntryModeSnapshot: variant.loadEntryMode,
+    trackingProfileSnapshot: trackingProfile,
     restSeconds: item.restSeconds,
     note: item.note,
     sets: item.sets.map((target) => ({
@@ -175,7 +197,14 @@ export function updateSet(
   const exercise = updated.exercises.find((item) => item.id === exerciseId);
   const set = exercise?.sets.find((item) => item.id === setId);
   if (!exercise || !set) throw new Error("Set not found");
-  Object.assign(set, values);
+  const normalized = { ...values };
+  if (normalized.rir !== undefined) normalized.rir = Number.isFinite(normalized.rir)
+    ? Math.min(10, Math.max(0, Math.round(normalized.rir)))
+    : undefined;
+  if (normalized.rpe !== undefined) normalized.rpe = Number.isFinite(normalized.rpe)
+    ? Math.min(10, Math.max(1, Math.round(normalized.rpe)))
+    : undefined;
+  Object.assign(set, normalized);
   if (complete) {
     set.completedAt = now();
     updated.restTimerEndsAt = new Date(Date.now() + exercise.restSeconds * 1000).toISOString();
@@ -200,12 +229,16 @@ export function switchExerciseVariant(session: WorkoutSession, exerciseId: strin
   if (index < 0) throw new Error("Exercise not found");
   const current = updated.exercises[index];
   if (current.movementId !== variant.movementId) throw new Error("Variant must belong to the same movement");
+  if (current.variantId === variant.id) return updated;
+  const trackingProfile = getTrackingProfile(variant.id)
+    ?? trackingProfileForLoadMode(variant.id, variant.loadEntryMode);
   const completed = current.sets.filter((set) => set.completedAt);
   const remaining = current.sets.filter((set) => !set.completedAt);
   if (completed.length === 0) {
     current.variantId = variant.id;
     current.variantNameSnapshot = variant.name;
     current.loadEntryModeSnapshot = variant.loadEntryMode;
+    current.trackingProfileSnapshot = trackingProfile;
     return updated;
   }
   current.sets = completed;
@@ -215,6 +248,7 @@ export function switchExerciseVariant(session: WorkoutSession, exerciseId: strin
     variantId: variant.id,
     variantNameSnapshot: variant.name,
     loadEntryModeSnapshot: variant.loadEntryMode,
+    trackingProfileSnapshot: trackingProfile,
     sets: (remaining.length ? remaining : [{ id: createId("set"), type: "working" as const }]).map((set) => ({
       ...set,
       id: createId("set"),

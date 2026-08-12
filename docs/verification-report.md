@@ -1,4 +1,14 @@
-# Verification report — 2026-08-10
+# Verification report — 2026-08-12
+
+## Local checkpoint 0.2.1
+
+- ESLint completed with zero warnings.
+- TypeScript project references completed without errors.
+- Vitest passed 49 tests across 9 files; content-contract tests passed 7 tests in 1 file.
+- Content validation and audit passed all video, source, license, nutrition-pack, and generated-recipe gates.
+- Production Vite/PWA build completed with 2,722 transformed modules and 37 precache entries.
+- Build still reports the known chunk-size warning: initial app 551.48 kB, nutrition route 502.99 kB, and progress route 378.12 kB before gzip. Performance splitting remains scheduled for the hardening release.
+- New regression coverage proves locale-aware nutrition input, incomplete-provider handling, pre-export backup validation, transactional onboarding, failed-workout-save rollback, reviewed load semantics, exact-variant previous values, modal keyboard focus, document language, and deferred-update re-prompting.
 
 ## Automated checks
 

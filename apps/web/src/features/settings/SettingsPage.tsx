@@ -30,14 +30,15 @@ export function SettingsPage() {
   const [profile, setProfile] = useState(storedProfile);
   const [saved, setSaved] = useState(false);
   const [backupBusy, setBackupBusy] = useState(false);
-  const [backupMessage, setBackupMessage] = useState<string>();
+  const [backupMessage, setBackupMessage] = useState<{ text: string; tone: "success" | "warning" }>();
+  const [profileMessage, setProfileMessage] = useState<{ text: string; tone: "success" | "warning" }>();
   const [usage, setUsage] = useState<{ usage?: number; quota?: number }>();
   const [persistent, setPersistent] = useState<boolean>();
   const [persistenceBusy, setPersistenceBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    void storageEstimate().then((value) => value && setUsage({ usage: value.usage, quota: value.quota }));
+    void storageEstimate().then((value) => value && setUsage({ usage: value.usage, quota: value.quota })).catch(() => setUsage(undefined));
     void persistentStorageStatus().then(setPersistent);
   }, []);
 
@@ -45,6 +46,9 @@ export function SettingsPage() {
     setPersistenceBusy(true);
     try {
       setPersistent(await requestPersistentStorage());
+      setProfileMessage(undefined);
+    } catch (error) {
+      setProfileMessage({ text: error instanceof Error ? error.message : (locale === "vi" ? "Không thể yêu cầu lưu trữ bền vững." : "Could not request persistent storage."), tone: "warning" });
     } finally {
       setPersistenceBusy(false);
     }
@@ -58,18 +62,37 @@ export function SettingsPage() {
 
   const saveAll = async () => {
     let nutritionTarget = profile.nutritionTarget;
-    if ((profile.biologicalSex === "female" || profile.biologicalSex === "male") && profile.age && profile.heightCm && profile.weightKg && profile.activityFactor) {
+    const hasAnyNutritionInput = Boolean(profile.age || profile.heightCm || profile.weightKg || (profile.biologicalSex && profile.biologicalSex !== "unspecified"));
+    const nutritionFieldsChanged = profile.age !== storedProfile.age
+      || profile.heightCm !== storedProfile.heightCm
+      || profile.weightKg !== storedProfile.weightKg
+      || profile.biologicalSex !== storedProfile.biologicalSex
+      || profile.activityFactor !== storedProfile.activityFactor
+      || profile.goal !== storedProfile.goal;
+    const hasCompleteNutritionInput = (profile.biologicalSex === "female" || profile.biologicalSex === "male") && Boolean(profile.age && profile.heightCm && profile.weightKg && profile.activityFactor);
+    if (hasCompleteNutritionInput) {
       try {
-        nutritionTarget = estimateNutritionTarget({ biologicalSex: profile.biologicalSex, age: profile.age, heightCm: profile.heightCm, weightKg: profile.weightKg, activityFactor: profile.activityFactor, goal: profile.goal });
+        nutritionTarget = estimateNutritionTarget({ biologicalSex: profile.biologicalSex as "female" | "male", age: profile.age!, heightCm: profile.heightCm!, weightKg: profile.weightKg!, activityFactor: profile.activityFactor!, goal: profile.goal });
       } catch {
-        // Keep the last confirmed target when current fields are outside supported ranges.
+        setProfileMessage({ text: locale === "vi" ? "Tuổi phải từ 18–100, chiều cao 120–230 cm và cân nặng 35–350 kg." : "Age must be 18–100, height 120–230 cm, and weight 35–350 kg.", tone: "warning" });
+        return;
       }
+    } else if (hasAnyNutritionInput && nutritionFieldsChanged) {
+      setProfileMessage({ text: locale === "vi" ? "Hãy nhập đủ tuổi, giới tính sinh học, chiều cao và cân nặng để cập nhật mục tiêu; mục tiêu cũ chưa được thay đổi." : "Enter age, biological sex, height and weight to update the target; the previous target has not been changed.", tone: "warning" });
+      return;
+    } else if (!hasAnyNutritionInput && nutritionFieldsChanged) {
+      nutritionTarget = undefined;
     }
     const updated: Profile = { ...profile, nutritionTarget, updatedAt: new Date().toISOString() };
-    await updateProfile(updated);
-    setProfile(updated);
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 1800);
+    try {
+      await updateProfile(updated);
+      setProfile(updated);
+      setProfileMessage(undefined);
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 1800);
+    } catch (error) {
+      setProfileMessage({ text: error instanceof Error ? error.message : (locale === "vi" ? "Không thể lưu thay đổi." : "Could not save changes."), tone: "warning" });
+    }
   };
 
   const exportBackup = async () => {
@@ -80,17 +103,21 @@ export function SettingsPage() {
       const blob = await createBackup(data);
       downloadBlob(blob, `gym-local-backup-${new Date().toISOString().slice(0, 10)}.zip`);
       await markBackup();
-      setBackupMessage(locale === "vi" ? "Đã tạo bản backup. Hãy giữ file ở nơi an toàn." : "Backup created. Keep the file somewhere safe.");
+      setBackupMessage({ text: locale === "vi" ? "Đã tạo bản backup. Hãy giữ file ở nơi an toàn." : "Backup created. Keep the file somewhere safe.", tone: "success" });
     } catch (error) {
-      setBackupMessage(error instanceof Error ? error.message : "Backup failed");
+      setBackupMessage({ text: error instanceof Error ? error.message : "Backup failed", tone: "warning" });
     } finally {
       setBackupBusy(false);
     }
   };
 
   const exportCsv = async () => {
-    const data = await exportAllData();
-    downloadBlob(new Blob([workoutCsv(data)], { type: "text/csv;charset=utf-8" }), `gym-local-workouts-${new Date().toISOString().slice(0, 10)}.csv`);
+    try {
+      const data = await exportAllData();
+      downloadBlob(new Blob([workoutCsv(data)], { type: "text/csv;charset=utf-8" }), `gym-local-workouts-${new Date().toISOString().slice(0, 10)}.csv`);
+    } catch (error) {
+      setBackupMessage({ text: error instanceof Error ? error.message : "CSV export failed", tone: "warning" });
+    }
   };
 
   const importBackup = async (file: File) => {
@@ -102,9 +129,9 @@ export function SettingsPage() {
       if (!approved) return;
       await restore(backup.data);
       if (backup.data.profile) setProfile(backup.data.profile);
-      setBackupMessage(locale === "vi" ? `Đã khôi phục bản ngày ${formatDate(backup.manifest.exportedAt, locale)}.` : `Restored backup from ${formatDate(backup.manifest.exportedAt, locale)}.`);
+      setBackupMessage({ text: locale === "vi" ? `Đã khôi phục bản ngày ${formatDate(backup.manifest.exportedAt, locale)}.` : `Restored backup from ${formatDate(backup.manifest.exportedAt, locale)}.`, tone: "success" });
     } catch (error) {
-      setBackupMessage(error instanceof Error ? error.message : "Restore failed");
+      setBackupMessage({ text: error instanceof Error ? error.message : "Restore failed", tone: "warning" });
     } finally {
       setBackupBusy(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -115,6 +142,7 @@ export function SettingsPage() {
     <div className="page settings-page">
       <header className="page-header"><div><span className="eyebrow">{locale === "vi" ? "Kiểm soát hoàn toàn" : "Full control"}</span><h1>{locale === "vi" ? "Cài đặt" : "Settings"}</h1><p>{locale === "vi" ? "Không tài khoản, không máy chủ, không đăng ký trả phí." : "No account, no server, no subscription."}</p></div><Button onClick={() => void saveAll()}>{saved ? <Check size={18} /> : <Save size={18} />}{saved ? (locale === "vi" ? "Đã lưu" : "Saved") : (locale === "vi" ? "Lưu thay đổi" : "Save changes")}</Button></header>
 
+      {profileMessage ? <Notice tone={profileMessage.tone}>{profileMessage.text}</Notice> : null}
       <div className="settings-layout">
         <div className="settings-main">
           <section>
@@ -155,7 +183,7 @@ export function SettingsPage() {
                 <button type="button" onClick={() => void exportCsv()}><span><FileSpreadsheet size={22} /></span><div><strong>{locale === "vi" ? "Xuất lịch sử CSV" : "Export workout CSV"}</strong><small>{locale === "vi" ? "Mở được bằng Excel / Sheets" : "Works with Excel / Sheets"}</small></div><Download size={18} /></button>
               </div>
               <input ref={fileRef} type="file" accept=".zip,application/zip" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importBackup(file); }} />
-              {backupMessage ? <Notice tone="success">{backupMessage}</Notice> : null}
+              {backupMessage ? <Notice tone={backupMessage.tone}>{backupMessage.text}</Notice> : null}
             </Card>
           </section>
         </div>

@@ -20,7 +20,7 @@ describe("backup", () => {
     };
     const blob = await createBackup(data);
     const restored = await readBackup(blob);
-    expect(restored.data.settings.catalogVersion).toBe(2);
+    expect(restored.data.settings.catalogVersion).toBe(3);
     expect(restored.manifest.backupVersion).toBe(2);
     expect(restored.data.routines[0].name.vi).toContain("Người mới");
     expect(restored.data.sessions[0].exercises[0].sets[0]).toMatchObject({ targetMinReps: 8, targetMaxReps: 12 });
@@ -89,5 +89,39 @@ describe("backup", () => {
     const malformed = await zip.generateAsync({ type: "blob" });
 
     await expect(readBackup(malformed)).rejects.toThrow();
+  });
+
+  it("refuses to create a backup containing non-finite nutrition data", async () => {
+    const data = {
+      profile: undefined,
+      routines: [],
+      sessions: [],
+      foods: [{
+        id: "food_bad",
+        name: { vi: "Lỗi", en: "Bad" },
+        per100g: { calories: Number.NaN, protein: 1, carbs: 1, fat: 1 },
+        source: "custom" as const,
+        updatedAt: "2026-08-10T00:00:00.000Z"
+      }],
+      meals: [],
+      bodyMetrics: [],
+      customVariants: [],
+      settings: defaultSettings
+    };
+    await expect(createBackup(data)).rejects.toThrow();
+  });
+
+  it("refuses to create a backup with an invalid active-session pointer", async () => {
+    const data = {
+      profile: undefined,
+      routines: [],
+      sessions: [],
+      foods: [],
+      meals: [],
+      bodyMetrics: [],
+      customVariants: [],
+      settings: { ...defaultSettings, activeSessionId: "session_missing" }
+    };
+    await expect(createBackup(data)).rejects.toThrow("active workout pointer");
   });
 });

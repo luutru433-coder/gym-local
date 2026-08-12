@@ -259,6 +259,22 @@ const backupDataSchema = z.object({
   settings: settingsSchema
 }).passthrough();
 
+function validateBackupRelations(data: z.infer<typeof backupDataSchema>): void {
+  const sessionIds = new Set(data.sessions.map((session) => session.id));
+  if (data.settings.activeSessionId) {
+    const active = data.sessions.find((session) => session.id === data.settings.activeSessionId);
+    if (!sessionIds.has(data.settings.activeSessionId) || active?.finishedAt) {
+      throw new Error("Backup active workout pointer is invalid");
+    }
+  }
+}
+
+function validateBackupData(data: unknown): BackupPayload["data"] {
+  const parsed = backupDataSchema.parse(data);
+  validateBackupRelations(parsed);
+  return parsed as unknown as BackupPayload["data"];
+}
+
 async function sha256(value: string): Promise<string> {
   const data = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest("SHA-256", data);
@@ -266,7 +282,8 @@ async function sha256(value: string): Promise<string> {
 }
 
 export async function createBackup(data: BackupPayload["data"]): Promise<Blob> {
-  const serialized = JSON.stringify(data);
+  const validated = validateBackupData(data);
+  const serialized = JSON.stringify(validated);
   const payload: BackupPayload = {
     manifest: {
       appVersion: APP_VERSIONS.app,
@@ -274,7 +291,7 @@ export async function createBackup(data: BackupPayload["data"]): Promise<Blob> {
       exportedAt: new Date().toISOString(),
       checksum: await sha256(serialized)
     },
-    data
+    data: validated
   };
   const zip = new JSZip();
   zip.file("manifest.json", JSON.stringify(payload.manifest, null, 2));
@@ -301,10 +318,14 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
     customVariants: parsed.customVariants.map((variant) => ({ ...variant, videoGuides: variant.videoGuides ?? [] })),
     settings: {
       ...parsed.settings,
+      catalogVersion: APP_VERSIONS.catalog,
       dbSchemaVersion: APP_VERSIONS.database,
+      routineTemplateVersion: APP_VERSIONS.routines,
+      nutritionFormulaVersion: APP_VERSIONS.nutritionFormula,
       backupVersion: APP_VERSIONS.backup
     }
   } as unknown as BackupPayload["data"];
+  validateBackupRelations(data as unknown as z.infer<typeof backupDataSchema>);
   return { manifest, data };
 }
 

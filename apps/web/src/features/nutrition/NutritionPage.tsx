@@ -3,7 +3,7 @@ import { BrowserMultiFormatReader, type IScannerControls } from "@zxing/browser"
 import { Barcode, Camera, Check, ChevronRight, Database, Download, Droplets, Flame, HardDrive, Plus, Salad, ScanLine, Search, ShieldCheck, Trash2, Utensils } from "lucide-react";
 import { Button, Card, EmptyState, Field, MetricRing, Modal, Notice, ProgressBar, SectionTitle } from "@gym/ui";
 import type { FoodItem, MealEntry, NutritionPackManifest, NutritionPackRecord } from "@gym/contracts";
-import { createCustomFood, createMealEntry, dailyNutrition, installNutritionPack, loadNutritionPackManifest, lookupFoodByBarcode, nutritionPackInfo, removeNutritionPack, searchOfflineFoods } from "@gym/nutrition";
+import { completeFoodLookupCandidate, createMealEntry, dailyNutrition, estimateNutritionTarget, installNutritionPack, loadNutritionPackManifest, lookupFoodByBarcode, nutritionPackInfo, parseNutritionNumber, removeNutritionPack, searchOfflineFoods, validateCustomFoodDraft, validateMealInput, type FoodLookupCandidate, type NutritionValidationError } from "@gym/nutrition";
 import { getNutritionPackRecord, saveNutritionPackRecord } from "@gym/storage";
 import { formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -41,6 +41,9 @@ export function NutritionPage() {
   const [barcode, setBarcode] = useState("");
   const [lookupBusy, setLookupBusy] = useState(false);
   const [lookupError, setLookupError] = useState<string>();
+  const [lookupCandidate, setLookupCandidate] = useState<FoodLookupCandidate>();
+  const [lookupValues, setLookupValues] = useState({ calories: "", protein: "", carbs: "", fat: "" });
+  const [formErrors, setFormErrors] = useState<NutritionValidationError[]>([]);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [customOpen, setCustomOpen] = useState(false);
   const [custom, setCustom] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "" });
@@ -52,7 +55,17 @@ export function NutritionPage() {
 
   const dayMeals = useMemo(() => meals.filter((entry) => entry.date === date), [date, meals]);
   const total = dailyNutrition(meals, date);
-  const target = profile.nutritionTarget;
+  const currentEstimatedTarget = useMemo(() => {
+    if (!profile.age || !profile.heightCm || !profile.weightKg || !profile.activityFactor || (profile.biologicalSex !== "female" && profile.biologicalSex !== "male")) return undefined;
+    try {
+      return estimateNutritionTarget({ age: profile.age, heightCm: profile.heightCm, weightKg: profile.weightKg, activityFactor: profile.activityFactor, biologicalSex: profile.biologicalSex, goal: profile.goal });
+    } catch {
+      return undefined;
+    }
+  }, [profile.activityFactor, profile.age, profile.biologicalSex, profile.goal, profile.heightCm, profile.weightKg]);
+  const targetIsCurrent = Boolean(profile.nutritionTarget && currentEstimatedTarget
+    && (["calories", "protein", "carbs", "fat", "waterMl", "formulaVersion"] as const).every((field) => profile.nutritionTarget?.[field] === currentEstimatedTarget[field]));
+  const target = targetIsCurrent ? profile.nutritionTarget : undefined;
   const filteredFoods = foods.filter((food) => {
     const term = foodQuery.trim().toLocaleLowerCase(locale);
     return !term || localize(food.name, locale).toLocaleLowerCase(locale).includes(term) || food.brand?.toLocaleLowerCase(locale).includes(term);
@@ -76,12 +89,12 @@ export function NutritionPage() {
             vietnameseRecipeCount: Number(info.metadata?.vietnamese_recipe_count ?? manifest.vietnameseRecipeCount)
           };
           setPackRecord(ready);
-          void saveNutritionPackRecord(ready);
+          void saveNutritionPackRecord(ready).catch((error) => setPackError(error instanceof Error ? error.message : "Nutrition pack state could not be saved"));
         } else {
           const interrupted = stored.status === "ready" || stored.status === "downloading" || stored.status === "installing";
           const next = interrupted ? { id: "nutrition-pack" as const, status: "not_installed" as const, bytesDownloaded: 0 } : stored;
           setPackRecord(next);
-          if (interrupted) void saveNutritionPackRecord(next);
+          if (interrupted) void saveNutritionPackRecord(next).catch((error) => setPackError(error instanceof Error ? error.message : "Nutrition pack state could not be saved"));
         }
       })
       .catch((error) => setPackError(error instanceof Error ? error.message : "Nutrition pack unavailable"));
@@ -92,6 +105,9 @@ export function NutritionPage() {
     setSelectedFood(undefined);
     setFoodQuery("");
     setOfflineResults([]);
+    setLookupCandidate(undefined);
+    setFormErrors([]);
+    setLookupError(undefined);
     setAddOpen(true);
   };
 
@@ -103,9 +119,28 @@ export function NutritionPage() {
       if (!food) {
         setLookupError(locale === "vi" ? "Không tìm thấy sản phẩm. Bạn có thể tạo thực phẩm thủ công." : "Product not found. You can create it manually.");
       } else {
-        await addFood(food);
-        setSelectedFood(food);
-        setBarcode(food.barcode ?? value);
+        setBarcode(food.barcode);
+        const values = {
+          calories: food.per100g.calories == null ? "" : String(food.per100g.calories),
+          protein: food.per100g.protein == null ? "" : String(food.per100g.protein),
+          carbs: food.per100g.carbs == null ? "" : String(food.per100g.carbs),
+          fat: food.per100g.fat == null ? "" : String(food.per100g.fat)
+        };
+        setLookupValues(values);
+        if (food.missingCoreNutrients.length) {
+          setLookupCandidate(food);
+          setSelectedFood(undefined);
+          setLookupError(locale === "vi" ? "Nguồn còn thiếu calories hoặc macro. Hãy nhập các giá trị còn thiếu theo nhãn sản phẩm." : "The source is missing calories or macros. Fill the missing values from the product label.");
+        } else {
+          const completed = completeFoodLookupCandidate(food, values, locale);
+          if (!completed.ok) {
+            setFormErrors(completed.errors);
+            return;
+          }
+          await addFood(completed.value);
+          setSelectedFood(completed.value);
+          setLookupCandidate(undefined);
+        }
       }
     } catch (error) {
       setLookupError(error instanceof Error ? error.message : "Lookup failed");
@@ -115,11 +150,21 @@ export function NutritionPage() {
   };
 
   const submitMeal = async () => {
-    if (!selectedFood || Number(grams) <= 0) return;
-    if (!foods.some((food) => food.id === selectedFood.id)) await addFood(selectedFood);
-    await addMeal(createMealEntry(selectedFood, Number(grams), date, mealType));
-    setAddOpen(false);
-    setSelectedFood(undefined);
+    if (!selectedFood) return;
+    const validated = validateMealInput(grams, date, locale);
+    if (!validated.ok) {
+      setFormErrors(validated.errors);
+      return;
+    }
+    setFormErrors([]);
+    try {
+      if (!foods.some((food) => food.id === selectedFood.id)) await addFood(selectedFood);
+      await addMeal(createMealEntry(selectedFood, validated.value.grams, validated.value.date, mealType));
+      setAddOpen(false);
+      setSelectedFood(undefined);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : (locale === "vi" ? "Không thể lưu món ăn." : "Could not save the meal."));
+    }
   };
 
   const installPack = async () => {
@@ -127,8 +172,8 @@ export function NutritionPage() {
     setPackError(undefined);
     const initial: NutritionPackRecord = { id: "nutrition-pack", status: "downloading", version: packManifest.version, bytesDownloaded: 0, totalBytes: packManifest.sizeBytes };
     setPackRecord(initial);
-    await saveNutritionPackRecord(initial);
     try {
+      await saveNutritionPackRecord(initial);
       const result = await installNutritionPack(packManifest, (progress) => {
         setPackRecord((current) => ({ ...current, status: "downloading", bytesDownloaded: progress.bytesDownloaded, totalBytes: progress.totalBytes ?? packManifest.sizeBytes }));
       });
@@ -151,18 +196,26 @@ export function NutritionPage() {
       const failed: NutritionPackRecord = { ...initial, status: "error", error: message };
       setPackRecord(failed);
       setPackError(message);
-      await saveNutritionPackRecord(failed);
+      try {
+        await saveNutritionPackRecord(failed);
+      } catch {
+        // The visible in-memory error remains useful when browser storage is unavailable.
+      }
     }
   };
 
   const removePack = async () => {
     const approved = window.confirm(locale === "vi" ? "Xóa gói thực phẩm offline? Nhật ký và thực phẩm đã lưu vẫn được giữ nguyên." : "Remove the offline food pack? Diary entries and saved foods will remain.");
     if (!approved) return;
-    await removeNutritionPack();
-    const empty: NutritionPackRecord = { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 };
-    setPackRecord(empty);
-    setOfflineResults([]);
-    await saveNutritionPackRecord(empty);
+    try {
+      await removeNutritionPack();
+      const empty: NutritionPackRecord = { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 };
+      setPackRecord(empty);
+      setOfflineResults([]);
+      await saveNutritionPackRecord(empty);
+    } catch (error) {
+      setPackError(error instanceof Error ? error.message : (locale === "vi" ? "Không thể xóa gói dinh dưỡng." : "Could not remove the nutrition pack."));
+    }
   };
 
   const searchFoods = async () => {
@@ -178,19 +231,50 @@ export function NutritionPage() {
     }
   };
 
-  const submitCustom = async () => {
-    if (!custom.name.trim()) return;
-    const food = createCustomFood(custom.name.trim(), {
-      calories: Math.max(0, Number(custom.calories) || 0),
-      protein: Math.max(0, Number(custom.protein) || 0),
-      carbs: Math.max(0, Number(custom.carbs) || 0),
-      fat: Math.max(0, Number(custom.fat) || 0)
-    });
-    await addFood(food);
-    setSelectedFood(food);
-    setCustomOpen(false);
-    setCustom({ name: "", calories: "", protein: "", carbs: "", fat: "" });
+  const removeMealEntry = async (id: string) => {
+    try {
+      await removeMeal(id);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : (locale === "vi" ? "Không thể xóa món khỏi nhật ký." : "Could not remove the diary entry."));
+    }
   };
+
+  const submitCustom = async () => {
+    const validated = validateCustomFoodDraft(custom, locale);
+    if (!validated.ok) {
+      setFormErrors(validated.errors);
+      return;
+    }
+    setFormErrors([]);
+    try {
+      await addFood(validated.value);
+      setSelectedFood(validated.value);
+      setCustomOpen(false);
+      setCustom({ name: "", calories: "", protein: "", carbs: "", fat: "" });
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : (locale === "vi" ? "Không thể lưu thực phẩm." : "Could not save the food."));
+    }
+  };
+
+  const completeLookup = async () => {
+    if (!lookupCandidate) return;
+    const completed = completeFoodLookupCandidate(lookupCandidate, lookupValues, locale);
+    if (!completed.ok) {
+      setFormErrors(completed.errors);
+      return;
+    }
+    setFormErrors([]);
+    try {
+      await addFood(completed.value);
+      setSelectedFood(completed.value);
+      setLookupCandidate(undefined);
+      setLookupError(undefined);
+    } catch (error) {
+      setLookupError(error instanceof Error ? error.message : (locale === "vi" ? "Không thể lưu thực phẩm." : "Could not save the food."));
+    }
+  };
+
+  const gramsPreview = parseNutritionNumber(grams, locale, "grams", { min: 0.1, max: 100_000 });
 
   return (
     <div className="page nutrition-page">
@@ -212,7 +296,7 @@ export function NutritionPage() {
             <MetricRing value={total.fat} max={target.fat} label="Fat" unit="g" tone="gold" />
           </div>
         </Card>
-      ) : <Notice tone="warning">{locale === "vi" ? "Chưa có mục tiêu dinh dưỡng. Bạn có thể thêm số đo trong Cài đặt để app ước tính calories và macro." : "No nutrition target yet. Add body details in Settings for an estimate."}</Notice>}
+      ) : <Notice tone="warning">{profile.nutritionTarget && !targetIsCurrent ? (locale === "vi" ? "Mục tiêu cũ không còn khớp thông tin cơ thể hiện tại. Hãy kiểm tra và lưu lại trong Cài đặt." : "The previous target no longer matches your current body details. Review and save them in Settings.") : (locale === "vi" ? "Chưa có mục tiêu dinh dưỡng. Bạn có thể thêm số đo trong Cài đặt để app ước tính calories và macro." : "No nutrition target yet. Add body details in Settings for an estimate.")}</Notice>}
 
       <Card className="nutrition-pack-card">
         <div className="nutrition-pack-card__icon"><Database size={27} /></div>
@@ -235,7 +319,7 @@ export function NutritionPage() {
               return (
                 <Card className="meal-card" key={meal}>
                   <header><span className="meal-card__icon"><Utensils size={18} /></span><div><h3>{mealLabels[meal][locale]}</h3><p>{calories} kcal</p></div><button type="button" className="icon-button" onClick={() => openAdd(meal)} aria-label={`Add ${meal}`}><Plus size={20} /></button></header>
-                  {entries.length ? <ul>{entries.map((entry) => <li key={entry.id}><div><strong>{localize(entry.foodNameSnapshot, locale)}</strong><small>{entry.grams}g · P {entry.nutrientsSnapshot.protein}g · C {entry.nutrientsSnapshot.carbs}g · F {entry.nutrientsSnapshot.fat}g</small></div><span>{entry.nutrientsSnapshot.calories} kcal</span><button type="button" onClick={() => void removeMeal(entry.id)} aria-label="Delete"><Trash2 size={16} /></button></li>)}</ul> : <button className="meal-card__empty" type="button" onClick={() => openAdd(meal)}><Plus size={16} />{locale === "vi" ? "Thêm món" : "Add food"}</button>}
+                  {entries.length ? <ul>{entries.map((entry) => <li key={entry.id}><div><strong>{localize(entry.foodNameSnapshot, locale)}</strong><small>{entry.grams}g · P {entry.nutrientsSnapshot.protein}g · C {entry.nutrientsSnapshot.carbs}g · F {entry.nutrientsSnapshot.fat}g</small></div><span>{entry.nutrientsSnapshot.calories} kcal</span><button type="button" onClick={() => void removeMealEntry(entry.id)} aria-label="Delete"><Trash2 size={16} /></button></li>)}</ul> : <button className="meal-card__empty" type="button" onClick={() => openAdd(meal)}><Plus size={16} />{locale === "vi" ? "Thêm món" : "Add food"}</button>}
                 </Card>
               );
             })}
@@ -254,17 +338,21 @@ export function NutritionPage() {
             <div className="search-box"><Search size={18} /><input value={foodQuery} onChange={(event) => { setFoodQuery(event.target.value); setOfflineResults([]); }} onKeyDown={(event) => { if (event.key === "Enter") void searchFoods(); }} placeholder={packRecord.status === "ready" ? (locale === "vi" ? "Nhập tên rồi bấm Tìm offline…" : "Enter a name, then search offline…") : (locale === "vi" ? "Tìm thực phẩm đã lưu…" : "Search saved foods…")} /></div>
             {packRecord.status === "ready" ? <Button variant="secondary" disabled={offlineSearchBusy || !foodQuery.trim()} onClick={() => void searchFoods()}><HardDrive size={17} />{offlineSearchBusy ? "…" : (locale === "vi" ? "Tìm offline" : "Search offline")}</Button> : null}
             <Button variant="secondary" onClick={() => setScannerOpen(true)}><ScanLine size={17} />{locale === "vi" ? "Quét mã" : "Scan"}</Button>
-            <Button variant="ghost" onClick={() => setCustomOpen(true)}><Plus size={17} />{locale === "vi" ? "Tự tạo" : "Custom"}</Button>
+            <Button variant="ghost" onClick={() => { setFormErrors([]); setCustomOpen(true); }}><Plus size={17} />{locale === "vi" ? "Tự tạo" : "Custom"}</Button>
           </div>
 
           <div className="barcode-manual"><Field label={locale === "vi" ? "Hoặc nhập mã vạch" : "Or enter a barcode"}><div className="input-action"><input inputMode="numeric" value={barcode} onChange={(event) => setBarcode(event.target.value.replace(/\D/g, ""))} placeholder="893…" /><Button size="sm" disabled={lookupBusy || barcode.length < 8} onClick={() => void lookup()}>{lookupBusy ? "…" : (locale === "vi" ? "Tra cứu" : "Look up")}</Button></div></Field>{lookupError ? <Notice tone="warning">{lookupError}</Notice> : null}</div>
+
+          {lookupCandidate ? <div className="custom-food-form"><strong>{localize(lookupCandidate.name, locale)}</strong><Notice tone="warning">{locale === "vi" ? "Chỉ lưu được sau khi tất cả calories và macro trên 100g đã có giá trị." : "This food can only be saved after all per-100g calories and macros have values."}</Notice><div className="form-grid form-grid--4">{(["calories", "protein", "carbs", "fat"] as const).map((field) => <Field key={field} label={field === "calories" ? "kcal" : `${field} (g)`}><input inputMode="decimal" value={lookupValues[field]} onChange={(event) => setLookupValues((current) => ({ ...current, [field]: event.target.value }))} aria-invalid={formErrors.some((error) => error.field === field)} /></Field>)}</div><Button size="sm" onClick={() => void completeLookup()}>{locale === "vi" ? "Xác nhận dữ liệu" : "Confirm nutrition"}</Button></div> : null}
+
+          {formErrors.length ? <Notice tone="warning"><ul>{formErrors.map((error, index) => <li key={`${error.field}-${error.code}-${index}`}>{error.message}</li>)}</ul></Notice> : null}
 
           <div className="food-results">
             {visibleFoods.length ? visibleFoods.map((food) => <button type="button" key={food.id} className={selectedFood?.id === food.id ? "food-result food-result--selected" : "food-result"} onClick={() => setSelectedFood(food)}><span className="food-result__icon"><Salad size={19} /></span><span><strong>{localize(food.name, locale)}</strong><small>{food.brand ? `${food.brand} · ` : ""}{formatNumber(food.per100g.calories, locale, 1)} kcal / 100g · {food.source === "vietnamese_recipe" ? (locale === "vi" ? "món ước tính" : "recipe estimate") : food.source === "usda_fdc" ? "USDA" : (locale === "vi" ? "đã lưu" : "saved")}</small></span>{selectedFood?.id === food.id ? <Check size={18} /> : <ChevronRight size={18} />}</button>) : <EmptyState title={locale === "vi" ? "Chưa có kết quả" : "No results yet"} body={packRecord.status === "ready" ? (locale === "vi" ? "Nhập tên và bấm Tìm offline, hoặc quét mã vạch." : "Enter a name and press Search offline, or scan a barcode.") : (locale === "vi" ? "Cài kho offline, quét mã vạch hoặc tạo thực phẩm thủ công." : "Install the offline library, scan a barcode, or create a custom food.")} />}
           </div>
 
-          {selectedFood ? <><div className="food-selection"><div><span>{locale === "vi" ? "Đã chọn" : "Selected"}</span><strong>{localize(selectedFood.name, locale)}</strong></div><Field label={locale === "vi" ? "Khối lượng (g)" : "Amount (g)"}><input inputMode="decimal" value={grams} onChange={(event) => setGrams(event.target.value)} /></Field><div className="food-selection__calories"><strong>{Math.round(selectedFood.per100g.calories * (Number(grams) || 0) / 100)}</strong><span>kcal</span></div></div><NutrientDetails food={selectedFood} locale={locale} /></> : null}
-          <div className="modal-actions"><Button variant="ghost" onClick={() => setAddOpen(false)}>{locale === "vi" ? "Hủy" : "Cancel"}</Button><Button disabled={!selectedFood || Number(grams) <= 0} onClick={() => void submitMeal()}>{locale === "vi" ? "Thêm vào nhật ký" : "Add to diary"}</Button></div>
+          {selectedFood ? <><div className="food-selection"><div><span>{locale === "vi" ? "Đã chọn" : "Selected"}</span><strong>{localize(selectedFood.name, locale)}</strong></div><Field label={locale === "vi" ? "Khối lượng (g)" : "Amount (g)"}><input inputMode="decimal" value={grams} onChange={(event) => { setGrams(event.target.value); setFormErrors([]); }} aria-invalid={formErrors.some((error) => error.field === "grams")} /></Field><div className="food-selection__calories"><strong>{gramsPreview.ok ? Math.round(selectedFood.per100g.calories * gramsPreview.value / 100) : "—"}</strong><span>kcal</span></div></div><NutrientDetails food={selectedFood} locale={locale} /></> : null}
+          <div className="modal-actions"><Button variant="ghost" onClick={() => setAddOpen(false)}>{locale === "vi" ? "Hủy" : "Cancel"}</Button><Button disabled={!selectedFood || !gramsPreview.ok} onClick={() => void submitMeal()}>{locale === "vi" ? "Thêm vào nhật ký" : "Add to diary"}</Button></div>
         </div>
       </Modal>
 
@@ -273,6 +361,7 @@ export function NutritionPage() {
           <Notice>{locale === "vi" ? "Nhập các giá trị trên 100g theo nhãn dinh dưỡng." : "Enter per-100g values from the nutrition label."}</Notice>
           <Field label={locale === "vi" ? "Tên thực phẩm" : "Food name"}><input value={custom.name} onChange={(event) => setCustom((value) => ({ ...value, name: event.target.value }))} autoFocus /></Field>
           <div className="form-grid form-grid--4"><Field label="kcal"><input inputMode="decimal" value={custom.calories} onChange={(event) => setCustom((value) => ({ ...value, calories: event.target.value }))} /></Field><Field label="Protein (g)"><input inputMode="decimal" value={custom.protein} onChange={(event) => setCustom((value) => ({ ...value, protein: event.target.value }))} /></Field><Field label="Carb (g)"><input inputMode="decimal" value={custom.carbs} onChange={(event) => setCustom((value) => ({ ...value, carbs: event.target.value }))} /></Field><Field label="Fat (g)"><input inputMode="decimal" value={custom.fat} onChange={(event) => setCustom((value) => ({ ...value, fat: event.target.value }))} /></Field></div>
+          {formErrors.length ? <Notice tone="warning"><ul>{formErrors.map((error, index) => <li key={`${error.field}-${error.code}-${index}`}>{error.message}</li>)}</ul></Notice> : null}
           <div className="modal-actions"><Button variant="ghost" onClick={() => setCustomOpen(false)}>{locale === "vi" ? "Hủy" : "Cancel"}</Button><Button disabled={!custom.name.trim()} onClick={() => void submitCustom()}>{locale === "vi" ? "Lưu & chọn" : "Save & select"}</Button></div>
         </div>
       </Modal>

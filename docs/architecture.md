@@ -24,10 +24,10 @@ Gym Local is a modular monolith compiled into one static PWA. `apps/web` is the 
 
 ## Independent versions
 
-- App: `0.2.0`
+- App: `0.2.1`
 - Database schema: `2`
-- Catalog: `2`
-- Routine templates: `1`
+- Catalog: `3`
+- Routine templates: `2`
 - Nutrition formula: `1`
 - Backup: `2`
 - Nutrition pack schema: `1`

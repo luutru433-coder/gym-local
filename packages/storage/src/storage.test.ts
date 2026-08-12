@@ -1,7 +1,7 @@
 import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { Profile, WorkoutSession } from "@gym/contracts";
+import type { Profile, Routine, WorkoutSession } from "@gym/contracts";
 import {
   GymDatabase,
   defaultSettings,
@@ -12,6 +12,8 @@ import {
   replaceAllData,
   getNutritionPackRecord,
   saveProfile,
+  saveInitialSetup,
+  saveMeal,
   saveNutritionPackRecord,
   saveSession
 } from "./index";
@@ -42,6 +44,21 @@ function profile(): Profile {
   };
 }
 
+function routine(): Routine {
+  const now = "2026-08-10T00:00:00.000Z";
+  return {
+    id: "routine_starter",
+    name: { vi: "Toàn thân", en: "Full body" },
+    goal: "general",
+    difficulty: "beginner",
+    daysPerWeek: 3,
+    templateVersion: 1,
+    items: [],
+    createdAt: now,
+    updatedAt: now
+  };
+}
+
 beforeEach(() => databases.splice(0));
 afterEach(async () => {
   for (const db of databases) {
@@ -51,6 +68,29 @@ afterEach(async () => {
 });
 
 describe("IndexedDB schema and recovery", () => {
+  it("saves onboarding profile and starter routines atomically", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+
+    await saveInitialSetup(profile(), [routine()], db);
+
+    expect((await getProfile(db))?.displayName).toBe("Local lifter");
+    expect(await db.routines.toArray()).toHaveLength(1);
+  });
+
+  it("rolls onboarding back when a starter routine cannot be stored", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    db.routines.hook("creating", () => {
+      throw new Error("simulated routine failure");
+    });
+
+    await expect(saveInitialSetup(profile(), [routine()], db)).rejects.toThrow("simulated routine failure");
+
+    expect(await getProfile(db)).toBeUndefined();
+    expect(await db.routines.count()).toBe(0);
+  });
+
   it("initializes schema v2 and round-trips all backup collections", async () => {
     const source = makeDatabase();
     await initializeDatabase(source);
@@ -67,6 +107,18 @@ describe("IndexedDB schema and recovery", () => {
 
     expect(await getProfile(target)).toEqual(exported.profile);
     expect(await exportAllData(target)).toEqual(exported);
+  });
+
+  it("updates catalog and template metadata without replacing user routines", async () => {
+    const db = makeDatabase();
+    await db.open();
+    await db.settings.put({ ...defaultSettings, catalogVersion: 2, routineTemplateVersion: 1 });
+    await db.routines.put(routine());
+
+    await initializeDatabase(db);
+
+    expect(await db.settings.get("app")).toMatchObject({ catalogVersion: 3, routineTemplateVersion: 2 });
+    expect((await db.routines.get("routine_starter"))?.name.en).toBe("Full body");
   });
 
   it("migrates v1 settings additively and keeps an installed nutrition pack during restore", async () => {
@@ -127,5 +179,23 @@ describe("IndexedDB schema and recovery", () => {
 
     expect((await db.sessions.get(session.id))?.finishedAt).toBe(finished.finishedAt);
     expect(await getActiveSession(db)).toBeUndefined();
+  });
+
+  it("rejects non-finite numeric values at the storage boundary", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+
+    await expect(saveMeal({
+      id: "meal_invalid",
+      date: "2026-08-12",
+      meal: "lunch",
+      foodId: "food_invalid",
+      foodNameSnapshot: { vi: "Không hợp lệ", en: "Invalid" },
+      grams: Number.NaN,
+      nutrientsSnapshot: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      createdAt: "2026-08-12T12:00:00.000Z"
+    }, db)).rejects.toThrow("finite numbers");
+
+    expect(await db.meals.count()).toBe(0);
   });
 });

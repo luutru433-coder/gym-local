@@ -13,6 +13,20 @@ import {
   type WorkoutSession
 } from "@gym/contracts";
 
+function assertFiniteRecord(value: unknown, path = "record"): void {
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new Error(`${path} must contain only finite numbers`);
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertFiniteRecord(item, `${path}[${index}]`));
+    return;
+  }
+  if (value && typeof value === "object") {
+    Object.entries(value).forEach(([key, item]) => assertFiniteRecord(item, `${path}.${key}`));
+  }
+}
+
 export class GymDatabase extends Dexie {
   profiles!: EntityTable<Profile, "id">;
   routines!: EntityTable<Routine, "id">;
@@ -74,7 +88,24 @@ export const defaultSettings: AppSettings = {
 
 export async function initializeDatabase(db: GymDatabase = gymDb): Promise<void> {
   const settings = await db.settings.get("app");
-  if (!settings) await db.settings.put(defaultSettings);
+  if (!settings) {
+    await db.settings.put(defaultSettings);
+    return;
+  }
+  if (
+    settings.catalogVersion !== APP_VERSIONS.catalog
+    || settings.routineTemplateVersion !== APP_VERSIONS.routines
+    || settings.nutritionFormulaVersion !== APP_VERSIONS.nutritionFormula
+    || settings.backupVersion !== APP_VERSIONS.backup
+  ) {
+    await db.settings.put({
+      ...settings,
+      catalogVersion: APP_VERSIONS.catalog,
+      routineTemplateVersion: APP_VERSIONS.routines,
+      nutritionFormulaVersion: APP_VERSIONS.nutritionFormula,
+      backupVersion: APP_VERSIONS.backup
+    });
+  }
 }
 
 export async function persistentStorageStatus(): Promise<boolean | undefined> {
@@ -102,6 +133,7 @@ export async function getProfile(db: GymDatabase = gymDb): Promise<Profile | und
 }
 
 export async function saveProfile(profile: Profile, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(profile, "profile");
   await db.profiles.put({ ...profile, updatedAt: new Date().toISOString() });
 }
 
@@ -110,7 +142,22 @@ export async function listRoutines(db: GymDatabase = gymDb): Promise<Routine[]> 
 }
 
 export async function saveRoutine(routine: Routine, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(routine, "routine");
   await db.routines.put({ ...routine, updatedAt: new Date().toISOString() });
+}
+
+export async function saveInitialSetup(profile: Profile, routines: Routine[], db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(profile, "profile");
+  assertFiniteRecord(routines, "routines");
+  await db.transaction("rw", db.profiles, db.routines, async () => {
+    await db.profiles.put({ ...profile, updatedAt: new Date().toISOString() });
+    if (routines.length) {
+      await db.routines.bulkPut(routines.map((routine) => ({
+        ...routine,
+        updatedAt: new Date().toISOString()
+      })));
+    }
+  });
 }
 
 export async function deleteRoutine(id: string, db: GymDatabase = gymDb): Promise<void> {
@@ -122,6 +169,7 @@ export async function listSessions(db: GymDatabase = gymDb): Promise<WorkoutSess
 }
 
 export async function saveSession(session: WorkoutSession, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(session, "session");
   const commit = () => db.transaction("rw", db.sessions, db.settings, async () => {
     await db.sessions.put(session);
     const settings = (await db.settings.get("app")) ?? defaultSettings;
@@ -141,6 +189,7 @@ export async function listFoods(db: GymDatabase = gymDb): Promise<FoodItem[]> {
 }
 
 export async function saveFood(food: FoodItem, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(food, "food");
   await db.foods.put(food);
 }
 
@@ -153,6 +202,7 @@ export async function listMeals(db: GymDatabase = gymDb): Promise<MealEntry[]> {
 }
 
 export async function saveMeal(entry: MealEntry, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(entry, "meal");
   await db.meals.put(entry);
 }
 
@@ -165,6 +215,7 @@ export async function listBodyMetrics(db: GymDatabase = gymDb): Promise<BodyMetr
 }
 
 export async function saveBodyMetric(metric: BodyMetric, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(metric, "body metric");
   await db.bodyMetrics.put(metric);
 }
 
@@ -173,6 +224,7 @@ export async function getSettings(db: GymDatabase = gymDb): Promise<AppSettings>
 }
 
 export async function saveSettings(settings: AppSettings, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(settings, "settings");
   await db.settings.put(settings);
 }
 
@@ -185,6 +237,7 @@ export async function getNutritionPackRecord(db: GymDatabase = gymDb): Promise<N
 }
 
 export async function saveNutritionPackRecord(record: NutritionPackRecord, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(record, "nutrition pack record");
   await db.nutritionPacks.put(record);
 }
 
@@ -214,6 +267,7 @@ export async function exportAllData(db: GymDatabase = gymDb): Promise<BackupPayl
 
 export async function replaceAllData(data: Awaited<ReturnType<typeof exportAllData>>, db: GymDatabase = gymDb): Promise<void> {
   await sessionWriteQueue;
+  assertFiniteRecord(data, "restore data");
   const userTables = [db.profiles, db.routines, db.sessions, db.foods, db.meals, db.bodyMetrics, db.customVariants, db.settings];
   await db.transaction("rw", userTables, async () => {
     for (const table of userTables) await table.clear();

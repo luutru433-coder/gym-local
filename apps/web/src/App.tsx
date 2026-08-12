@@ -4,6 +4,7 @@ import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { Onboarding } from "./features/onboarding/Onboarding";
+import { useDocumentLanguage } from "./lib/i18n";
 import { useGymStore } from "./store/useGymStore";
 
 const HomePage = lazy(() => import("./features/home/HomePage").then((module) => ({ default: module.HomePage })));
@@ -22,6 +23,8 @@ export function App() {
   const notice = useGymStore((state) => state.notice);
   const clearNotice = useGymStore((state) => state.clearNotice);
   const hydrate = useGymStore((state) => state.hydrate);
+
+  useDocumentLanguage(profile?.locale ?? "vi");
 
   useEffect(() => { void hydrate(); }, [hydrate]);
   useEffect(() => {

@@ -6,6 +6,7 @@ import { EQUIPMENT_OPTIONS } from "@gym/catalog";
 import { estimateNutritionTarget } from "@gym/nutrition";
 import { useGymStore } from "../../store/useGymStore";
 import { Brand } from "../../components/Brand";
+import { useDocumentLanguage } from "../../lib/i18n";
 
 const goalOptions: Array<{ id: Goal; vi: string; en: string }> = [
   { id: "hypertrophy", vi: "Tăng cơ", en: "Build muscle" },
@@ -49,6 +50,8 @@ export function Onboarding() {
   const [weight, setWeight] = useState("");
   const [activityFactor, setActivityFactor] = useState<1.2 | 1.375 | 1.55 | 1.725 | 1.9>(1.55);
   const [error, setError] = useState<string>();
+
+  useDocumentLanguage(locale);
 
   const isVi = locale === "vi";
   const nutritionTarget = useMemo(() => {
@@ -138,7 +141,7 @@ export function Onboarding() {
             <span>{isVi ? `Bước ${step} / 3` : `Step ${step} of 3`}</span>
             <span>{Math.round((step / 3) * 100)}%</span>
           </div>
-          <ProgressBar value={(step / 3) * 100} />
+          <ProgressBar value={(step / 3) * 100} label={isVi ? "Tiến độ thiết lập" : "Setup progress"} />
 
           {error ? <Notice tone="warning">{error}</Notice> : null}
 

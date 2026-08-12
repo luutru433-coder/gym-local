@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.1
+
+- Corrected workout tracking semantics for per-hand, bodyweight-added, assisted, timed, distance, and reps-only variants; sessions now snapshot reviewed tracking behavior.
+- Corrected assisted pull-up requirements, timed plank targets, exact-variant previous values, completed-set history, RIR/RPE bounds, and misleading aggregate progress metrics.
+- Added transactional onboarding persistence and visible workout autosave status with rollback on a failed browser-storage write.
+- Added locale-aware nutrition validation, stopped treating missing provider macros as zero, and require completion of missing core nutrients before diary logging.
+- Validate backup data before creating a ZIP and reject invalid active-session relationships.
+- Added keyboard-safe dialogs, exposed selection/progress accessibility state, synchronized the document language, and re-prompted deferred PWA updates after a workout ends.
+
 ## 0.2.0
 
 - Added one direct, click-to-load instructional video for all 199 reviewed equipment variants; removed search-result guidance links.

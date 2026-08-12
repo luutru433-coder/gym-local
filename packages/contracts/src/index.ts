@@ -45,6 +45,23 @@ export type LoadEntryMode =
   | "reps_only"
   | "duration_distance";
 
+export type TrackingEffortKind = "reps" | "duration" | "distance_duration";
+export type TrackingVolumeMetric = "external_load" | "added_load" | "none";
+export type TrackingE1rmMetric = "entered_load" | "none";
+export type TrackingProgressDirection = "higher_load" | "lower_assistance" | "higher_reps" | "longer_duration" | "greater_distance";
+export type ExerciseLaterality = "bilateral" | "unilateral" | "ambiguous" | "not_applicable";
+
+export interface ExerciseTrackingProfile {
+  variantId: Id;
+  effortKind: TrackingEffortKind;
+  loadEntryMode: LoadEntryMode;
+  laterality: ExerciseLaterality;
+  volumeMetric: TrackingVolumeMetric;
+  volumeMultiplier?: 1 | 2;
+  e1rmMetric: TrackingE1rmMetric;
+  progressDirection: TrackingProgressDirection;
+}
+
 export interface ContentSource {
   id: Id;
   label: string;
@@ -181,6 +198,7 @@ export interface SessionExercise {
   variantId: Id;
   variantNameSnapshot: LocalizedText;
   loadEntryModeSnapshot: LoadEntryMode;
+  trackingProfileSnapshot?: ExerciseTrackingProfile;
   sets: SetLog[];
   restSeconds: number;
   note?: string;
@@ -363,10 +381,10 @@ export interface BackupPayload {
 }
 
 export const APP_VERSIONS = {
-  app: "0.2.0",
+  app: "0.2.1",
   database: 2,
-  catalog: 2,
-  routines: 1,
+  catalog: 3,
+  routines: 2,
   nutritionFormula: 1,
   backup: 2,
   nutritionPackSchema: 1

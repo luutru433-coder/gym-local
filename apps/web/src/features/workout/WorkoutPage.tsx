@@ -3,9 +3,9 @@ import { ArrowLeft, Check, ChevronDown, CircleHelp, Clock3, Dumbbell, Pause, Pla
 import { useNavigate } from "react-router-dom";
 import { Button, Card, EmptyState, Modal, Notice, ProgressBar } from "@gym/ui";
 import type { ExerciseVariant, SetLog, WorkoutSession } from "@gym/contracts";
-import { EQUIPMENT_OPTIONS, getVariant, rankVariantsForEquipment } from "@gym/catalog";
+import { EQUIPMENT_OPTIONS, getTrackingProfile, getVariant, rankVariantsForEquipment, trackingProfileForLoadMode } from "@gym/catalog";
 import { addSet, sessionProgress, switchExerciseVariant, updateSet } from "@gym/workouts";
-import { variantHistory } from "@gym/progress";
+import { latestVariantHistory } from "@gym/progress";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
@@ -25,9 +25,11 @@ function nonNegativeNumber(value: string): number | undefined {
   return Number.isFinite(number) ? Math.max(0, number) : undefined;
 }
 
-function nonNegativeInteger(value: string): number | undefined {
+function nonNegativeInteger(value: string, maximum?: number): number | undefined {
   const number = nonNegativeNumber(value);
-  return number === undefined ? undefined : Math.round(number);
+  if (number === undefined) return undefined;
+  const rounded = Math.round(number);
+  return maximum === undefined ? rounded : Math.min(maximum, rounded);
 }
 
 export function WorkoutPage() {
@@ -37,6 +39,7 @@ export function WorkoutPage() {
   const sessions = useGymStore((state) => state.sessions);
   const setActiveSession = useGymStore((state) => state.setActiveSession);
   const completeWorkout = useGymStore((state) => state.completeWorkout);
+  const sessionSaveStatus = useGymStore((state) => state.sessionSaveStatus);
   const locale = profile.locale;
   const [now, setNow] = useState(() => activeSession ? new Date(activeSession.startedAt).getTime() : 0);
   const [expandedId, setExpandedId] = useState(activeSession?.activeExerciseId);
@@ -52,7 +55,9 @@ export function WorkoutPage() {
   const progress = activeSession ? sessionProgress(activeSession) : { completed: 0, total: 0, percent: 0 };
   const restRemaining = restLabel(activeSession?.restTimerEndsAt, now);
 
-  const save = (session: WorkoutSession) => void setActiveSession(session);
+  const save = (session: WorkoutSession) => {
+    void setActiveSession(session).catch(() => undefined);
+  };
 
   const patchSet = (exerciseId: string, setId: string, values: Partial<Pick<SetLog, "weightKg" | "reps" | "rir" | "rpe" | "durationSeconds" | "distanceMeters" | "type">>) => {
     if (!activeSession) return;
@@ -82,6 +87,11 @@ export function WorkoutPage() {
 
   const chooseVariant = (exerciseId: string, variant: ExerciseVariant) => {
     if (!activeSession) return;
+    const current = activeSession.exercises.find((exercise) => exercise.id === exerciseId);
+    if (current?.variantId === variant.id) {
+      setVariantForExercise(undefined);
+      return;
+    }
     const updated = switchExerciseVariant(activeSession, exerciseId, variant);
     save(updated);
     setVariantForExercise(undefined);
@@ -105,12 +115,19 @@ export function WorkoutPage() {
 
   const modalExercise = activeSession.exercises.find((exercise) => exercise.id === variantForExercise);
   const modalVariants = modalExercise ? rankVariantsForEquipment(modalExercise.movementId, availableEquipment) : [];
+  const saveStatusLabel = sessionSaveStatus === "saving"
+    ? (locale === "vi" ? "Đang lưu…" : "Saving…")
+    : sessionSaveStatus === "saved"
+      ? (locale === "vi" ? "Đã lưu trên thiết bị" : "Saved on device")
+      : sessionSaveStatus === "error"
+        ? (locale === "vi" ? "Lưu thất bại" : "Save failed")
+        : (locale === "vi" ? "Đang tập" : "Workout live");
 
   return (
     <div className="workout-page">
       <header className="workout-header">
         <button className="icon-button icon-button--dark" type="button" onClick={() => navigate("/")} aria-label="Back"><ArrowLeft size={21} /></button>
-        <div className="workout-header__title"><span className="live-dot" /> <div><small>{locale === "vi" ? "Đang tập" : "Workout live"}</small><strong>{activeSession.routineNameSnapshot ? localize(activeSession.routineNameSnapshot, locale) : "Workout"}</strong></div></div>
+        <div className="workout-header__title"><span className="live-dot" /> <div><small>{saveStatusLabel}</small><strong>{activeSession.routineNameSnapshot ? localize(activeSession.routineNameSnapshot, locale) : "Workout"}</strong></div></div>
         <div className="workout-header__timer"><Clock3 size={17} /><span>{durationLabel(activeSession.startedAt, now)}</span></div>
         <Button variant="secondary" size="sm" onClick={() => void finish()}>{locale === "vi" ? "Kết thúc" : "Finish"}<Check size={16} /></Button>
       </header>
@@ -129,13 +146,17 @@ export function WorkoutPage() {
 
       <main className="workout-content">
         {activeSession.exercises.map((exercise, exerciseIndex) => {
-          const expanded = expandedId === exercise.id;
-          const variant = getVariant(exercise.variantId);
-          const previous = variantHistory(sessions.filter((session) => session.id !== activeSession.id), exercise.variantId);
-          const doneCount = exercise.sets.filter((set) => set.completedAt).length;
-          const durationMode = exercise.loadEntryModeSnapshot === "duration_distance";
-          const repsOnly = exercise.loadEntryModeSnapshot === "reps_only";
-          const weightHeading = repsOnly ? "—" : exercise.loadEntryModeSnapshot === "per_hand" ? (locale === "vi" ? "KG/TAY" : "KG/HAND") : exercise.loadEntryModeSnapshot === "per_side" ? (locale === "vi" ? "KG/BÊN" : "KG/SIDE") : exercise.loadEntryModeSnapshot === "assisted" ? "ASSIST KG" : "KG";
+           const expanded = expandedId === exercise.id;
+           const variant = getVariant(exercise.variantId);
+           const previous = latestVariantHistory(sessions.filter((session) => session.id !== activeSession.id), exercise.variantId);
+           const doneCount = exercise.sets.filter((set) => set.completedAt).length;
+           const trackingProfile = exercise.trackingProfileSnapshot
+             ?? getTrackingProfile(exercise.variantId)
+             ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
+           const distanceMode = trackingProfile.effortKind === "distance_duration";
+           const timedMode = trackingProfile.effortKind === "duration";
+           const repsOnly = trackingProfile.loadEntryMode === "reps_only";
+           const weightHeading = repsOnly ? "—" : trackingProfile.loadEntryMode === "per_hand" ? (locale === "vi" ? "KG/TAY" : "KG/HAND") : trackingProfile.loadEntryMode === "per_side" ? (locale === "vi" ? "KG/BÊN" : "KG/SIDE") : trackingProfile.loadEntryMode === "assisted" ? (locale === "vi" ? "KG TRỢ LỰC" : "ASSIST KG") : trackingProfile.loadEntryMode === "bodyweight_plus" ? (locale === "vi" ? "KG THÊM" : "ADDED KG") : "KG";
           return (
             <Card id={exercise.id} key={exercise.id} className={expanded ? "workout-exercise workout-exercise--expanded" : "workout-exercise"}>
               <button type="button" className="workout-exercise__header" onClick={() => setExpandedId(expanded ? undefined : exercise.id)}>
@@ -153,29 +174,40 @@ export function WorkoutPage() {
                   </div>
 
                   <div className="set-table">
-                    <div className="set-table__head"><span>SET</span><span>{locale === "vi" ? "TRƯỚC / MỤC TIÊU" : "PREV / TARGET"}</span><span>{weightHeading}</span><span>{durationMode ? "M" : "REPS"}</span><span>{durationMode ? "GIÂY" : "RIR"}</span><span /></div>
+                    <div className="set-table__head"><span>SET</span><span>{locale === "vi" ? "TRƯỚC / MỤC TIÊU" : "PREV / TARGET"}</span><span>{weightHeading}</span><span>{distanceMode ? "M" : timedMode ? (locale === "vi" ? "GIÂY" : "SEC") : "REPS"}</span><span>{distanceMode ? (locale === "vi" ? "GIÂY" : "SEC") : "RIR"}</span><span /></div>
                     {exercise.sets.map((set, setIndex) => {
-                      const prior = previous[setIndex];
-                      const targetLabel = durationMode
+                      const workingSetIndex = exercise.sets.slice(0, setIndex + 1).filter((candidate) => candidate.type !== "warmup").length - 1;
+                      const prior = set.type === "warmup" ? undefined : previous[workingSetIndex];
+                      const targetLabel = distanceMode
                         ? (set.targetMinReps !== undefined || set.targetMaxReps !== undefined ? `${set.targetMinReps ?? "—"}–${set.targetMaxReps ?? "—"} m` : set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : "—")
+                        : timedMode
+                          ? (set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : "—")
                         : (set.targetMinReps !== undefined || set.targetMaxReps !== undefined ? `${set.targetMinReps ?? "—"}–${set.targetMaxReps ?? "—"}` : "—");
                       const previousLabel = prior
-                        ? (durationMode ? `${prior.distanceMeters ?? "—"}m · ${prior.durationSeconds ?? "—"}s` : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`)
+                        ? (distanceMode
+                          ? `${prior.distanceMeters ?? "—"}m · ${prior.durationSeconds ?? "—"}s`
+                          : timedMode
+                            ? `${prior.weightKg ? `${prior.weightKg}kg · ` : ""}${prior.durationSeconds ?? "—"}s`
+                            : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`)
                         : targetLabel;
-                      const canComplete = durationMode
+                      const canComplete = distanceMode
                         ? Boolean((set.distanceMeters ?? 0) > 0 || (set.durationSeconds ?? 0) > 0)
+                        : timedMode
+                          ? Boolean((set.durationSeconds ?? 0) > 0)
                         : Boolean((set.reps ?? 0) > 0);
                       return (
                         <div className={set.completedAt ? "set-row set-row--done" : "set-row"} key={set.id}>
                           <button type="button" className="set-type" onClick={() => patchSet(exercise.id, set.id, { type: set.type === "warmup" ? "working" : "warmup" })}>{set.type === "warmup" ? "W" : setIndex + 1}</button>
                           <span className="previous-value">{previousLabel}</span>
                           {repsOnly ? <span className="set-input-placeholder">—</span> : <input aria-label={`Set ${setIndex + 1} weight`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
-                          {durationMode
+                          {distanceMode
                             ? <input aria-label={`Set ${setIndex + 1} distance in meters`} inputMode="decimal" min="0" step="1" value={set.distanceMeters ?? ""} placeholder="m" onChange={(event) => patchSet(exercise.id, set.id, { distanceMeters: nonNegativeNumber(event.target.value) })} />
+                            : timedMode
+                              ? <input aria-label={`Set ${setIndex + 1} duration in seconds`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
                             : <input aria-label={`Set ${setIndex + 1} reps`} inputMode="numeric" min="0" step="1" value={set.reps ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { reps: nonNegativeInteger(event.target.value) })} />}
-                          {durationMode
+                          {distanceMode
                             ? <input aria-label={`Set ${setIndex + 1} duration in seconds`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
-                            : <input aria-label={`Set ${setIndex + 1} RIR`} inputMode="numeric" min="0" max="10" step="1" value={set.rir ?? ""} placeholder={String(set.targetRir ?? 2)} onChange={(event) => patchSet(exercise.id, set.id, { rir: nonNegativeInteger(event.target.value) })} />}
+                            : <input aria-label={`Set ${setIndex + 1} RIR`} inputMode="numeric" min="0" max="10" step="1" value={set.rir ?? ""} placeholder={String(set.targetRir ?? 2)} onChange={(event) => patchSet(exercise.id, set.id, { rir: nonNegativeInteger(event.target.value, 10) })} />}
                           <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id)} aria-label={set.completedAt ? "Undo set" : "Complete set"} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập reps, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}>{set.completedAt ? <Check size={19} /> : null}</button>
                         </div>
                       );

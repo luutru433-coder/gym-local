@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Activity, BarChart3, CalendarDays, ChevronDown, Dumbbell, Plus, Scale, Target, TrendingUp, Trophy } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button, Card, EmptyState, Field, Modal, SectionTitle } from "@gym/ui";
-import { createId, type BodyMetric, type MuscleGroup, type WorkoutSession } from "@gym/contracts";
-import { getVariant } from "@gym/catalog";
-import { personalRecord, weeklyMuscleSets } from "@gym/progress";
+import { createId, type BodyMetric, type MuscleGroup, type SessionExercise } from "@gym/contracts";
+import { getTrackingProfile, trackingProfileForLoadMode } from "@gym/catalog";
+import { personalRecord, sessionExternalVolume, weeklyMuscleSets } from "@gym/progress";
 import { formatDate, formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 
@@ -20,8 +20,22 @@ function weekStart(): Date {
   return date;
 }
 
-function sessionVolume(session: WorkoutSession): number {
-  return Math.round(session.exercises.reduce((total, exercise) => total + exercise.sets.reduce((sum, set) => sum + ((set.completedAt && set.weightKg && set.reps) ? set.weightKg * set.reps : 0), 0), 0));
+function completedPerformanceLabel(exercise: SessionExercise, locale: "vi" | "en"): string {
+  const sets = exercise.sets.filter((set) => set.completedAt && set.type !== "warmup");
+  const profile = exercise.trackingProfileSnapshot
+    ?? getTrackingProfile(exercise.variantId)
+    ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
+  if (profile.effortKind === "duration") return `${Math.max(0, ...sets.map((set) => set.durationSeconds ?? 0))}s`;
+  if (profile.effortKind === "distance_duration") return `${Math.max(0, ...sets.map((set) => set.distanceMeters ?? 0))}m`;
+  if (profile.loadEntryMode === "assisted") {
+    const values = sets.map((set) => set.weightKg).filter((value): value is number => value !== undefined);
+    return values.length ? `${locale === "vi" ? "trợ lực" : "assist"} ${Math.min(...values)} kg` : "—";
+  }
+  if (profile.loadEntryMode === "reps_only" || !sets.some((set) => set.weightKg !== undefined)) {
+    return `${Math.max(0, ...sets.map((set) => set.reps ?? 0))} reps`;
+  }
+  const suffix = profile.loadEntryMode === "per_hand" ? (locale === "vi" ? " kg/tay" : " kg/hand") : " kg";
+  return `${Math.max(0, ...sets.map((set) => set.weightKg ?? 0))}${suffix}`;
 }
 
 function optionalPositiveMetric(raw: string): number | undefined {
@@ -40,15 +54,15 @@ export function ProgressPage() {
   const [metric, setMetric] = useState({ date: new Date().toISOString().slice(0, 10), weightKg: profile.weightKg ? String(profile.weightKg) : "", waistCm: "", chestCm: "", hipsCm: "", armCm: "", thighCm: "" });
 
   const totalSets = sessions.reduce((total, session) => total + session.exercises.flatMap((exercise) => exercise.sets).filter((set) => set.completedAt && set.type !== "warmup").length, 0);
-  const totalVolume = sessions.reduce((sum, session) => sum + sessionVolume(session), 0);
+  const totalVolume = sessions.reduce((sum, session) => sum + sessionExternalVolume(session), 0);
   const uniqueVariants = [...new Set(sessions.flatMap((session) => session.exercises.map((exercise) => exercise.variantId)))];
-  const bestRecord = uniqueVariants.map((variantId) => ({ variantId, ...personalRecord(sessions, variantId) })).sort((a, b) => b.maxE1rm - a.maxE1rm)[0];
+  const e1rmVariantCount = uniqueVariants.filter((variantId) => personalRecord(sessions, variantId).maxE1rm > 0).length;
   const muscleSets = weeklyMuscleSets(sessions, weekStart());
   const maxMuscleSets = Math.max(1, ...Object.values(muscleSets).map(Number));
 
   const volumeData = [...sessions].reverse().slice(-10).map((session) => ({
     date: new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", { day: "2-digit", month: "2-digit" }).format(new Date(session.finishedAt!)),
-    volume: sessionVolume(session)
+    volume: sessionExternalVolume(session)
   }));
   const weightData = bodyMetrics.filter((entry) => entry.weightKg).slice(-12).map((entry) => ({
     date: new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", { day: "2-digit", month: "2-digit" }).format(new Date(entry.date)),
@@ -81,13 +95,13 @@ export function ProgressPage() {
       <div className="progress-stats">
         <Card><span className="progress-stat__icon"><CalendarDays size={20} /></span><div><span>{locale === "vi" ? "Buổi đã tập" : "Workouts"}</span><strong>{sessions.length}</strong></div><small>{locale === "vi" ? "toàn thời gian" : "all time"}</small></Card>
         <Card><span className="progress-stat__icon"><Activity size={20} /></span><div><span>Working sets</span><strong>{totalSets}</strong></div><small>{locale === "vi" ? "đã hoàn tất" : "completed"}</small></Card>
-        <Card><span className="progress-stat__icon"><Dumbbell size={20} /></span><div><span>{locale === "vi" ? "Tổng volume" : "Total volume"}</span><strong>{formatNumber(totalVolume, locale, 0)}</strong></div><small>kg</small></Card>
-        <Card className="progress-stat--accent"><span className="progress-stat__icon"><Trophy size={20} /></span><div><span>{locale === "vi" ? "e1RM tốt nhất" : "Best e1RM"}</span><strong>{bestRecord?.maxE1rm ? formatNumber(bestRecord.maxE1rm, locale) : "—"}</strong></div><small>{bestRecord ? getVariant(bestRecord.variantId)?.name[locale] : (locale === "vi" ? "Cần set 1–10 reps" : "Needs a 1–10 rep set")}</small></Card>
+        <Card><span className="progress-stat__icon"><Dumbbell size={20} /></span><div><span>{locale === "vi" ? "Volume tải ngoài" : "External-load volume"}</span><strong>{formatNumber(totalVolume, locale, 0)}</strong></div><small>{locale === "vi" ? "kg·reps · không tính warm-up" : "kg·reps · warm-ups excluded"}</small></Card>
+        <Card className="progress-stat--accent"><span className="progress-stat__icon"><Trophy size={20} /></span><div><span>{locale === "vi" ? "Biến thể có e1RM" : "Variants with e1RM"}</span><strong>{e1rmVariantCount || "—"}</strong></div><small>{locale === "vi" ? "PR được tách theo đúng biến thể" : "PRs stay exact-variation only"}</small></Card>
       </div>
 
       <div className="chart-grid">
         <Card className="chart-card">
-          <SectionTitle eyebrow={locale === "vi" ? "10 buổi gần nhất" : "Last 10 sessions"} title={locale === "vi" ? "Volume tập luyện" : "Training volume"} />
+          <SectionTitle eyebrow={locale === "vi" ? "10 buổi gần nhất" : "Last 10 sessions"} title={locale === "vi" ? "Volume tải ngoài" : "External-load volume"} />
           {volumeData.length ? <div className="chart-wrap"><ResponsiveContainer width="100%" height="100%"><AreaChart data={volumeData} margin={{ left: -15, right: 8, top: 12 }}><defs><linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#d9ff58" stopOpacity={0.7} /><stop offset="100%" stopColor="#d9ff58" stopOpacity={0.02} /></linearGradient></defs><CartesianGrid strokeDasharray="3 5" vertical={false} stroke="#d7d4ca" /><XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#77786f" }} /><YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#77786f" }} /><Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #d7d4ca", background: "#fffdf8" }} /><Area type="monotone" dataKey="volume" stroke="#1d2018" strokeWidth={2.5} fill="url(#volumeFill)" /></AreaChart></ResponsiveContainer></div> : <EmptyState icon={<BarChart3 />} title={locale === "vi" ? "Chưa có volume" : "No volume data"} body={locale === "vi" ? "Hoàn tất set có mức tạ và reps để xem biểu đồ." : "Complete weighted sets to see this chart."} />}
         </Card>
         <Card className="chart-card">
@@ -110,7 +124,7 @@ export function ProgressPage() {
           <div className="history-list">
             {sessions.slice(0, 8).map((session) => {
               const open = expandedSession === session.id;
-              return <Card className={open ? "history-card history-card--open" : "history-card"} key={session.id}><button type="button" className="history-card__head" onClick={() => setExpandedSession(open ? undefined : session.id)}><span className="history-card__date"><strong>{new Date(session.finishedAt!).getDate()}</strong><small>{formatDate(session.finishedAt!, locale, { month: "short" })}</small></span><div><h3>{session.routineNameSnapshot ? localize(session.routineNameSnapshot, locale) : "Workout"}</h3><p>{session.exercises.length} {locale === "vi" ? "động tác" : "exercises"} · {sessionVolume(session).toLocaleString()} kg</p></div><ChevronDown size={19} /></button>{open ? <ul>{session.exercises.map((exercise) => <li key={exercise.id}><div><strong>{localize(exercise.variantNameSnapshot, locale)}</strong><small>{exercise.sets.filter((set) => set.completedAt).length} sets</small></div><span>{Math.max(0, ...exercise.sets.map((set) => set.weightKg ?? 0))} kg</span></li>)}</ul> : null}</Card>;
+              return <Card className={open ? "history-card history-card--open" : "history-card"} key={session.id}><button type="button" className="history-card__head" onClick={() => setExpandedSession(open ? undefined : session.id)}><span className="history-card__date"><strong>{new Date(session.finishedAt!).getDate()}</strong><small>{formatDate(session.finishedAt!, locale, { month: "short" })}</small></span><div><h3>{session.routineNameSnapshot ? localize(session.routineNameSnapshot, locale) : "Workout"}</h3><p>{session.exercises.length} {locale === "vi" ? "động tác" : "exercises"} · {formatNumber(sessionExternalVolume(session), locale, 0)} kg·reps</p></div><ChevronDown size={19} /></button>{open ? <ul>{session.exercises.map((exercise) => <li key={exercise.id}><div><strong>{localize(exercise.variantNameSnapshot, locale)}</strong><small>{exercise.sets.filter((set) => set.completedAt && set.type !== "warmup").length} sets</small></div><span>{completedPerformanceLabel(exercise, locale)}</span></li>)}</ul> : null}</Card>;
             })}
             {!sessions.length ? <EmptyState icon={<TrendingUp />} title={locale === "vi" ? "Chưa có buổi đã lưu" : "No finished workouts"} body={locale === "vi" ? "Kết thúc buổi tập đầu tiên để bắt đầu theo dõi tiến độ." : "Finish your first workout to begin tracking progress."} /> : null}
           </div>

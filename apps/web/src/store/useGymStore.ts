@@ -19,6 +19,7 @@ import {
   saveFood,
   saveMeal,
   saveProfile,
+  saveInitialSetup,
   saveRoutine,
   saveSession,
   saveSettings
@@ -38,6 +39,8 @@ interface GymState {
   meals: MealEntry[];
   bodyMetrics: BodyMetric[];
   settings: AppSettings;
+  sessionSaveStatus: "idle" | "saving" | "saved" | "error";
+  sessionSaveRevision: number;
   hydrate: () => Promise<void>;
   clearNotice: () => void;
   setNotice: (message: string) => void;
@@ -75,6 +78,8 @@ async function loadSnapshot() {
   return { profile, routines, sessions, activeSession, foods, meals, bodyMetrics, settings };
 }
 
+let lastPersistedActiveSession: WorkoutSession | undefined;
+
 export const useGymStore = create<GymState>((set, get) => ({
   ready: false,
   busy: false,
@@ -84,12 +89,16 @@ export const useGymStore = create<GymState>((set, get) => ({
   meals: [],
   bodyMetrics: [],
   settings: defaultSettings,
+  sessionSaveStatus: "idle",
+  sessionSaveRevision: 0,
 
   async hydrate() {
     set({ busy: true, error: undefined });
     try {
       await initializeDatabase();
-      set({ ...(await loadSnapshot()), ready: true, busy: false });
+      const snapshot = await loadSnapshot();
+      lastPersistedActiveSession = snapshot.activeSession;
+      set({ ...snapshot, ready: true, busy: false, sessionSaveStatus: "idle" });
     } catch (error) {
       set({ ready: true, busy: false, error: messageFrom(error) });
     }
@@ -101,13 +110,8 @@ export const useGymStore = create<GymState>((set, get) => ({
   async completeOnboarding(profile, templateIds) {
     set({ busy: true, error: undefined });
     try {
-      await saveProfile(profile);
-      const routines: Routine[] = [];
-      for (const templateId of templateIds) {
-        const routine = cloneRoutineTemplate(templateId);
-        await saveRoutine(routine);
-        routines.push(routine);
-      }
+      const routines = templateIds.map((templateId) => cloneRoutineTemplate(templateId));
+      await saveInitialSetup(profile, routines);
       set({ profile, routines, busy: false, notice: profile.locale === "vi" ? "Thiết lập đã được lưu trên thiết bị." : "Setup was saved on this device." });
     } catch (error) {
       set({ busy: false, error: messageFrom(error) });
@@ -147,20 +151,35 @@ export const useGymStore = create<GymState>((set, get) => ({
     if (active) throw new Error(get().profile?.locale === "en" ? "You already have an unfinished workout" : "Bạn đang có một buổi tập chưa hoàn tất");
     const session = createSessionFromRoutine(routine, get().profile?.activeLocationId);
     await saveSession(session);
-    set((state) => ({ activeSession: session, sessions: [session, ...state.sessions] }));
+    lastPersistedActiveSession = session;
+    set((state) => ({ activeSession: session, sessions: [session, ...state.sessions], sessionSaveStatus: "saved" }));
   },
 
   async setActiveSession(session) {
+    const revision = get().sessionSaveRevision + 1;
     set((state) => ({
       activeSession: session.finishedAt ? undefined : session,
       sessions: state.sessions.some((item) => item.id === session.id)
         ? state.sessions.map((item) => item.id === session.id ? session : item)
-        : [session, ...state.sessions]
+        : [session, ...state.sessions],
+      sessionSaveStatus: "saving",
+      sessionSaveRevision: revision
     }));
     try {
       await saveSession(session);
+      lastPersistedActiveSession = session.finishedAt ? undefined : session;
+      if (get().sessionSaveRevision === revision) set({ sessionSaveStatus: "saved" });
     } catch (error) {
-      set({ error: messageFrom(error) });
+      if (get().sessionSaveRevision === revision) {
+        set((state) => ({
+          activeSession: lastPersistedActiveSession,
+          sessions: lastPersistedActiveSession
+            ? state.sessions.map((item) => item.id === lastPersistedActiveSession!.id ? lastPersistedActiveSession! : item)
+            : state.sessions.filter((item) => item.id !== session.id),
+          sessionSaveStatus: "error",
+          error: messageFrom(error)
+        }));
+      }
       throw error;
     }
   },
@@ -170,9 +189,11 @@ export const useGymStore = create<GymState>((set, get) => ({
     if (!active) return undefined;
     const finished = finishSession(active);
     await saveSession(finished);
+    lastPersistedActiveSession = undefined;
     set((state) => ({
       activeSession: undefined,
       sessions: state.sessions.map((session) => session.id === finished.id ? finished : session),
+      sessionSaveStatus: "saved",
       notice: state.profile?.locale === "en" ? "Workout saved. Nice work!" : "Buổi tập đã được lưu. Tuyệt vời!"
     }));
     return finished;

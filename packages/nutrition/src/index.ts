@@ -14,6 +14,139 @@ export interface NutritionEstimateInput {
   goal: Goal;
 }
 
+export type NutritionLocale = "vi" | "en";
+
+export interface NutritionValidationError {
+  field: "date" | "grams" | "name" | "calories" | "protein" | "carbs" | "fat";
+  code: "required" | "invalid_number" | "out_of_range" | "invalid_date" | "missing_nutrient";
+  message: string;
+}
+
+export type NutritionValidationResult<T> =
+  | { ok: true; value: T }
+  | { ok: false; errors: NutritionValidationError[] };
+
+export interface FoodLookupCandidate {
+  id: string;
+  barcode: string;
+  name: FoodItem["name"];
+  brand?: string;
+  servingLabel?: string;
+  servingGrams?: number;
+  per100g: Partial<NutrientProfile>;
+  missingCoreNutrients: Array<"calories" | "protein" | "carbs" | "fat">;
+  source: "open_food_facts";
+  sourceUrl: string;
+  updatedAt: string;
+}
+
+export interface CustomFoodDraft {
+  name: string;
+  calories: string;
+  protein: string;
+  carbs: string;
+  fat: string;
+}
+
+const coreNutrients = ["calories", "protein", "carbs", "fat"] as const;
+
+function validationMessage(locale: NutritionLocale, field: NutritionValidationError["field"], code: NutritionValidationError["code"]): string {
+  const labels = locale === "vi"
+    ? { date: "Ngày", grams: "Khối lượng", name: "Tên thực phẩm", calories: "Calories", protein: "Protein", carbs: "Carb", fat: "Fat" }
+    : { date: "Date", grams: "Amount", name: "Food name", calories: "Calories", protein: "Protein", carbs: "Carbs", fat: "Fat" };
+  if (code === "required") return locale === "vi" ? `${labels[field]} là bắt buộc.` : `${labels[field]} is required.`;
+  if (code === "invalid_date") return locale === "vi" ? "Ngày không hợp lệ." : "Enter a valid date.";
+  if (code === "missing_nutrient") return locale === "vi" ? `${labels[field]} chưa có từ nguồn dữ liệu. Hãy nhập giá trị trên 100g.` : `${labels[field]} is missing from the source. Enter a per-100g value.`;
+  if (code === "out_of_range") return locale === "vi" ? `${labels[field]} nằm ngoài phạm vi cho phép.` : `${labels[field]} is outside the supported range.`;
+  return locale === "vi" ? `${labels[field]} phải là một số hợp lệ.` : `${labels[field]} must be a valid number.`;
+}
+
+export function parseNutritionNumber(
+  raw: string,
+  locale: NutritionLocale,
+  field: NutritionValidationError["field"],
+  options: { min?: number; max?: number; allowZero?: boolean } = {}
+): NutritionValidationResult<number> {
+  const trimmed = raw.trim();
+  if (!trimmed) return { ok: false, errors: [{ field, code: "required", message: validationMessage(locale, field, "required") }] };
+  const normalized = trimmed.replace(",", ".");
+  if (!/^\d+(?:\.\d+)?$/.test(normalized)) {
+    return { ok: false, errors: [{ field, code: "invalid_number", message: validationMessage(locale, field, "invalid_number") }] };
+  }
+  const value = Number(normalized);
+  const min = options.min ?? (options.allowZero ? 0 : Number.MIN_VALUE);
+  const max = options.max ?? Number.MAX_SAFE_INTEGER;
+  if (!Number.isFinite(value) || value < min || value > max || (!options.allowZero && value === 0)) {
+    return { ok: false, errors: [{ field, code: "out_of_range", message: validationMessage(locale, field, "out_of_range") }] };
+  }
+  return { ok: true, value };
+}
+
+export function validateMealInput(
+  grams: string,
+  date: string,
+  locale: NutritionLocale
+): NutritionValidationResult<{ grams: number; date: string }> {
+  const errors: NutritionValidationError[] = [];
+  const parsedGrams = parseNutritionNumber(grams, locale, "grams", { min: 0.1, max: 100_000 });
+  if (!parsedGrams.ok) errors.push(...parsedGrams.errors);
+  const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date) && (() => {
+    const [year, month, day] = date.split("-").map(Number);
+    const value = new Date(Date.UTC(year, month - 1, day));
+    return value.getUTCFullYear() === year && value.getUTCMonth() === month - 1 && value.getUTCDate() === day;
+  })();
+  if (!validDate) errors.push({ field: "date", code: "invalid_date", message: validationMessage(locale, "date", "invalid_date") });
+  if (errors.length || !parsedGrams.ok) return { ok: false, errors };
+  return { ok: true, value: { grams: parsedGrams.value, date } };
+}
+
+export function validateCustomFoodDraft(draft: CustomFoodDraft, locale: NutritionLocale): NutritionValidationResult<FoodItem> {
+  const errors: NutritionValidationError[] = [];
+  const name = draft.name.trim();
+  if (!name) errors.push({ field: "name", code: "required", message: validationMessage(locale, "name", "required") });
+  const parsed = {} as Record<(typeof coreNutrients)[number], number>;
+  for (const field of coreNutrients) {
+    const result = parseNutritionNumber(draft[field], locale, field, { min: 0, max: field === "calories" ? 10_000 : 1_000, allowZero: true });
+    if (result.ok) parsed[field] = result.value;
+    else errors.push(...result.errors);
+  }
+  if (errors.length) return { ok: false, errors };
+  return { ok: true, value: createCustomFood(name, parsed) };
+}
+
+export function completeFoodLookupCandidate(
+  candidate: FoodLookupCandidate,
+  values: Pick<CustomFoodDraft, "calories" | "protein" | "carbs" | "fat">,
+  locale: NutritionLocale
+): NutritionValidationResult<FoodItem> {
+  const parsed = {} as Record<(typeof coreNutrients)[number], number>;
+  const errors: NutritionValidationError[] = [];
+  for (const field of coreNutrients) {
+    const sourceValue = candidate.per100g[field];
+    const raw = values[field].trim() || (typeof sourceValue === "number" && Number.isFinite(sourceValue) ? String(sourceValue) : "");
+    const result = parseNutritionNumber(raw, locale, field, { min: 0, max: field === "calories" ? 10_000 : 1_000, allowZero: true });
+    if (result.ok) parsed[field] = result.value;
+    else errors.push({ ...(result.errors[0] ?? { field, code: "missing_nutrient" as const, message: "" }), field, code: raw ? result.errors[0]?.code ?? "invalid_number" : "missing_nutrient", message: raw ? result.errors[0]?.message ?? validationMessage(locale, field, "invalid_number") : validationMessage(locale, field, "missing_nutrient") });
+  }
+  if (errors.length) return { ok: false, errors };
+  return {
+    ok: true,
+    value: {
+      id: candidate.id,
+      barcode: candidate.barcode,
+      name: candidate.name,
+      brand: candidate.brand,
+      servingLabel: candidate.servingLabel,
+      servingGrams: candidate.servingGrams,
+      per100g: { ...candidate.per100g, ...parsed },
+      source: candidate.source,
+      sourceUrl: candidate.sourceUrl,
+      dataQuality: candidate.missingCoreNutrients.length ? "partial" : "complete",
+      updatedAt: candidate.updatedAt
+    }
+  };
+}
+
 export function estimateNutritionTarget(input: NutritionEstimateInput): NutritionTarget {
   if (input.age < 18 || input.age > 100) throw new Error("Nutrition estimates are available for adults only");
   if (input.heightCm < 120 || input.heightCm > 230 || input.weightKg < 35 || input.weightKg > 350) {
@@ -50,6 +183,7 @@ function scaledNutrient(value: number | null | undefined, factor: number, precis
 }
 
 export function nutrientsForGrams(food: FoodItem, grams: number): NutrientProfile {
+  if (!Number.isFinite(grams) || grams <= 0 || grams > 100_000) throw new Error("Invalid food amount");
   const factor = Math.max(0, grams) / 100;
   return {
     calories: Math.round(food.per100g.calories * factor),
@@ -76,14 +210,16 @@ export function nutrientsForGrams(food: FoodItem, grams: number): NutrientProfil
 }
 
 export function createMealEntry(food: FoodItem, grams: number, date: string, meal: MealEntry["meal"]): MealEntry {
+  const validated = validateMealInput(String(grams), date, "en");
+  if (!validated.ok) throw new Error(validated.errors.map((error) => error.message).join(" "));
   return {
     id: createId("meal"),
     date,
     meal,
     foodId: food.id,
     foodNameSnapshot: food.name,
-    grams,
-    nutrientsSnapshot: nutrientsForGrams(food, grams),
+    grams: validated.value.grams,
+    nutrientsSnapshot: nutrientsForGrams(food, validated.value.grams),
     createdAt: new Date().toISOString()
   };
 }
@@ -119,7 +255,7 @@ function nutrientValue(nutriments: Record<string, unknown>, key: string, multipl
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value * multiplier : null;
 }
 
-export async function lookupFoodByBarcode(barcode: string, signal?: AbortSignal): Promise<FoodItem | undefined> {
+export async function lookupFoodByBarcode(barcode: string, signal?: AbortSignal): Promise<FoodLookupCandidate | undefined> {
   const normalized = barcode.replace(/\D/g, "");
   if (normalized.length < 8 || normalized.length > 14) throw new Error("Invalid barcode");
   const fields = "code,product_name,product_name_vi,product_name_en,brands,serving_size,serving_quantity,nutriments";
@@ -137,6 +273,7 @@ export async function lookupFoodByBarcode(barcode: string, signal?: AbortSignal)
   const protein = nutrientValue(nutriments, "proteins");
   const carbs = nutrientValue(nutriments, "carbohydrates");
   const fat = nutrientValue(nutriments, "fat");
+  const missingCoreNutrients = coreNutrients.filter((field) => ({ calories, protein, carbs, fat })[field] === null);
   return {
     id: `off_${normalized}`,
     barcode: normalized,
@@ -145,10 +282,10 @@ export async function lookupFoodByBarcode(barcode: string, signal?: AbortSignal)
     servingLabel: product.serving_size,
     servingGrams: product.serving_quantity,
     per100g: {
-      calories: calories ?? 0,
-      protein: protein ?? 0,
-      carbs: carbs ?? 0,
-      fat: fat ?? 0,
+      calories: calories ?? undefined,
+      protein: protein ?? undefined,
+      carbs: carbs ?? undefined,
+      fat: fat ?? undefined,
       fiber: nutrientValue(nutriments, "fiber"),
       sugar: nutrientValue(nutriments, "sugars"),
       sodiumMg: nutrientValue(nutriments, "sodium", 1000),
@@ -166,17 +303,22 @@ export async function lookupFoodByBarcode(barcode: string, signal?: AbortSignal)
       vitaminB12Mcg: nutrientValue(nutriments, "vitamin-b12", 1_000_000),
       folateMcg: nutrientValue(nutriments, "folates", 1_000_000)
     },
+    missingCoreNutrients,
     source: "open_food_facts",
     sourceUrl: `https://world.openfoodfacts.org/product/${normalized}`,
-    dataQuality: [calories, protein, carbs, fat].every((value) => value !== null) ? "complete" : "partial",
     updatedAt: new Date().toISOString()
   };
 }
 
 export function createCustomFood(name: string, per100g: FoodItem["per100g"]): FoodItem {
+  if (!name.trim()) throw new Error("Food name is required");
+  for (const field of coreNutrients) {
+    const value = per100g[field];
+    if (!Number.isFinite(value) || value < 0) throw new Error(`${field} must be a finite non-negative number`);
+  }
   return {
     id: createId("food"),
-    name: { vi: name, en: name },
+    name: { vi: name.trim(), en: name.trim() },
     per100g,
     source: "custom",
     dataQuality: "partial",

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { LocalizedText } from "@gym/contracts";
 
 export type Locale = "vi" | "en";
@@ -57,4 +58,10 @@ export function formatDate(value: string | Date, locale: Locale, options?: Intl.
 
 export function formatNumber(value: number, locale: Locale, maximumFractionDigits = 1): string {
   return new Intl.NumberFormat(locale === "vi" ? "vi-VN" : "en-US", { maximumFractionDigits }).format(value);
+}
+
+export function useDocumentLanguage(locale: Locale) {
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 }
