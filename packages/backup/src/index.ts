@@ -6,7 +6,11 @@ const manifestSchema = z.object({
   appVersion: z.string().min(1),
   backupVersion: z.number().int().positive(),
   exportedAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), "Invalid export date"),
-  checksum: z.string().regex(/^[a-f0-9]{64}$/).optional()
+  checksum: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  format: z.literal("gym-local-backup").optional(),
+  dbSchemaVersion: z.number().int().positive().optional(),
+  dataBytes: z.number().int().nonnegative().optional(),
+  counts: z.record(z.string(), z.number().int().nonnegative()).optional()
 });
 
 const idSchema = z.string().min(1);
@@ -20,6 +24,16 @@ const difficultySchema = z.enum(["beginner", "intermediate", "advanced"]);
 const equipmentSchema = z.enum(["bodyweight", "dumbbell", "barbell", "smith", "cable", "machine", "resistance_band", "kettlebell", "trap_bar", "bench", "pullup_bar"]);
 const loadModeSchema = z.enum(["total_weight", "per_hand", "per_side", "bodyweight_plus", "assisted", "reps_only", "duration_distance"]);
 const setTypeSchema = z.enum(["warmup", "working", "drop", "failure"]);
+const trackingProfileSchema = z.object({
+  variantId: idSchema,
+  effortKind: z.enum(["reps", "duration", "distance_duration"]),
+  loadEntryMode: loadModeSchema,
+  laterality: z.enum(["bilateral", "unilateral", "ambiguous", "not_applicable"]),
+  volumeMetric: z.enum(["external_load", "added_load", "none"]),
+  volumeMultiplier: z.union([z.literal(1), z.literal(2)]).optional(),
+  e1rmMetric: z.enum(["entered_load", "none"]),
+  progressDirection: z.enum(["higher_load", "lower_assistance", "higher_reps", "longer_duration", "greater_distance"])
+}).passthrough();
 const optionalNutrient = nonNegativeNumber.nullable().optional();
 const nutrientSchema = z.object({
   calories: nonNegativeNumber,
@@ -67,6 +81,7 @@ const sessionExerciseSchema = z.object({
   variantId: idSchema,
   variantNameSnapshot: localizedTextSchema,
   loadEntryModeSnapshot: loadModeSchema,
+  trackingProfileSnapshot: trackingProfileSchema.optional(),
   sets: z.array(setLogSchema),
   restSeconds: nonNegativeNumber,
   note: z.string().optional()
@@ -117,6 +132,25 @@ const routineSchema = z.object({
   updatedAt: timestampSchema
 }).passthrough();
 
+const progressionRuleSchema = z.object({
+  type: z.literal("double_progression"),
+  successSessions: z.number().int().positive(),
+  defaultIncrementKg: nonNegativeNumber,
+  fallbackIncreasePercent: nonNegativeNumber
+}).passthrough();
+
+const programSchema = z.object({
+  id: idSchema,
+  name: localizedTextSchema,
+  goal: goalSchema,
+  difficulty: difficultySchema,
+  days: z.array(z.object({ order: z.number().int().nonnegative(), routineId: idSchema }).passthrough()),
+  activeDayIndex: z.number().int().nonnegative(),
+  progressionRule: progressionRuleSchema.optional(),
+  createdAt: timestampSchema,
+  updatedAt: timestampSchema
+}).passthrough();
+
 const foodSchema = z.object({
   id: idSchema,
   name: localizedTextSchema,
@@ -142,6 +176,40 @@ const mealSchema = z.object({
   grams: nonNegativeNumber,
   nutrientsSnapshot: nutrientSchema,
   createdAt: timestampSchema
+}).passthrough();
+
+const recipeIngredientSchema = z.object({
+  id: idSchema,
+  foodId: idSchema,
+  foodNameSnapshot: localizedTextSchema,
+  grams: nonNegativeNumber,
+  nutrientsPer100gSnapshot: nutrientSchema
+}).passthrough();
+
+const recipeSchema = z.object({
+  id: idSchema,
+  name: localizedTextSchema,
+  ingredients: z.array(recipeIngredientSchema),
+  yieldGrams: nonNegativeNumber,
+  servings: nonNegativeNumber.optional(),
+  createdAt: timestampSchema,
+  updatedAt: timestampSchema
+}).passthrough();
+
+const waterEntrySchema = z.object({
+  id: idSchema,
+  date: dateSchema,
+  amountMl: nonNegativeNumber,
+  createdAt: timestampSchema
+}).passthrough();
+
+const foodPreferenceSchema = z.object({
+  id: idSchema,
+  foodId: idSchema,
+  favorite: z.boolean(),
+  defaultServingGrams: nonNegativeNumber.optional(),
+  lastUsedAt: timestampSchema.optional(),
+  useCount: z.number().int().nonnegative()
 }).passthrough();
 
 const bodyMetricSchema = z.object({
@@ -211,7 +279,17 @@ const nutritionTargetSchema = z.object({
   fat: nonNegativeNumber,
   waterMl: nonNegativeNumber,
   formulaVersion: z.number().int().positive(),
-  confirmedAt: timestampSchema.optional()
+  confirmedAt: timestampSchema.optional(),
+  source: z.enum(["estimated", "manual", "legacy"]).optional(),
+  basis: z.object({
+    biologicalSex: z.enum(["female", "male"]),
+    age: z.number().int().positive(),
+    heightCm: nonNegativeNumber,
+    weightKg: nonNegativeNumber,
+    activityFactor: z.union([z.literal(1.2), z.literal(1.375), z.literal(1.55), z.literal(1.725), z.literal(1.9)]),
+    goal: goalSchema
+  }).passthrough().optional(),
+  calculatedAt: timestampSchema.optional()
 }).passthrough();
 
 const profileSchema = z.object({
@@ -248,7 +326,7 @@ const settingsSchema = z.object({
   storagePersistenceGranted: z.boolean().optional()
 }).passthrough();
 
-const backupDataSchema = z.object({
+const legacyBackupDataSchema = z.object({
   profile: profileSchema.optional(),
   routines: z.array(routineSchema),
   sessions: z.array(sessionSchema),
@@ -259,7 +337,17 @@ const backupDataSchema = z.object({
   settings: settingsSchema
 }).passthrough();
 
-function validateBackupRelations(data: z.infer<typeof backupDataSchema>): void {
+const backupDataSchema = legacyBackupDataSchema.extend({
+  programs: z.array(programSchema),
+  recipes: z.array(recipeSchema),
+  waterEntries: z.array(waterEntrySchema),
+  foodPreferences: z.array(foodPreferenceSchema)
+});
+
+const collectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
+type LegacyBackupData = z.infer<typeof legacyBackupDataSchema>;
+
+function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "settings">): void {
   const sessionIds = new Set(data.sessions.map((session) => session.id));
   if (data.settings.activeSessionId) {
     const active = data.sessions.find((session) => session.id === data.settings.activeSessionId);
@@ -275,6 +363,76 @@ function validateBackupData(data: unknown): BackupPayload["data"] {
   return parsed as unknown as BackupPayload["data"];
 }
 
+function backupCounts(data: BackupPayload["data"]): NonNullable<BackupPayload["manifest"]["counts"]> {
+  return Object.fromEntries(collectionKeys.map((key) => [key, data[key].length])) as NonNullable<BackupPayload["manifest"]["counts"]>;
+}
+
+function migrateV1ToV2(raw: unknown): LegacyBackupData {
+  const legacy = legacyBackupDataSchema.parse(raw);
+  return {
+    ...legacy,
+    customVariants: legacy.customVariants.map((variant) => ({
+      ...variant,
+      videoGuides: variant.videoGuides ?? []
+    }))
+  };
+}
+
+function migrateNutritionTargetMetadata(profile: LegacyBackupData["profile"]): LegacyBackupData["profile"] {
+  const target = profile?.nutritionTarget;
+  if (!profile || !target || target.source) return profile;
+  const hasBasis = (profile.biologicalSex === "female" || profile.biologicalSex === "male")
+    && profile.age !== undefined
+    && profile.heightCm !== undefined
+    && profile.weightKg !== undefined
+    && profile.activityFactor !== undefined;
+  return {
+    ...profile,
+    nutritionTarget: {
+      ...target,
+      source: hasBasis ? "estimated" : "legacy",
+      basis: hasBasis ? {
+        biologicalSex: profile.biologicalSex as "female" | "male",
+        age: profile.age!,
+        heightCm: profile.heightCm!,
+        weightKg: profile.weightKg!,
+        activityFactor: profile.activityFactor!,
+        goal: profile.goal
+      } : undefined,
+      calculatedAt: profile.updatedAt
+    }
+  };
+}
+
+function migrateV2ToV3(raw: unknown): BackupPayload["data"] {
+  const legacy = legacyBackupDataSchema.parse(raw);
+  const profile = migrateNutritionTargetMetadata(legacy.profile);
+  return validateBackupData({
+    ...legacy,
+    profile,
+    programs: [],
+    recipes: [],
+    waterEntries: [],
+    foodPreferences: []
+  });
+}
+
+function validateV3Manifest(manifest: BackupPayload["manifest"], data: BackupPayload["data"], serializedBytes: number): void {
+  if (manifest.format !== "gym-local-backup") throw new Error("Backup v3 format identifier is missing");
+  if (manifest.dbSchemaVersion !== APP_VERSIONS.database) throw new Error("Backup database schema metadata is invalid");
+  if (manifest.dataBytes !== serializedBytes) throw new Error("Backup data byte count does not match");
+  const expected = backupCounts(data);
+  const countKeys = manifest.counts ? Object.keys(manifest.counts) : [];
+  if (
+    !manifest.counts
+    || countKeys.length !== collectionKeys.length
+    || countKeys.some((key) => !collectionKeys.includes(key as typeof collectionKeys[number]))
+    || collectionKeys.some((key) => manifest.counts?.[key] !== expected[key])
+  ) {
+    throw new Error("Backup collection counts do not match data");
+  }
+}
+
 async function sha256(value: string): Promise<string> {
   const data = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest("SHA-256", data);
@@ -284,12 +442,17 @@ async function sha256(value: string): Promise<string> {
 export async function createBackup(data: BackupPayload["data"]): Promise<Blob> {
   const validated = validateBackupData(data);
   const serialized = JSON.stringify(validated);
+  const dataBytes = new TextEncoder().encode(serialized).byteLength;
   const payload: BackupPayload = {
     manifest: {
       appVersion: APP_VERSIONS.app,
       backupVersion: APP_VERSIONS.backup,
       exportedAt: new Date().toISOString(),
-      checksum: await sha256(serialized)
+      checksum: await sha256(serialized),
+      format: "gym-local-backup",
+      dbSchemaVersion: APP_VERSIONS.database,
+      dataBytes,
+      counts: backupCounts(validated)
     },
     data: validated
   };
@@ -308,11 +471,26 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
   if (!manifestFile || !dataFile) throw new Error("Backup is missing required files");
   const manifest = manifestSchema.parse(JSON.parse(await manifestFile.async("text"))) as BackupPayload["manifest"];
   if (manifest.backupVersion > APP_VERSIONS.backup) throw new Error("Backup was created by a newer app version");
-  if (manifest.backupVersion < Math.max(1, APP_VERSIONS.backup - 2)) throw new Error("Backup version is no longer supported");
+  if (manifest.backupVersion < APP_VERSIONS.backup - 2) throw new Error("Backup version is no longer supported");
   const serialized = await dataFile.async("text");
-  if (serialized.length > 20 * 1024 * 1024) throw new Error("Backup data is too large");
+  const serializedBytes = new TextEncoder().encode(serialized).byteLength;
+  if (serializedBytes > 20 * 1024 * 1024) throw new Error("Backup data is too large");
   if (manifest.checksum && (await sha256(serialized)) !== manifest.checksum) throw new Error("Backup checksum does not match");
-  const parsed = backupDataSchema.parse(JSON.parse(serialized));
+  const raw = JSON.parse(serialized);
+  let parsed: BackupPayload["data"];
+  switch (manifest.backupVersion) {
+    case 1:
+      parsed = migrateV2ToV3(migrateV1ToV2(raw));
+      break;
+    case 2:
+      parsed = migrateV2ToV3(raw);
+      break;
+    case 3:
+      parsed = validateBackupData(raw);
+      break;
+    default:
+      throw new Error("Backup version is not supported");
+  }
   const data = {
     ...parsed,
     customVariants: parsed.customVariants.map((variant) => ({ ...variant, videoGuides: variant.videoGuides ?? [] })),
@@ -324,8 +502,9 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
       nutritionFormulaVersion: APP_VERSIONS.nutritionFormula,
       backupVersion: APP_VERSIONS.backup
     }
-  } as unknown as BackupPayload["data"];
-  validateBackupRelations(data as unknown as z.infer<typeof backupDataSchema>);
+  } satisfies BackupPayload["data"];
+  validateBackupRelations(data);
+  if (manifest.backupVersion === 3) validateV3Manifest(manifest, data, serializedBytes);
   return { manifest, data };
 }
 

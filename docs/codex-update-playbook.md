@@ -22,4 +22,12 @@ Use one narrowly scoped change request at a time. Start from `docs/codex-change-
 5. Run `pnpm run verify:affected`; run `pnpm run verify` for any cross-module, storage, backup, or release change.
 6. Update `CHANGELOG.md` and source/review metadata when user-visible behavior or content changes.
 
+## Long-running changes
+
+- Work on a `codex/*` branch and create a verified checkpoint at least every 30 minutes and at every stable release boundary.
+- A checkpoint is a Conventional Commit made only after the currently affected lint, typecheck, tests, and content gates pass.
+- Record the exact checks and known warnings in `docs/verification-report.md` before checkpointing.
+- Do not mix two schema migrations, two unrelated feature owners, or generated artifacts in one checkpoint.
+- If a later step fails, continue from the newest green checkpoint rather than rewriting or discarding user data.
+
 Generated folders (`dist`, `apps/web/dev-dist`) and personal data are never source files. Do not commit local backups, exported CSV files, or browser storage.

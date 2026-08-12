@@ -1,5 +1,17 @@
 # Verification report — 2026-08-12
 
+## Local checkpoint 0.3.0
+
+- Frozen-lockfile installation completed with pnpm 11.16.0. The exact `pnpm run verify` pipeline passed: architecture audit, ESLint with zero warnings, TypeScript project references, content validation/audit, 70 Vitest tests across 9 files, and the production build.
+- Content-contract validation passed 7 tests. The audits confirmed 199 reviewed equipment variants, 199 direct variant-specific videos, valid source/license/review metadata, exactly 300 Vietnamese recipe estimates, and no unresolved placeholders.
+- The SQLite integrity/FTS verifier passed for 13,835 foods, 24,907 Vietnamese aliases, and 300 recipes with SHA-256 `4f844b93c1c8d0540c34038cbc5b69096c92a3982fe884b2ac877c5df7bdc88f`.
+- IndexedDB v3 migration and rollback, backup v1/v2/v3 migration and round trip, exact byte/count validation, consistent export, active-workout restore refusal, pre-restore recovery, undo, and nutrition-pack preservation are covered by automated failure-path tests.
+- SQLite/OPFS and nutrition-pack network operations are owned by `packages/storage`; the executable architecture audit found no direct database/API access in the UI or nutrition module.
+- A regression test proves that an optimistic workout save rolls back on failure and that the failed write cannot poison later export/restore operations.
+- Browser acceptance at 320 px and 390 px passed without horizontal page overflow. The workout timer remains visible, three set inputs fit on one row, touch targets meet 44 px, and the mobile dialog fills but does not exceed the viewport.
+- Vite built 2,725 modules. The PWA precache contains 37 core entries (4,505.27 KiB); the 16.4 MB nutrition SQLite file and remote video URLs are absent.
+- The known non-blocking chunk warning remains: initial app 559.32 kB, nutrition route 503.00 kB, and progress route 380.08 kB before gzip. Route/vendor splitting remains scheduled for Release 4.
+
 ## Local checkpoint 0.2.1
 
 - ESLint completed with zero warnings.

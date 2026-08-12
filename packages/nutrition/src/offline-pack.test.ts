@@ -1,9 +1,37 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadNutritionPackManifest, mapNutritionPackRow } from "./offline-pack";
+import type { NutritionPackManifest } from "@gym/contracts";
+import {
+  NutritionPackWorkerClient,
+  commitStagedNutritionPack,
+  obsoletePackFileAfterActivation
+} from "@gym/storage";
+import {
+  NutritionPackCompatibilityError,
+  loadNutritionPackManifest,
+  mapNutritionPackRow,
+  parseNutritionPackManifest
+} from "./offline-pack";
 
 afterEach(() => vi.restoreAllMocks());
 
 describe("offline nutrition pack contracts", () => {
+  const manifest = (overrides: Partial<NutritionPackManifest> = {}): NutritionPackManifest => ({
+    id: "gym-local-nutrition",
+    version: "2026.04",
+    schemaVersion: 1,
+    createdAt: "2026-08-10T00:00:00Z",
+    minimumAppVersion: "0.2.0",
+    fileName: "nutrition.sqlite3",
+    downloadUrl: "./nutrition.sqlite3",
+    sizeBytes: 123,
+    sha256: "a".repeat(64),
+    foodCount: 13_835,
+    aliasCount: 24_907,
+    vietnameseRecipeCount: 300,
+    sources: [{ id: "usda", label: "USDA", url: "https://fdc.nal.usda.gov/", licenseId: "CC0-1.0", licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/", retrievedAt: "2026-08-10" }],
+    ...overrides
+  });
+
   it("maps macros and micronutrients without turning missing values into zero", () => {
     const food = mapNutritionPackRow({
       id: "usda_1",
@@ -25,24 +53,149 @@ describe("offline nutrition pack contracts", () => {
   });
 
   it("validates the pack manifest and resolves a relative release asset", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({
-      id: "gym-local-nutrition",
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(manifest()), { status: 200, headers: { "content-type": "application/json" } }));
+
+    const loadedManifest = await loadNutritionPackManifest("https://example.test/data/manifest.json");
+    expect(loadedManifest.downloadUrl).toBe("https://example.test/data/nutrition.sqlite3");
+    expect(loadedManifest.vietnameseRecipeCount).toBe(300);
+  });
+
+  it("rejects packs that require a newer app or an unsupported schema", () => {
+    for (const [input, code] of [
+      [manifest({ minimumAppVersion: "9.0.0" }), "app_too_old"],
+      [manifest({ schemaVersion: 2 }), "unsupported_schema"]
+    ] as const) {
+      try {
+        parseNutritionPackManifest(input, "https://example.test/manifest.json", "0.3.0", 1);
+        throw new Error("Expected compatibility validation to fail");
+      } catch (error) {
+        expect(error).toBeInstanceOf(NutritionPackCompatibilityError);
+        expect((error as NutritionPackCompatibilityError).code).toBe(code);
+      }
+    }
+  });
+
+  it("keeps an installed pack usable when the manifest request is offline", async () => {
+    const installed = await loadNutritionPackManifest("https://offline.test/manifest.json", {
+      fetchManifest: vi.fn().mockRejectedValue(new TypeError("offline")),
+      getPackInfo: vi.fn().mockResolvedValue({
+        installed: true,
+        activeFileName: "/gym-local-nutrition-pack-2026.04.sqlite3",
+        metadata: {
+          id: "gym-local-nutrition",
+          version: "2026.04",
+          schema_version: "1",
+          created_at: "2026-08-10T00:00:00Z",
+          food_count: "13835",
+          alias_count: "24907",
+          vietnamese_recipe_count: "300"
+        }
+      })
+    });
+
+    expect(installed).toMatchObject({
       version: "2026.04",
       schemaVersion: 1,
-      createdAt: "2026-08-10T00:00:00Z",
-      minimumAppVersion: "0.2.0",
-      fileName: "nutrition.sqlite3",
-      downloadUrl: "./nutrition.sqlite3",
-      sizeBytes: 123,
-      sha256: "a".repeat(64),
-      foodCount: 13_835,
-      aliasCount: 24_907,
-      vietnameseRecipeCount: 300,
-      sources: [{ id: "usda", label: "USDA", url: "https://fdc.nal.usda.gov/", licenseId: "CC0-1.0", licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/", retrievedAt: "2026-08-10" }]
-    }), { status: 200, headers: { "content-type": "application/json" } }));
+      fileName: "gym-local-nutrition-pack-2026.04.sqlite3",
+      foodCount: 13_835
+    });
+  });
 
-    const manifest = await loadNutritionPackManifest("https://example.test/data/manifest.json");
-    expect(manifest.downloadUrl).toBe("https://example.test/data/nutrition.sqlite3");
-    expect(manifest.vietnameseRecipeCount).toBe(300);
+  it("surfaces an offline manifest failure when no installed pack exists", async () => {
+    await expect(loadNutritionPackManifest("https://offline.test/manifest.json", {
+      fetchManifest: vi.fn().mockRejectedValue(new TypeError("offline")),
+      getPackInfo: vi.fn().mockResolvedValue({ installed: false })
+    })).rejects.toThrow("offline");
+  });
+
+  it("retains one rollback pack and cleans only the obsolete older pack across repeated updates", () => {
+    expect(obsoletePackFileAfterActivation(undefined, "/pack-b.sqlite3", "/pack-a.sqlite3")).toBeUndefined();
+    expect(obsoletePackFileAfterActivation("/pack-a.sqlite3", "/pack-c.sqlite3", "/pack-b.sqlite3")).toBe("/pack-a.sqlite3");
+    expect(obsoletePackFileAfterActivation("/pack-b.sqlite3", "/pack-c.sqlite3", "/pack-b.sqlite3")).toBeUndefined();
+    expect(obsoletePackFileAfterActivation("/pack-c.sqlite3", "/pack-c.sqlite3", "/pack-b.sqlite3")).toBeUndefined();
+  });
+
+  it.each(["download", "checksum", "schema"])("does not activate over the old pack after a %s failure", async (failure) => {
+    let activeFileName = "/working-pack.sqlite3";
+    let stagedExists = true;
+    const activate = vi.fn(async () => {
+      activeFileName = "/staged-pack.sqlite3";
+    });
+
+    await expect(commitStagedNutritionPack({
+      prepare: async () => {
+        throw new Error(`${failure} failed`);
+      },
+      activate,
+      discardStaged: async () => {
+        stagedExists = false;
+      }
+    })).rejects.toThrow(`${failure} failed`);
+
+    expect(activate).not.toHaveBeenCalled();
+    expect(activeFileName).toBe("/working-pack.sqlite3");
+    expect(stagedExists).toBe(false);
+  });
+
+  it("preserves the old pointer when atomic activation itself fails", async () => {
+    const activeFileName = "/working-pack.sqlite3";
+    let stagedExists = true;
+    await expect(commitStagedNutritionPack({
+      prepare: async () => ({ validated: true }),
+      activate: async () => {
+        throw new Error("pointer commit failed");
+      },
+      discardStaged: async () => {
+        stagedExists = false;
+      }
+    })).rejects.toThrow("pointer commit failed");
+    expect(activeFileName).toBe("/working-pack.sqlite3");
+    expect(stagedExists).toBe(false);
+  });
+
+  it("serializes worker operations and rejects a crashed operation before recreating the worker", async () => {
+    class FakeWorker extends EventTarget {
+      readonly messages: Array<Record<string, unknown>> = [];
+      readonly terminate = vi.fn();
+
+      postMessage(message: Record<string, unknown>) {
+        this.messages.push(message);
+      }
+
+      result(index: number, payload: unknown) {
+        this.dispatchEvent(new MessageEvent("message", { data: { id: this.messages[index].id, type: "result", payload } }));
+      }
+
+      crash(message: string) {
+        this.dispatchEvent(new ErrorEvent("error", { message }));
+      }
+    }
+
+    const firstWorker = new FakeWorker();
+    const secondWorker = new FakeWorker();
+    const workers = [firstWorker, secondWorker];
+    const client = new NutritionPackWorkerClient(() => workers.shift() as unknown as Worker);
+    const first = client.request<string>("first");
+    const second = client.request<string>("second");
+    await vi.waitFor(() => expect(firstWorker.messages).toHaveLength(1));
+    expect(firstWorker.messages[0].type).toBe("first");
+    expect(firstWorker.messages).toHaveLength(1);
+    firstWorker.result(0, "one");
+    await expect(first).resolves.toBe("one");
+    await vi.waitFor(() => expect(firstWorker.messages).toHaveLength(2));
+    expect(firstWorker.messages[1].type).toBe("second");
+    firstWorker.result(1, "two");
+    await expect(second).resolves.toBe("two");
+
+    const crashing = client.request("crash");
+    await vi.waitFor(() => expect(firstWorker.messages).toHaveLength(3));
+    firstWorker.crash("worker crashed");
+    await expect(crashing).rejects.toThrow("worker crashed");
+    expect(firstWorker.terminate).toHaveBeenCalledOnce();
+
+    const recovered = client.request<string>("recovered");
+    await vi.waitFor(() => expect(secondWorker.messages).toHaveLength(1));
+    secondWorker.result(0, "ok");
+    await expect(recovered).resolves.toBe("ok");
   });
 });

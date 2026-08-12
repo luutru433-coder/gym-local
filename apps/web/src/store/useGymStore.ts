@@ -12,6 +12,7 @@ import {
   listBodyMetrics,
   listFoods,
   listMeals,
+  listRecoveryPoints,
   listRoutines,
   listSessions,
   replaceAllData,
@@ -22,7 +23,8 @@ import {
   saveInitialSetup,
   saveRoutine,
   saveSession,
-  saveSettings
+  saveSettings,
+  undoLatestRestore
 } from "@gym/storage";
 import type { BackupPayload } from "@gym/contracts";
 
@@ -39,6 +41,7 @@ interface GymState {
   meals: MealEntry[];
   bodyMetrics: BodyMetric[];
   settings: AppSettings;
+  recoveryAvailable: boolean;
   sessionSaveStatus: "idle" | "saving" | "saved" | "error";
   sessionSaveRevision: number;
   hydrate: () => Promise<void>;
@@ -57,6 +60,7 @@ interface GymState {
   removeMeal: (id: string) => Promise<void>;
   addBodyMetric: (metric: BodyMetric) => Promise<void>;
   restore: (data: BackupPayload["data"]) => Promise<void>;
+  undoRestore: () => Promise<boolean>;
   markBackup: () => Promise<void>;
 }
 
@@ -65,7 +69,7 @@ function messageFrom(error: unknown): string {
 }
 
 async function loadSnapshot() {
-  const [profile, routines, sessions, activeSession, foods, meals, bodyMetrics, settings] = await Promise.all([
+  const [profile, routines, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryPoints] = await Promise.all([
     getProfile(),
     listRoutines(),
     listSessions(),
@@ -73,9 +77,10 @@ async function loadSnapshot() {
     listFoods(),
     listMeals(),
     listBodyMetrics(),
-    getSettings()
+    getSettings(),
+    listRecoveryPoints()
   ]);
-  return { profile, routines, sessions, activeSession, foods, meals, bodyMetrics, settings };
+  return { profile, routines, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
 }
 
 let lastPersistedActiveSession: WorkoutSession | undefined;
@@ -89,6 +94,7 @@ export const useGymStore = create<GymState>((set, get) => ({
   meals: [],
   bodyMetrics: [],
   settings: defaultSettings,
+  recoveryAvailable: false,
   sessionSaveStatus: "idle",
   sessionSaveRevision: 0,
 
@@ -227,7 +233,30 @@ export const useGymStore = create<GymState>((set, get) => ({
     try {
       await replaceAllData(data);
       const snapshot = await loadSnapshot();
+      lastPersistedActiveSession = snapshot.activeSession;
       set({ ...snapshot, busy: false, notice: snapshot.profile?.locale === "en" ? "Data restored successfully." : "Khôi phục dữ liệu thành công." });
+    } catch (error) {
+      set({ busy: false, error: messageFrom(error) });
+      throw error;
+    }
+  },
+
+  async undoRestore() {
+    set({ busy: true, error: undefined });
+    try {
+      const restored = await undoLatestRestore();
+      if (!restored) {
+        set({ busy: false, recoveryAvailable: false });
+        return false;
+      }
+      const snapshot = await loadSnapshot();
+      lastPersistedActiveSession = snapshot.activeSession;
+      set({
+        ...snapshot,
+        busy: false,
+        notice: snapshot.profile?.locale === "en" ? "The previous data was restored." : "Đã hoàn tác và khôi phục dữ liệu trước đó."
+      });
+      return true;
     } catch (error) {
       set({ busy: false, error: messageFrom(error) });
       throw error;

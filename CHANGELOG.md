@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Added personal-data schema v3 for programs, recipes, water entries, food preferences, and local recovery points without rewriting existing records.
+- Added backup v3 metadata and validation, v1/v2 migration, consistent transactional export, pre-restore recovery, active-workout restore protection, and one-click undo; a failed workout write no longer blocks later export or restore operations.
+- Hardened offline nutrition-pack compatibility, failure recovery, worker request handling, and network-provider boundaries so an installed usable pack survives failed updates.
+- Improved small-screen workout usability, keyboard navigation, localized accessibility labels, selection state, chart summaries, and mobile dialog behavior.
+- Added an executable module-boundary audit plus a release roadmap and Codex change/checkpoint templates for safer incremental updates.
+
 ## 0.2.1
 
 - Corrected workout tracking semantics for per-hand, bodyweight-added, assisted, timed, distance, and reps-only variants; sessions now snapshot reviewed tracking behavior.

@@ -1,6 +1,6 @@
 {
   "name": "gym-local",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.16.0",
@@ -15,8 +15,9 @@
     "lint": "eslint apps packages scripts --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
+    "architecture:audit": "node scripts/verify-affected.mjs --architecture",
     "verify:affected": "node scripts/verify-affected.mjs",
-    "verify": "pnpm run lint && pnpm run typecheck && pnpm run content:validate && pnpm run content:audit && pnpm run test && pnpm run build",
+    "verify": "pnpm run architecture:audit && pnpm run lint && pnpm run typecheck && pnpm run content:validate && pnpm run content:audit && pnpm run test && pnpm run build",
     "content:validate": "node scripts/content-validate.mjs",
     "content:audit": "node scripts/content-audit.mjs && node scripts/nutrition-content-validate.mjs",
     "nutrition:recipes": "node scripts/generate-vietnamese-recipes.mjs",

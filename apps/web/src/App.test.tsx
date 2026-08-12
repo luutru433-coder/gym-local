@@ -4,8 +4,8 @@ import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip, Modal, ProgressBar, ToggleGroup, ToggleGroupItem } from "@gym/ui";
-import type { WorkoutSession } from "@gym/contracts";
-import { defaultSettings, getProfile, gymDb, initializeDatabase, listRoutines, saveSession } from "@gym/storage";
+import type { Profile, WorkoutSession } from "@gym/contracts";
+import { defaultSettings, exportAllData, getProfile, gymDb, initializeDatabase, listRoutines, saveProfile, saveSession } from "@gym/storage";
 import { App } from "./App";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { useGymStore } from "./store/useGymStore";
@@ -28,6 +28,7 @@ beforeEach(async () => {
     meals: [],
     bodyMetrics: [],
     settings: defaultSettings,
+    recoveryAvailable: false,
     sessionSaveStatus: "idle",
     sessionSaveRevision: 0
   });
@@ -45,8 +46,12 @@ describe("application onboarding", () => {
     render(<App />);
 
     expect(await screen.findByRole("heading", { name: "Tập thông minh hơn. Dữ liệu vẫn là của bạn." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tăng cơ" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Tăng sức mạnh" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "3 buổi mỗi tuần" })).toHaveAttribute("aria-pressed", "true");
     await user.type(screen.getByLabelText("Tên hiển thị"), "Minh");
     await user.click(screen.getByRole("button", { name: /Tiếp tục/ }));
+    expect(screen.getByRole("button", { name: /tạ đơn/i })).toHaveAttribute("aria-pressed", "true");
     await user.click(screen.getByRole("button", { name: /Tiếp tục/ }));
     await user.click(screen.getByRole("button", { name: /Bắt đầu/ }));
 
@@ -62,7 +67,7 @@ describe("application onboarding", () => {
     expect(await screen.findByRole("heading", { name: "Tập thông minh hơn. Dữ liệu vẫn là của bạn." })).toBeInTheDocument();
     expect(document.documentElement).toHaveAttribute("lang", "vi");
 
-    await user.click(screen.getByRole("button", { name: "English" }));
+    await user.click(screen.getByRole("button", { name: /English/ }));
 
     expect(await screen.findByRole("heading", { name: "Train smarter. Keep your data yours." })).toBeInTheDocument();
     expect(document.documentElement).toHaveAttribute("lang", "en");
@@ -198,15 +203,60 @@ describe("workout autosave state", () => {
     const failUpdate = () => {
       throw new Error("simulated quota failure");
     };
-    gymDb.sessions.hook("updating", failUpdate);
+    const updatingHook = gymDb.sessions.hook("updating");
+    updatingHook.subscribe(failUpdate);
 
-    await expect(useGymStore.getState().setActiveSession({ ...persisted, notes: "not persisted" }))
-      .rejects.toThrow("simulated quota failure");
+    try {
+      await expect(useGymStore.getState().setActiveSession({ ...persisted, notes: "not persisted" }))
+        .rejects.toThrow("simulated quota failure");
 
-    expect(useGymStore.getState().activeSession).toEqual(persisted);
-    expect(useGymStore.getState().sessionSaveStatus).toBe("error");
-    expect(useGymStore.getState().error).toContain("simulated quota failure");
+      expect(useGymStore.getState().activeSession).toEqual(persisted);
+      expect(useGymStore.getState().sessionSaveStatus).toBe("error");
+      expect(useGymStore.getState().error).toContain("simulated quota failure");
+      await expect(exportAllData()).resolves.toMatchObject({ sessions: [persisted] });
+    } finally {
+      updatingHook.unsubscribe(failUpdate);
+    }
+  });
+});
 
-    gymDb.sessions.hook("updating").unsubscribe(failUpdate);
+describe("restore recovery state", () => {
+  it("exposes recovery after restore and clears it after undo", async () => {
+    const timestamp = "2026-08-12T10:00:00.000Z";
+    const before: Profile = {
+      id: "profile",
+      displayName: "Before restore",
+      locale: "en",
+      units: "metric",
+      goal: "general",
+      experience: "beginner",
+      daysPerWeek: 3,
+      locations: [],
+      onboardingComplete: true,
+      createdAt: timestamp,
+      updatedAt: timestamp
+    };
+    await initializeDatabase();
+    await saveProfile(before);
+    await useGymStore.getState().hydrate();
+
+    await useGymStore.getState().restore({
+      profile: { ...before, displayName: "After restore" },
+      routines: [],
+      programs: [],
+      sessions: [],
+      foods: [],
+      meals: [],
+      recipes: [],
+      waterEntries: [],
+      foodPreferences: [],
+      bodyMetrics: [],
+      customVariants: [],
+      settings: defaultSettings
+    });
+
+    expect(useGymStore.getState()).toMatchObject({ recoveryAvailable: true, profile: { displayName: "After restore" } });
+    await expect(useGymStore.getState().undoRestore()).resolves.toBe(true);
+    expect(useGymStore.getState()).toMatchObject({ recoveryAvailable: false, profile: { displayName: "Before restore" } });
   });
 });

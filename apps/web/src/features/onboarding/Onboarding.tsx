@@ -123,7 +123,7 @@ export function Onboarding() {
     <main className="onboarding">
       <div className="onboarding__masthead">
         <Brand />
-        <button className="language-switch" type="button" onClick={() => setLocale(isVi ? "en" : "vi")}>
+        <button className="language-switch" type="button" aria-label={isVi ? "Chuyển sang English" : "Switch to Tiếng Việt"} onClick={() => setLocale(isVi ? "en" : "vi")}>
           <Languages size={17} /> {isVi ? "English" : "Tiếng Việt"}
         </button>
       </div>
@@ -143,7 +143,7 @@ export function Onboarding() {
           </div>
           <ProgressBar value={(step / 3) * 100} label={isVi ? "Tiến độ thiết lập" : "Setup progress"} />
 
-          {error ? <Notice tone="warning">{error}</Notice> : null}
+          {error ? <div role="alert"><Notice tone="warning">{error}</Notice></div> : null}
 
           {step === 1 ? (
             <div className="onboarding__step">
@@ -156,19 +156,20 @@ export function Onboarding() {
               </Field>
               <div className="field">
                 <span className="field__label">{isVi ? "Bạn muốn tập để" : "I want to"}</span>
-                <div className="option-grid option-grid--2">
+                <div className="option-grid option-grid--2" role="group" aria-label={isVi ? "Mục tiêu tập luyện" : "Training goal"}>
                   {goalOptions.map((option) => <Chip key={option.id} active={goal === option.id} onClick={() => setGoal(option.id)}>{goal === option.id ? <Check size={15} /> : null}{isVi ? option.vi : option.en}</Chip>)}
                 </div>
               </div>
               <div className="field">
                 <span className="field__label">{isVi ? "Kinh nghiệm" : "Experience"}</span>
-                <div className="option-grid">
+                <div className="option-grid" role="group" aria-label={isVi ? "Kinh nghiệm tập luyện" : "Training experience"}>
                   {experienceOptions.map((option) => <Chip key={option.id} active={experience === option.id} onClick={() => setExperience(option.id)}>{isVi ? option.vi : option.en}</Chip>)}
                 </div>
               </div>
-              <Field label={isVi ? "Số buổi mỗi tuần" : "Days per week"}>
-                <div className="day-picker">{[2, 3, 4, 5, 6].map((day) => <button key={day} type="button" className={daysPerWeek === day ? "active" : ""} onClick={() => setDaysPerWeek(day)}>{day}</button>)}</div>
-              </Field>
+              <div className="field">
+                <span className="field__label">{isVi ? "Số buổi mỗi tuần" : "Days per week"}</span>
+                <div className="day-picker" role="group" aria-label={isVi ? "Số buổi mỗi tuần" : "Days per week"}>{[2, 3, 4, 5, 6].map((day) => <button key={day} type="button" className={daysPerWeek === day ? "active" : ""} aria-pressed={daysPerWeek === day} aria-label={isVi ? `${day} buổi mỗi tuần` : `${day} days per week`} onClick={() => setDaysPerWeek(day)}>{day}</button>)}</div>
+              </div>
             </div>
           ) : null}
 
@@ -178,9 +179,9 @@ export function Onboarding() {
               <Field label={isVi ? "Tên địa điểm" : "Location name"}>
                 <input value={locationName} onChange={(event) => setLocationName(event.target.value)} />
               </Field>
-              <div className="equipment-grid">
+              <div className="equipment-grid" role="group" aria-label={isVi ? "Dụng cụ hiện có" : "Available equipment"}>
                 {EQUIPMENT_OPTIONS.map((option) => (
-                  <button type="button" key={option.id} className={equipment.includes(option.id) ? "equipment-option equipment-option--active" : "equipment-option"} onClick={() => toggleEquipment(option.id)}>
+                  <button type="button" key={option.id} className={equipment.includes(option.id) ? "equipment-option equipment-option--active" : "equipment-option"} aria-pressed={equipment.includes(option.id)} onClick={() => toggleEquipment(option.id)}>
                     <span className="equipment-option__check">{equipment.includes(option.id) ? <Check size={14} /> : null}</span>
                     <span>{option.name[locale]}</span>
                   </button>

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Check, ChevronRight, Clock3, CopyPlus, Dumbbell, Layers3, Play, Plus, Search, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, EmptyState, Field, Modal, SectionTitle } from "@gym/ui";
-import { createId, type Goal, type Routine, type RoutineItem } from "@gym/contracts";
+import { createId, type Difficulty, type Goal, type Routine, type RoutineItem } from "@gym/contracts";
 import { getVariantsForMovement, MOVEMENTS, rankVariantsForEquipment } from "@gym/catalog";
 import { ROUTINE_TEMPLATES } from "@gym/workouts";
 import { localize } from "../../lib/i18n";
@@ -13,6 +13,12 @@ const goalLabels: Record<Goal, { vi: string; en: string }> = {
   strength: { vi: "Sức mạnh", en: "Strength" },
   fat_loss: { vi: "Giảm mỡ", en: "Fat loss" },
   general: { vi: "Tổng quát", en: "General" }
+};
+
+const difficultyLabels: Record<Difficulty, { vi: string; en: string }> = {
+  beginner: { vi: "Mới bắt đầu", en: "Beginner" },
+  intermediate: { vi: "Trung cấp", en: "Intermediate" },
+  advanced: { vi: "Nâng cao", en: "Advanced" }
 };
 
 export function RoutinesPage() {
@@ -101,7 +107,7 @@ export function RoutinesPage() {
                   <p><Layers3 size={15} />{routine.items.length} {locale === "vi" ? "động tác" : "exercises"}<span>·</span><Clock3 size={15} />~{Math.max(25, routine.items.length * 7)} min</p>
                   <div className="routine-card__actions">
                     <Button size="sm" onClick={() => void launch(routine)}><Play size={16} fill="currentColor" />{activeSession ? (locale === "vi" ? "Tiếp tục" : "Resume") : (locale === "vi" ? "Bắt đầu" : "Start")}</Button>
-                    <button type="button" className="icon-button" aria-label="Details" onClick={() => setDetail(routine)}><ChevronRight size={19} /></button>
+                    <button type="button" className="icon-button" aria-label={`${locale === "vi" ? "Xem chi tiết" : "View details"}: ${localize(routine.name, locale)}`} aria-haspopup="dialog" onClick={() => setDetail(routine)}><ChevronRight size={19} /></button>
                   </div>
                 </div>
               </Card>
@@ -118,7 +124,7 @@ export function RoutinesPage() {
             return (
               <Card className="template-row" key={template.id}>
                 <span className="template-row__index">{String(ROUTINE_TEMPLATES.indexOf(template) + 1).padStart(2, "0")}</span>
-                <div><span className="tag tag--outline">{goalLabels[template.goal][locale]}</span><h3>{localize(template.name, locale)}</h3><p>{template.items.length} {locale === "vi" ? "động tác" : "exercises"} · {template.difficulty}</p></div>
+                <div><span className="tag tag--outline">{goalLabels[template.goal][locale]}</span><h3>{localize(template.name, locale)}</h3><p>{template.items.length} {locale === "vi" ? "động tác" : "exercises"} · {difficultyLabels[template.difficulty][locale]}</p></div>
                 <Button variant={installed ? "ghost" : "secondary"} size="sm" disabled={installed} onClick={() => void installTemplate(template.id)}>{installed ? <Check size={16} /> : <CopyPlus size={16} />}{installed ? (locale === "vi" ? "Đã thêm" : "Added") : (locale === "vi" ? "Thêm" : "Add")}</Button>
               </Card>
             );
@@ -144,11 +150,11 @@ export function RoutinesPage() {
             <Field label={locale === "vi" ? "Tên lịch" : "Routine name"}><input value={builderName} onChange={(event) => setBuilderName(event.target.value)} placeholder={locale === "vi" ? "Ví dụ: Upper cuối tuần" : "e.g. Weekend upper"} /></Field>
             <Field label={locale === "vi" ? "Mục tiêu" : "Goal"}><select value={builderGoal} onChange={(event) => setBuilderGoal(event.target.value as Goal)}>{Object.entries(goalLabels).map(([id, label]) => <option value={id} key={id}>{label[locale]}</option>)}</select></Field>
           </div>
-          <div className="builder-toolbar"><div className="search-box"><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={locale === "vi" ? "Tìm động tác…" : "Search movements…"} /></div><span>{selectedMovements.length} {locale === "vi" ? "đã chọn" : "selected"}</span></div>
-          <div className="builder-movements">{movementResults.map((movement) => {
+          <div className="builder-toolbar"><div className="search-box"><Search size={18} /><input aria-label={locale === "vi" ? "Tìm động tác cho lịch tập" : "Search movements for routine"} value={search} onChange={(event) => setSearch(event.target.value)} placeholder={locale === "vi" ? "Tìm động tác…" : "Search movements…"} /></div><span aria-live="polite">{selectedMovements.length} {locale === "vi" ? "đã chọn" : "selected"}</span></div>
+          <div className="builder-movements" role="group" aria-label={locale === "vi" ? "Chọn động tác" : "Choose movements"}>{movementResults.map((movement) => {
             const selected = selectedMovements.includes(movement.id);
             const preferred = rankVariantsForEquipment(movement.id, availableEquipment)[0];
-            return <button type="button" key={movement.id} onClick={() => toggleMovement(movement.id)} className={selected ? "builder-movement builder-movement--selected" : "builder-movement"}><span className="builder-movement__check">{selected ? <Check size={15} /> : <Plus size={15} />}</span><span><strong>{localize(movement.name, locale)}</strong><small>{preferred ? localize(preferred.name, locale) : ""}</small></span></button>;
+            return <button type="button" key={movement.id} aria-pressed={selected} onClick={() => toggleMovement(movement.id)} className={selected ? "builder-movement builder-movement--selected" : "builder-movement"}><span className="builder-movement__check">{selected ? <Check size={15} /> : <Plus size={15} />}</span><span><strong>{localize(movement.name, locale)}</strong><small>{preferred ? localize(preferred.name, locale) : ""}</small></span></button>;
           })}</div>
           <p className="fine-print">{locale === "vi" ? "Mỗi động tác được đặt mặc định 3 × 8–12, nghỉ 90 giây. Bạn có thể đổi biến thể ngay trong buổi tập." : "Each movement starts at 3 × 8–12 with 90s rest. You can switch variations during the workout."}</p>
           <div className="modal-actions"><Button variant="ghost" onClick={() => setBuilderOpen(false)}>{locale === "vi" ? "Hủy" : "Cancel"}</Button><Button disabled={saving || !builderName.trim() || !selectedMovements.length} onClick={() => void makeRoutine()}>{saving ? "…" : (locale === "vi" ? "Lưu lịch tập" : "Save routine")}</Button></div>

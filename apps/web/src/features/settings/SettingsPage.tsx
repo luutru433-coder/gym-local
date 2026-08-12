@@ -23,8 +23,10 @@ export function SettingsPage() {
   const storedProfile = useGymStore((state) => state.profile)!;
   const settings = useGymStore((state) => state.settings);
   const activeSession = useGymStore((state) => state.activeSession);
+  const recoveryAvailable = useGymStore((state) => state.recoveryAvailable);
   const updateProfile = useGymStore((state) => state.updateProfile);
   const restore = useGymStore((state) => state.restore);
+  const undoRestore = useGymStore((state) => state.undoRestore);
   const markBackup = useGymStore((state) => state.markBackup);
   const locale = storedProfile.locale;
   const [profile, setProfile] = useState(storedProfile);
@@ -138,6 +140,26 @@ export function SettingsPage() {
     }
   };
 
+  const undoBackupRestore = async () => {
+    setBackupBusy(true);
+    setBackupMessage(undefined);
+    try {
+      const restored = await undoRestore();
+      const recoveredProfile = useGymStore.getState().profile;
+      if (restored && recoveredProfile) setProfile(recoveredProfile);
+      setBackupMessage({
+        text: restored
+          ? (locale === "vi" ? "Đã hoàn tác và khôi phục dữ liệu trước lần nhập backup." : "Restored the data from before the backup import.")
+          : (locale === "vi" ? "Không còn điểm khôi phục để hoàn tác." : "No restore point is available."),
+        tone: restored ? "success" : "warning"
+      });
+    } catch (error) {
+      setBackupMessage({ text: error instanceof Error ? error.message : "Undo restore failed", tone: "warning" });
+    } finally {
+      setBackupBusy(false);
+    }
+  };
+
   return (
     <div className="page settings-page">
       <header className="page-header"><div><span className="eyebrow">{locale === "vi" ? "Kiểm soát hoàn toàn" : "Full control"}</span><h1>{locale === "vi" ? "Cài đặt" : "Settings"}</h1><p>{locale === "vi" ? "Không tài khoản, không máy chủ, không đăng ký trả phí." : "No account, no server, no subscription."}</p></div><Button onClick={() => void saveAll()}>{saved ? <Check size={18} /> : <Save size={18} />}{saved ? (locale === "vi" ? "Đã lưu" : "Saved") : (locale === "vi" ? "Lưu thay đổi" : "Save changes")}</Button></header>
@@ -180,6 +202,7 @@ export function SettingsPage() {
               <div className="backup-actions">
                 <button type="button" onClick={() => void exportBackup()} disabled={backupBusy}><span><FileJson size={22} /></span><div><strong>{locale === "vi" ? "Tải backup ZIP" : "Download ZIP backup"}</strong><small>{settings.lastBackupAt ? `${locale === "vi" ? "Lần cuối" : "Last"}: ${formatDate(settings.lastBackupAt, locale, { day: "numeric", month: "short", year: "numeric" })}` : (locale === "vi" ? "Chưa backup" : "No backup yet")}</small></div><Download size={18} /></button>
                 <button type="button" onClick={() => fileRef.current?.click()} disabled={backupBusy || Boolean(activeSession)}><span><Upload size={22} /></span><div><strong>{locale === "vi" ? "Khôi phục từ ZIP" : "Restore from ZIP"}</strong><small>{locale === "vi" ? "Kiểm tra file trước khi thay thế" : "Validated before replacing data"}</small></div><ChevronRight size={18} /></button>
+                {recoveryAvailable ? <button type="button" onClick={() => void undoBackupRestore()} disabled={backupBusy || Boolean(activeSession)}><span><RefreshCw size={22} /></span><div><strong>{locale === "vi" ? "Hoàn tác khôi phục" : "Undo last restore"}</strong><small>{locale === "vi" ? "Lấy lại dữ liệu trước lần nhập ZIP gần nhất" : "Recover data from before the latest ZIP import"}</small></div><ChevronRight size={18} /></button> : null}
                 <button type="button" onClick={() => void exportCsv()}><span><FileSpreadsheet size={22} /></span><div><strong>{locale === "vi" ? "Xuất lịch sử CSV" : "Export workout CSV"}</strong><small>{locale === "vi" ? "Mở được bằng Excel / Sheets" : "Works with Excel / Sheets"}</small></div><Download size={18} /></button>
               </div>
               <input ref={fileRef} type="file" accept=".zip,application/zip" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importBackup(file); }} />

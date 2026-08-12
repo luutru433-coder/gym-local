@@ -5,11 +5,24 @@ afterEach(() => vi.restoreAllMocks());
 
 describe("nutrition", () => {
   it("uses versioned editable Mifflin-St Jeor defaults", () => {
-    const target = estimateNutritionTarget({ biologicalSex: "male", age: 30, heightCm: 175, weightKg: 70, activityFactor: 1.55, goal: "hypertrophy" });
-    expect(target.formulaVersion).toBe(1);
-    expect(target.calories).toBeGreaterThan(2000);
-    expect(target.protein).toBe(112);
-    expect(target.carbs).toBeGreaterThan(0);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-13T08:00:00.000Z"));
+    try {
+      const basis = { biologicalSex: "male" as const, age: 30, heightCm: 175, weightKg: 70, activityFactor: 1.55 as const, goal: "hypertrophy" as const };
+      expect(estimateNutritionTarget(basis)).toEqual({
+        calories: 2683,
+        protein: 112,
+        carbs: 390,
+        fat: 75,
+        waterMl: 2450,
+        formulaVersion: 1,
+        source: "estimated",
+        basis,
+        calculatedAt: "2026-08-13T08:00:00.000Z"
+      });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("stores nutrient snapshots instead of recomputing diary history", () => {

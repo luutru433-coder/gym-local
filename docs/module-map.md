@@ -13,6 +13,13 @@ Use this map before changing behavior. A change starts in the primary owner and 
 | Accessible visual primitives and design tokens | `packages/ui` | none | all features | component, accessibility, and visual tests |
 | PWA update lifecycle and application routing | `apps/web/src/app`, `apps/web/src/pwa` | service worker registration | app shell | active-workout update and offline E2E |
 
+Personal-data ownership in schema v3:
+
+- `programs` and `routines`: workout programming; backup and recovery included.
+- `recipes`, `waterEntries`, and `foodPreferences`: nutrition; backup and recovery included.
+- `recoveryPoints`: storage-only safety data; deliberately excluded from backup.
+- `nutritionPacks`: reproducible public data status; deliberately excluded from backup and restore.
+
 ## Feature layout
 
 Each feature should keep the page as a small composition root:
@@ -40,4 +47,3 @@ features/example/
 4. Run the checks from the table and `pnpm run verify:affected`.
 5. For storage, backup, catalog, or cross-module changes, run `pnpm run verify` and update `docs/verification-report.md`.
 6. Record user-visible behavior in `CHANGELOG.md` and create a checkpoint before starting the next module.
-

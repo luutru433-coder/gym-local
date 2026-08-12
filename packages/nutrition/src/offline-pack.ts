@@ -1,5 +1,14 @@
 import { z } from "zod";
-import type { FoodItem, NutritionPackManifest } from "@gym/contracts";
+import { APP_VERSIONS, type FoodItem, type NutritionPackManifest } from "@gym/contracts";
+import {
+  fetchNutritionPackManifest as fetchManifestFromProvider,
+  getNutritionPackWorkerInfo,
+  installNutritionPackFile,
+  removeNutritionPackFiles,
+  searchNutritionPackRows,
+  type NutritionPackProgressListener,
+  type NutritionPackWorkerInfo
+} from "@gym/storage";
 
 const manifestSchema = z.object({
   id: z.literal("gym-local-nutrition"),
@@ -24,54 +33,92 @@ const manifestSchema = z.object({
   })).min(1)
 });
 
-interface WorkerEnvelope {
-  id: string;
-  type: "result" | "error" | "progress";
-  payload: unknown;
-}
+export type NutritionPackInfo = NutritionPackWorkerInfo;
 
-type ProgressListener = (progress: { bytesDownloaded: number; totalBytes?: number }) => void;
+export type NutritionPackCompatibilityCode = "app_too_old" | "unsupported_schema" | "invalid_version";
 
-class NutritionPackClient {
-  private worker?: Worker;
-  private pending = new Map<string, { resolve: (value: unknown) => void; reject: (reason: Error) => void; onProgress?: ProgressListener }>();
-
-  private getWorker(): Worker {
-    if (!this.worker) {
-      this.worker = new Worker(new URL("./nutrition-pack.worker.ts", import.meta.url), { type: "module", name: "gym-local-nutrition" });
-      this.worker.addEventListener("message", (event: MessageEvent<WorkerEnvelope>) => {
-        const message = event.data;
-        const pending = this.pending.get(message.id);
-        if (!pending) return;
-        if (message.type === "progress") {
-          pending.onProgress?.(message.payload as { bytesDownloaded: number; totalBytes?: number });
-          return;
-        }
-        this.pending.delete(message.id);
-        if (message.type === "error") pending.reject(new Error((message.payload as { message?: string }).message ?? "Nutrition worker failed"));
-        else pending.resolve(message.payload);
-      });
-      this.worker.addEventListener("error", (event) => {
-        for (const pending of this.pending.values()) pending.reject(new Error(event.message || "Nutrition worker crashed"));
-        this.pending.clear();
-      });
-    }
-    return this.worker;
-  }
-
-  request<T>(type: string, payload: Record<string, unknown> = {}, onProgress?: ProgressListener): Promise<T> {
-    const id = crypto.randomUUID();
-    return new Promise<T>((resolve, reject) => {
-      this.pending.set(id, { resolve: (value) => resolve(value as T), reject, onProgress });
-      this.getWorker().postMessage({ id, type, ...payload });
-    });
+export class NutritionPackCompatibilityError extends Error {
+  constructor(public readonly code: NutritionPackCompatibilityCode, message: string) {
+    super(message);
+    this.name = "NutritionPackCompatibilityError";
   }
 }
 
-const client = new NutritionPackClient();
+export type ProgressListener = NutritionPackProgressListener;
+
+function versionParts(version: string): [number, number, number] {
+  const match = /^(\d+)\.(\d+)\.(\d+)(?:[-+].*)?$/.exec(version.trim());
+  if (!match) throw new NutritionPackCompatibilityError("invalid_version", `Invalid application version: ${version}`);
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function compareVersions(left: string, right: string): number {
+  const leftParts = versionParts(left);
+  const rightParts = versionParts(right);
+  for (let index = 0; index < leftParts.length; index += 1) {
+    const difference = leftParts[index] - rightParts[index];
+    if (difference !== 0) return difference;
+  }
+  return 0;
+}
+
+export function assertNutritionPackCompatibility(
+  manifest: Pick<NutritionPackManifest, "minimumAppVersion" | "schemaVersion">,
+  appVersion: string = APP_VERSIONS.app,
+  supportedSchemaVersion: number = APP_VERSIONS.nutritionPackSchema
+): void {
+  if (compareVersions(appVersion, manifest.minimumAppVersion) < 0) {
+    throw new NutritionPackCompatibilityError(
+      "app_too_old",
+      `Nutrition pack requires Gym Local ${manifest.minimumAppVersion} or newer`
+    );
+  }
+  if (manifest.schemaVersion !== supportedSchemaVersion) {
+    throw new NutritionPackCompatibilityError(
+      "unsupported_schema",
+      `Nutrition pack schema ${manifest.schemaVersion} is not supported by schema ${supportedSchemaVersion}`
+    );
+  }
+}
+
+export function parseNutritionPackManifest(
+  input: unknown,
+  sourceUrl: string,
+  appVersion: string = APP_VERSIONS.app,
+  supportedSchemaVersion: number = APP_VERSIONS.nutritionPackSchema
+): NutritionPackManifest {
+  const parsed = manifestSchema.parse(input);
+  const manifest = { ...parsed, downloadUrl: new URL(parsed.downloadUrl, sourceUrl).href };
+  assertNutritionPackCompatibility(manifest, appVersion, supportedSchemaVersion);
+  return manifest;
+}
 
 function numberOrNull(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function metadataNumber(metadata: Record<string, string> | undefined, key: string): number {
+  const value = Number(metadata?.[key]);
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
+function installedManifestFallback(info: NutritionPackInfo): NutritionPackManifest {
+  const metadata = info.metadata;
+  return {
+    id: "gym-local-nutrition",
+    version: metadata?.version || "installed",
+    schemaVersion: metadataNumber(metadata, "schema_version") || APP_VERSIONS.nutritionPackSchema,
+    createdAt: metadata?.created_at || new Date(0).toISOString(),
+    minimumAppVersion: "0.0.0",
+    fileName: info.activeFileName?.replace(/^\//, "") || "installed-nutrition-pack.sqlite3",
+    downloadUrl: "",
+    sizeBytes: metadataNumber(metadata, "size_bytes"),
+    sha256: metadata?.sha256 || "0".repeat(64),
+    foodCount: metadataNumber(metadata, "food_count"),
+    aliasCount: metadataNumber(metadata, "alias_count"),
+    vietnameseRecipeCount: metadataNumber(metadata, "vietnamese_recipe_count"),
+    sources: []
+  };
 }
 
 export function mapNutritionPackRow(row: Record<string, unknown>): FoodItem {
@@ -110,29 +157,61 @@ export function mapNutritionPackRow(row: Record<string, unknown>): FoodItem {
   };
 }
 
-export async function loadNutritionPackManifest(url = new URL("nutrition-pack-manifest.json", document.baseURI).href): Promise<NutritionPackManifest> {
-  const response = await fetch(url, { cache: "no-store" });
-  if (!response.ok) throw new Error("Không tải được manifest gói dinh dưỡng");
-  const parsed = manifestSchema.parse(await response.json());
-  return {
-    ...parsed,
-    downloadUrl: new URL(parsed.downloadUrl, url).href
-  };
+export async function loadNutritionPackManifest(
+  url = new URL("nutrition-pack-manifest.json", document.baseURI).href,
+  dependencies: {
+    fetchManifest?: (sourceUrl: string) => Promise<unknown>;
+    getPackInfo?: () => Promise<NutritionPackInfo>;
+    appVersion?: string;
+    supportedSchemaVersion?: number;
+  } = {}
+): Promise<NutritionPackManifest> {
+  try {
+    const input = await (dependencies.fetchManifest ?? fetchManifestFromProvider)(url);
+    return parseNutritionPackManifest(
+      input,
+      url,
+      dependencies.appVersion ?? APP_VERSIONS.app,
+      dependencies.supportedSchemaVersion ?? APP_VERSIONS.nutritionPackSchema
+    );
+  } catch (manifestError) {
+    try {
+      const info = await (dependencies.getPackInfo ?? nutritionPackInfo)();
+      if (!info.installed) throw manifestError;
+      const installedManifest = info.manifest ?? installedManifestFallback(info);
+      assertNutritionPackCompatibility(
+        installedManifest,
+        dependencies.appVersion ?? APP_VERSIONS.app,
+        dependencies.supportedSchemaVersion ?? APP_VERSIONS.nutritionPackSchema
+      );
+      return installedManifest;
+    } catch (packError) {
+      if (packError === manifestError) throw manifestError;
+      throw packError;
+    }
+  }
 }
 
-export function nutritionPackInfo(): Promise<{ installed: boolean; metadata?: Record<string, string> }> {
-  return client.request("init");
+export function nutritionPackInfo(): Promise<NutritionPackInfo> {
+  return getNutritionPackWorkerInfo();
 }
 
-export function installNutritionPack(manifest: NutritionPackManifest, onProgress?: ProgressListener): Promise<{ installed: boolean; checksum: string; bytesDownloaded: number; metadata?: Record<string, string> }> {
-  return client.request("install", { manifest }, onProgress);
+export function installNutritionPack(
+  manifest: NutritionPackManifest,
+  onProgress?: ProgressListener
+): Promise<NutritionPackInfo & { checksum: string; bytesDownloaded: number }> {
+  assertNutritionPackCompatibility(manifest);
+  if (!manifest.downloadUrl || manifest.sizeBytes <= 0 || /^0+$/.test(manifest.sha256)) {
+    return Promise.reject(new Error("The installed offline fallback cannot be downloaded"));
+  }
+  return installNutritionPackFile(manifest, onProgress);
 }
 
 export async function searchOfflineFoods(query: string, limit = 30): Promise<FoodItem[]> {
-  const rows = await client.request<Record<string, unknown>[]>("search", { query, limit });
+  const rows = await searchNutritionPackRows(query, limit);
   return rows.map(mapNutritionPackRow);
 }
 
 export function removeNutritionPack(): Promise<{ removed: boolean }> {
-  return client.request("remove");
+  return removeNutritionPackFiles();
 }

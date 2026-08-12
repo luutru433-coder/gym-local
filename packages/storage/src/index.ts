@@ -2,16 +2,23 @@ import Dexie, { type EntityTable } from "dexie";
 import {
   APP_VERSIONS,
   type AppSettings,
-  type BackupPayload,
   type BodyMetric,
   type ExerciseVariant,
+  type FoodPreference,
   type FoodItem,
   type MealEntry,
   type NutritionPackRecord,
+  type PersonalDataSnapshot,
   type Profile,
+  type Program,
+  type Recipe,
+  type RecoveryPoint,
   type Routine,
+  type WaterEntry,
   type WorkoutSession
 } from "@gym/contracts";
+
+export * from "./nutrition-pack-client";
 
 function assertFiniteRecord(value: unknown, path = "record"): void {
   if (typeof value === "number") {
@@ -30,15 +37,20 @@ function assertFiniteRecord(value: unknown, path = "record"): void {
 export class GymDatabase extends Dexie {
   profiles!: EntityTable<Profile, "id">;
   routines!: EntityTable<Routine, "id">;
+  programs!: EntityTable<Program, "id">;
   sessions!: EntityTable<WorkoutSession, "id">;
   foods!: EntityTable<FoodItem, "id">;
   meals!: EntityTable<MealEntry, "id">;
+  recipes!: EntityTable<Recipe, "id">;
+  waterEntries!: EntityTable<WaterEntry, "id">;
+  foodPreferences!: EntityTable<FoodPreference, "id">;
   bodyMetrics!: EntityTable<BodyMetric, "id">;
   customVariants!: EntityTable<ExerciseVariant, "id">;
   settings!: EntityTable<AppSettings, "id">;
   nutritionPacks!: EntityTable<NutritionPackRecord, "id">;
+  recoveryPoints!: EntityTable<RecoveryPoint, "id">;
 
-  constructor(name = "gym-local") {
+  constructor(name = "gym-local", migrationHooks: { beforeV3Commit?: () => void | Promise<void> } = {}) {
     super(name);
     this.version(1).stores({
       profiles: "id, updatedAt",
@@ -71,6 +83,84 @@ export class GymDatabase extends Dexie {
         });
       }
     });
+    this.version(3).stores({
+      profiles: "id, updatedAt",
+      routines: "id, goal, updatedAt, sourceTemplateId",
+      programs: "id, goal, updatedAt",
+      sessions: "id, routineId, startedAt, finishedAt, locationId",
+      foods: "id, barcode, updatedAt",
+      meals: "id, date, meal, foodId, createdAt",
+      recipes: "id, updatedAt",
+      waterEntries: "id, date, createdAt",
+      foodPreferences: "id, foodId, favorite, lastUsedAt",
+      bodyMetrics: "id, date",
+      customVariants: "id, movementId, reviewStatus",
+      settings: "id",
+      nutritionPacks: "id, status, version, installedAt",
+      recoveryPoints: "id, createdAt"
+    }).upgrade(async (transaction) => {
+      const settingsTable = transaction.table<AppSettings>("settings");
+      const profilesTable = transaction.table<Profile>("profiles");
+      const packTable = transaction.table<NutritionPackRecord>("nutritionPacks");
+      const settings = await settingsTable.get("app");
+      if (settings) {
+        await settingsTable.put({
+          ...settings,
+          dbSchemaVersion: 3,
+          backupVersion: 3
+        });
+      }
+      await profilesTable.toCollection().modify((profile) => {
+        const target = profile.nutritionTarget;
+        if (!target || target.source) return;
+        const hasBasis = (profile.biologicalSex === "female" || profile.biologicalSex === "male")
+          && Boolean(profile.age && profile.heightCm && profile.weightKg && profile.activityFactor);
+        profile.nutritionTarget = {
+          ...target,
+          source: hasBasis ? "estimated" : "legacy",
+          basis: hasBasis ? {
+            biologicalSex: profile.biologicalSex as "female" | "male",
+            age: profile.age!,
+            heightCm: profile.heightCm!,
+            weightKg: profile.weightKg!,
+            activityFactor: profile.activityFactor!,
+            goal: profile.goal
+          } : undefined,
+          calculatedAt: profile.updatedAt
+        };
+      });
+      const pack = await packTable.get("nutrition-pack");
+      if (pack?.status === "ready" && pack.version && pack.installedAt && !pack.active) {
+        await packTable.put({
+          ...pack,
+          active: {
+            version: pack.version,
+            fileName: "/gym-local-nutrition.sqlite3",
+            checksum: pack.checksum ?? "legacy-unverified",
+            installedAt: pack.installedAt,
+            foodCount: pack.foodCount,
+            aliasCount: pack.aliasCount,
+            vietnameseRecipeCount: pack.vietnameseRecipeCount
+          }
+        });
+      } else if (pack && (pack.status === "downloading" || pack.status === "installing") && !pack.operation) {
+        await packTable.put({
+          ...pack,
+          status: "error",
+          error: pack.error ?? "Previous nutrition pack operation was interrupted",
+          operation: {
+            id: `pack_operation_${Date.now()}`,
+            kind: pack.active ? "update" : "install",
+            status: "failed",
+            bytesDownloaded: pack.bytesDownloaded,
+            totalBytes: pack.totalBytes,
+            startedAt: settings?.storagePersistenceRequestedAt ?? new Date(0).toISOString(),
+            errorCode: "interrupted_by_upgrade"
+          }
+        });
+      }
+      await migrationHooks.beforeV3Commit?.();
+    });
   }
 }
 
@@ -97,12 +187,14 @@ export async function initializeDatabase(db: GymDatabase = gymDb): Promise<void>
     || settings.routineTemplateVersion !== APP_VERSIONS.routines
     || settings.nutritionFormulaVersion !== APP_VERSIONS.nutritionFormula
     || settings.backupVersion !== APP_VERSIONS.backup
+    || settings.dbSchemaVersion !== APP_VERSIONS.database
   ) {
     await db.settings.put({
       ...settings,
       catalogVersion: APP_VERSIONS.catalog,
       routineTemplateVersion: APP_VERSIONS.routines,
       nutritionFormulaVersion: APP_VERSIONS.nutritionFormula,
+      dbSchemaVersion: APP_VERSIONS.database,
       backupVersion: APP_VERSIONS.backup
     });
   }
@@ -175,8 +267,9 @@ export async function saveSession(session: WorkoutSession, db: GymDatabase = gym
     const settings = (await db.settings.get("app")) ?? defaultSettings;
     await db.settings.put({ ...settings, activeSessionId: session.finishedAt ? undefined : session.id });
   });
-  sessionWriteQueue = sessionWriteQueue.then(commit, commit);
-  await sessionWriteQueue;
+  const operation = sessionWriteQueue.then(commit, commit);
+  sessionWriteQueue = operation.then(() => undefined, () => undefined);
+  await operation;
 }
 
 export async function getActiveSession(db: GymDatabase = gymDb): Promise<WorkoutSession | undefined> {
@@ -241,14 +334,36 @@ export async function saveNutritionPackRecord(record: NutritionPackRecord, db: G
   await db.nutritionPacks.put(record);
 }
 
-export async function exportAllData(db: GymDatabase = gymDb): Promise<BackupPayload["data"]> {
-  await sessionWriteQueue;
-  const [profile, routines, sessions, foods, meals, bodyMetrics, customVariants, settings] = await Promise.all([
-    getProfile(db),
+const personalTableNames = [
+  "profiles",
+  "routines",
+  "programs",
+  "sessions",
+  "foods",
+  "meals",
+  "recipes",
+  "waterEntries",
+  "foodPreferences",
+  "bodyMetrics",
+  "customVariants",
+  "settings"
+] as const;
+
+function personalTables(db: GymDatabase) {
+  return personalTableNames.map((name) => db.table(name));
+}
+
+async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<PersonalDataSnapshot> {
+  const [profile, routines, programs, sessions, foods, meals, recipes, waterEntries, foodPreferences, bodyMetrics, customVariants, settings] = await Promise.all([
+    db.profiles.toCollection().first(),
     db.routines.toArray(),
+    db.programs.toArray(),
     db.sessions.toArray(),
     db.foods.toArray(),
     db.meals.toArray(),
+    db.recipes.toArray(),
+    db.waterEntries.toArray(),
+    db.foodPreferences.toArray(),
     db.bodyMetrics.toArray(),
     db.customVariants.toArray(),
     db.settings.get("app")
@@ -256,31 +371,81 @@ export async function exportAllData(db: GymDatabase = gymDb): Promise<BackupPayl
   return {
     profile,
     routines,
+    programs,
     sessions,
     foods,
     meals,
+    recipes,
+    waterEntries,
+    foodPreferences,
     bodyMetrics,
     customVariants,
     settings: settings ?? defaultSettings
   };
 }
 
-export async function replaceAllData(data: Awaited<ReturnType<typeof exportAllData>>, db: GymDatabase = gymDb): Promise<void> {
+async function putSnapshotInCurrentTransaction(data: PersonalDataSnapshot, db: GymDatabase): Promise<void> {
+  for (const table of personalTables(db)) await table.clear();
+  if (data.profile) await db.profiles.put(data.profile);
+  await db.routines.bulkPut(data.routines);
+  await db.programs.bulkPut(data.programs);
+  await db.sessions.bulkPut(data.sessions);
+  await db.foods.bulkPut(data.foods);
+  await db.meals.bulkPut(data.meals);
+  await db.recipes.bulkPut(data.recipes);
+  await db.waterEntries.bulkPut(data.waterEntries);
+  await db.foodPreferences.bulkPut(data.foodPreferences);
+  await db.bodyMetrics.bulkPut(data.bodyMetrics);
+  await db.customVariants.bulkPut(data.customVariants);
+  await db.settings.put(data.settings);
+}
+
+export async function exportAllData(db: GymDatabase = gymDb): Promise<PersonalDataSnapshot> {
+  await sessionWriteQueue;
+  return db.transaction("r", personalTables(db), () => readSnapshotInCurrentTransaction(db));
+}
+
+export async function replaceAllData(data: PersonalDataSnapshot, db: GymDatabase = gymDb): Promise<void> {
   await sessionWriteQueue;
   assertFiniteRecord(data, "restore data");
-  const userTables = [db.profiles, db.routines, db.sessions, db.foods, db.meals, db.bodyMetrics, db.customVariants, db.settings];
-  await db.transaction("rw", userTables, async () => {
-    for (const table of userTables) await table.clear();
-    if (data.profile) await db.profiles.put(data.profile);
-    await Promise.all([
-      db.routines.bulkPut(data.routines),
-      db.sessions.bulkPut(data.sessions),
-      db.foods.bulkPut(data.foods),
-      db.meals.bulkPut(data.meals),
-      db.bodyMetrics.bulkPut(data.bodyMetrics),
-      db.customVariants.bulkPut(data.customVariants),
-      db.settings.put(data.settings)
-    ]);
+  const tables = [...personalTables(db), db.recoveryPoints];
+  await db.transaction("rw", tables, async () => {
+    const currentSettings = await db.settings.get("app");
+    const activeSession = currentSettings?.activeSessionId ? await db.sessions.get(currentSettings.activeSessionId) : undefined;
+    if (activeSession && !activeSession.finishedAt) throw new Error("Finish the active workout before restoring a backup");
+    const current = await readSnapshotInCurrentTransaction(db);
+    const newestRecovery = await db.recoveryPoints.orderBy("createdAt").last();
+    const newestCreatedAt = newestRecovery ? Date.parse(newestRecovery.createdAt) : Number.NaN;
+    const createdAt = new Date(Math.max(Date.now(), Number.isFinite(newestCreatedAt) ? newestCreatedAt + 1 : 0)).toISOString();
+    const recoveryPoint: RecoveryPoint = {
+      id: `recovery_${crypto.randomUUID()}`,
+      reason: "before_restore",
+      createdAt,
+      snapshot: current
+    };
+    await db.recoveryPoints.put(recoveryPoint);
+    const obsolete = await db.recoveryPoints.orderBy("createdAt").reverse().offset(2).toArray();
+    if (obsolete.length) await db.recoveryPoints.bulkDelete(obsolete.map((point) => point.id));
+    await putSnapshotInCurrentTransaction(data, db);
+  });
+}
+
+export async function listRecoveryPoints(db: GymDatabase = gymDb): Promise<RecoveryPoint[]> {
+  return db.recoveryPoints.orderBy("createdAt").reverse().toArray();
+}
+
+export async function undoLatestRestore(db: GymDatabase = gymDb): Promise<boolean> {
+  await sessionWriteQueue;
+  const tables = [...personalTables(db), db.recoveryPoints];
+  return db.transaction("rw", tables, async () => {
+    const currentSettings = await db.settings.get("app");
+    const activeSession = currentSettings?.activeSessionId ? await db.sessions.get(currentSettings.activeSessionId) : undefined;
+    if (activeSession && !activeSession.finishedAt) throw new Error("Finish the active workout before undoing a restore");
+    const latest = await db.recoveryPoints.orderBy("createdAt").last();
+    if (!latest) return false;
+    await putSnapshotInCurrentTransaction(latest.snapshot, db);
+    await db.recoveryPoints.delete(latest.id);
+    return true;
   });
 }
 

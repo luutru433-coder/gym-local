@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Check, ChevronDown, CircleHelp, Clock3, Dumbbell, Pause, Play, Plus, RotateCcw, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, EmptyState, Modal, Notice, ProgressBar } from "@gym/ui";
-import type { ExerciseVariant, SetLog, WorkoutSession } from "@gym/contracts";
+import type { ExerciseVariant, LoadEntryMode, SetLog, WorkoutSession } from "@gym/contracts";
 import { EQUIPMENT_OPTIONS, getTrackingProfile, getVariant, rankVariantsForEquipment, trackingProfileForLoadMode } from "@gym/catalog";
 import { addSet, sessionProgress, switchExerciseVariant, updateSet } from "@gym/workouts";
 import { latestVariantHistory } from "@gym/progress";
@@ -31,6 +31,16 @@ function nonNegativeInteger(value: string, maximum?: number): number | undefined
   const rounded = Math.round(number);
   return maximum === undefined ? rounded : Math.min(maximum, rounded);
 }
+
+const loadModeLabels: Record<LoadEntryMode, { vi: string; en: string }> = {
+  total_weight: { vi: "Tổng mức tạ", en: "Total weight" },
+  per_hand: { vi: "Mức tạ mỗi tay", en: "Weight per hand" },
+  per_side: { vi: "Mức tạ mỗi bên", en: "Weight per side" },
+  bodyweight_plus: { vi: "Trọng lượng cơ thể + tạ", en: "Bodyweight + added load" },
+  assisted: { vi: "Mức trợ lực", en: "Assistance weight" },
+  reps_only: { vi: "Chỉ số lần", en: "Reps only" },
+  duration_distance: { vi: "Quãng đường và thời gian", en: "Distance and duration" }
+};
 
 export function WorkoutPage() {
   const navigate = useNavigate();
@@ -126,21 +136,21 @@ export function WorkoutPage() {
   return (
     <div className="workout-page">
       <header className="workout-header">
-        <button className="icon-button icon-button--dark" type="button" onClick={() => navigate("/")} aria-label="Back"><ArrowLeft size={21} /></button>
-        <div className="workout-header__title"><span className="live-dot" /> <div><small>{saveStatusLabel}</small><strong>{activeSession.routineNameSnapshot ? localize(activeSession.routineNameSnapshot, locale) : "Workout"}</strong></div></div>
-        <div className="workout-header__timer"><Clock3 size={17} /><span>{durationLabel(activeSession.startedAt, now)}</span></div>
+        <button className="icon-button icon-button--dark" type="button" onClick={() => navigate("/")} aria-label={locale === "vi" ? "Quay lại trang chủ" : "Back to home"}><ArrowLeft size={21} /></button>
+        <div className="workout-header__title"><span className="live-dot" /> <div><small role="status" aria-live="polite">{saveStatusLabel}</small><strong>{activeSession.routineNameSnapshot ? localize(activeSession.routineNameSnapshot, locale) : "Workout"}</strong></div></div>
+        <div className="workout-header__timer" role="timer" aria-label={`${locale === "vi" ? "Thời gian buổi tập" : "Workout duration"}: ${durationLabel(activeSession.startedAt, now)}`}><Clock3 size={17} aria-hidden="true" /><span>{durationLabel(activeSession.startedAt, now)}</span></div>
         <Button variant="secondary" size="sm" onClick={() => void finish()}>{locale === "vi" ? "Kết thúc" : "Finish"}<Check size={16} /></Button>
       </header>
 
       <div className="workout-progress">
         <div><span>{progress.completed}/{progress.total} sets</span><strong>{progress.percent}%</strong></div>
-        <ProgressBar value={progress.percent} />
+        <ProgressBar value={progress.percent} label={locale === "vi" ? "Tiến độ buổi tập" : "Workout progress"} valueText={`${progress.completed}/${progress.total} ${locale === "vi" ? "set hoàn tất" : "sets complete"}`} />
       </div>
 
-      <nav className="exercise-jump" aria-label="Workout exercises">
+      <nav className="exercise-jump" aria-label={locale === "vi" ? "Các bài trong buổi tập" : "Workout exercises"}>
         {activeSession.exercises.map((exercise, index) => {
           const done = exercise.sets.every((set) => set.completedAt);
-          return <button type="button" key={exercise.id} className={expandedId === exercise.id ? "exercise-jump__item exercise-jump__item--active" : "exercise-jump__item"} onClick={() => { setExpandedId(exercise.id); document.getElementById(exercise.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><span>{done ? <Check size={14} /> : index + 1}</span><small>{localize(exercise.movementNameSnapshot, locale)}</small></button>;
+          return <button type="button" key={exercise.id} className={expandedId === exercise.id ? "exercise-jump__item exercise-jump__item--active" : "exercise-jump__item"} aria-pressed={expandedId === exercise.id} onClick={() => { setExpandedId(exercise.id); document.getElementById(exercise.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><span>{done ? <Check size={14} /> : index + 1}</span><small>{localize(exercise.movementNameSnapshot, locale)}</small></button>;
         })}
       </nav>
 
@@ -157,25 +167,45 @@ export function WorkoutPage() {
            const timedMode = trackingProfile.effortKind === "duration";
            const repsOnly = trackingProfile.loadEntryMode === "reps_only";
            const weightHeading = repsOnly ? "—" : trackingProfile.loadEntryMode === "per_hand" ? (locale === "vi" ? "KG/TAY" : "KG/HAND") : trackingProfile.loadEntryMode === "per_side" ? (locale === "vi" ? "KG/BÊN" : "KG/SIDE") : trackingProfile.loadEntryMode === "assisted" ? (locale === "vi" ? "KG TRỢ LỰC" : "ASSIST KG") : trackingProfile.loadEntryMode === "bodyweight_plus" ? (locale === "vi" ? "KG THÊM" : "ADDED KG") : "KG";
+           const loadFieldLabel = repsOnly
+             ? (locale === "vi" ? "Không nhập tạ" : "No load entry")
+             : trackingProfile.loadEntryMode === "per_hand"
+               ? (locale === "vi" ? "Kg mỗi tay" : "Kg per hand")
+               : trackingProfile.loadEntryMode === "per_side"
+                 ? (locale === "vi" ? "Kg mỗi bên" : "Kg per side")
+                 : trackingProfile.loadEntryMode === "assisted"
+                   ? (locale === "vi" ? "Kg trợ lực" : "Assistance kg")
+                   : trackingProfile.loadEntryMode === "bodyweight_plus"
+                     ? (locale === "vi" ? "Kg thêm" : "Added kg")
+                     : (locale === "vi" ? "Mức tạ kg" : "Load kg");
+           const effortFieldLabel = distanceMode
+             ? (locale === "vi" ? "Quãng đường m" : "Distance m")
+             : timedMode
+               ? (locale === "vi" ? "Thời gian giây" : "Duration sec")
+               : (locale === "vi" ? "Số lần" : "Reps");
+           const intensityFieldLabel = distanceMode
+             ? (locale === "vi" ? "Thời gian giây" : "Duration sec")
+             : "RIR";
           return (
             <Card id={exercise.id} key={exercise.id} className={expanded ? "workout-exercise workout-exercise--expanded" : "workout-exercise"}>
-              <button type="button" className="workout-exercise__header" onClick={() => setExpandedId(expanded ? undefined : exercise.id)}>
+              <button type="button" className="workout-exercise__header" aria-expanded={expanded} aria-controls={`${exercise.id}-details`} onClick={() => setExpandedId(expanded ? undefined : exercise.id)}>
                 <span className="workout-exercise__index">{String(exerciseIndex + 1).padStart(2, "0")}</span>
                 <div><span className="eyebrow">{localize(exercise.movementNameSnapshot, locale)}</span><h2>{localize(exercise.variantNameSnapshot, locale)}</h2><p>{doneCount}/{exercise.sets.length} sets · {exercise.restSeconds}s {locale === "vi" ? "nghỉ" : "rest"}</p></div>
                 <span className="workout-exercise__chevron"><ChevronDown size={20} /></span>
               </button>
 
               {expanded ? (
-                <div className="workout-exercise__body">
+                <div className="workout-exercise__body" id={`${exercise.id}-details`}>
                   <div className="exercise-tools">
                     <button type="button" onClick={() => setVariantForExercise(exercise.id)}><RotateCcw size={16} />{locale === "vi" ? "Đổi máy / dụng cụ" : "Switch equipment"}</button>
                     {variant ? <button type="button" onClick={() => setGuideVariant(variant)}><CircleHelp size={16} />{locale === "vi" ? "Xem kỹ thuật" : "Form guide"}</button> : null}
-                    <span className="load-mode">{exercise.loadEntryModeSnapshot.replaceAll("_", " ")}</span>
+                    <span className="load-mode">{loadModeLabels[exercise.loadEntryModeSnapshot][locale]}</span>
                   </div>
 
-                  <div className="set-table">
-                    <div className="set-table__head"><span>SET</span><span>{locale === "vi" ? "TRƯỚC / MỤC TIÊU" : "PREV / TARGET"}</span><span>{weightHeading}</span><span>{distanceMode ? "M" : timedMode ? (locale === "vi" ? "GIÂY" : "SEC") : "REPS"}</span><span>{distanceMode ? (locale === "vi" ? "GIÂY" : "SEC") : "RIR"}</span><span /></div>
+                  <div className="set-table" role="group" aria-label={`${locale === "vi" ? "Các set của" : "Sets for"} ${localize(exercise.variantNameSnapshot, locale)}`}>
+                    <div className="set-table__head" aria-hidden="true"><span>SET</span><span>{locale === "vi" ? "TRƯỚC / MỤC TIÊU" : "PREV / TARGET"}</span><span>{weightHeading}</span><span>{distanceMode ? "M" : timedMode ? (locale === "vi" ? "GIÂY" : "SEC") : "REPS"}</span><span>{distanceMode ? (locale === "vi" ? "GIÂY" : "SEC") : "RIR"}</span><span /></div>
                     {exercise.sets.map((set, setIndex) => {
+                      const setNumber = setIndex + 1;
                       const workingSetIndex = exercise.sets.slice(0, setIndex + 1).filter((candidate) => candidate.type !== "warmup").length - 1;
                       const prior = set.type === "warmup" ? undefined : previous[workingSetIndex];
                       const targetLabel = distanceMode
@@ -195,20 +225,37 @@ export function WorkoutPage() {
                         : timedMode
                           ? Boolean((set.durationSeconds ?? 0) > 0)
                         : Boolean((set.reps ?? 0) > 0);
+                      const setTypeLabel = set.type === "warmup"
+                        ? (locale === "vi" ? `Set ${setNumber}: khởi động, nhấn để đổi sang set chính` : `Set ${setNumber}: warm-up, press to change to working set`)
+                        : (locale === "vi" ? `Set ${setNumber}: set chính, nhấn để đổi sang khởi động` : `Set ${setNumber}: working set, press to change to warm-up`);
+                      const completeLabel = set.completedAt
+                        ? (locale === "vi" ? `Bỏ hoàn tất set ${setNumber}` : `Undo set ${setNumber}`)
+                        : canComplete
+                          ? (locale === "vi" ? `Hoàn tất set ${setNumber}` : `Complete set ${setNumber}`)
+                          : (locale === "vi" ? `Set ${setNumber}: nhập số lần, quãng đường hoặc thời gian trước` : `Set ${setNumber}: enter reps, distance, or duration first`);
                       return (
                         <div className={set.completedAt ? "set-row set-row--done" : "set-row"} key={set.id}>
-                          <button type="button" className="set-type" onClick={() => patchSet(exercise.id, set.id, { type: set.type === "warmup" ? "working" : "warmup" })}>{set.type === "warmup" ? "W" : setIndex + 1}</button>
-                          <span className="previous-value">{previousLabel}</span>
-                          {repsOnly ? <span className="set-input-placeholder">—</span> : <input aria-label={`Set ${setIndex + 1} weight`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
+                          <button type="button" className="set-type" aria-label={setTypeLabel} aria-pressed={set.type === "warmup"} onClick={() => patchSet(exercise.id, set.id, { type: set.type === "warmup" ? "working" : "warmup" })}>{set.type === "warmup" ? "W" : setNumber}</button>
+                          <span className="previous-value"><span className="sr-only">{locale === "vi" ? "Trước hoặc mục tiêu: " : "Previous or target: "}</span>{previousLabel}</span>
+                          <div className="set-field set-field--load">
+                            <span className="set-field__label">{loadFieldLabel}</span>
+                            {repsOnly ? <span className="set-input-placeholder" aria-hidden="true">—</span> : <input aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${loadFieldLabel}`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
+                          </div>
+                          <label className="set-field set-field--effort">
+                            <span className="set-field__label">{effortFieldLabel}</span>
                           {distanceMode
-                            ? <input aria-label={`Set ${setIndex + 1} distance in meters`} inputMode="decimal" min="0" step="1" value={set.distanceMeters ?? ""} placeholder="m" onChange={(event) => patchSet(exercise.id, set.id, { distanceMeters: nonNegativeNumber(event.target.value) })} />
+                            ? <input aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="decimal" min="0" step="1" value={set.distanceMeters ?? ""} placeholder="m" onChange={(event) => patchSet(exercise.id, set.id, { distanceMeters: nonNegativeNumber(event.target.value) })} />
                             : timedMode
-                              ? <input aria-label={`Set ${setIndex + 1} duration in seconds`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
-                            : <input aria-label={`Set ${setIndex + 1} reps`} inputMode="numeric" min="0" step="1" value={set.reps ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { reps: nonNegativeInteger(event.target.value) })} />}
+                              ? <input aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
+                            : <input aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.reps ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { reps: nonNegativeInteger(event.target.value) })} />}
+                          </label>
+                          <label className="set-field set-field--intensity">
+                            <span className="set-field__label">{intensityFieldLabel}</span>
                           {distanceMode
-                            ? <input aria-label={`Set ${setIndex + 1} duration in seconds`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
-                            : <input aria-label={`Set ${setIndex + 1} RIR`} inputMode="numeric" min="0" max="10" step="1" value={set.rir ?? ""} placeholder={String(set.targetRir ?? 2)} onChange={(event) => patchSet(exercise.id, set.id, { rir: nonNegativeInteger(event.target.value, 10) })} />}
-                          <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id)} aria-label={set.completedAt ? "Undo set" : "Complete set"} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập reps, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}>{set.completedAt ? <Check size={19} /> : null}</button>
+                            ? <input aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${intensityFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
+                            : <input aria-label={`Set ${setNumber}, RIR`} inputMode="numeric" min="0" max="10" step="1" value={set.rir ?? ""} placeholder={String(set.targetRir ?? 2)} onChange={(event) => patchSet(exercise.id, set.id, { rir: nonNegativeInteger(event.target.value, 10) })} />}
+                          </label>
+                          <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id)} aria-label={completeLabel} aria-pressed={Boolean(set.completedAt)} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập số lần, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}>{set.completedAt ? <Check size={19} /> : null}</button>
                         </div>
                       );
                     })}
@@ -223,20 +270,21 @@ export function WorkoutPage() {
       </main>
 
       {activeSession.restTimerEndsAt ? (
-        <div className={restRemaining === 0 ? "rest-dock rest-dock--done" : "rest-dock"}>
+        <div className={restRemaining === 0 ? "rest-dock rest-dock--done" : "rest-dock"} role="region" aria-label={locale === "vi" ? "Bộ đếm thời gian nghỉ" : "Rest timer controls"}>
           <span className="rest-dock__icon">{restRemaining ? <Pause size={20} /> : <Play size={20} />}</span>
-          <div><small>{restRemaining ? (locale === "vi" ? "Đang nghỉ" : "Rest timer") : (locale === "vi" ? "Sẵn sàng" : "Ready")}</small><strong>{String(Math.floor(restRemaining / 60)).padStart(2, "0")}:{String(restRemaining % 60).padStart(2, "0")}</strong></div>
-          <button type="button" onClick={() => modifyRest(30)}>+30s</button>
+          <div role="timer" aria-label={`${locale === "vi" ? "Thời gian nghỉ còn lại" : "Rest time remaining"}: ${restRemaining} ${locale === "vi" ? "giây" : "seconds"}`}><small>{restRemaining ? (locale === "vi" ? "Đang nghỉ" : "Rest timer") : (locale === "vi" ? "Sẵn sàng" : "Ready")}</small><strong>{String(Math.floor(restRemaining / 60)).padStart(2, "0")}:{String(restRemaining % 60).padStart(2, "0")}</strong></div>
+          <button type="button" aria-label={locale === "vi" ? "Thêm 30 giây nghỉ" : "Add 30 seconds of rest"} onClick={() => modifyRest(30)}>+30s</button>
           <button type="button" onClick={() => modifyRest(undefined)}>{locale === "vi" ? "Bỏ qua" : "Skip"}<X size={16} /></button>
+          <span className="sr-only" aria-live="assertive">{restRemaining === 0 ? (locale === "vi" ? "Hết giờ nghỉ, sẵn sàng tập" : "Rest complete, ready") : ""}</span>
         </div>
       ) : null}
 
       <Modal open={Boolean(modalExercise)} title={locale === "vi" ? "Đổi cách tập" : "Switch variation"} onClose={() => setVariantForExercise(undefined)}>
-        {modalExercise ? <div className="variant-picker">
+        {modalExercise ? <div className="variant-picker" role="group" aria-label={locale === "vi" ? "Chọn biến thể thay thế" : "Choose replacement variation"}>
           <p>{locale === "vi" ? "Lịch sử được lưu riêng cho từng biến thể. Các set đã hoàn tất sẽ không bị thay đổi." : "History stays separate for each variation. Completed sets will not be changed."}</p>
           {modalVariants.map((variant) => {
             const ready = variant.equipment.every((item) => availableEquipment.includes(item));
-            return <button type="button" key={variant.id} className={variant.id === modalExercise.variantId ? "variant-choice variant-choice--active" : "variant-choice"} onClick={() => chooseVariant(modalExercise.id, variant)}><span className="variant-choice__icon"><Dumbbell size={19} /></span><span><strong>{localize(variant.name, locale)}</strong><small>{variant.equipment.map((item) => EQUIPMENT_OPTIONS.find((entry) => entry.id === item)?.name[locale]).join(" + ")}</small></span><em>{ready ? <><Check size={14} />{locale === "vi" ? "Sẵn sàng" : "Ready"}</> : (locale === "vi" ? "Thiếu dụng cụ" : "Unavailable")}</em></button>;
+            return <button type="button" key={variant.id} className={variant.id === modalExercise.variantId ? "variant-choice variant-choice--active" : "variant-choice"} aria-pressed={variant.id === modalExercise.variantId} onClick={() => chooseVariant(modalExercise.id, variant)}><span className="variant-choice__icon"><Dumbbell size={19} /></span><span><strong>{localize(variant.name, locale)}</strong><small>{variant.equipment.map((item) => EQUIPMENT_OPTIONS.find((entry) => entry.id === item)?.name[locale]).join(" + ")}</small></span><em>{ready ? <><Check size={14} />{locale === "vi" ? "Sẵn sàng" : "Ready"}</> : (locale === "vi" ? "Thiếu dụng cụ" : "Unavailable")}</em></button>;
           })}
         </div> : null}
       </Modal>

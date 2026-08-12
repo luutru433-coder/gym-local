@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { AlertTriangle, ArrowUpRight, CheckCircle2, Dumbbell, Info, Search, ShieldCheck, SlidersHorizontal, Target } from "lucide-react";
 import { Button, Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
-import type { EquipmentType, ExerciseVariant, MuscleGroup } from "@gym/contracts";
+import type { EquipmentType, ExerciseVariant, Movement, MuscleGroup } from "@gym/contracts";
 import { EQUIPMENT_OPTIONS, getVariantsForMovement, MOVEMENTS, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
 import { openExternalMedia } from "@gym/media";
 import { localize } from "../../lib/i18n";
@@ -16,6 +16,17 @@ const muscleLabels: Record<MuscleGroup, { vi: string; en: string }> = {
 };
 
 const muscleFilters: MuscleGroup[] = ["chest", "back", "shoulders", "quadriceps", "hamstrings", "glutes", "biceps", "triceps", "core"];
+
+const patternLabels: Record<Movement["pattern"], { vi: string; en: string }> = {
+  push: { vi: "Đẩy", en: "Push" },
+  pull: { vi: "Kéo", en: "Pull" },
+  squat: { vi: "Squat", en: "Squat" },
+  hinge: { vi: "Gập hông", en: "Hinge" },
+  lunge: { vi: "Chùng chân", en: "Lunge" },
+  isolation: { vi: "Cô lập", en: "Isolation" },
+  core: { vi: "Core", en: "Core" },
+  carry: { vi: "Mang tải", en: "Carry" }
+};
 
 export function CatalogPage() {
   const profile = useGymStore((state) => state.profile)!;
@@ -51,9 +62,9 @@ export function CatalogPage() {
       </header>
 
       <Card className="catalog-toolbar">
-        <div className="search-box search-box--large"><Search size={20} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={locale === "vi" ? "Tìm chest press, kéo lưng, squat…" : "Search chest press, row, squat…"} /><span>{results.length}</span></div>
-        <div className="filter-line"><SlidersHorizontal size={17} /><div className="filter-scroll"><Chip active={!muscle} onClick={() => setMuscle(undefined)}>{locale === "vi" ? "Tất cả cơ" : "All muscles"}</Chip>{muscleFilters.map((item) => <Chip key={item} active={muscle === item} onClick={() => setMuscle(muscle === item ? undefined : item)}>{muscleLabels[item][locale]}</Chip>)}</div></div>
-        <div className="filter-line"><Dumbbell size={17} /><div className="filter-scroll"><Chip active={!equipment} onClick={() => setEquipment(undefined)}>{locale === "vi" ? "Mọi dụng cụ" : "All equipment"}</Chip>{EQUIPMENT_OPTIONS.map((item) => <Chip key={item.id} active={equipment === item.id} onClick={() => setEquipment(equipment === item.id ? undefined : item.id)}>{item.name[locale]}</Chip>)}</div></div>
+        <div className="search-box search-box--large"><Search size={20} /><input aria-label={locale === "vi" ? "Tìm bài tập" : "Search exercises"} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={locale === "vi" ? "Tìm chest press, kéo lưng, squat…" : "Search chest press, row, squat…"} /><span aria-live="polite">{results.length}</span></div>
+        <div className="filter-line"><SlidersHorizontal size={17} /><div className="filter-scroll" role="group" aria-label={locale === "vi" ? "Lọc theo nhóm cơ" : "Filter by muscle"}><Chip active={!muscle} onClick={() => setMuscle(undefined)}>{locale === "vi" ? "Tất cả cơ" : "All muscles"}</Chip>{muscleFilters.map((item) => <Chip key={item} active={muscle === item} onClick={() => setMuscle(muscle === item ? undefined : item)}>{muscleLabels[item][locale]}</Chip>)}</div></div>
+        <div className="filter-line"><Dumbbell size={17} /><div className="filter-scroll" role="group" aria-label={locale === "vi" ? "Lọc theo dụng cụ" : "Filter by equipment"}><Chip active={!equipment} onClick={() => setEquipment(undefined)}>{locale === "vi" ? "Mọi dụng cụ" : "All equipment"}</Chip>{EQUIPMENT_OPTIONS.map((item) => <Chip key={item.id} active={equipment === item.id} onClick={() => setEquipment(equipment === item.id ? undefined : item.id)}>{item.name[locale]}</Chip>)}</div></div>
       </Card>
 
       {results.length ? (
@@ -67,6 +78,8 @@ export function CatalogPage() {
                 key={movement.id}
                 role="button"
                 tabIndex={0}
+                aria-haspopup="dialog"
+                aria-label={`${localize(movement.name, locale)} · ${allVariants.length} ${locale === "vi" ? "biến thể" : "variations"}`}
                 onClick={() => openMovement(movement.id)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
@@ -81,7 +94,7 @@ export function CatalogPage() {
                   <span className="muscle-stamp">{muscleLabels[movement.primaryMuscles[0]][locale]}</span>
                 </div>
                 <div className="movement-card__body">
-                  <span className="eyebrow">{movement.pattern} · {movement.primaryMuscles.map((item) => muscleLabels[item][locale]).join(", ")}</span>
+                  <span className="eyebrow">{patternLabels[movement.pattern][locale]} · {movement.primaryMuscles.map((item) => muscleLabels[item][locale]).join(", ")}</span>
                   <h3>{localize(movement.name, locale)}</h3>
                   <div className="movement-card__meta"><span><LayersIcon />{allVariants.length} {locale === "vi" ? "biến thể" : "variations"}</span><span className={readyCount ? "ready-count" : ""}><CheckCircle2 size={15} />{readyCount} {locale === "vi" ? "sẵn sàng" : "ready"}</span></div>
                 </div>
@@ -95,15 +108,15 @@ export function CatalogPage() {
         {selectedMovement && activeVariant ? (
           <div className="exercise-detail">
             <div className="exercise-detail__hero">
-              <div><span className="eyebrow">{selectedMovement.pattern} · {selectedMovement.primaryMuscles.map((item) => muscleLabels[item][locale]).join(", ")}</span><p>{localize(selectedMovement.description, locale)}</p></div>
+              <div><span className="eyebrow">{patternLabels[selectedMovement.pattern][locale]} · {selectedMovement.primaryMuscles.map((item) => muscleLabels[item][locale]).join(", ")}</span><p>{localize(selectedMovement.description, locale)}</p></div>
               <span className="review-badge"><ShieldCheck size={16} />{locale === "vi" ? "Nội dung đã rà soát" : "Reviewed content"}</span>
             </div>
 
             <section className="variant-section">
               <div className="variant-heading"><div><span className="eyebrow">{locale === "vi" ? "Chọn cách tập" : "Choose your setup"}</span><h3>{localize(activeVariant.name, locale)}</h3></div><span>{variants.indexOf(activeVariant) + 1}/{variants.length}</span></div>
-              <div className="variant-tabs">{variants.map((variant) => {
+              <div className="variant-tabs" role="group" aria-label={locale === "vi" ? "Biến thể bài tập" : "Exercise variations"}>{variants.map((variant) => {
                 const ready = variant.equipment.every((item) => availableEquipment.includes(item));
-                return <button type="button" key={variant.id} className={variant.id === activeVariant.id ? "variant-tab variant-tab--active" : "variant-tab"} onClick={() => setSelectedVariant(variant)}><span>{localize(variant.name, locale)}</span><small>{ready ? <><CheckCircle2 size={13} />{locale === "vi" ? "Bạn có đủ dụng cụ" : "Equipment ready"}</> : variant.equipment.map((item) => EQUIPMENT_OPTIONS.find((entry) => entry.id === item)?.name[locale]).join(" + ")}</small></button>;
+                return <button type="button" key={variant.id} className={variant.id === activeVariant.id ? "variant-tab variant-tab--active" : "variant-tab"} aria-pressed={variant.id === activeVariant.id} onClick={() => setSelectedVariant(variant)}><span>{localize(variant.name, locale)}</span><small>{ready ? <><CheckCircle2 size={13} />{locale === "vi" ? "Bạn có đủ dụng cụ" : "Equipment ready"}</> : variant.equipment.map((item) => EQUIPMENT_OPTIONS.find((entry) => entry.id === item)?.name[locale]).join(" + ")}</small></button>;
               })}</div>
             </section>
 
