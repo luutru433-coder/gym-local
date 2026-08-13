@@ -12,6 +12,7 @@ node_modules/
 
 # testing
 /coverage
+/.pnpm-store/
 
 # misc
 .DS_Store
@@ -32,3 +33,4 @@ yarn-error.log*
 /apps/web/dev-dist/
 /outputs/
 /work/
+/reports/

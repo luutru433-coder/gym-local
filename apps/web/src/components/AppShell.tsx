@@ -15,12 +15,15 @@ const navItems = [
 export function AppShell() {
   const profile = useGymStore((state) => state.profile);
   const locale = profile?.locale ?? "vi";
+  const navigationLabel = locale === "vi" ? "Điều hướng chính" : "Main navigation";
+  const skipLabel = locale === "vi" ? "Bỏ qua đến nội dung chính" : "Skip to main content";
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">{skipLabel}</a>
       <aside className="sidebar">
         <Brand />
-        <nav className="sidebar__nav" aria-label="Main navigation">
+        <nav className="sidebar__nav" aria-label={navigationLabel}>
           {navItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end} className={({ isActive }) => isActive ? "nav-item nav-item--active" : "nav-item"}>
               <Icon size={20} />
@@ -41,8 +44,8 @@ export function AppShell() {
           <Brand compact />
           <NavLink className="icon-button" to="/settings" aria-label={t(locale, "settings")}><Settings size={20} /></NavLink>
         </header>
-        <main className="app-main"><Outlet /></main>
-        <nav className="bottom-nav" aria-label="Main navigation">
+        <main className="app-main" id="main-content" tabIndex={-1}><Outlet /></main>
+        <nav className="bottom-nav" aria-label={navigationLabel}>
           {navItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end} className={({ isActive }) => isActive ? "bottom-nav__item bottom-nav__item--active" : "bottom-nav__item"}>
               <Icon size={20} />

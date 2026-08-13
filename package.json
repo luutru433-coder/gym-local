@@ -1,6 +1,6 @@
 {
   "name": "gym-local",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.16.0",
@@ -9,21 +9,25 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/performance-report.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint apps packages scripts --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
+    "architecture:audit": "node scripts/verify-affected.mjs --architecture",
     "verify:affected": "node scripts/verify-affected.mjs",
-    "verify": "pnpm run lint && pnpm run typecheck && pnpm run content:validate && pnpm run content:audit && pnpm run test && pnpm run build",
+    "verify": "pnpm run architecture:audit && pnpm run lint && pnpm run typecheck && pnpm run content:validate && pnpm run content:audit && pnpm run test && pnpm run build",
     "content:validate": "node scripts/content-validate.mjs",
     "content:audit": "node scripts/content-audit.mjs && node scripts/nutrition-content-validate.mjs",
+    "media:health": "node scripts/media-health-report.mjs",
+    "media:health:online": "node scripts/media-health-report.mjs --online",
+    "performance:report": "node scripts/performance-report.mjs",
     "nutrition:recipes": "node scripts/generate-vietnamese-recipes.mjs",
     "nutrition:verify-pack": "python scripts/verify-nutrition-pack.py --db outputs/gym-local-nutrition-2026.04.sqlite3 --manifest public/nutrition-pack-manifest.json",
     "db:test-migrations": "vitest run packages/storage",
     "backup:test": "vitest run packages/backup",
-    "release:check": "pnpm run verify"
+    "release:check": "pnpm run verify && pnpm run media:health"
   },
   "dependencies": {
     "@noble/hashes": "2.2.0",

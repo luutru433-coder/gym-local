@@ -1,16 +1,31 @@
 import type {
   ContentSource,
   EquipmentType,
+  ExerciseLaterality,
+  ExerciseTrackingProfile,
   ExerciseVideoGuide,
   ExerciseVariant,
   LoadEntryMode,
   LocalizedText,
   Movement,
-  MuscleGroup
+  MuscleGroup,
+  TrackingEffortKind,
+  TrackingE1rmMetric,
+  TrackingProgressDirection,
+  TrackingVolumeMetric
 } from "@gym/contracts";
 import videoGuideManifest from "../../../content/exercise-video-guides.json";
 
 type Pattern = Movement["pattern"];
+
+export type {
+  ExerciseLaterality,
+  ExerciseTrackingProfile,
+  TrackingEffortKind,
+  TrackingE1rmMetric,
+  TrackingProgressDirection,
+  TrackingVolumeMetric
+} from "@gym/contracts";
 
 interface MovementSeed {
   id: string;
@@ -185,12 +200,106 @@ const equipmentName: Record<EquipmentType, LocalizedText> = {
   pullup_bar: { vi: "xà đơn", en: "Pull-Up Bar" }
 };
 
+const unilateralMovements = new Set([
+  "one_arm_row",
+  "split_squat",
+  "lunge",
+  "step_up",
+  "glute_kickback",
+  "triceps_kickback",
+  "side_bend"
+]);
+
+const ambiguousPerHandMovements = new Set([
+  "squat",
+  "pullover",
+  "biceps_curl",
+  "hammer_curl",
+  "preacher_curl",
+  "reverse_curl",
+  "overhead_triceps_extension",
+  "triceps_press",
+  "hip_thrust",
+  "leg_curl",
+  "standing_calf_raise",
+  "seated_calf_raise",
+  "rotation"
+]);
+
+const advancedMovements = new Set(["nordic_curl"]);
+const intermediateMovements = new Set([
+  "dip",
+  "pull_up",
+  "upright_row",
+  "split_squat",
+  "lunge",
+  "good_morning",
+  "deadlift"
+]);
+
+function reviewedDifficulty(seed: MovementSeed, equipment: EquipmentType): ExerciseVariant["difficulty"] {
+  if (advancedMovements.has(seed.id)) return "advanced";
+  if (intermediateMovements.has(seed.id)) return "intermediate";
+  if (["barbell", "smith", "trap_bar"].includes(equipment) && ["squat", "romanian_deadlift", "overhead_press"].includes(seed.id)) {
+    return "intermediate";
+  }
+  return "beginner";
+}
+
+function reviewedLaterality(seed: MovementSeed, equipment: EquipmentType): ExerciseLaterality {
+  if (seed.pattern === "carry" || seed.id === "plank") return "not_applicable";
+  if (unilateralMovements.has(seed.id)) return "unilateral";
+  if ((equipment === "dumbbell" || equipment === "kettlebell") && ambiguousPerHandMovements.has(seed.id)) return "ambiguous";
+  return "bilateral";
+}
+
 function loadMode(seed: MovementSeed, equipment: EquipmentType): LoadEntryMode {
   if (seed.pattern === "carry") return "duration_distance";
+  if (seed.id === "pull_up" && equipment === "machine") return "assisted";
   if (equipment === "bodyweight") return "bodyweight_plus";
   if (equipment === "dumbbell" || equipment === "kettlebell") return "per_hand";
   if (equipment === "resistance_band") return "reps_only";
   return "total_weight";
+}
+
+export function trackingProfileForLoadMode(
+  variantId: string,
+  loadEntryMode: LoadEntryMode,
+  effortKind: TrackingEffortKind = loadEntryMode === "duration_distance" ? "distance_duration" : "reps",
+  laterality: ExerciseLaterality = loadEntryMode === "per_hand" || loadEntryMode === "per_side" ? "ambiguous" : "bilateral"
+): ExerciseTrackingProfile {
+  const canCalculateRepetitionVolume = effortKind === "reps" && !["unilateral", "ambiguous"].includes(laterality);
+  const volumeMultiplier = loadEntryMode === "per_hand" || loadEntryMode === "per_side" ? 2 : 1;
+  const volumeMetric: TrackingVolumeMetric = !canCalculateRepetitionVolume
+    ? "none"
+    : loadEntryMode === "bodyweight_plus"
+      ? "added_load"
+      : ["total_weight", "per_hand", "per_side"].includes(loadEntryMode)
+        ? "external_load"
+        : "none";
+  const e1rmMetric: TrackingE1rmMetric = effortKind === "reps" && ["total_weight", "per_hand", "per_side"].includes(loadEntryMode)
+    ? "entered_load"
+    : "none";
+  const progressDirection: TrackingProgressDirection = loadEntryMode === "assisted"
+    ? "lower_assistance"
+    : effortKind === "duration"
+      ? "longer_duration"
+      : effortKind === "distance_duration"
+        ? "greater_distance"
+        : volumeMetric === "none"
+          ? "higher_reps"
+          : "higher_load";
+
+  return {
+    variantId,
+    effortKind,
+    loadEntryMode,
+    laterality,
+    volumeMetric,
+    volumeMultiplier: volumeMetric === "none" ? undefined : volumeMultiplier,
+    e1rmMetric,
+    progressDirection
+  };
 }
 
 function setupInstruction(equipment: EquipmentType): LocalizedText {
@@ -230,10 +339,24 @@ function variantName(seed: MovementSeed, equipment: EquipmentType): LocalizedTex
 
 function variantEquipment(seed: MovementSeed, equipment: EquipmentType): EquipmentType[] {
   const result: EquipmentType[] = [equipment];
-  if (seed.needsBench && !["machine", "bodyweight"].includes(equipment)) result.push("bench");
-  if (seed.id === "pull_up") result.push("pullup_bar");
+  const standingCableVariant = seed.id === "chest_press" && equipment === "cable";
+  if (seed.needsBench && !["machine", "bodyweight"].includes(equipment) && !standingCableVariant) result.push("bench");
+  if (seed.id === "pull_up" && equipment !== "machine") result.push("pullup_bar");
   return [...new Set(result)];
 }
+
+export const EXERCISE_TRACKING_PROFILES: ExerciseTrackingProfile[] = movementSeeds.flatMap((seed) =>
+  seed.equipment.map((equipment) => {
+    const variantId = `${seed.id}__${equipment}`;
+    const mode = loadMode(seed, equipment);
+    const effortKind: TrackingEffortKind = seed.id === "plank"
+      ? "duration"
+      : seed.pattern === "carry"
+        ? "distance_duration"
+        : "reps";
+    return trackingProfileForLoadMode(variantId, mode, effortKind, reviewedLaterality(seed, equipment));
+  })
+);
 
 export const MOVEMENTS: Movement[] = movementSeeds.map((seed) => ({
   id: seed.id,
@@ -260,7 +383,7 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
       movementId: seed.id,
       name,
       equipment: variantEquipment(seed, equipment),
-      difficulty: "beginner",
+      difficulty: reviewedDifficulty(seed, equipment),
       loadEntryMode: loadMode(seed, equipment),
       instructions: [setupInstruction(equipment), ...movementInstruction(seed)],
       cues: [{ vi: seed.cueVi, en: seed.cueEn }],
@@ -302,6 +425,10 @@ export function getMovement(id: string): Movement | undefined {
 
 export function getVariant(id: string): ExerciseVariant | undefined {
   return EXERCISE_VARIANTS.find((variant) => variant.id === id);
+}
+
+export function getTrackingProfile(variantId: string): ExerciseTrackingProfile | undefined {
+  return EXERCISE_TRACKING_PROFILES.find((profile) => profile.variantId === variantId);
 }
 
 export function getVariantsForMovement(movementId: string): ExerciseVariant[] {

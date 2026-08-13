@@ -45,6 +45,23 @@ export type LoadEntryMode =
   | "reps_only"
   | "duration_distance";
 
+export type TrackingEffortKind = "reps" | "duration" | "distance_duration";
+export type TrackingVolumeMetric = "external_load" | "added_load" | "none";
+export type TrackingE1rmMetric = "entered_load" | "none";
+export type TrackingProgressDirection = "higher_load" | "lower_assistance" | "higher_reps" | "longer_duration" | "greater_distance";
+export type ExerciseLaterality = "bilateral" | "unilateral" | "ambiguous" | "not_applicable";
+
+export interface ExerciseTrackingProfile {
+  variantId: Id;
+  effortKind: TrackingEffortKind;
+  loadEntryMode: LoadEntryMode;
+  laterality: ExerciseLaterality;
+  volumeMetric: TrackingVolumeMetric;
+  volumeMultiplier?: 1 | 2;
+  e1rmMetric: TrackingE1rmMetric;
+  progressDirection: TrackingProgressDirection;
+}
+
 export interface ContentSource {
   id: Id;
   label: string;
@@ -158,6 +175,25 @@ export interface Routine {
   updatedAt: string;
 }
 
+export interface ProgressionRule {
+  type: "double_progression";
+  successSessions: number;
+  defaultIncrementKg: number;
+  fallbackIncreasePercent: number;
+}
+
+export interface Program {
+  id: Id;
+  name: LocalizedText;
+  goal: Goal;
+  difficulty: Difficulty;
+  days: Array<{ order: number; routineId: Id }>;
+  activeDayIndex: number;
+  progressionRule?: ProgressionRule;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface SetLog {
   id: Id;
   type: SetType;
@@ -181,6 +217,7 @@ export interface SessionExercise {
   variantId: Id;
   variantNameSnapshot: LocalizedText;
   loadEntryModeSnapshot: LoadEntryMode;
+  trackingProfileSnapshot?: ExerciseTrackingProfile;
   sets: SetLog[];
   restSeconds: number;
   note?: string;
@@ -188,6 +225,7 @@ export interface SessionExercise {
 
 export interface WorkoutSession {
   id: Id;
+  programId?: Id;
   routineId?: Id;
   routineNameSnapshot?: LocalizedText;
   locationId?: Id;
@@ -251,6 +289,40 @@ export interface MealEntry {
   createdAt: string;
 }
 
+export interface RecipeIngredient {
+  id: Id;
+  foodId: Id;
+  foodNameSnapshot: LocalizedText;
+  grams: number;
+  nutrientsPer100gSnapshot: NutrientProfile;
+}
+
+export interface Recipe {
+  id: Id;
+  name: LocalizedText;
+  ingredients: RecipeIngredient[];
+  yieldGrams: number;
+  servings?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WaterEntry {
+  id: Id;
+  date: string;
+  amountMl: number;
+  createdAt: string;
+}
+
+export interface FoodPreference {
+  id: Id;
+  foodId: Id;
+  favorite: boolean;
+  defaultServingGrams?: number;
+  lastUsedAt?: string;
+  useCount: number;
+}
+
 export interface NutritionPackManifest {
   id: "gym-local-nutrition";
   version: string;
@@ -286,6 +358,29 @@ export interface NutritionPackRecord {
   aliasCount?: number;
   vietnameseRecipeCount?: number;
   error?: string;
+  active?: InstalledNutritionPack;
+  previous?: InstalledNutritionPack;
+  operation?: NutritionPackOperation;
+}
+
+export interface InstalledNutritionPack {
+  version: string;
+  fileName: string;
+  checksum: string;
+  installedAt: string;
+  foodCount?: number;
+  aliasCount?: number;
+  vietnameseRecipeCount?: number;
+}
+
+export interface NutritionPackOperation {
+  id: Id;
+  kind: "install" | "update" | "remove";
+  status: "downloading" | "validating" | "activating" | "failed";
+  bytesDownloaded: number;
+  totalBytes?: number;
+  startedAt: string;
+  errorCode?: string;
 }
 
 export interface NutritionTarget {
@@ -296,6 +391,16 @@ export interface NutritionTarget {
   waterMl: number;
   formulaVersion: number;
   confirmedAt?: string;
+  source?: "estimated" | "manual" | "legacy";
+  basis?: {
+    biologicalSex: "female" | "male";
+    age: number;
+    heightCm: number;
+    weightKg: number;
+    activityFactor: 1.2 | 1.375 | 1.55 | 1.725 | 1.9;
+    goal: Goal;
+  };
+  calculatedAt?: string;
 }
 
 export interface BodyMetric {
@@ -339,8 +444,31 @@ export interface AppSettings {
   backupVersion: number;
   lastBackupAt?: string;
   activeSessionId?: Id;
+  activeProgramId?: Id;
   storagePersistenceRequestedAt?: string;
   storagePersistenceGranted?: boolean;
+}
+
+export interface PersonalDataSnapshot {
+  profile?: Profile;
+  routines: Routine[];
+  programs: Program[];
+  sessions: WorkoutSession[];
+  foods: FoodItem[];
+  meals: MealEntry[];
+  recipes: Recipe[];
+  waterEntries: WaterEntry[];
+  foodPreferences: FoodPreference[];
+  bodyMetrics: BodyMetric[];
+  customVariants: ExerciseVariant[];
+  settings: AppSettings;
+}
+
+export interface RecoveryPoint {
+  id: Id;
+  reason: "before_restore";
+  createdAt: string;
+  snapshot: PersonalDataSnapshot;
 }
 
 export interface BackupPayload {
@@ -349,26 +477,21 @@ export interface BackupPayload {
     backupVersion: number;
     exportedAt: string;
     checksum?: string;
+    format?: "gym-local-backup";
+    dbSchemaVersion?: number;
+    dataBytes?: number;
+    counts?: Partial<Record<keyof Omit<PersonalDataSnapshot, "profile" | "settings">, number>>;
   };
-  data: {
-    profile?: Profile;
-    routines: Routine[];
-    sessions: WorkoutSession[];
-    foods: FoodItem[];
-    meals: MealEntry[];
-    bodyMetrics: BodyMetric[];
-    customVariants: ExerciseVariant[];
-    settings: AppSettings;
-  };
+  data: PersonalDataSnapshot;
 }
 
 export const APP_VERSIONS = {
-  app: "0.2.0",
-  database: 2,
-  catalog: 2,
-  routines: 1,
+  app: "0.5.0",
+  database: 3,
+  catalog: 3,
+  routines: 2,
   nutritionFormula: 1,
-  backup: 2,
+  backup: 3,
   nutritionPackSchema: 1
 } as const;
 

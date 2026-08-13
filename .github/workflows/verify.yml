@@ -23,3 +23,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run verify
+      - run: pnpm run media:health
+      - name: Upload verification reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-reports
+          path: |
+            reports/
+            dist/reports/
+          if-no-files-found: warn
+          retention-days: 14

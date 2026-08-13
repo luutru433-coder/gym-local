@@ -15,6 +15,8 @@ Project-authored guidance points to this policy through `sourcePath`; external m
 
 Every new media host must be added to the allowlist in `packages/media`, carry a source record, and add an allowlist test. Automated checks validate direct-video coverage, unique variant IDs, creator metadata, URLs, translations, equipment references, sources, licenses/terms, review dates, and routine-template references.
 
+`pnpm media:health` produces the deterministic release report without making network requests. The weekly/manual `media-health.yml` workflow runs `pnpm media:health:online`, which checks YouTube oEmbed metadata only; it never downloads video or thumbnails. Availability results remain separate from editorial review and never update `lastVerifiedAt` automatically.
+
 ## Nutrition content
 
 - The offline pack contains only sources declared in `public/nutrition-pack-manifest.json`; byte size and SHA-256 are release gates.

@@ -1,4 +1,45 @@
-# Verification report — 2026-08-10
+# Verification report — 2026-08-13
+
+## Local checkpoint 0.5.0
+
+- The complete verification pipeline passed on the combined worktree: architecture audit, ESLint with zero warnings, TypeScript project references, content/license validation, 103 Vitest tests across 12 files, production build, and enforced performance/PWA budgets.
+- Nutrition/storage/backup coverage includes recipe, water, preference and exact-barcode behavior; transactional meal/recent writes; v3 round trips; v1/v2/v3 import compatibility; immutable historical food/meal/recipe nutrient snapshots; and missing micronutrients remaining unknown rather than becoming zero.
+- Browser acceptance passed on a fresh local profile at 320 px and 1280 px for onboarding, custom food, favorite/default serving, meal logging/edit controls, water logging, recipe creation, multi-day program creation, program-day launch, live-workout controls, and progress calendar. No horizontal page overflow or browser console warning/error was observed.
+- Static media audit passed for all 199 reviewed variants with 199 direct videos, traceable attribution/license metadata, complete offline text fallback, and zero issues. The connected YouTube oEmbed health check passed 199/199 without downloading videos or thumbnails.
+- Vite built 2,731 modules without a chunk-size warning. The measured entry chunk is 173.0 KiB, initial JavaScript graph 577.2 KiB, and PWA precache 3,132.5 KiB; all core routes are cached while source maps, the SQLite pack, remote video URLs, and social-preview media are excluded.
+- Deployment now stages the nutrition pack in a temporary file and verifies byte size, SHA-256, SQLite integrity, schema, source counts, and FTS search before copying it into the Pages artifact.
+
+## Local checkpoint 0.4.0
+
+- The exact `pnpm run verify` pipeline passed: architecture boundaries, ESLint with zero warnings, TypeScript project references, content validation/audit, 90 Vitest tests across 10 files, and the production build.
+- Multi-day program CRUD, active-program selection, routine editing, and transactional day advancement are covered by storage, backup, and App tests. Standalone and freestyle sessions cannot advance a selected program accidentally.
+- Live workouts support safe exact-variant add, swap, reorder, and removal; completed work remains immutable. Save failures retain the attempted edit and expose retry without poisoning later writes.
+- Exact-variant double progression is advisory and explainable. Warm-ups, incomplete sets, and other equipment variants are excluded; assistance, duration, distance, reps-only, and external-load directions retain their snapshotted semantics.
+- The 28-day calendar, exact-variant trend/PR views, variant volume, and visible tabular alternatives are bilingual and responsive. Progress and live-workout scoped accessibility tests pass.
+- The PWA precache contains 41 core entries (4,573.27 KiB). Remote exercise videos and the optional nutrition SQLite pack remain outside the core cache.
+- The known non-blocking chunk warning remains: initial app 570.41 kB, nutrition route 503.00 kB, and progress route 387.95 kB before gzip. Route/vendor splitting remains scheduled for Release 4.
+
+## Local checkpoint 0.3.0
+
+- Frozen-lockfile installation completed with pnpm 11.16.0. The exact `pnpm run verify` pipeline passed: architecture audit, ESLint with zero warnings, TypeScript project references, content validation/audit, 70 Vitest tests across 9 files, and the production build.
+- Content-contract validation passed 7 tests. The audits confirmed 199 reviewed equipment variants, 199 direct variant-specific videos, valid source/license/review metadata, exactly 300 Vietnamese recipe estimates, and no unresolved placeholders.
+- The SQLite integrity/FTS verifier passed for 13,835 foods, 24,907 Vietnamese aliases, and 300 recipes with SHA-256 `4f844b93c1c8d0540c34038cbc5b69096c92a3982fe884b2ac877c5df7bdc88f`.
+- IndexedDB v3 migration and rollback, backup v1/v2/v3 migration and round trip, exact byte/count validation, consistent export, active-workout restore refusal, pre-restore recovery, undo, and nutrition-pack preservation are covered by automated failure-path tests.
+- SQLite/OPFS and nutrition-pack network operations are owned by `packages/storage`; the executable architecture audit found no direct database/API access in the UI or nutrition module.
+- A regression test proves that an optimistic workout save rolls back on failure and that the failed write cannot poison later export/restore operations.
+- Browser acceptance at 320 px and 390 px passed without horizontal page overflow. The workout timer remains visible, three set inputs fit on one row, touch targets meet 44 px, and the mobile dialog fills but does not exceed the viewport.
+- Vite built 2,725 modules. The PWA precache contains 37 core entries (4,505.27 KiB); the 16.4 MB nutrition SQLite file and remote video URLs are absent.
+- The known non-blocking chunk warning remains: initial app 559.32 kB, nutrition route 503.00 kB, and progress route 380.08 kB before gzip. Route/vendor splitting remains scheduled for Release 4.
+
+## Local checkpoint 0.2.1
+
+- ESLint completed with zero warnings.
+- TypeScript project references completed without errors.
+- Vitest passed 49 tests across 9 files; content-contract tests passed 7 tests in 1 file.
+- Content validation and audit passed all video, source, license, nutrition-pack, and generated-recipe gates.
+- Production Vite/PWA build completed with 2,722 transformed modules and 37 precache entries.
+- Build still reports the known chunk-size warning: initial app 551.48 kB, nutrition route 502.99 kB, and progress route 378.12 kB before gzip. Performance splitting remains scheduled for the hardening release.
+- New regression coverage proves locale-aware nutrition input, incomplete-provider handling, pre-export backup validation, transactional onboarding, failed-workout-save rollback, reviewed load semantics, exact-variant previous values, modal keyboard focus, document language, and deferred-update re-prompting.
 
 ## Automated checks
 

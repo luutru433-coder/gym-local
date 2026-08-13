@@ -1,7 +1,7 @@
 import { ArrowRight, CalendarCheck, ChevronRight, Clock3, Dumbbell, Flame, Play, Salad, ShieldCheck, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, MetricRing, ProgressBar, SectionTitle } from "@gym/ui";
-import { dailyNutrition } from "@gym/nutrition";
+import { dailyNutrition, nutritionTargetNeedsConfirmation, type NutritionEstimateInput } from "@gym/nutrition";
 import { sessionProgress } from "@gym/workouts";
 import { localize, formatDate } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -23,6 +23,8 @@ export function HomePage() {
   const navigate = useNavigate();
   const profile = useGymStore((state) => state.profile)!;
   const routines = useGymStore((state) => state.routines);
+  const programs = useGymStore((state) => state.programs);
+  const settings = useGymStore((state) => state.settings);
   const sessions = useGymStore((state) => state.sessions);
   const meals = useGymStore((state) => state.meals);
   const activeSession = useGymStore((state) => state.activeSession);
@@ -30,17 +32,28 @@ export function HomePage() {
   const locale = profile.locale;
   const today = localDate();
   const nutrition = dailyNutrition(meals, today);
-  const target = profile.nutritionTarget;
+  const nutritionInput: NutritionEstimateInput | undefined = profile.age && profile.heightCm && profile.weightKg && profile.activityFactor
+    && (profile.biologicalSex === "female" || profile.biologicalSex === "male")
+    ? { age: profile.age, heightCm: profile.heightCm, weightKg: profile.weightKg, activityFactor: profile.activityFactor, biologicalSex: profile.biologicalSex, goal: profile.goal }
+    : undefined;
+  const target = nutritionTargetNeedsConfirmation(profile.nutritionTarget, nutritionInput) ? undefined : profile.nutritionTarget;
+  const targetNeedsReview = Boolean(profile.nutritionTarget && !target);
   const weekStart = startOfWeek();
   const weeklySessions = sessions.filter((session) => session.finishedAt && new Date(session.finishedAt) >= weekStart);
   const weeklySets = weeklySessions.reduce((total, session) => total + session.exercises.flatMap((exercise) => exercise.sets).filter((set) => set.completedAt && set.type !== "warmup").length, 0);
-  const nextRoutine = routines[weeklySessions.length % Math.max(1, routines.length)];
+  const activeProgram = programs.find((program) => program.id === settings.activeProgramId);
+  const activeProgramDays = activeProgram ? [...activeProgram.days].sort((left, right) => left.order - right.order) : [];
+  const activeProgramDay = activeProgramDays[activeProgram?.activeDayIndex ?? 0];
+  const programmedRoutine = activeProgramDay
+    ? routines.find((routine) => routine.id === activeProgramDay.routineId)
+    : undefined;
+  const nextRoutine = programmedRoutine ?? routines[weeklySessions.length % Math.max(1, routines.length)];
   const recent = sessions.find((session) => session.finishedAt);
   const progress = activeSession ? sessionProgress(activeSession) : undefined;
 
   const begin = async () => {
     if (!nextRoutine) return navigate("/routines");
-    await startWorkout(nextRoutine);
+    await startWorkout(nextRoutine, programmedRoutine ? activeProgram?.id : undefined);
     navigate("/workout");
   };
 
@@ -69,7 +82,9 @@ export function HomePage() {
         <Card className="workout-hero">
           <div className="workout-hero__stamp"><span>{weeklySessions.length}</span><small>/{profile.daysPerWeek}<br />{locale === "vi" ? "buổi tuần này" : "this week"}</small></div>
           <div className="workout-hero__copy">
-            <span className="eyebrow">{locale === "vi" ? "Gợi ý tiếp theo" : "Up next"}</span>
+            <span className="eyebrow">{activeProgram
+              ? `${localize(activeProgram.name, locale)} · ${locale === "vi" ? "Ngày" : "Day"} ${(activeProgram?.activeDayIndex ?? 0) + 1}/${activeProgramDays.length}`
+              : (locale === "vi" ? "Gợi ý tiếp theo" : "Up next")}</span>
             <h2>{nextRoutine ? localize(nextRoutine.name, locale) : (locale === "vi" ? "Chọn lịch tập đầu tiên" : "Choose your first routine")}</h2>
             <p>{nextRoutine ? `${nextRoutine.items.length} ${locale === "vi" ? "động tác" : "movements"} · ${nextRoutine.goal.replace("_", " ")}` : (locale === "vi" ? "Kho lịch có sẵn nhiều chương trình miễn phí." : "Pick from the included free programs.")}</p>
             <Button size="lg" onClick={() => void begin()}><Play size={18} fill="currentColor" />{locale === "vi" ? "Bắt đầu tập" : "Start workout"}</Button>
@@ -102,7 +117,11 @@ export function HomePage() {
                 <MetricRing value={nutrition.fat} max={target.fat} label="Fat" unit="g" tone="gold" />
               </div>
             ) : (
-              <button className="nutrition-empty" onClick={() => navigate("/settings")}><Salad size={28} /><span><strong>{locale === "vi" ? "Thiết lập mục tiêu dinh dưỡng" : "Set a nutrition target"}</strong><small>{locale === "vi" ? "Calories, macro và nước uống" : "Calories, macros, and hydration"}</small></span><ChevronRight size={20} /></button>
+              <button className="nutrition-empty" onClick={() => navigate("/settings")}><Salad size={28} /><span><strong>{targetNeedsReview
+                ? (locale === "vi" ? "Kiểm tra lại mục tiêu dinh dưỡng" : "Review your nutrition target")
+                : (locale === "vi" ? "Thiết lập mục tiêu dinh dưỡng" : "Set a nutrition target")}</strong><small>{targetNeedsReview
+                ? (locale === "vi" ? "Thông tin hoặc công thức đã thay đổi" : "Your inputs or formula changed")
+                : (locale === "vi" ? "Calories, macro và nước uống" : "Calories, macros, and hydration")}</small></span><ChevronRight size={20} /></button>
             )}
           </Card>
         </section>
