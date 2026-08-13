@@ -49,7 +49,7 @@ Release gate: workout/progress unit tests, persistence reload tests, mobile live
 
 ## Release 4 — Nutrition and content parity
 
-Status: pending Release 3.
+Status: completed for checkpoint 4; deployment verification follows from the exact checkpoint commit.
 
 - Full downloadable offline food pack with Vietnamese aliases, branded foods where licensing permits, visible source/version/checksum/size, atomic update, and old-pack fallback.
 - Fast recent/favorite/serving flows, daily meal editor, barcode fallback, custom foods, recipes, water logging, micronutrient detail, and nutrient-completeness warnings.

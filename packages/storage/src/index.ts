@@ -402,6 +402,20 @@ export async function saveFood(food: FoodItem, db: GymDatabase = gymDb): Promise
   await db.foods.put(food);
 }
 
+export async function findSavedFoodByBarcode(barcode: string, db: GymDatabase = gymDb): Promise<FoodItem | undefined> {
+  const normalized = barcode.replace(/\D/g, "");
+  if (normalized.length < 8 || normalized.length > 14) throw new Error("Invalid barcode");
+  return db.foods.where("barcode").equals(normalized).first();
+}
+
+/** Removes a saved food and its UI preference; immutable meal/recipe snapshots remain intact. */
+export async function deleteFood(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.transaction("rw", db.foods, db.foodPreferences, async () => {
+    await db.foods.delete(id);
+    await db.foodPreferences.where("foodId").equals(id).delete();
+  });
+}
+
 export async function listMealsForDate(date: string, db: GymDatabase = gymDb): Promise<MealEntry[]> {
   return db.meals.where("date").equals(date).toArray();
 }
@@ -415,8 +429,97 @@ export async function saveMeal(entry: MealEntry, db: GymDatabase = gymDb): Promi
   await db.meals.put(entry);
 }
 
+export async function saveMealAndRecordFoodUse(
+  entry: MealEntry,
+  options: { defaultServingGrams?: number; usedAt?: string } = {},
+  db: GymDatabase = gymDb
+): Promise<FoodPreference> {
+  assertFiniteRecord(entry, "meal");
+  const usedAt = options.usedAt ?? entry.createdAt;
+  if (!Number.isFinite(Date.parse(usedAt))) throw new Error("Invalid food use date");
+  if (options.defaultServingGrams !== undefined
+    && (!Number.isFinite(options.defaultServingGrams) || options.defaultServingGrams <= 0 || options.defaultServingGrams > 100_000)) {
+    throw new Error("Invalid default serving amount");
+  }
+  let saved!: FoodPreference;
+  await db.transaction("rw", db.meals, db.foodPreferences, async () => {
+    await db.meals.put(entry);
+    const existing = await db.foodPreferences.where("foodId").equals(entry.foodId).first();
+    saved = {
+      id: existing?.id ?? `food_preference_${crypto.randomUUID()}`,
+      foodId: entry.foodId,
+      favorite: existing?.favorite ?? false,
+      defaultServingGrams: options.defaultServingGrams ?? existing?.defaultServingGrams,
+      lastUsedAt: usedAt,
+      useCount: (existing?.useCount ?? 0) + 1
+    };
+    await db.foodPreferences.put(saved);
+  });
+  return saved;
+}
+
 export async function deleteMeal(id: string, db: GymDatabase = gymDb): Promise<void> {
   await db.meals.delete(id);
+}
+
+export async function listRecipes(db: GymDatabase = gymDb): Promise<Recipe[]> {
+  return db.recipes.orderBy("updatedAt").reverse().toArray();
+}
+
+export async function saveRecipe(recipe: Recipe, db: GymDatabase = gymDb): Promise<Recipe> {
+  assertFiniteRecord(recipe, "recipe");
+  if (!recipe.ingredients.length || recipe.yieldGrams <= 0 || (recipe.servings !== undefined && recipe.servings <= 0)) {
+    throw new Error("Recipe needs ingredients and a positive yield");
+  }
+  const saved = { ...recipe, updatedAt: new Date().toISOString() };
+  await db.recipes.put(saved);
+  return saved;
+}
+
+export async function deleteRecipe(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.recipes.delete(id);
+}
+
+export async function listWaterEntries(db: GymDatabase = gymDb): Promise<WaterEntry[]> {
+  return db.waterEntries.orderBy("createdAt").reverse().toArray();
+}
+
+export async function listWaterEntriesForDate(date: string, db: GymDatabase = gymDb): Promise<WaterEntry[]> {
+  return db.waterEntries.where("date").equals(date).sortBy("createdAt");
+}
+
+export async function saveWaterEntry(entry: WaterEntry, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(entry, "water entry");
+  if (entry.amountMl <= 0 || entry.amountMl > 20_000) throw new Error("Invalid water amount");
+  await db.waterEntries.put(entry);
+}
+
+export async function deleteWaterEntry(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.waterEntries.delete(id);
+}
+
+export async function listFoodPreferences(db: GymDatabase = gymDb): Promise<FoodPreference[]> {
+  return db.foodPreferences.toArray();
+}
+
+export async function saveFoodPreference(preference: FoodPreference, db: GymDatabase = gymDb): Promise<FoodPreference> {
+  assertFiniteRecord(preference, "food preference");
+  if (!Number.isInteger(preference.useCount) || preference.useCount < 0) throw new Error("Invalid food use count");
+  if (preference.defaultServingGrams !== undefined
+    && (preference.defaultServingGrams <= 0 || preference.defaultServingGrams > 100_000)) {
+    throw new Error("Invalid default serving amount");
+  }
+  let saved = preference;
+  await db.transaction("rw", db.foodPreferences, async () => {
+    const existing = await db.foodPreferences.where("foodId").equals(preference.foodId).first();
+    saved = existing && existing.id !== preference.id ? { ...preference, id: existing.id } : preference;
+    await db.foodPreferences.put(saved);
+  });
+  return saved;
+}
+
+export async function deleteFoodPreference(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.foodPreferences.delete(id);
 }
 
 export async function listBodyMetrics(db: GymDatabase = gymDb): Promise<BodyMetric[]> {

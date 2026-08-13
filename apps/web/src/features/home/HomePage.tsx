@@ -1,7 +1,7 @@
 import { ArrowRight, CalendarCheck, ChevronRight, Clock3, Dumbbell, Flame, Play, Salad, ShieldCheck, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, MetricRing, ProgressBar, SectionTitle } from "@gym/ui";
-import { dailyNutrition } from "@gym/nutrition";
+import { dailyNutrition, nutritionTargetNeedsConfirmation, type NutritionEstimateInput } from "@gym/nutrition";
 import { sessionProgress } from "@gym/workouts";
 import { localize, formatDate } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -32,7 +32,12 @@ export function HomePage() {
   const locale = profile.locale;
   const today = localDate();
   const nutrition = dailyNutrition(meals, today);
-  const target = profile.nutritionTarget;
+  const nutritionInput: NutritionEstimateInput | undefined = profile.age && profile.heightCm && profile.weightKg && profile.activityFactor
+    && (profile.biologicalSex === "female" || profile.biologicalSex === "male")
+    ? { age: profile.age, heightCm: profile.heightCm, weightKg: profile.weightKg, activityFactor: profile.activityFactor, biologicalSex: profile.biologicalSex, goal: profile.goal }
+    : undefined;
+  const target = nutritionTargetNeedsConfirmation(profile.nutritionTarget, nutritionInput) ? undefined : profile.nutritionTarget;
+  const targetNeedsReview = Boolean(profile.nutritionTarget && !target);
   const weekStart = startOfWeek();
   const weeklySessions = sessions.filter((session) => session.finishedAt && new Date(session.finishedAt) >= weekStart);
   const weeklySets = weeklySessions.reduce((total, session) => total + session.exercises.flatMap((exercise) => exercise.sets).filter((set) => set.completedAt && set.type !== "warmup").length, 0);
@@ -112,7 +117,11 @@ export function HomePage() {
                 <MetricRing value={nutrition.fat} max={target.fat} label="Fat" unit="g" tone="gold" />
               </div>
             ) : (
-              <button className="nutrition-empty" onClick={() => navigate("/settings")}><Salad size={28} /><span><strong>{locale === "vi" ? "Thiết lập mục tiêu dinh dưỡng" : "Set a nutrition target"}</strong><small>{locale === "vi" ? "Calories, macro và nước uống" : "Calories, macros, and hydration"}</small></span><ChevronRight size={20} /></button>
+              <button className="nutrition-empty" onClick={() => navigate("/settings")}><Salad size={28} /><span><strong>{targetNeedsReview
+                ? (locale === "vi" ? "Kiểm tra lại mục tiêu dinh dưỡng" : "Review your nutrition target")
+                : (locale === "vi" ? "Thiết lập mục tiêu dinh dưỡng" : "Set a nutrition target")}</strong><small>{targetNeedsReview
+                ? (locale === "vi" ? "Thông tin hoặc công thức đã thay đổi" : "Your inputs or formula changed")
+                : (locale === "vi" ? "Calories, macro và nước uống" : "Calories, macros, and hydration")}</small></span><ChevronRight size={20} /></button>
             )}
           </Card>
         </section>

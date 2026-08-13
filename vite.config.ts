@@ -51,6 +51,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         navigateFallback: "index.html",
         globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+        globIgnores: ["og-gym-local.png", "**/*.map"],
+        maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/world\.openfoodfacts\.org\//,
@@ -69,7 +71,27 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "../../dist",
     emptyOutDir: true,
-    sourcemap: true
+    manifest: true,
+    sourcemap: false,
+    // ZXing is a separately loaded, self-contained camera dependency. Keep the
+    // warning ceiling aligned with the enforced report budget below rather than
+    // hiding accidental growth in application or route chunks.
+    chunkSizeWarningLimit: 500,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: "vendor-react", test: /node_modules[\\/](?:react|react-dom|react-router|react-router-dom|scheduler)[\\/]/, priority: 100 },
+            { name: "vendor-charts", test: /node_modules[\\/](?:recharts|d3-[^\\/]+|victory-vendor)[\\/]/, priority: 90 },
+            { name: "vendor-barcode", test: /node_modules[\\/]@zxing[\\/]/, priority: 80 },
+            { name: "vendor-state", test: /node_modules[\\/](?:dexie|zustand)[\\/]/, priority: 70 },
+            { name: "vendor-backup", test: /node_modules[\\/](?:jszip|@noble[\\/]hashes)[\\/]/, priority: 60 },
+            { name: "vendor-icons", test: /node_modules[\\/]lucide-react[\\/]/, priority: 50 },
+            { name: "vendor-validation", test: /node_modules[\\/]zod[\\/]/, priority: 40 }
+          ]
+        }
+      }
+    }
   },
   test: {
     environment: "jsdom",

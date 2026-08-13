@@ -1,5 +1,27 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { completeFoodLookupCandidate, createCustomFood, createMealEntry, dailyNutrition, estimateNutritionTarget, lookupFoodByBarcode, parseNutritionNumber, validateCustomFoodDraft, validateMealInput, type FoodLookupCandidate } from "./index";
+import {
+  assessNutrientCompleteness,
+  completeFoodLookupCandidate,
+  confirmNutritionTarget,
+  createCustomFood,
+  createMealEntry,
+  createMealEntryFromRecipe,
+  createRecipe,
+  createWaterEntry,
+  dailyNutrition,
+  dailyNutritionWithMicronutrients,
+  estimateNutritionTarget,
+  findFoodByBarcode,
+  lookupFoodByBarcode,
+  nutritionTargetNeedsConfirmation,
+  parseNutritionNumber,
+  rankFoodsByPreference,
+  recipeNutrition,
+  recordFoodUse,
+  validateCustomFoodDraft,
+  validateMealInput,
+  type FoodLookupCandidate
+} from "./index";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -73,5 +95,75 @@ describe("nutrition", () => {
     const candidate = await lookupFoodByBarcode("12345678");
     expect(candidate?.per100g.carbs).toBeUndefined();
     expect(candidate?.missingCoreNutrients).toEqual(["carbs"]);
+  });
+
+  it("requires target confirmation again when estimate inputs change", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-13T08:00:00.000Z"));
+    try {
+      const basis = { biologicalSex: "male" as const, age: 30, heightCm: 175, weightKg: 70, activityFactor: 1.55 as const, goal: "hypertrophy" as const };
+      const confirmed = confirmNutritionTarget(estimateNutritionTarget(basis), "2026-08-13T09:00:00.000Z");
+      expect(nutritionTargetNeedsConfirmation(confirmed, basis)).toBe(false);
+      expect(nutritionTargetNeedsConfirmation(confirmed, { ...basis, weightKg: 71 })).toBe(true);
+      expect(nutritionTargetNeedsConfirmation({ ...confirmed, confirmedAt: undefined }, basis)).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("calculates recipe snapshots honestly and supports direct meal logging", () => {
+    const rice = createCustomFood("Rice", {
+      calories: 130,
+      protein: 2.7,
+      carbs: 28,
+      fat: 0.3,
+      fiber: 1,
+      ironMg: 0.2
+    });
+    const recipe = createRecipe("Rice bowl", [{ food: rice, grams: 200 }], {
+      id: "recipe_rice",
+      yieldGrams: 250,
+      servings: 2,
+      createdAt: "2026-08-13T00:00:00.000Z",
+      updatedAt: "2026-08-13T00:00:00.000Z"
+    });
+    rice.per100g.calories = 999;
+
+    const nutrition = recipeNutrition(recipe);
+    expect(nutrition.total.calories).toBe(260);
+    expect(nutrition.per100g).toMatchObject({ calories: 104, fiber: 0.8, ironMg: 0.16 });
+    expect(nutrition.completeness.missing).toContain("vitaminCMg");
+    const meal = createMealEntryFromRecipe(recipe, undefined, "2026-08-13", "lunch");
+    expect(meal).toMatchObject({ foodId: "recipe_rice", grams: 125, nutrientsSnapshot: { calories: 130 } });
+  });
+
+  it("marks optional nutrients unknown instead of silently undercounting them", () => {
+    const complete = createMealEntry(createCustomFood("A", {
+      calories: 100, protein: 2, carbs: 10, fat: 1, ironMg: 2
+    }), 100, "2026-08-13", "lunch");
+    const partial = createMealEntry(createCustomFood("B", {
+      calories: 50, protein: 1, carbs: 5, fat: 1
+    }), 100, "2026-08-13", "lunch");
+    const total = dailyNutritionWithMicronutrients([complete, partial], "2026-08-13");
+    expect(total.calories).toBe(150);
+    expect(total.ironMg).toBeUndefined();
+    expect(assessNutrientCompleteness(total).missing).toContain("ironMg");
+  });
+
+  it("creates bounded water entries and exact barcode matches", () => {
+    expect(createWaterEntry(350.4, "2026-08-13", "2026-08-13T01:00:00.000Z")).toMatchObject({ amountMl: 350, date: "2026-08-13" });
+    expect(() => createWaterEntry(250, "2026-02-30")).toThrow("date");
+    const food = { ...createCustomFood("Milk", { calories: 60, protein: 3, carbs: 5, fat: 3 }), barcode: "0123456789012" };
+    expect(findFoodByBarcode([food], "0 123 456 789 012")?.id).toBe(food.id);
+    expect(findFoodByBarcode([food], "1234567890123")).toBeUndefined();
+  });
+
+  it("ranks favorites and recent foods while preserving explicit serving defaults", () => {
+    const first = createCustomFood("Apple", { calories: 50, protein: 0, carbs: 12, fat: 0 });
+    const second = createCustomFood("Banana", { calories: 90, protein: 1, carbs: 22, fat: 0 });
+    const recent = recordFoodUse(undefined, first.id, { usedAt: "2026-08-13T01:00:00.000Z", defaultServingGrams: 150 });
+    const favorite = { ...recordFoodUse(undefined, second.id, { usedAt: "2026-08-12T01:00:00.000Z" }), favorite: true };
+    expect(rankFoodsByPreference([first, second], [recent, favorite], "en").map((food) => food.id)).toEqual([second.id, first.id]);
+    expect(recent).toMatchObject({ defaultServingGrams: 150, useCount: 1 });
   });
 });

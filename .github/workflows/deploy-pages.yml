@@ -29,13 +29,20 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run verify
+      - name: Publish verified build reports
+        run: |
+          mkdir -p dist/reports
+          pnpm run media:health -- --output=dist/reports/media-health-report.json
       - name: Stage verified nutrition pack from the GitHub Release
         env:
           PACK_URL: https://github.com/${{ github.repository }}/releases/download/nutrition-v2026.04/gym-local-nutrition-2026.04.sqlite3
-          PACK_SHA256: 4f844b93c1c8d0540c34038cbc5b69096c92a3982fe884b2ac877c5df7bdc88f
+          PACK_FILE_NAME: gym-local-nutrition-2026.04.sqlite3
         run: |
-          curl --fail --location --retry 3 "$PACK_URL" --output dist/gym-local-nutrition-2026.04.sqlite3
-          echo "$PACK_SHA256  dist/gym-local-nutrition-2026.04.sqlite3" | sha256sum --check
+          pack_staging="$RUNNER_TEMP/$PACK_FILE_NAME"
+          curl --fail --location --retry 3 "$PACK_URL" --output "$pack_staging.part"
+          mv "$pack_staging.part" "$pack_staging"
+          python scripts/verify-nutrition-pack.py --db "$pack_staging" --manifest public/nutrition-pack-manifest.json
+          install -m 0644 "$pack_staging" "dist/$PACK_FILE_NAME"
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

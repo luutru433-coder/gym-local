@@ -1,5 +1,14 @@
 # Verification report — 2026-08-13
 
+## Local checkpoint 0.5.0
+
+- The complete verification pipeline passed on the combined worktree: architecture audit, ESLint with zero warnings, TypeScript project references, content/license validation, 103 Vitest tests across 12 files, production build, and enforced performance/PWA budgets.
+- Nutrition/storage/backup coverage includes recipe, water, preference and exact-barcode behavior; transactional meal/recent writes; v3 round trips; v1/v2/v3 import compatibility; immutable historical food/meal/recipe nutrient snapshots; and missing micronutrients remaining unknown rather than becoming zero.
+- Browser acceptance passed on a fresh local profile at 320 px and 1280 px for onboarding, custom food, favorite/default serving, meal logging/edit controls, water logging, recipe creation, multi-day program creation, program-day launch, live-workout controls, and progress calendar. No horizontal page overflow or browser console warning/error was observed.
+- Static media audit passed for all 199 reviewed variants with 199 direct videos, traceable attribution/license metadata, complete offline text fallback, and zero issues. The connected YouTube oEmbed health check passed 199/199 without downloading videos or thumbnails.
+- Vite built 2,731 modules without a chunk-size warning. The measured entry chunk is 173.0 KiB, initial JavaScript graph 577.2 KiB, and PWA precache 3,132.5 KiB; all core routes are cached while source maps, the SQLite pack, remote video URLs, and social-preview media are excluded.
+- Deployment now stages the nutrition pack in a temporary file and verifies byte size, SHA-256, SQLite integrity, schema, source counts, and FTS search before copying it into the Pages artifact.
+
 ## Local checkpoint 0.4.0
 
 - The exact `pnpm run verify` pipeline passed: architecture boundaries, ESLint with zero warnings, TypeScript project references, content validation/audit, 90 Vitest tests across 10 files, and the production build.

@@ -1,4 +1,15 @@
-import { createId, type FoodItem, type Goal, type MealEntry, type NutrientProfile, type NutritionTarget } from "@gym/contracts";
+import {
+  createId,
+  type FoodItem,
+  type FoodPreference,
+  type Goal,
+  type LocalizedText,
+  type MealEntry,
+  type NutrientProfile,
+  type NutritionTarget,
+  type Recipe,
+  type WaterEntry
+} from "@gym/contracts";
 import { lookupFoodByBarcode } from "./providers/open-food-facts";
 
 export * from "./offline-pack";
@@ -18,7 +29,7 @@ export interface NutritionEstimateInput {
 export type NutritionLocale = "vi" | "en";
 
 export interface NutritionValidationError {
-  field: "date" | "grams" | "name" | "calories" | "protein" | "carbs" | "fat";
+  field: "date" | "grams" | "water" | "name" | "calories" | "protein" | "carbs" | "fat";
   code: "required" | "invalid_number" | "out_of_range" | "invalid_date" | "missing_nutrient";
   message: string;
 }
@@ -51,7 +62,50 @@ export interface CustomFoodDraft {
 
 const coreNutrients = ["calories", "protein", "carbs", "fat"] as const;
 
+export const OPTIONAL_NUTRIENT_KEYS = [
+  "fiber",
+  "sugar",
+  "sodiumMg",
+  "calciumMg",
+  "ironMg",
+  "potassiumMg",
+  "magnesiumMg",
+  "zincMg",
+  "vitaminAMcg",
+  "vitaminCMg",
+  "vitaminDMcg",
+  "vitaminEMg",
+  "vitaminKMcg",
+  "vitaminB6Mg",
+  "vitaminB12Mcg",
+  "folateMcg"
+] as const satisfies ReadonlyArray<keyof NutrientProfile>;
+
+export type OptionalNutrientKey = (typeof OPTIONAL_NUTRIENT_KEYS)[number];
+
+export interface NutrientCompleteness {
+  available: OptionalNutrientKey[];
+  missing: OptionalNutrientKey[];
+  availableCount: number;
+  totalCount: number;
+  percent: number;
+  complete: boolean;
+}
+
+export interface RecipeNutrition {
+  total: NutrientProfile;
+  per100g: NutrientProfile;
+  perServing?: NutrientProfile;
+  completeness: NutrientCompleteness;
+}
+
 function validationMessage(locale: NutritionLocale, field: NutritionValidationError["field"], code: NutritionValidationError["code"]): string {
+  if (field === "water") {
+    const label = locale === "vi" ? "L\u01b0\u1ee3ng n\u01b0\u1edbc" : "Water amount";
+    if (code === "required") return locale === "vi" ? `${label} l\u00e0 b\u1eaft bu\u1ed9c.` : `${label} is required.`;
+    if (code === "out_of_range") return locale === "vi" ? `${label} n\u1eb1m ngo\u00e0i ph\u1ea1m vi cho ph\u00e9p.` : `${label} is outside the supported range.`;
+    return locale === "vi" ? `${label} ph\u1ea3i l\u00e0 m\u1ed9t s\u1ed1 h\u1ee3p l\u1ec7.` : `${label} must be a valid number.`;
+  }
   const labels = locale === "vi"
     ? { date: "Ngày", grams: "Khối lượng", name: "Tên thực phẩm", calories: "Calories", protein: "Protein", carbs: "Carb", fat: "Fat" }
     : { date: "Date", grams: "Amount", name: "Food name", calories: "Calories", protein: "Protein", carbs: "Carbs", fat: "Fat" };
@@ -179,11 +233,107 @@ export function estimateNutritionTarget(input: NutritionEstimateInput): Nutritio
   };
 }
 
+function sameEstimateBasis(left: NutritionTarget["basis"], right: NutritionEstimateInput): boolean {
+  return Boolean(left
+    && left.biologicalSex === right.biologicalSex
+    && left.age === right.age
+    && left.heightCm === right.heightCm
+    && left.weightKg === right.weightKg
+    && left.activityFactor === right.activityFactor
+    && left.goal === right.goal);
+}
+
+/** Marks a reviewed target as user-approved without changing any calculated values. */
+export function confirmNutritionTarget(target: NutritionTarget, confirmedAt = new Date().toISOString()): NutritionTarget {
+  if (!Number.isFinite(Date.parse(confirmedAt))) throw new Error("Invalid nutrition target confirmation date");
+  return { ...target, confirmedAt };
+}
+
+/**
+ * Estimated targets must be reviewed again when formula/profile inputs change.
+ * Manual targets only require an explicit confirmation timestamp.
+ */
+export function nutritionTargetNeedsConfirmation(
+  target: NutritionTarget | undefined,
+  currentEstimateInput?: NutritionEstimateInput
+): boolean {
+  if (!target?.confirmedAt) return true;
+  if (target.formulaVersion !== NUTRITION_FORMULA_VERSION) return true;
+  if (target.calculatedAt && Date.parse(target.confirmedAt) < Date.parse(target.calculatedAt)) return true;
+  if (target.source === "estimated") {
+    return !currentEstimateInput || !sameEstimateBasis(target.basis, currentEstimateInput);
+  }
+  return false;
+}
+
 function scaledNutrient(value: number | null | undefined, factor: number, precision = 1): number | null | undefined {
   if (value === null) return null;
   if (value === undefined) return undefined;
   const multiplier = 10 ** precision;
   return Math.round(value * factor * multiplier) / multiplier;
+}
+
+export function assessNutrientCompleteness(nutrients: NutrientProfile): NutrientCompleteness {
+  const available = OPTIONAL_NUTRIENT_KEYS.filter((key) => {
+    const value = nutrients[key];
+    return typeof value === "number" && Number.isFinite(value);
+  });
+  const availableSet = new Set<OptionalNutrientKey>(available);
+  const missing = OPTIONAL_NUTRIENT_KEYS.filter((key) => !availableSet.has(key));
+  return {
+    available,
+    missing,
+    availableCount: available.length,
+    totalCount: OPTIONAL_NUTRIENT_KEYS.length,
+    percent: Math.round((available.length / OPTIONAL_NUTRIENT_KEYS.length) * 100),
+    complete: missing.length === 0
+  };
+}
+
+function aggregateNutrients(
+  values: Array<{ nutrients: NutrientProfile; factor: number }>
+): NutrientProfile {
+  const total: NutrientProfile = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+  for (const key of coreNutrients) {
+    total[key] = values.reduce((sum, value) => {
+      const nutrient = value.nutrients[key];
+      if (!Number.isFinite(nutrient) || nutrient < 0 || !Number.isFinite(value.factor) || value.factor < 0) {
+        throw new Error(`Invalid ${key} value`);
+      }
+      return sum + nutrient * value.factor;
+    }, 0);
+  }
+  total.calories = Math.round(total.calories);
+  total.protein = Math.round(total.protein * 10) / 10;
+  total.carbs = Math.round(total.carbs * 10) / 10;
+  total.fat = Math.round(total.fat * 10) / 10;
+
+  for (const key of OPTIONAL_NUTRIENT_KEYS) {
+    let sum = 0;
+    let known = values.length > 0;
+    for (const value of values) {
+      const nutrient = value.nutrients[key];
+      if (nutrient === undefined || nutrient === null) {
+        known = false;
+        break;
+      }
+      if (!Number.isFinite(nutrient)) throw new Error(`Invalid ${key} value`);
+      sum += nutrient * value.factor;
+    }
+    total[key] = known ? Math.round(sum * 1000) / 1000 : undefined;
+  }
+  return total;
+}
+
+function scaleNutrientProfile(nutrients: NutrientProfile, factor: number): NutrientProfile {
+  const scaled: NutrientProfile = {
+    calories: Math.round(nutrients.calories * factor),
+    protein: Math.round(nutrients.protein * factor * 10) / 10,
+    carbs: Math.round(nutrients.carbs * factor * 10) / 10,
+    fat: Math.round(nutrients.fat * factor * 10) / 10
+  };
+  for (const key of OPTIONAL_NUTRIENT_KEYS) scaled[key] = scaledNutrient(nutrients[key], factor, 3);
+  return scaled;
 }
 
 export function nutrientsForGrams(food: FoodItem, grams: number): NutrientProfile {
@@ -238,6 +388,192 @@ export function dailyNutrition(entries: MealEntry[], date: string) {
     }),
     { calories: 0, protein: 0, carbs: 0, fat: 0 }
   );
+}
+
+export function dailyNutritionWithMicronutrients(entries: MealEntry[], date: string): NutrientProfile {
+  return aggregateNutrients(entries
+    .filter((entry) => entry.date === date)
+    .map((entry) => ({ nutrients: entry.nutrientsSnapshot, factor: 1 })));
+}
+
+export interface RecipeIngredientInput {
+  food: FoodItem;
+  grams: number;
+}
+
+export interface CreateRecipeOptions {
+  id?: string;
+  yieldGrams: number;
+  servings?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+function localizedName(name: string | LocalizedText): LocalizedText {
+  if (typeof name !== "string") {
+    if (!name.vi.trim() || !name.en.trim()) throw new Error("Recipe name is required in both languages");
+    return { vi: name.vi.trim(), en: name.en.trim() };
+  }
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Recipe name is required");
+  return { vi: trimmed, en: trimmed };
+}
+
+export function createRecipe(
+  name: string | LocalizedText,
+  ingredients: RecipeIngredientInput[],
+  options: CreateRecipeOptions
+): Recipe {
+  if (!ingredients.length) throw new Error("A recipe needs at least one ingredient");
+  if (!Number.isFinite(options.yieldGrams) || options.yieldGrams <= 0 || options.yieldGrams > 1_000_000) {
+    throw new Error("Invalid recipe yield");
+  }
+  if (options.servings !== undefined && (!Number.isFinite(options.servings) || options.servings <= 0 || options.servings > 10_000)) {
+    throw new Error("Invalid recipe serving count");
+  }
+  const now = options.updatedAt ?? new Date().toISOString();
+  const createdAt = options.createdAt ?? now;
+  if (!Number.isFinite(Date.parse(now)) || !Number.isFinite(Date.parse(createdAt))) throw new Error("Invalid recipe date");
+  return {
+    id: options.id ?? createId("recipe"),
+    name: localizedName(name),
+    ingredients: ingredients.map(({ food, grams }) => {
+      if (!Number.isFinite(grams) || grams <= 0 || grams > 100_000) throw new Error("Invalid recipe ingredient amount");
+      return {
+        id: createId("ingredient"),
+        foodId: food.id,
+        foodNameSnapshot: { ...food.name },
+        grams,
+        nutrientsPer100gSnapshot: { ...food.per100g }
+      };
+    }),
+    yieldGrams: options.yieldGrams,
+    servings: options.servings,
+    createdAt,
+    updatedAt: now
+  };
+}
+
+export function recipeNutrition(recipe: Recipe): RecipeNutrition {
+  if (!Number.isFinite(recipe.yieldGrams) || recipe.yieldGrams <= 0) throw new Error("Invalid recipe yield");
+  if (recipe.servings !== undefined && (!Number.isFinite(recipe.servings) || recipe.servings <= 0)) {
+    throw new Error("Invalid recipe serving count");
+  }
+  const total = aggregateNutrients(recipe.ingredients.map((ingredient) => {
+    if (!Number.isFinite(ingredient.grams) || ingredient.grams <= 0) throw new Error("Invalid recipe ingredient amount");
+    return { nutrients: ingredient.nutrientsPer100gSnapshot, factor: ingredient.grams / 100 };
+  }));
+  const per100g = scaleNutrientProfile(total, 100 / recipe.yieldGrams);
+  const perServing = recipe.servings ? scaleNutrientProfile(total, 1 / recipe.servings) : undefined;
+  return { total, per100g, perServing, completeness: assessNutrientCompleteness(per100g) };
+}
+
+export function recipeToFoodItem(recipe: Recipe): FoodItem {
+  const nutrition = recipeNutrition(recipe);
+  return {
+    id: recipe.id,
+    name: { ...recipe.name },
+    servingLabel: recipe.servings ? `1/${recipe.servings}` : undefined,
+    servingGrams: recipe.servings ? recipe.yieldGrams / recipe.servings : recipe.yieldGrams,
+    per100g: nutrition.per100g,
+    source: "custom",
+    dataQuality: nutrition.completeness.complete ? "complete" : "partial",
+    updatedAt: recipe.updatedAt
+  };
+}
+
+export function createMealEntryFromRecipe(
+  recipe: Recipe,
+  grams: number | undefined,
+  date: string,
+  meal: MealEntry["meal"]
+): MealEntry {
+  const food = recipeToFoodItem(recipe);
+  return createMealEntry(food, grams ?? food.servingGrams ?? recipe.yieldGrams, date, meal);
+}
+
+export function createWaterEntry(amountMl: number, date: string, createdAt = new Date().toISOString()): WaterEntry {
+  const [year, month, day] = date.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date)
+    && parsed.getUTCFullYear() === year
+    && parsed.getUTCMonth() === month - 1
+    && parsed.getUTCDate() === day;
+  if (!validDate) throw new Error("Invalid water entry date");
+  if (!Number.isFinite(amountMl) || amountMl <= 0 || amountMl > 20_000) throw new Error("Invalid water amount");
+  if (!Number.isFinite(Date.parse(createdAt))) throw new Error("Invalid water entry timestamp");
+  return { id: createId("water"), date, amountMl: Math.round(amountMl), createdAt };
+}
+
+export function upsertFoodPreference(
+  existing: FoodPreference | undefined,
+  foodId: string,
+  patch: Partial<Pick<FoodPreference, "favorite" | "defaultServingGrams" | "lastUsedAt" | "useCount">>
+): FoodPreference {
+  if (!foodId.trim()) throw new Error("Food id is required");
+  const defaultServingGrams = patch.defaultServingGrams ?? existing?.defaultServingGrams;
+  if (defaultServingGrams !== undefined && (!Number.isFinite(defaultServingGrams) || defaultServingGrams <= 0 || defaultServingGrams > 100_000)) {
+    throw new Error("Invalid default serving amount");
+  }
+  const useCount = patch.useCount ?? existing?.useCount ?? 0;
+  if (!Number.isInteger(useCount) || useCount < 0) throw new Error("Invalid food use count");
+  const lastUsedAt = patch.lastUsedAt ?? existing?.lastUsedAt;
+  if (lastUsedAt && !Number.isFinite(Date.parse(lastUsedAt))) throw new Error("Invalid food use date");
+  return {
+    id: existing?.id ?? createId("food_preference"),
+    foodId,
+    favorite: patch.favorite ?? existing?.favorite ?? false,
+    defaultServingGrams,
+    lastUsedAt,
+    useCount
+  };
+}
+
+export function recordFoodUse(
+  existing: FoodPreference | undefined,
+  foodId: string,
+  options: { usedAt?: string; defaultServingGrams?: number } = {}
+): FoodPreference {
+  return upsertFoodPreference(existing, foodId, {
+    lastUsedAt: options.usedAt ?? new Date().toISOString(),
+    defaultServingGrams: options.defaultServingGrams,
+    useCount: (existing?.useCount ?? 0) + 1
+  });
+}
+
+export function rankFoodsByPreference(
+  foods: FoodItem[],
+  preferences: FoodPreference[],
+  locale: NutritionLocale,
+  query = ""
+): FoodItem[] {
+  const preferenceByFoodId = new Map(preferences.map((preference) => [preference.foodId, preference]));
+  const normalizedQuery = query.trim().toLocaleLowerCase(locale);
+  const visible = normalizedQuery
+    ? foods.filter((food) => [food.name.vi, food.name.en, ...(food.aliases ?? []), food.brand ?? ""]
+      .some((value) => value.toLocaleLowerCase(locale).includes(normalizedQuery)))
+    : foods;
+  return [...visible].sort((left, right) => {
+    const leftPreference = preferenceByFoodId.get(left.id);
+    const rightPreference = preferenceByFoodId.get(right.id);
+    if (Boolean(leftPreference?.favorite) !== Boolean(rightPreference?.favorite)) return leftPreference?.favorite ? -1 : 1;
+    const recent = (rightPreference?.lastUsedAt ?? "").localeCompare(leftPreference?.lastUsedAt ?? "");
+    if (recent) return recent;
+    const useCount = (rightPreference?.useCount ?? 0) - (leftPreference?.useCount ?? 0);
+    if (useCount) return useCount;
+    return left.name[locale].localeCompare(right.name[locale], locale);
+  });
+}
+
+export function normalizeBarcode(value: string): string {
+  const barcode = value.replace(/\D/g, "");
+  if (barcode.length < 8 || barcode.length > 14) throw new Error("Invalid barcode");
+  return barcode;
+}
+
+export function findFoodByBarcode(foods: FoodItem[], value: string): FoodItem | undefined {
+  const barcode = normalizeBarcode(value);
+  return foods.find((food) => food.barcode === barcode);
 }
 
 export function createCustomFood(name: string, per100g: FoodItem["per100g"]): FoodItem {

@@ -25,7 +25,7 @@ Gym Local is a modular monolith compiled into one static PWA. `apps/web` is the 
 
 ## Independent versions
 
-- App: `0.4.0`
+- App: `0.5.0`
 - Database schema: `3`
 - Catalog: `3`
 - Routine templates: `2`
@@ -33,4 +33,4 @@ Gym Local is a modular monolith compiled into one static PWA. `apps/web` is the 
 - Backup: `3`
 - Nutrition pack schema: `1`
 
-Historical workout and meal records store snapshots so catalog, source, and formula updates do not rewrite the past. See `docs/adr/0002-nutrition-pack-and-backup-v2.md` for nutrition-pack ownership and `docs/adr/0005-personal-data-v3-and-recovery.md` for personal-data recovery.
+Historical workout and meal records store snapshots so catalog, source, and formula updates do not rewrite the past. See `docs/adr/0002-nutrition-pack-and-backup-v2.md` for nutrition-pack ownership, `docs/adr/0005-personal-data-v3-and-recovery.md` for personal-data recovery, and `docs/adr/0007-nutrition-workflows-and-release-gates.md` for snapshot-safe nutrition workflows and measured release gates.

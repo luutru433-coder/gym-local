@@ -486,7 +486,7 @@ export interface BackupPayload {
 }
 
 export const APP_VERSIONS = {
-  app: "0.4.0",
+  app: "0.5.0",
   database: 3,
   catalog: 3,
   routines: 2,

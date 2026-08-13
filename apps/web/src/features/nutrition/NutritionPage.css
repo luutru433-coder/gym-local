@@ -1,0 +1,263 @@
+.meal-entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.meal-entry-actions > button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.meal-entry-actions > button:hover,
+.meal-entry-actions > button:focus-visible {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
+.water-card--interactive {
+  flex-wrap: wrap;
+}
+
+.water-card--interactive > div:nth-child(2) {
+  flex: 1 1 130px;
+}
+
+.water-card--interactive strong small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.water-controls {
+  flex: 1 0 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+}
+
+.water-controls input {
+  min-width: 0;
+  min-height: 44px;
+}
+
+.water-card--interactive ul {
+  flex: 1 0 100%;
+  max-height: 132px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+}
+
+.water-card--interactive li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+}
+
+.water-card--interactive li button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.food-result {
+  position: relative;
+  padding: 0;
+}
+
+.food-result__select {
+  min-width: 0;
+  min-height: 62px;
+  padding: 9px 42px 9px 9px;
+  border: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.favorite-button {
+  position: absolute;
+  z-index: 1;
+  top: 9px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.favorite-button[aria-pressed="true"] {
+  color: #b84a32;
+}
+
+.recipe-section {
+  margin: 24px 0;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.recipe-card {
+  min-width: 0;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.recipe-card__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: #637419;
+  background: #f0f7d3;
+  border-radius: 10px;
+}
+
+.recipe-card h3,
+.recipe-card p {
+  margin: 0;
+}
+
+.recipe-card h3 {
+  font-size: 13px;
+}
+
+.recipe-card p,
+.recipe-card small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.recipe-card strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 10px;
+}
+
+.recipe-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.recipe-card__actions > button:not(.button) {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.recipe-empty {
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.recipe-editor,
+.recipe-ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recipe-ingredient {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px auto 44px;
+  align-items: center;
+  gap: 7px;
+}
+
+.recipe-ingredient > button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: var(--surface-2);
+  cursor: pointer;
+}
+
+.recipe-ingredient > button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .recipe-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .recipe-card__actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 390px) {
+  .meal-card li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .meal-card li > span:not(.meal-entry-actions) {
+    grid-column: 1;
+  }
+
+  .meal-entry-actions {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .recipe-ingredient {
+    grid-template-columns: minmax(0, 1fr) 74px auto;
+  }
+
+  .recipe-ingredient > button {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+}

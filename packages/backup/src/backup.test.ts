@@ -66,6 +66,23 @@ describe("backup", () => {
       }],
       settings: { ...defaultSettings, activeProgramId: "program_1" },
       sessions: [session],
+      foods: [{
+        id: "food_oats",
+        name: { vi: "Y\u1ebfn m\u1ea1ch hi\u1ec7n t\u1ea1i", en: "Current oats" },
+        per100g: { calories: 420, protein: 18, carbs: 70, fat: 8, ironMg: 5.2 },
+        source: "custom",
+        updatedAt: "2026-08-13T00:00:00.000Z"
+      }],
+      meals: [{
+        id: "meal_historical_oats",
+        date: "2026-08-10",
+        meal: "breakfast",
+        foodId: "food_oats",
+        foodNameSnapshot: { vi: "Y\u1ebfn m\u1ea1ch c\u0169", en: "Historical oats" },
+        grams: 50,
+        nutrientsSnapshot: { calories: 194, protein: 8.45, carbs: 33.15, fat: 3.45, ironMg: 2.35 },
+        createdAt: "2026-08-10T01:00:00.000Z"
+      }],
       recipes: [{
         id: "recipe_1",
         name: { vi: "Yến mạch", en: "Oats" },
@@ -104,8 +121,8 @@ describe("backup", () => {
       routines: 1,
       programs: 1,
       sessions: 1,
-      foods: 0,
-      meals: 0,
+      foods: 1,
+      meals: 1,
       recipes: 1,
       waterEntries: 1,
       foodPreferences: 1,
@@ -117,6 +134,18 @@ describe("backup", () => {
     expect(restored.data.sessions[0].exercises[0].trackingProfileSnapshot).toMatchObject({ variantId: "squat__dumbbell" });
     expect(restored.data.sessions[0].programId).toBe("program_1");
     expect(restored.data.recipes[0].ingredients[0].nutrientsPer100gSnapshot).toMatchObject({ ironMg: 4.7 });
+    expect(restored.data.meals[0]).toMatchObject({
+      foodNameSnapshot: { vi: "Y\u1ebfn m\u1ea1ch c\u0169", en: "Historical oats" },
+      nutrientsSnapshot: { calories: 194, ironMg: 2.35 }
+    });
+    expect(restored.data.foods[0].per100g).toMatchObject({ calories: 420, ironMg: 5.2 });
+    expect(restored.data.waterEntries[0]).toMatchObject({ id: "water_1", amountMl: 500 });
+    expect(restored.data.foodPreferences[0]).toMatchObject({
+      foodId: "food_oats",
+      favorite: true,
+      defaultServingGrams: 50,
+      useCount: 3
+    });
     expect(restored.data.settings.activeProgramId).toBe("program_1");
   });
 

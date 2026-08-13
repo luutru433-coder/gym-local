@@ -1,35 +1,56 @@
 import { create } from "zustand";
-import type { AppSettings, BodyMetric, FoodItem, MealEntry, Profile, Program, Routine, WorkoutSession } from "@gym/contracts";
+import type { AppSettings, BodyMetric, FoodItem, FoodPreference, MealEntry, NutritionPackManifest, NutritionPackRecord, Profile, Program, Recipe, Routine, WaterEntry, WorkoutSession } from "@gym/contracts";
 import { cloneRoutineTemplate, createFreestyleSession, createSessionFromRoutine, finishSession } from "@gym/workouts";
+import {
+  installNutritionPack,
+  loadNutritionPackManifest,
+  lookupFoodByBarcode,
+  nutritionPackInfo,
+  removeNutritionPack,
+  searchOfflineFoods,
+  type FoodLookupCandidate
+} from "@gym/nutrition";
 import {
   defaultSettings,
   deleteMeal,
   deleteProgram as deleteProgramFromDb,
   deleteRoutine as deleteRoutineFromDb,
   getActiveSession,
+  getNutritionPackRecord,
   getProfile,
   getSettings,
   initializeDatabase,
   listBodyMetrics,
   listFoods,
+  listFoodPreferences,
   listMeals,
   listPrograms,
   listRecoveryPoints,
+  listRecipes,
   listRoutines,
   listSessions,
+  listWaterEntries,
   replaceAllData,
   saveBodyMetric,
   saveFood,
+  saveFoodPreference,
   saveMeal,
+  saveMealAndRecordFoodUse,
+  saveNutritionPackRecord,
   saveProfile,
   saveProgram,
+  saveRecipe,
   saveCompletedSessionAndAdvanceProgram,
   saveInitialSetup,
   saveRoutine,
   saveSession,
   saveStartedSession,
   saveSettings,
+  saveWaterEntry,
   selectProgram,
+  deleteFoodPreference,
+  deleteRecipe,
+  deleteWaterEntry,
   undoLatestRestore
 } from "@gym/storage";
 import type { BackupPayload } from "@gym/contracts";
@@ -46,6 +67,12 @@ interface GymState {
   activeSession?: WorkoutSession;
   foods: FoodItem[];
   meals: MealEntry[];
+  recipes: Recipe[];
+  waterEntries: WaterEntry[];
+  foodPreferences: FoodPreference[];
+  nutritionPackRecord: NutritionPackRecord;
+  nutritionPackManifest?: NutritionPackManifest;
+  nutritionPackError?: string;
   bodyMetrics: BodyMetric[];
   settings: AppSettings;
   recoveryAvailable: boolean;
@@ -68,7 +95,19 @@ interface GymState {
   completeWorkout: () => Promise<WorkoutSession | undefined>;
   addFood: (food: FoodItem) => Promise<void>;
   addMeal: (entry: MealEntry) => Promise<void>;
+  updateMeal: (entry: MealEntry) => Promise<void>;
   removeMeal: (id: string) => Promise<void>;
+  saveUserRecipe: (recipe: Recipe) => Promise<Recipe>;
+  removeRecipe: (id: string) => Promise<void>;
+  addWater: (entry: WaterEntry) => Promise<void>;
+  removeWater: (id: string) => Promise<void>;
+  saveUserFoodPreference: (preference: FoodPreference) => Promise<FoodPreference>;
+  removeFoodPreference: (id: string) => Promise<void>;
+  refreshNutritionPack: () => Promise<void>;
+  installOfflineNutritionPack: () => Promise<void>;
+  removeOfflineNutritionPack: () => Promise<void>;
+  searchOfflineNutritionFoods: (query: string) => Promise<FoodItem[]>;
+  lookupBarcodeFood: (barcode: string) => Promise<FoodLookupCandidate | undefined>;
   addBodyMetric: (metric: BodyMetric) => Promise<void>;
   restore: (data: BackupPayload["data"]) => Promise<void>;
   undoRestore: () => Promise<boolean>;
@@ -80,7 +119,7 @@ function messageFrom(error: unknown): string {
 }
 
 async function loadSnapshot() {
-  const [profile, routines, programs, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryPoints] = await Promise.all([
+  const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, bodyMetrics, settings, recoveryPoints] = await Promise.all([
     getProfile(),
     listRoutines(),
     listPrograms(),
@@ -88,11 +127,14 @@ async function loadSnapshot() {
     getActiveSession(),
     listFoods(),
     listMeals(),
+    listRecipes(),
+    listWaterEntries(),
+    listFoodPreferences(),
     listBodyMetrics(),
     getSettings(),
     listRecoveryPoints()
   ]);
-  return { profile, routines, programs, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
+  return { profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
 }
 
 let lastPersistedActiveSession: WorkoutSession | undefined;
@@ -105,6 +147,10 @@ export const useGymStore = create<GymState>((set, get) => ({
   sessions: [],
   foods: [],
   meals: [],
+  recipes: [],
+  waterEntries: [],
+  foodPreferences: [],
+  nutritionPackRecord: { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 },
   bodyMetrics: [],
   settings: defaultSettings,
   recoveryAvailable: false,
@@ -121,6 +167,101 @@ export const useGymStore = create<GymState>((set, get) => ({
     } catch (error) {
       set({ ready: true, busy: false, error: messageFrom(error) });
     }
+  },
+
+  async refreshNutritionPack() {
+    try {
+      const [stored, info, manifest] = await Promise.all([
+        getNutritionPackRecord(),
+        nutritionPackInfo(),
+        loadNutritionPackManifest()
+      ]);
+      if (info.installed) {
+        const ready: NutritionPackRecord = {
+          ...stored,
+          id: "nutrition-pack",
+          status: "ready",
+          version: info.metadata?.version ?? stored.version,
+          bytesDownloaded: stored.bytesDownloaded || manifest.sizeBytes,
+          totalBytes: manifest.sizeBytes,
+          foodCount: Number(info.metadata?.food_count ?? manifest.foodCount),
+          aliasCount: Number(info.metadata?.alias_count ?? manifest.aliasCount),
+          vietnameseRecipeCount: Number(info.metadata?.vietnamese_recipe_count ?? manifest.vietnameseRecipeCount)
+        };
+        await saveNutritionPackRecord(ready);
+        set({ nutritionPackManifest: manifest, nutritionPackRecord: ready, nutritionPackError: undefined });
+        return;
+      }
+      const interrupted = stored.status === "ready" || stored.status === "downloading" || stored.status === "installing";
+      const record: NutritionPackRecord = interrupted
+        ? { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 }
+        : stored;
+      if (interrupted) await saveNutritionPackRecord(record);
+      set({ nutritionPackManifest: manifest, nutritionPackRecord: record, nutritionPackError: undefined });
+    } catch (error) {
+      set({ nutritionPackError: messageFrom(error) });
+      throw error;
+    }
+  },
+
+  async installOfflineNutritionPack() {
+    const manifest = get().nutritionPackManifest;
+    if (!manifest) throw new Error("Nutrition pack manifest is unavailable");
+    const initial: NutritionPackRecord = {
+      id: "nutrition-pack",
+      status: "downloading",
+      version: manifest.version,
+      bytesDownloaded: 0,
+      totalBytes: manifest.sizeBytes
+    };
+    set({ nutritionPackRecord: initial, nutritionPackError: undefined });
+    await saveNutritionPackRecord(initial);
+    try {
+      const result = await installNutritionPack(manifest, (progress) => {
+        set((state) => ({
+          nutritionPackRecord: {
+            ...state.nutritionPackRecord,
+            status: "downloading",
+            bytesDownloaded: progress.bytesDownloaded,
+            totalBytes: progress.totalBytes ?? manifest.sizeBytes
+          }
+        }));
+      });
+      const ready: NutritionPackRecord = {
+        id: "nutrition-pack",
+        status: "ready",
+        version: manifest.version,
+        bytesDownloaded: result.bytesDownloaded,
+        totalBytes: manifest.sizeBytes,
+        installedAt: new Date().toISOString(),
+        checksum: result.checksum,
+        foodCount: manifest.foodCount,
+        aliasCount: manifest.aliasCount,
+        vietnameseRecipeCount: manifest.vietnameseRecipeCount
+      };
+      await saveNutritionPackRecord(ready);
+      set({ nutritionPackRecord: ready });
+    } catch (error) {
+      const failed: NutritionPackRecord = { ...initial, status: "error", error: messageFrom(error) };
+      await saveNutritionPackRecord(failed).catch(() => undefined);
+      set({ nutritionPackRecord: failed, nutritionPackError: failed.error });
+      throw error;
+    }
+  },
+
+  async removeOfflineNutritionPack() {
+    await removeNutritionPack();
+    const record: NutritionPackRecord = { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 };
+    await saveNutritionPackRecord(record);
+    set({ nutritionPackRecord: record, nutritionPackError: undefined });
+  },
+
+  searchOfflineNutritionFoods(query) {
+    return searchOfflineFoods(query);
+  },
+
+  lookupBarcodeFood(barcode) {
+    return lookupFoodByBarcode(barcode);
   },
 
   clearNotice: () => set({ notice: undefined }),
@@ -279,13 +420,57 @@ export const useGymStore = create<GymState>((set, get) => ({
   },
 
   async addMeal(entry) {
+    const preference = await saveMealAndRecordFoodUse(entry, { defaultServingGrams: entry.grams });
+    set((state) => ({
+      meals: [entry, ...state.meals],
+      foodPreferences: [preference, ...state.foodPreferences.filter((item) => item.foodId !== entry.foodId)]
+    }));
+  },
+
+  async updateMeal(entry) {
     await saveMeal(entry);
-    set((state) => ({ meals: [entry, ...state.meals] }));
+    set((state) => ({ meals: state.meals.map((item) => item.id === entry.id ? entry : item) }));
   },
 
   async removeMeal(id) {
     await deleteMeal(id);
     set((state) => ({ meals: state.meals.filter((entry) => entry.id !== id) }));
+  },
+
+  async saveUserRecipe(recipe) {
+    const saved = await saveRecipe(recipe);
+    set((state) => ({
+      recipes: [saved, ...state.recipes.filter((item) => item.id !== saved.id)]
+    }));
+    return saved;
+  },
+
+  async removeRecipe(id) {
+    await deleteRecipe(id);
+    set((state) => ({ recipes: state.recipes.filter((recipe) => recipe.id !== id) }));
+  },
+
+  async addWater(entry) {
+    await saveWaterEntry(entry);
+    set((state) => ({ waterEntries: [entry, ...state.waterEntries] }));
+  },
+
+  async removeWater(id) {
+    await deleteWaterEntry(id);
+    set((state) => ({ waterEntries: state.waterEntries.filter((entry) => entry.id !== id) }));
+  },
+
+  async saveUserFoodPreference(preference) {
+    const saved = await saveFoodPreference(preference);
+    set((state) => ({
+      foodPreferences: [saved, ...state.foodPreferences.filter((item) => item.foodId !== saved.foodId)]
+    }));
+    return saved;
+  },
+
+  async removeFoodPreference(id) {
+    await deleteFoodPreference(id);
+    set((state) => ({ foodPreferences: state.foodPreferences.filter((item) => item.id !== id) }));
   },
 
   async addBodyMetric(metric) {

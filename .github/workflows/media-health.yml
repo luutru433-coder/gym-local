@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Gym Local contributors
+# SPDX-License-Identifier: MIT
+
+name: Check exercise video availability
+
+on:
+  schedule:
+    - cron: "17 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  media-health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.16.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check direct YouTube guide availability
+        id: health
+        continue-on-error: true
+        run: pnpm run media:health:online
+      - name: Upload media health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-health-report
+          path: reports/media-health-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Fail when a reviewed guide is unavailable
+        if: steps.health.outcome != 'success'
+        run: exit 1

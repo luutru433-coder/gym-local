@@ -10,19 +10,33 @@ import {
   getProfile,
   initializeDatabase,
   deleteProgram,
+  deleteFood,
+  deleteFoodPreference,
+  deleteRecipe,
   deleteRoutine,
+  deleteWaterEntry,
+  findSavedFoodByBarcode,
   listPrograms,
+  listFoodPreferences,
+  listRecipes,
   listRecoveryPoints,
+  listWaterEntries,
+  listWaterEntriesForDate,
   replaceAllData,
   getNutritionPackRecord,
   saveProfile,
   saveProgram,
   saveCompletedSessionAndAdvanceProgram,
   saveInitialSetup,
+  saveFood,
+  saveFoodPreference,
   saveMeal,
+  saveMealAndRecordFoodUse,
   saveNutritionPackRecord,
+  saveRecipe,
   saveSession,
   saveStartedSession,
+  saveWaterEntry,
   selectProgram,
   undoLatestRestore
 } from "./index";
@@ -586,6 +600,96 @@ describe("IndexedDB schema and recovery", () => {
 
     expect((await db.sessions.get(session.id))?.finishedAt).toBe(finished.finishedAt);
     expect(await getActiveSession(db)).toBeUndefined();
+  });
+
+  it("persists nutrition editor records and records recent food use atomically", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    const food = {
+      id: "food_milk",
+      name: { vi: "Sá»¯a", en: "Milk" },
+      barcode: "0123456789012",
+      per100g: { calories: 60, protein: 3, carbs: 5, fat: 3 },
+      source: "custom" as const,
+      updatedAt: "2026-08-13T00:00:00.000Z"
+    };
+    await saveFood(food, db);
+    expect((await findSavedFoodByBarcode("0 123 456 789 012", db))?.id).toBe(food.id);
+
+    const recipe = await saveRecipe({
+      id: "recipe_milk",
+      name: { vi: "Sá»¯a", en: "Milk" },
+      ingredients: [{
+        id: "ingredient_milk",
+        foodId: food.id,
+        foodNameSnapshot: food.name,
+        grams: 200,
+        nutrientsPer100gSnapshot: food.per100g
+      }],
+      yieldGrams: 200,
+      servings: 1,
+      createdAt: "2026-08-13T00:00:00.000Z",
+      updatedAt: "2026-08-13T00:00:00.000Z"
+    }, db);
+    await saveWaterEntry({ id: "water_1", date: "2026-08-13", amountMl: 350, createdAt: "2026-08-13T01:00:00.000Z" }, db);
+    await saveWaterEntry({ id: "water_2", date: "2026-08-12", amountMl: 500, createdAt: "2026-08-12T01:00:00.000Z" }, db);
+    expect((await listRecipes(db))[0]?.id).toBe(recipe.id);
+    expect(await listWaterEntriesForDate("2026-08-13", db)).toHaveLength(1);
+    expect(await listWaterEntries(db)).toHaveLength(2);
+
+    const preference = await saveFoodPreference({
+      id: "preference_milk",
+      foodId: food.id,
+      favorite: true,
+      defaultServingGrams: 250,
+      useCount: 0
+    }, db);
+    const meal = {
+      id: "meal_milk",
+      date: "2026-08-13",
+      meal: "breakfast" as const,
+      foodId: food.id,
+      foodNameSnapshot: food.name,
+      grams: 250,
+      nutrientsSnapshot: { calories: 150, protein: 7.5, carbs: 12.5, fat: 7.5 },
+      createdAt: "2026-08-13T02:00:00.000Z"
+    };
+    const used = await saveMealAndRecordFoodUse(meal, {}, db);
+    expect(used).toMatchObject({ id: preference.id, favorite: true, defaultServingGrams: 250, useCount: 1, lastUsedAt: meal.createdAt });
+    expect(await listFoodPreferences(db)).toEqual([used]);
+
+    await deleteFood(food.id, db);
+    expect(await findSavedFoodByBarcode(food.barcode, db)).toBeUndefined();
+    expect(await db.meals.get(meal.id)).toEqual(meal);
+    expect(await db.recipes.get(recipe.id)).toBeDefined();
+    expect(await listFoodPreferences(db)).toEqual([]);
+    await deleteRecipe(recipe.id, db);
+    await deleteWaterEntry("water_1", db);
+    await deleteFoodPreference("missing", db);
+    expect(await listRecipes(db)).toEqual([]);
+    expect(await listWaterEntriesForDate("2026-08-13", db)).toEqual([]);
+  });
+
+  it("rolls back a meal when recent-food preference persistence fails", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    db.foodPreferences.hook("creating", () => {
+      throw new Error("simulated preference failure");
+    });
+    const meal = {
+      id: "meal_rollback",
+      date: "2026-08-13",
+      meal: "snack" as const,
+      foodId: "food_rollback",
+      foodNameSnapshot: { vi: "Táº¡m", en: "Temporary" },
+      grams: 100,
+      nutrientsSnapshot: { calories: 100, protein: 1, carbs: 20, fat: 1 },
+      createdAt: "2026-08-13T02:00:00.000Z"
+    };
+
+    await expect(saveMealAndRecordFoodUse(meal, {}, db)).rejects.toThrow("simulated preference failure");
+    expect(await db.meals.count()).toBe(0);
+    expect(await db.foodPreferences.count()).toBe(0);
   });
 
   it("rejects non-finite numeric values at the storage boundary", async () => {

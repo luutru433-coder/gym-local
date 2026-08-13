@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Added fast recent/favorite/default-serving food flows, editable meal entries, water tracking, custom recipe CRUD and serving-based recipe logging with immutable nutrient snapshots.
+- Added explicit nutrition-target provenance and confirmation, exact saved-barcode fallback, micronutrient completeness warnings, and a store-owned boundary for all nutrition pack and provider operations.
+- Added measured bundle/PWA budgets, route/vendor splitting, lazy barcode scanning, complete offline-route checks, deterministic media auditing, scheduled online video health checks, and full SQLite pack verification before deployment.
+
 ## 0.4.0
 
 - Added multi-day programs, full routine editing, freestyle and editable live workouts, and explicit save recovery while preserving completed history.

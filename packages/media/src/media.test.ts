@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { ExerciseVideoGuide, MediaAsset } from "@gym/contracts";
-import { isSafeMediaUrl, isSafeVideoGuide, youtubeEmbedUrl } from "./index";
+import { CONTENT_SOURCES, EXERCISE_VARIANTS } from "@gym/catalog";
+import type { ExerciseVariant, ExerciseVideoGuide, MediaAsset } from "@gym/contracts";
+import { auditExerciseMedia, isSafeMediaUrl, isSafeVideoGuide, youtubeEmbedUrl } from "./index";
 
 function asset(type: MediaAsset["type"], url: string): MediaAsset {
   return { id: "test", type, url, sourceId: "source", title: { vi: "Test", en: "Test" }, onlineOnly: true, reviewStatus: "reviewed" };
@@ -16,6 +17,12 @@ describe("media allowlist", () => {
   it("rejects insecure or unknown hosts", () => {
     expect(isSafeMediaUrl(asset("image", "http://raw.githubusercontent.com/example/image.jpg"))).toBe(false);
     expect(isSafeMediaUrl(asset("image", "https://example.com/image.jpg"))).toBe(false);
+  });
+
+  it("rejects a guide whose direct URLs do not match its reviewed video ID", () => {
+    const guide = structuredClone(EXERCISE_VARIANTS[0].videoGuides[0]);
+    guide.watchUrl = "https://www.youtube.com/watch?v=AAAAAAAAAAA";
+    expect(isSafeVideoGuide(guide)).toBe(false);
   });
 
   it("builds privacy-enhanced embeds only for direct reviewed guides", () => {
@@ -38,5 +45,29 @@ describe("media allowlist", () => {
     };
     expect(isSafeVideoGuide(guide)).toBe(true);
     expect(youtubeEmbedUrl(guide)).toContain("https://www.youtube-nocookie.com/embed/A2b2EmIg0dA");
+  });
+
+  it("audits complete direct-video coverage, attribution, and offline fallbacks", () => {
+    const report = auditExerciseMedia(EXERCISE_VARIANTS, CONTENT_SOURCES, { asOf: new Date("2026-08-13T00:00:00Z") });
+    expect(report).toMatchObject({
+      reviewedVariantCount: EXERCISE_VARIANTS.length,
+      directVideoCount: EXERCISE_VARIANTS.length,
+      issues: []
+    });
+    expect(report.oldestVerificationAgeDays).toBeLessThanOrEqual(3);
+  });
+
+  it("reports missing offline guidance and stale or unsafe videos", () => {
+    const broken = structuredClone(EXERCISE_VARIANTS[0]) as ExerciseVariant;
+    broken.instructions = [];
+    broken.videoGuides[0].watchUrl = "http://example.com/watch";
+    broken.videoGuides[0].lastVerifiedAt = "2025-01-01";
+
+    const report = auditExerciseMedia([broken], CONTENT_SOURCES, { asOf: new Date("2026-08-13T00:00:00Z"), maximumVerificationAgeDays: 180 });
+    expect(report.issues.map((issue) => issue.code)).toEqual(expect.arrayContaining([
+      "missing_offline_fallback",
+      "invalid_video_guide",
+      "stale_video_review"
+    ]));
   });
 });
