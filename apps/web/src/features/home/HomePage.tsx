@@ -23,6 +23,8 @@ export function HomePage() {
   const navigate = useNavigate();
   const profile = useGymStore((state) => state.profile)!;
   const routines = useGymStore((state) => state.routines);
+  const programs = useGymStore((state) => state.programs);
+  const settings = useGymStore((state) => state.settings);
   const sessions = useGymStore((state) => state.sessions);
   const meals = useGymStore((state) => state.meals);
   const activeSession = useGymStore((state) => state.activeSession);
@@ -34,13 +36,19 @@ export function HomePage() {
   const weekStart = startOfWeek();
   const weeklySessions = sessions.filter((session) => session.finishedAt && new Date(session.finishedAt) >= weekStart);
   const weeklySets = weeklySessions.reduce((total, session) => total + session.exercises.flatMap((exercise) => exercise.sets).filter((set) => set.completedAt && set.type !== "warmup").length, 0);
-  const nextRoutine = routines[weeklySessions.length % Math.max(1, routines.length)];
+  const activeProgram = programs.find((program) => program.id === settings.activeProgramId);
+  const activeProgramDays = activeProgram ? [...activeProgram.days].sort((left, right) => left.order - right.order) : [];
+  const activeProgramDay = activeProgramDays[activeProgram?.activeDayIndex ?? 0];
+  const programmedRoutine = activeProgramDay
+    ? routines.find((routine) => routine.id === activeProgramDay.routineId)
+    : undefined;
+  const nextRoutine = programmedRoutine ?? routines[weeklySessions.length % Math.max(1, routines.length)];
   const recent = sessions.find((session) => session.finishedAt);
   const progress = activeSession ? sessionProgress(activeSession) : undefined;
 
   const begin = async () => {
     if (!nextRoutine) return navigate("/routines");
-    await startWorkout(nextRoutine);
+    await startWorkout(nextRoutine, programmedRoutine ? activeProgram?.id : undefined);
     navigate("/workout");
   };
 
@@ -69,7 +77,9 @@ export function HomePage() {
         <Card className="workout-hero">
           <div className="workout-hero__stamp"><span>{weeklySessions.length}</span><small>/{profile.daysPerWeek}<br />{locale === "vi" ? "buổi tuần này" : "this week"}</small></div>
           <div className="workout-hero__copy">
-            <span className="eyebrow">{locale === "vi" ? "Gợi ý tiếp theo" : "Up next"}</span>
+            <span className="eyebrow">{activeProgram
+              ? `${localize(activeProgram.name, locale)} · ${locale === "vi" ? "Ngày" : "Day"} ${(activeProgram?.activeDayIndex ?? 0) + 1}/${activeProgramDays.length}`
+              : (locale === "vi" ? "Gợi ý tiếp theo" : "Up next")}</span>
             <h2>{nextRoutine ? localize(nextRoutine.name, locale) : (locale === "vi" ? "Chọn lịch tập đầu tiên" : "Choose your first routine")}</h2>
             <p>{nextRoutine ? `${nextRoutine.items.length} ${locale === "vi" ? "động tác" : "movements"} · ${nextRoutine.goal.replace("_", " ")}` : (locale === "vi" ? "Kho lịch có sẵn nhiều chương trình miễn phí." : "Pick from the included free programs.")}</p>
             <Button size="lg" onClick={() => void begin()}><Play size={18} fill="currentColor" />{locale === "vi" ? "Bắt đầu tập" : "Start workout"}</Button>

@@ -9,14 +9,21 @@ import {
   getActiveSession,
   getProfile,
   initializeDatabase,
+  deleteProgram,
+  deleteRoutine,
+  listPrograms,
   listRecoveryPoints,
   replaceAllData,
   getNutritionPackRecord,
   saveProfile,
+  saveProgram,
+  saveCompletedSessionAndAdvanceProgram,
   saveInitialSetup,
   saveMeal,
   saveNutritionPackRecord,
   saveSession,
+  saveStartedSession,
+  selectProgram,
   undoLatestRestore
 } from "./index";
 
@@ -408,6 +415,161 @@ describe("IndexedDB schema and recovery", () => {
     await saveSession({ ...session, finishedAt: "2026-08-10T02:00:00.000Z" }, db);
     expect(await getActiveSession(db)).toBeUndefined();
     expect((await db.settings.get("app")) ?? defaultSettings).toMatchObject({ activeSessionId: undefined });
+  });
+
+  it("creates, updates, lists, and deletes programs without changing routines", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    await db.routines.put(routine());
+
+    const saved = await saveProgram({
+      ...program(),
+      activeDayIndex: 9,
+      days: [
+        { order: 4, routineId: "routine_starter" },
+        { order: 2, routineId: "routine_starter" }
+      ]
+    }, db);
+    expect(saved.days.map((day) => day.order)).toEqual([0, 1]);
+    expect(saved.activeDayIndex).toBe(1);
+    expect(await listPrograms(db)).toEqual([saved]);
+
+    const renamed = await saveProgram({ ...saved, name: { vi: "Đã đổi tên", en: "Renamed" } }, db);
+    expect(await listPrograms(db)).toEqual([renamed]);
+    expect((await db.routines.get("routine_starter"))?.name.en).toBe("Full body");
+
+    await selectProgram(saved.id, db);
+    await expect(deleteRoutine("routine_starter", db)).rejects.toThrow("used by a program");
+    expect(await db.routines.get("routine_starter")).toBeDefined();
+    await deleteProgram(saved.id, db);
+    expect(await listPrograms(db)).toEqual([]);
+    expect((await db.settings.get("app"))?.activeProgramId).toBeUndefined();
+    await deleteRoutine("routine_starter", db);
+    expect(await db.routines.get("routine_starter")).toBeUndefined();
+  });
+
+  it("finishes a session and persistently advances matching program days atomically", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    await db.routines.put(routine());
+    await db.programs.put({
+      ...program(),
+      days: [
+        { order: 0, routineId: "routine_starter" },
+        { order: 1, routineId: "routine_next" }
+      ]
+    });
+    await db.programs.put({
+      ...program("program_same_routine_not_started"),
+      days: [
+        { order: 0, routineId: "routine_starter" },
+        { order: 1, routineId: "routine_next" }
+      ]
+    });
+    await selectProgram("program_starter", db);
+    const active: WorkoutSession = {
+      id: "session_program_day",
+      programId: "program_starter",
+      routineId: "routine_starter",
+      startedAt: "2026-08-10T01:00:00.000Z",
+      exercises: []
+    };
+    await saveStartedSession(active, db);
+
+    const programs = await saveCompletedSessionAndAdvanceProgram({
+      ...active,
+      finishedAt: "2026-08-10T02:00:00.000Z"
+    }, db);
+
+    expect(programs[0]?.activeDayIndex).toBe(1);
+    expect((await db.programs.get("program_starter"))?.activeDayIndex).toBe(1);
+    expect((await db.programs.get("program_same_routine_not_started"))?.activeDayIndex).toBe(0);
+    expect((await db.sessions.get(active.id))?.finishedAt).toBe("2026-08-10T02:00:00.000Z");
+    expect(await getActiveSession(db)).toBeUndefined();
+  });
+
+  it("rolls completion back when advancing a program cannot be persisted", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    await db.programs.put(program());
+    await selectProgram("program_starter", db);
+    const active: WorkoutSession = {
+      id: "session_program_failure",
+      programId: "program_starter",
+      routineId: "routine_starter",
+      startedAt: "2026-08-10T01:00:00.000Z",
+      exercises: []
+    };
+    await saveStartedSession(active, db);
+    const failUpdate = () => {
+      throw new Error("simulated program failure");
+    };
+    const updatingHook = db.programs.hook("updating");
+    updatingHook.subscribe(failUpdate);
+
+    try {
+      await expect(saveCompletedSessionAndAdvanceProgram({
+        ...active,
+        finishedAt: "2026-08-10T02:00:00.000Z"
+      }, db)).rejects.toThrow("simulated program failure");
+    } finally {
+      updatingHook.unsubscribe(failUpdate);
+    }
+
+    expect((await db.sessions.get(active.id))?.finishedAt).toBeUndefined();
+    expect((await db.programs.get("program_starter"))?.activeDayIndex).toBe(0);
+    expect((await getActiveSession(db))?.id).toBe(active.id);
+  });
+
+  it("does not advance an unselected program when a routine is completed", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    await db.programs.bulkPut([
+      program("program_selected_other_routine"),
+      { ...program("program_same_routine_unselected"), activeDayIndex: 0 }
+    ]);
+    await db.programs.update("program_selected_other_routine", {
+      days: [{ order: 0, routineId: "routine_other" }]
+    });
+    await selectProgram("program_selected_other_routine", db);
+    const active: WorkoutSession = {
+      id: "session_unselected_program",
+      routineId: "routine_starter",
+      startedAt: "2026-08-10T01:00:00.000Z",
+      exercises: []
+    };
+    await saveSession(active, db);
+
+    await saveCompletedSessionAndAdvanceProgram({ ...active, finishedAt: "2026-08-10T02:00:00.000Z" }, db);
+
+    expect((await db.programs.get("program_selected_other_routine"))?.activeDayIndex).toBe(0);
+    expect((await db.programs.get("program_same_routine_unselected"))?.activeDayIndex).toBe(0);
+  });
+
+  it("validates a program workout at start and preserves selection for standalone workouts", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    await db.programs.put(program());
+    await selectProgram("program_starter", db);
+    const standalone: WorkoutSession = {
+      id: "session_standalone",
+      routineId: "routine_other",
+      startedAt: "2026-08-10T01:00:00.000Z",
+      exercises: []
+    };
+    await saveStartedSession(standalone, db);
+    expect(await db.settings.get("app")).toMatchObject({
+      activeSessionId: standalone.id,
+      activeProgramId: "program_starter"
+    });
+
+    await saveSession({ ...standalone, finishedAt: "2026-08-10T01:30:00.000Z" }, db);
+    await expect(saveStartedSession({
+      ...standalone,
+      id: "session_wrong_day",
+      programId: "program_starter"
+    }, db)).rejects.toThrow("does not match");
+    expect(await getActiveSession(db)).toBeUndefined();
   });
 
   it("serializes concurrent autosaves in call order", async () => {

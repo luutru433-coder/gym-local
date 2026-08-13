@@ -225,6 +225,7 @@ export interface SessionExercise {
 
 export interface WorkoutSession {
   id: Id;
+  programId?: Id;
   routineId?: Id;
   routineNameSnapshot?: LocalizedText;
   locationId?: Id;
@@ -443,6 +444,7 @@ export interface AppSettings {
   backupVersion: number;
   lastBackupAt?: string;
   activeSessionId?: Id;
+  activeProgramId?: Id;
   storagePersistenceRequestedAt?: string;
   storagePersistenceGranted?: boolean;
 }
@@ -484,7 +486,7 @@ export interface BackupPayload {
 }
 
 export const APP_VERSIONS = {
-  app: "0.3.0",
+  app: "0.4.0",
   database: 3,
   catalog: 3,
   routines: 2,

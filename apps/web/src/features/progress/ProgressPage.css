@@ -1,0 +1,274 @@
+.progress-insights-grid {
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: minmax(280px, .72fr) minmax(0, 1.28fr);
+  gap: 14px;
+}
+
+.activity-calendar-card,
+.variant-trend-card {
+  min-width: 0;
+  padding: 20px;
+}
+
+.activity-calendar {
+  margin: 15px 0 10px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  list-style: none;
+}
+
+.activity-day {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  color: #6d7066;
+  background: #efede5;
+  border: 1px solid #dfddd4;
+  border-radius: 7px;
+}
+
+.activity-day > span {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.activity-day time {
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.activity-day > i {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  min-width: 13px;
+  height: 13px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: rgba(24, 26, 21, .72);
+  border-radius: 50%;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.activity-day--1 { background: #eef6ca; border-color: #d6e49c; }
+.activity-day--2 { background: #dceca1; border-color: #c2d879; }
+.activity-day--3 { color: #29310e; background: #c9df69; border-color: #abc84d; }
+.activity-day--4 { color: #1d2018; background: var(--lime); border-color: #9fbd2d; }
+
+.activity-calendar__legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.activity-calendar__legend i {
+  width: 13px;
+  height: 13px;
+  border: 1px solid #dfddd4;
+  border-radius: 3px;
+}
+
+.variant-trend-card__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, .7fr);
+  align-items: start;
+  gap: 16px;
+}
+
+.variant-trend-picker {
+  display: grid;
+  gap: 5px;
+}
+
+.variant-trend-picker > span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.variant-trend-picker select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 34px 0 10px;
+  background-color: var(--surface-2);
+}
+
+.variant-trend-summary {
+  margin-top: 13px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.variant-trend-summary > div {
+  min-width: 0;
+  min-height: 77px;
+  padding: 10px;
+  border-right: 1px solid var(--line);
+}
+
+.variant-trend-summary > div:last-child {
+  border-right: 0;
+}
+
+.variant-trend-summary span,
+.variant-trend-summary small,
+.variant-trend-summary strong {
+  display: block;
+}
+
+.variant-trend-summary span,
+.variant-trend-summary small {
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.variant-trend-summary strong {
+  margin: 6px 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+}
+
+.variant-trend-card__identity {
+  margin: 13px 0 2px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px;
+  font-size: 11px;
+}
+
+.variant-trend-card__identity span {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.variant-trend-chart {
+  width: 100%;
+  height: 190px;
+}
+
+.variant-trend-table-wrap {
+  max-height: 245px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.variant-trend-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+
+.variant-trend-table caption {
+  padding: 9px 10px;
+  color: var(--muted);
+  background: var(--surface-2);
+  font-size: 9px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.variant-trend-table th,
+.variant-trend-table td {
+  padding: 9px 10px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.variant-trend-table thead th {
+  color: var(--muted);
+  background: #f4f2eb;
+  font-size: 8px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.pr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  color: #2b350d;
+  background: var(--lime);
+  border-radius: 20px;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .progress-insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-calendar-card {
+    max-width: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .activity-calendar-card,
+  .variant-trend-card {
+    padding: 15px;
+  }
+
+  .activity-calendar {
+    gap: 4px;
+  }
+
+  .activity-day {
+    border-radius: 5px;
+  }
+
+  .activity-day > span {
+    display: none;
+  }
+
+  .variant-trend-card__header {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .variant-trend-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .variant-trend-summary > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .variant-trend-summary > div:last-child {
+    grid-column: 1 / -1;
+    min-height: 66px;
+    border-top: 1px solid var(--line);
+  }
+
+  .variant-trend-chart {
+    height: 165px;
+  }
+}

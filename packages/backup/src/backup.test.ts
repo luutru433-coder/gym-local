@@ -45,6 +45,7 @@ describe("backup", () => {
   it("round-trips v3 personal data, Vietnamese text, tracking semantics, and manifest metadata", async () => {
     const routine = cloneRoutineTemplate("tpl_full_body_a");
     const session = createSessionFromRoutine(routine);
+    session.programId = "program_1";
     const data = emptyData({
       routines: [routine],
       programs: [{
@@ -63,6 +64,7 @@ describe("backup", () => {
         createdAt: "2026-08-10T00:00:00.000Z",
         updatedAt: "2026-08-10T00:00:00.000Z"
       }],
+      settings: { ...defaultSettings, activeProgramId: "program_1" },
       sessions: [session],
       recipes: [{
         id: "recipe_1",
@@ -113,7 +115,9 @@ describe("backup", () => {
     expect(restored.data.routines[0].name.vi).toBe(routine.name.vi);
     expect(restored.data.sessions[0].exercises[0].sets[0]).toMatchObject({ targetMinReps: 8, targetMaxReps: 12 });
     expect(restored.data.sessions[0].exercises[0].trackingProfileSnapshot).toMatchObject({ variantId: "squat__dumbbell" });
+    expect(restored.data.sessions[0].programId).toBe("program_1");
     expect(restored.data.recipes[0].ingredients[0].nutrientsPer100gSnapshot).toMatchObject({ ironMg: 4.7 });
+    expect(restored.data.settings.activeProgramId).toBe("program_1");
   });
 
   it("keeps micronutrients and upgrades supported v1 settings through v2 to v3", async () => {
@@ -300,5 +304,10 @@ describe("backup", () => {
   it("refuses to create a backup with an invalid active-session pointer", async () => {
     const data = emptyData({ settings: { ...defaultSettings, activeSessionId: "session_missing" } });
     await expect(createBackup(data)).rejects.toThrow("active workout pointer");
+  });
+
+  it("refuses to create a backup with an invalid active-program pointer", async () => {
+    const data = emptyData({ settings: { ...defaultSettings, activeProgramId: "program_missing" } });
+    await expect(createBackup(data)).rejects.toThrow("active program pointer");
   });
 });

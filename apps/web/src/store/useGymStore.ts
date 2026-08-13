@@ -1,9 +1,10 @@
 import { create } from "zustand";
-import type { AppSettings, BodyMetric, FoodItem, MealEntry, Profile, Routine, WorkoutSession } from "@gym/contracts";
-import { cloneRoutineTemplate, createSessionFromRoutine, finishSession } from "@gym/workouts";
+import type { AppSettings, BodyMetric, FoodItem, MealEntry, Profile, Program, Routine, WorkoutSession } from "@gym/contracts";
+import { cloneRoutineTemplate, createFreestyleSession, createSessionFromRoutine, finishSession } from "@gym/workouts";
 import {
   defaultSettings,
   deleteMeal,
+  deleteProgram as deleteProgramFromDb,
   deleteRoutine as deleteRoutineFromDb,
   getActiveSession,
   getProfile,
@@ -12,6 +13,7 @@ import {
   listBodyMetrics,
   listFoods,
   listMeals,
+  listPrograms,
   listRecoveryPoints,
   listRoutines,
   listSessions,
@@ -20,10 +22,14 @@ import {
   saveFood,
   saveMeal,
   saveProfile,
+  saveProgram,
+  saveCompletedSessionAndAdvanceProgram,
   saveInitialSetup,
   saveRoutine,
   saveSession,
+  saveStartedSession,
   saveSettings,
+  selectProgram,
   undoLatestRestore
 } from "@gym/storage";
 import type { BackupPayload } from "@gym/contracts";
@@ -35,6 +41,7 @@ interface GymState {
   notice?: string;
   profile?: Profile;
   routines: Routine[];
+  programs: Program[];
   sessions: WorkoutSession[];
   activeSession?: WorkoutSession;
   foods: FoodItem[];
@@ -50,9 +57,13 @@ interface GymState {
   completeOnboarding: (profile: Profile, templateIds: string[]) => Promise<void>;
   updateProfile: (profile: Profile) => Promise<void>;
   installTemplate: (templateId: string) => Promise<Routine>;
-  saveUserRoutine: (routine: Routine) => Promise<void>;
+  saveUserRoutine: (routine: Routine) => Promise<Routine>;
   removeRoutine: (routineId: string) => Promise<void>;
-  startWorkout: (routine: Routine) => Promise<void>;
+  saveUserProgram: (program: Program) => Promise<Program>;
+  removeProgram: (programId: string) => Promise<void>;
+  selectUserProgram: (programId?: string) => Promise<void>;
+  startWorkout: (routine: Routine, programId?: string) => Promise<void>;
+  startFreestyleWorkout: () => Promise<void>;
   setActiveSession: (session: WorkoutSession) => Promise<void>;
   completeWorkout: () => Promise<WorkoutSession | undefined>;
   addFood: (food: FoodItem) => Promise<void>;
@@ -69,9 +80,10 @@ function messageFrom(error: unknown): string {
 }
 
 async function loadSnapshot() {
-  const [profile, routines, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryPoints] = await Promise.all([
+  const [profile, routines, programs, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryPoints] = await Promise.all([
     getProfile(),
     listRoutines(),
+    listPrograms(),
     listSessions(),
     getActiveSession(),
     listFoods(),
@@ -80,7 +92,7 @@ async function loadSnapshot() {
     getSettings(),
     listRecoveryPoints()
   ]);
-  return { profile, routines, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
+  return { profile, routines, programs, sessions, activeSession, foods, meals, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
 }
 
 let lastPersistedActiveSession: WorkoutSession | undefined;
@@ -89,6 +101,7 @@ export const useGymStore = create<GymState>((set, get) => ({
   ready: false,
   busy: false,
   routines: [],
+  programs: [],
   sessions: [],
   foods: [],
   meals: [],
@@ -138,27 +151,80 @@ export const useGymStore = create<GymState>((set, get) => ({
   },
 
   async saveUserRoutine(routine) {
-    await saveRoutine(routine);
+    const saved = await saveRoutine(routine);
     set((state) => ({
-      routines: state.routines.some((item) => item.id === routine.id)
-        ? state.routines.map((item) => item.id === routine.id ? routine : item)
-        : [routine, ...state.routines],
+      routines: state.routines.some((item) => item.id === saved.id)
+        ? state.routines.map((item) => item.id === saved.id ? saved : item)
+        : [saved, ...state.routines],
       notice: state.profile?.locale === "en" ? "Routine saved." : "Đã lưu lịch tập."
     }));
+    return saved;
   },
 
   async removeRoutine(routineId) {
     await deleteRoutineFromDb(routineId);
-    set((state) => ({ routines: state.routines.filter((routine) => routine.id !== routineId) }));
+    set((state) => ({
+      routines: state.routines.filter((routine) => routine.id !== routineId),
+      notice: state.profile?.locale === "en" ? "Routine deleted. Workout history was preserved." : "Đã xóa lịch tập. Lịch sử buổi tập vẫn được giữ."
+    }));
   },
 
-  async startWorkout(routine) {
+  async saveUserProgram(program) {
+    const saved = await saveProgram(program);
+    set((state) => ({
+      programs: state.programs.some((item) => item.id === saved.id)
+        ? state.programs.map((item) => item.id === saved.id ? saved : item)
+        : [saved, ...state.programs],
+      notice: state.profile?.locale === "en" ? "Program saved." : "Đã lưu chương trình."
+    }));
+    return saved;
+  },
+
+  async removeProgram(programId) {
+    await deleteProgramFromDb(programId);
+    set((state) => ({
+      programs: state.programs.filter((program) => program.id !== programId),
+      settings: state.settings.activeProgramId === programId ? { ...state.settings, activeProgramId: undefined } : state.settings,
+      notice: state.profile?.locale === "en" ? "Program deleted. Routines and history were preserved." : "Đã xóa chương trình. Lịch tập và lịch sử vẫn được giữ."
+    }));
+  },
+
+  async selectUserProgram(programId) {
+    const settings = await selectProgram(programId);
+    set((state) => ({
+      settings,
+      notice: programId
+        ? (state.profile?.locale === "en" ? "Active program selected." : "Đã chọn chương trình đang tập.")
+        : undefined
+    }));
+  },
+
+  async startWorkout(routine, programId) {
     const active = get().activeSession;
     if (active) throw new Error(get().profile?.locale === "en" ? "You already have an unfinished workout" : "Bạn đang có một buổi tập chưa hoàn tất");
-    const session = createSessionFromRoutine(routine, get().profile?.activeLocationId);
-    await saveSession(session);
+    const session = { ...createSessionFromRoutine(routine, get().profile?.activeLocationId), programId };
+    await saveStartedSession(session);
     lastPersistedActiveSession = session;
-    set((state) => ({ activeSession: session, sessions: [session, ...state.sessions], sessionSaveStatus: "saved" }));
+    set((state) => ({
+      activeSession: session,
+      sessions: [session, ...state.sessions],
+      settings: { ...state.settings, activeSessionId: session.id, activeProgramId: programId ?? state.settings.activeProgramId },
+      sessionSaveStatus: "saved"
+    }));
+  },
+
+  async startFreestyleWorkout() {
+    const active = get().activeSession;
+    if (active) throw new Error(get().profile?.locale === "en" ? "You already have an unfinished workout" : "Bạn đang có một buổi tập chưa hoàn tất");
+    const session = createFreestyleSession({ locationId: get().profile?.activeLocationId });
+    await saveStartedSession(session);
+    lastPersistedActiveSession = session;
+    set((state) => ({
+      activeSession: session,
+      sessions: [session, ...state.sessions],
+      settings: { ...state.settings, activeSessionId: session.id },
+      sessionSaveStatus: "saved"
+    }));
   },
 
   async setActiveSession(session) {
@@ -194,11 +260,13 @@ export const useGymStore = create<GymState>((set, get) => ({
     const active = get().activeSession;
     if (!active) return undefined;
     const finished = finishSession(active);
-    await saveSession(finished);
+    const programs = await saveCompletedSessionAndAdvanceProgram(finished);
     lastPersistedActiveSession = undefined;
     set((state) => ({
       activeSession: undefined,
+      programs,
       sessions: state.sessions.map((session) => session.id === finished.id ? finished : session),
+      settings: { ...state.settings, activeSessionId: undefined },
       sessionSaveStatus: "saved",
       notice: state.profile?.locale === "en" ? "Workout saved. Nice work!" : "Buổi tập đã được lưu. Tuyệt vời!"
     }));

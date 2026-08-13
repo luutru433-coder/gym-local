@@ -233,9 +233,51 @@ export async function listRoutines(db: GymDatabase = gymDb): Promise<Routine[]> 
   return db.routines.orderBy("updatedAt").reverse().toArray();
 }
 
-export async function saveRoutine(routine: Routine, db: GymDatabase = gymDb): Promise<void> {
+export async function saveRoutine(routine: Routine, db: GymDatabase = gymDb): Promise<Routine> {
   assertFiniteRecord(routine, "routine");
-  await db.routines.put({ ...routine, updatedAt: new Date().toISOString() });
+  const saved = { ...routine, updatedAt: new Date().toISOString() };
+  await db.routines.put(saved);
+  return saved;
+}
+
+export async function listPrograms(db: GymDatabase = gymDb): Promise<Program[]> {
+  return db.programs.orderBy("updatedAt").reverse().toArray();
+}
+
+export async function saveProgram(program: Program, db: GymDatabase = gymDb): Promise<Program> {
+  assertFiniteRecord(program, "program");
+  const days = [...program.days]
+    .sort((left, right) => left.order - right.order)
+    .map((day, order) => ({ ...day, order }));
+  const saved: Program = {
+    ...program,
+    days,
+    activeDayIndex: days.length ? Math.min(Math.max(0, program.activeDayIndex), days.length - 1) : 0,
+    updatedAt: new Date().toISOString()
+  };
+  await db.transaction("rw", db.programs, db.routines, async () => {
+    const routineIds = [...new Set(saved.days.map((day) => day.routineId))];
+    const routines = await db.routines.bulkGet(routineIds);
+    if (routines.some((routine) => !routine)) throw new Error("Program contains a missing routine");
+    await db.programs.put(saved);
+  });
+  return saved;
+}
+
+export async function deleteProgram(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.transaction("rw", db.programs, db.settings, async () => {
+    await db.programs.delete(id);
+    const settings = await db.settings.get("app");
+    if (settings?.activeProgramId === id) await db.settings.put({ ...settings, activeProgramId: undefined });
+  });
+}
+
+export async function selectProgram(id: string | undefined, db: GymDatabase = gymDb): Promise<AppSettings> {
+  const settings = (await db.settings.get("app")) ?? defaultSettings;
+  if (id && !(await db.programs.get(id))) throw new Error("Program not found");
+  const updated = { ...settings, activeProgramId: id };
+  await db.settings.put(updated);
+  return updated;
 }
 
 export async function saveInitialSetup(profile: Profile, routines: Routine[], db: GymDatabase = gymDb): Promise<void> {
@@ -253,7 +295,11 @@ export async function saveInitialSetup(profile: Profile, routines: Routine[], db
 }
 
 export async function deleteRoutine(id: string, db: GymDatabase = gymDb): Promise<void> {
-  await db.routines.delete(id);
+  await db.transaction("rw", db.routines, db.programs, async () => {
+    const referenced = (await db.programs.toArray()).some((program) => program.days.some((day) => day.routineId === id));
+    if (referenced) throw new Error("Routine is still used by a program");
+    await db.routines.delete(id);
+  });
 }
 
 export async function listSessions(db: GymDatabase = gymDb): Promise<WorkoutSession[]> {
@@ -270,6 +316,76 @@ export async function saveSession(session: WorkoutSession, db: GymDatabase = gym
   const operation = sessionWriteQueue.then(commit, commit);
   sessionWriteQueue = operation.then(() => undefined, () => undefined);
   await operation;
+}
+
+export async function saveStartedSession(
+  session: WorkoutSession,
+  db: GymDatabase = gymDb
+): Promise<void> {
+  assertFiniteRecord(session, "session");
+  if (session.finishedAt) throw new Error("Started session cannot already be finished");
+  const commit = () => db.transaction("rw", db.sessions, db.settings, db.programs, async () => {
+    if (session.programId) {
+      const program = await db.programs.get(session.programId);
+      if (!program) throw new Error("Program not found");
+      const activeIndex = program.days.length ? Math.min(Math.max(0, program.activeDayIndex), program.days.length - 1) : 0;
+      const currentDay = [...program.days].sort((left, right) => left.order - right.order)[activeIndex];
+      if (!session.routineId || currentDay?.routineId !== session.routineId) {
+        throw new Error("Workout does not match the selected program day");
+      }
+    }
+    await db.sessions.put(session);
+    const settings = (await db.settings.get("app")) ?? defaultSettings;
+    await db.settings.put({
+      ...settings,
+      activeSessionId: session.id,
+      activeProgramId: session.programId ?? settings.activeProgramId
+    });
+  });
+  const operation = sessionWriteQueue.then(commit, commit);
+  sessionWriteQueue = operation.then(() => undefined, () => undefined);
+  await operation;
+}
+
+/**
+ * Completes a workout and advances only the explicitly selected program when
+ * its current day matches this routine. Both writes share one IndexedDB transaction, so a failed
+ * program update cannot leave a completed session with a stale next day.
+ */
+export async function saveCompletedSessionAndAdvanceProgram(
+  session: WorkoutSession,
+  db: GymDatabase = gymDb
+): Promise<Program[]> {
+  assertFiniteRecord(session, "session");
+  if (!session.finishedAt) throw new Error("Completed session requires finishedAt");
+
+  let programs: Program[] = [];
+  const commit = () => db.transaction("rw", db.sessions, db.settings, db.programs, async () => {
+    await db.sessions.put(session);
+    const settings = (await db.settings.get("app")) ?? defaultSettings;
+    await db.settings.put({ ...settings, activeSessionId: undefined });
+
+    const existing = await db.programs.toArray();
+    const timestamp = new Date().toISOString();
+    const selected = session.programId ? existing.find((program) => program.id === session.programId) : undefined;
+    const activeIndex = selected?.days.length
+      ? Math.min(Math.max(0, selected.activeDayIndex), selected.days.length - 1)
+      : 0;
+    const currentDay = selected ? [...selected.days].sort((left, right) => left.order - right.order)[activeIndex] : undefined;
+    const advanced = selected && session.routineId && currentDay?.routineId === session.routineId ? {
+      ...selected,
+      activeDayIndex: (activeIndex + 1) % selected.days.length,
+      updatedAt: timestamp
+    } : undefined;
+    if (advanced) await db.programs.put(advanced);
+    programs = existing
+      .map((program) => program.id === advanced?.id ? advanced : program)
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt) || left.id.localeCompare(right.id));
+  });
+  const operation = sessionWriteQueue.then(commit, commit);
+  sessionWriteQueue = operation.then(() => undefined, () => undefined);
+  await operation;
+  return programs;
 }
 
 export async function getActiveSession(db: GymDatabase = gymDb): Promise<WorkoutSession | undefined> {

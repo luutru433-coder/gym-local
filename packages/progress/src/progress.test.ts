@@ -3,11 +3,14 @@ import type { SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, getVariant } from "@gym/catalog";
 import {
   estimatedOneRepMax,
+  exactVariantTrend,
   latestVariantHistory,
   personalRecord,
   sessionVolumeMetrics,
   setPerformanceMetrics,
-  variantHistory
+  variantHistory,
+  variantVolumeSummary,
+  workoutCalendar
 } from "./index";
 
 let exerciseSequence = 0;
@@ -133,5 +136,48 @@ describe("progress calculations", () => {
     });
     expect(setPerformanceMetrics(dumbbellPress, { id: "incomplete", type: "working", weightKg: 20, reps: 10 }))
       .toEqual({ exclusionReason: "incomplete" });
+  });
+
+  it("builds a workout calendar from finished sessions only", () => {
+    const sessions = [
+      session("day_one_a", "2026-08-10T09:30:00.000Z", [exercise("chest_press__barbell", [completedSet("a", { weightKg: 100, reps: 5 })])]),
+      session("day_one_b", "2026-08-10T11:00:00.000Z", [exercise("chest_press__dumbbell", [completedSet("b", { weightKg: 20, reps: 10 })])]),
+      session("unfinished", undefined, [exercise("chest_press__barbell", [completedSet("c", { weightKg: 999, reps: 1 })])])
+    ];
+    sessions[0].startedAt = "2026-08-10T09:00:00.000Z";
+    sessions[1].startedAt = "2026-08-10T10:00:00.000Z";
+
+    expect(workoutCalendar(sessions)).toEqual([{
+      date: "2026-08-10",
+      sessions: 2,
+      completedWorkingSets: 2,
+      externalLoadVolumeKg: 900,
+      durationMinutes: 90
+    }]);
+  });
+
+  it("builds PR markers and trends for the exact variant without mixing equipment", () => {
+    const sessions = [
+      session("db_old", "2026-08-08T10:00:00.000Z", [exercise("chest_press__dumbbell", [completedSet("a", { weightKg: 16, reps: 10 })])]),
+      session("machine", "2026-08-09T10:00:00.000Z", [exercise("chest_press__machine", [completedSet("b", { weightKg: 100, reps: 10 })])]),
+      session("db_new", "2026-08-10T10:00:00.000Z", [exercise("chest_press__dumbbell", [completedSet("c", { weightKg: 20, reps: 8 })])])
+    ];
+    const trend = exactVariantTrend(sessions, "chest_press__dumbbell");
+
+    expect(trend.map((point) => point.sessionId)).toEqual(["db_old", "db_new"]);
+    expect(trend.map((point) => point.bestLoadKg)).toEqual([16, 20]);
+    expect(trend.every((point) => point.variantId === "chest_press__dumbbell")).toBe(true);
+    expect(trend.map((point) => point.isLoadPr)).toEqual([true, true]);
+  });
+
+  it("summarizes working volume per exact variant", () => {
+    const workout = session("variants", "2026-08-10T10:00:00.000Z", [
+      exercise("chest_press__barbell", [completedSet("barbell", { weightKg: 100, reps: 5 })]),
+      exercise("chest_press__dumbbell", [completedSet("dumbbell", { weightKg: 20, reps: 10 })])
+    ]);
+    expect(variantVolumeSummary([workout])).toMatchObject([
+      { variantId: "chest_press__dumbbell", externalLoadVolumeKg: 400, completedWorkingSets: 1 },
+      { variantId: "chest_press__barbell", externalLoadVolumeKg: 500, completedWorkingSets: 1 }
+    ].sort((left, right) => right.externalLoadVolumeKg - left.externalLoadVolumeKg));
   });
 });

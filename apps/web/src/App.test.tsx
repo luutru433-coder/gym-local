@@ -22,6 +22,7 @@ beforeEach(async () => {
     notice: undefined,
     profile: undefined,
     routines: [],
+    programs: [],
     sessions: [],
     activeSession: undefined,
     foods: [],

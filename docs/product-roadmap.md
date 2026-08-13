@@ -37,7 +37,7 @@ Release gate: full verification, migration/round-trip/failure tests, production 
 
 ## Release 3 — Workout feature parity
 
-Status: pending Release 2.
+Status: completed for checkpoint 3.
 
 - Program model and multi-day routine editor with reorder, duplicate, superset, rest, RIR, and variant selection.
 - Freestyle workout and safe add/remove/reorder/swap exercise during a live session.

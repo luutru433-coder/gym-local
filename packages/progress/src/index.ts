@@ -18,6 +18,38 @@ export interface SessionVolumeMetrics {
   excludedSets: number;
 }
 
+export interface WorkoutCalendarDay {
+  date: string;
+  sessions: number;
+  completedWorkingSets: number;
+  externalLoadVolumeKg: number;
+  durationMinutes: number;
+}
+
+export interface VariantTrendPoint {
+  sessionId: string;
+  date: string;
+  variantId: string;
+  bestLoadKg?: number;
+  minAssistanceKg?: number;
+  bestReps?: number;
+  bestDurationSeconds?: number;
+  bestDistanceMeters?: number;
+  bestE1rmKg?: number;
+  externalLoadVolumeKg: number;
+  completedWorkingSets: number;
+  isLoadPr: boolean;
+  isE1rmPr: boolean;
+  isAssistancePr: boolean;
+}
+
+export interface VariantVolumeSummary {
+  variantId: string;
+  movementId: string;
+  completedWorkingSets: number;
+  externalLoadVolumeKg: number;
+}
+
 export type VolumeExclusionReason =
   | "incomplete"
   | "warmup"
@@ -165,4 +197,106 @@ export function weeklyMuscleSets(sessions: WorkoutSession[], weekStart: Date): P
     });
   });
   return result;
+}
+
+function localDateKey(value: string): string {
+  const date = new Date(value);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+export function workoutCalendar(sessions: WorkoutSession[]): WorkoutCalendarDay[] {
+  const days = new Map<string, WorkoutCalendarDay>();
+  orderedFinishedSessions(sessions).forEach((session) => {
+    const date = localDateKey(session.finishedAt!);
+    const existing = days.get(date) ?? {
+      date,
+      sessions: 0,
+      completedWorkingSets: 0,
+      externalLoadVolumeKg: 0,
+      durationMinutes: 0
+    };
+    existing.sessions += 1;
+    existing.completedWorkingSets += session.exercises.reduce(
+      (sum, exercise) => sum + completedWorkingSets(exercise).length,
+      0
+    );
+    existing.externalLoadVolumeKg += sessionExternalVolume(session);
+    existing.durationMinutes += Math.max(0, Math.round(
+      (new Date(session.finishedAt!).getTime() - new Date(session.startedAt).getTime()) / 60_000
+    ));
+    days.set(date, existing);
+  });
+  return [...days.values()]
+    .map((day) => ({ ...day, externalLoadVolumeKg: Math.round(day.externalLoadVolumeKg * 10) / 10 }))
+    .sort((left, right) => left.date.localeCompare(right.date));
+}
+
+export function exactVariantTrend(sessions: WorkoutSession[], variantId: string): VariantTrendPoint[] {
+  let recordLoad = 0;
+  let recordE1rm = 0;
+  let recordAssistance = Number.POSITIVE_INFINITY;
+  return orderedFinishedSessions(sessions)
+    .reverse()
+    .flatMap((session) => {
+      const exercises = session.exercises.filter((exercise) => exercise.variantId === variantId);
+      if (!exercises.length) return [];
+      const sets = exercises.flatMap(completedWorkingSets);
+      if (!sets.length) return [];
+      const profile = trackingProfile(exercises[0]);
+      const loadValues = sets.map((set) => set.weightKg).filter((value): value is number => value !== undefined);
+      const e1rmValues = exercises.flatMap((exercise) => completedWorkingSets(exercise)
+        .map((set) => setPerformanceMetrics(exercise, set).e1rmKg)
+        .filter((value): value is number => value !== undefined));
+      const bestLoadKg = profile.loadEntryMode === "assisted" || !loadValues.length ? undefined : Math.max(...loadValues);
+      const minAssistanceKg = profile.loadEntryMode === "assisted" && loadValues.length ? Math.min(...loadValues) : undefined;
+      const bestE1rmKg = e1rmValues.length ? Math.max(...e1rmValues) : undefined;
+      const externalLoadVolumeKg = exercises.reduce((sum, exercise) => sum + completedWorkingSets(exercise)
+        .reduce((setSum, set) => setSum + (setPerformanceMetrics(exercise, set).externalLoadVolumeKg ?? 0), 0), 0);
+      const isLoadPr = bestLoadKg !== undefined && bestLoadKg > recordLoad;
+      const isE1rmPr = bestE1rmKg !== undefined && bestE1rmKg > recordE1rm;
+      const isAssistancePr = minAssistanceKg !== undefined && minAssistanceKg < recordAssistance;
+      if (bestLoadKg !== undefined) recordLoad = Math.max(recordLoad, bestLoadKg);
+      if (bestE1rmKg !== undefined) recordE1rm = Math.max(recordE1rm, bestE1rmKg);
+      if (minAssistanceKg !== undefined) recordAssistance = Math.min(recordAssistance, minAssistanceKg);
+      return [{
+        sessionId: session.id,
+        date: session.finishedAt!,
+        variantId,
+        bestLoadKg,
+        minAssistanceKg,
+        bestReps: Math.max(0, ...sets.map((set) => set.reps ?? 0)) || undefined,
+        bestDurationSeconds: Math.max(0, ...sets.map((set) => set.durationSeconds ?? 0)) || undefined,
+        bestDistanceMeters: Math.max(0, ...sets.map((set) => set.distanceMeters ?? 0)) || undefined,
+        bestE1rmKg,
+        externalLoadVolumeKg: Math.round(externalLoadVolumeKg * 10) / 10,
+        completedWorkingSets: sets.length,
+        isLoadPr,
+        isE1rmPr,
+        isAssistancePr
+      }];
+    });
+}
+
+export function variantVolumeSummary(sessions: WorkoutSession[]): VariantVolumeSummary[] {
+  const summaries = new Map<string, VariantVolumeSummary>();
+  orderedFinishedSessions(sessions).forEach((session) => {
+    session.exercises.forEach((exercise) => {
+      const existing = summaries.get(exercise.variantId) ?? {
+        variantId: exercise.variantId,
+        movementId: exercise.movementId,
+        completedWorkingSets: 0,
+        externalLoadVolumeKg: 0
+      };
+      completedWorkingSets(exercise).forEach((set) => {
+        existing.completedWorkingSets += 1;
+        existing.externalLoadVolumeKg += setPerformanceMetrics(exercise, set).externalLoadVolumeKg ?? 0;
+      });
+      summaries.set(exercise.variantId, existing);
+    });
+  });
+  return [...summaries.values()]
+    .map((summary) => ({ ...summary, externalLoadVolumeKg: Math.round(summary.externalLoadVolumeKg * 10) / 10 }))
+    .sort((left, right) => right.externalLoadVolumeKg - left.externalLoadVolumeKg
+      || right.completedWorkingSets - left.completedWorkingSets
+      || left.variantId.localeCompare(right.variantId));
 }

@@ -89,6 +89,7 @@ const sessionExerciseSchema = z.object({
 
 const sessionSchema = z.object({
   id: idSchema,
+  programId: idSchema.optional(),
   routineId: idSchema.optional(),
   routineNameSnapshot: localizedTextSchema.optional(),
   locationId: idSchema.optional(),
@@ -322,6 +323,7 @@ const settingsSchema = z.object({
   backupVersion: z.number().int().positive(),
   lastBackupAt: timestampSchema.optional(),
   activeSessionId: idSchema.optional(),
+  activeProgramId: idSchema.optional(),
   storagePersistenceRequestedAt: timestampSchema.optional(),
   storagePersistenceGranted: z.boolean().optional()
 }).passthrough();
@@ -347,13 +349,16 @@ const backupDataSchema = legacyBackupDataSchema.extend({
 const collectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
 type LegacyBackupData = z.infer<typeof legacyBackupDataSchema>;
 
-function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "settings">): void {
+function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "programs" | "settings">): void {
   const sessionIds = new Set(data.sessions.map((session) => session.id));
   if (data.settings.activeSessionId) {
     const active = data.sessions.find((session) => session.id === data.settings.activeSessionId);
     if (!sessionIds.has(data.settings.activeSessionId) || active?.finishedAt) {
       throw new Error("Backup active workout pointer is invalid");
     }
+  }
+  if (data.settings.activeProgramId && !data.programs.some((program) => program.id === data.settings.activeProgramId)) {
+    throw new Error("Backup active program pointer is invalid");
   }
 }
 

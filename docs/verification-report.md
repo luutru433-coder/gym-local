@@ -1,4 +1,14 @@
-# Verification report — 2026-08-12
+# Verification report — 2026-08-13
+
+## Local checkpoint 0.4.0
+
+- The exact `pnpm run verify` pipeline passed: architecture boundaries, ESLint with zero warnings, TypeScript project references, content validation/audit, 90 Vitest tests across 10 files, and the production build.
+- Multi-day program CRUD, active-program selection, routine editing, and transactional day advancement are covered by storage, backup, and App tests. Standalone and freestyle sessions cannot advance a selected program accidentally.
+- Live workouts support safe exact-variant add, swap, reorder, and removal; completed work remains immutable. Save failures retain the attempted edit and expose retry without poisoning later writes.
+- Exact-variant double progression is advisory and explainable. Warm-ups, incomplete sets, and other equipment variants are excluded; assistance, duration, distance, reps-only, and external-load directions retain their snapshotted semantics.
+- The 28-day calendar, exact-variant trend/PR views, variant volume, and visible tabular alternatives are bilingual and responsive. Progress and live-workout scoped accessibility tests pass.
+- The PWA precache contains 41 core entries (4,573.27 KiB). Remote exercise videos and the optional nutrition SQLite pack remain outside the core cache.
+- The known non-blocking chunk warning remains: initial app 570.41 kB, nutrition route 503.00 kB, and progress route 387.95 kB before gzip. Route/vendor splitting remains scheduled for Release 4.
 
 ## Local checkpoint 0.3.0
 

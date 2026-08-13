@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+
+- Added multi-day programs, full routine editing, freestyle and editable live workouts, and explicit save recovery while preserving completed history.
+- Added explainable exact-variant double progression, plate-loading guidance, progress calendar, exact-variant trends and PRs, and accessible data alternatives.
+
 ## 0.3.0
 
 - Added personal-data schema v3 for programs, recipes, water entries, food preferences, and local recovery points without rewriting existing records.
