@@ -6,6 +6,7 @@
 - Added local pantry records for exact foods or broad food groups, optional available amounts, additive IndexedDB schema v4 migration, recovery-point preservation, and backup v4 round trips.
 - Added deterministic offline menu ranking with exact-food/group matching, quantity coverage, meal/dietary/allergen filters, per-serving nutrition, and explicit missing-ingredient explanations.
 - Added a bilingual, mobile-first pantry and menu workspace with offline food search, group chips, optional gram amounts, editable pantry rows, explainable recipe cards, and one-tap immutable diary snapshots.
+- Added an in-app iPhone/PWA installation guide with standalone-mode detection and a one-time offline food-pack setup reminder.
 - Corrected estimated-recipe micronutrients so a nutrient stays unknown when any contributing ingredient lacks that value, instead of publishing a misleading partial total.
 - Kept already installed schema 1 packs compatible while adding manifest, foreign-key, relationship, and source-metadata validation for schema 2.
 - Kept backup v1/v2/v3 imports compatible by migrating them to an empty pantry without modifying historical nutrition or workout snapshots.

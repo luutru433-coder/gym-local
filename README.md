@@ -47,7 +47,7 @@ pnpm nutrition:verify-pack
 3. Bật Pages với source **GitHub Actions**.
 4. Workflow `.github/workflows/deploy-pages.yml` chỉ deploy sau khi toàn bộ kiểm tra và checksum gói đạt.
 
-App dùng `HashRouter` và asset path tương đối nên hoạt động ở repository subpath. Trên iPhone, mở URL Pages bằng Safari rồi chọn **Share → Add to Home Screen**.
+App dùng `HashRouter` và asset path tương đối nên hoạt động ở repository subpath. Trên iPhone, mở URL Pages bằng Safari, chọn **Share → Add to Home Screen**, bật **Open as Web App**, rồi chọn **Add**. Đây là cách cài miễn phí phù hợp với iPhone; iPhone không chạy file APK. Sau lần mở đầu, vào **Dinh dưỡng → Tải & cài** để lưu kho thực phẩm vào thiết bị và dùng offline.
 
 ## Cấu trúc dễ cập nhật bằng Codex
 

@@ -626,6 +626,18 @@ a { color: inherit; text-decoration: none; }
 .storage-card .button { width: 100%; margin-top: 12px; }
 .storage-card > small { display: block; margin-top: 7px; color: var(--muted); font-size: 8px; line-height: 1.4; }
 .version-card, .content-card { padding: 17px; }
+.install-card { padding: 17px; background: #eef4d5; }
+.install-card .settings-card__heading { margin-bottom: 12px; }
+.install-card .notice { margin-bottom: 10px; font-size: 9px; }
+.install-card .notice svg { flex: 0 0 auto; }
+.install-card .button { width: 100%; }
+.install-steps { list-style: none; padding: 0; margin: 0 0 12px; }
+.install-steps li { min-height: 44px; display: grid; grid-template-columns: 27px 1fr; gap: 9px; align-items: center; border-top: 1px solid rgba(31, 34, 27, .12); }
+.install-steps li > span { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); background: var(--lime); font-size: 9px; font-weight: 900; }
+.install-steps p { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; color: var(--ink-soft); font-size: 9px; line-height: 1.45; }
+.install-card__hint, .install-card__pack-note { color: var(--muted); font-size: 9px; line-height: 1.55; }
+.install-card__hint { margin: 0 0 10px; }
+.install-card__pack-note { padding-top: 10px; margin: 0; border-top: 1px solid rgba(31, 34, 27, .12); }
 .version-card .settings-card__heading, .content-card .settings-card__heading { margin-bottom: 12px; }
 .version-card ul, .content-card ul { list-style: none; padding: 0; margin: 0 0 12px; }
 .version-card li, .content-card li { min-height: 31px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); font-size: 9px; }
