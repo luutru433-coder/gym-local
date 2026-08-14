@@ -10,6 +10,19 @@ export async function downloadNutritionPack(url: string): Promise<Response> {
   return response;
 }
 
+export function nutritionPackTransferSizeMatches(response: Pick<Response, "headers">, expectedBytes: number): boolean {
+  const contentEncoding = response.headers.get("content-encoding")?.trim().toLowerCase();
+  // Fetch exposes the compressed transfer length while streaming the decoded
+  // response body. The decoded byte count and SHA-256 are verified after the
+  // stream completes, so a compressed response cannot be checked up front.
+  if (contentEncoding && contentEncoding !== "identity") return true;
+
+  const contentLength = response.headers.get("content-length");
+  if (!contentLength) return true;
+  const declaredBytes = Number(contentLength);
+  return Number.isInteger(declaredBytes) && declaredBytes === expectedBytes;
+}
+
 export function obsoletePackFileAfterActivation(
   oldPreviousFileName: string | undefined,
   nextActiveFileName: string,
