@@ -13,6 +13,7 @@ import {
 import { lookupFoodByBarcode } from "./providers/open-food-facts";
 
 export * from "./offline-pack";
+export * from "./menu-suggestions";
 export { lookupFoodByBarcode };
 
 export const NUTRITION_FORMULA_VERSION = 1;

@@ -35,8 +35,8 @@ jobs:
           pnpm run media:health -- --output=dist/reports/media-health-report.json
       - name: Stage verified nutrition pack from the GitHub Release
         env:
-          PACK_URL: https://github.com/${{ github.repository }}/releases/download/nutrition-v2026.04/gym-local-nutrition-2026.04.sqlite3
-          PACK_FILE_NAME: gym-local-nutrition-2026.04.sqlite3
+          PACK_URL: https://github.com/${{ github.repository }}/releases/download/nutrition-v2026.08/gym-local-nutrition-2026.08.sqlite3
+          PACK_FILE_NAME: gym-local-nutrition-2026.08.sqlite3
         run: |
           pack_staging="$RUNNER_TEMP/$PACK_FILE_NAME"
           curl --fail --location --retry 3 "$PACK_URL" --output "$pack_staging.part"

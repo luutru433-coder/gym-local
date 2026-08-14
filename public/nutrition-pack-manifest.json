@@ -1,16 +1,18 @@
 {
   "id": "gym-local-nutrition",
-  "version": "2026.04",
-  "schemaVersion": 1,
-  "createdAt": "2026-08-09T20:16:15Z",
-  "minimumAppVersion": "0.2.0",
-  "fileName": "gym-local-nutrition-2026.04.sqlite3",
-  "downloadUrl": "./gym-local-nutrition-2026.04.sqlite3",
-  "sizeBytes": 16445440,
-  "sha256": "4f844b93c1c8d0540c34038cbc5b69096c92a3982fe884b2ac877c5df7bdc88f",
+  "version": "2026.08",
+  "schemaVersion": 2,
+  "createdAt": "2026-08-14T11:35:24Z",
+  "minimumAppVersion": "0.6.0",
+  "fileName": "gym-local-nutrition-2026.08.sqlite3",
+  "downloadUrl": "./gym-local-nutrition-2026.08.sqlite3",
+  "sizeBytes": 24334336,
+  "sha256": "278caa98bb378d70c93c572f87e9100f95836677313d4d34b5ff9878d9941974",
   "foodCount": 13835,
   "aliasCount": 24907,
   "vietnameseRecipeCount": 300,
+  "foodGroupCount": 10,
+  "recipeIngredientCount": 1200,
   "sources": [
     {
       "id": "usda-foundation-2026-04",
@@ -42,7 +44,7 @@
       "url": "https://github.com/luutru433-coder/gym-local/blob/main/content/vietnamese-recipes.json",
       "licenseId": "project-content",
       "licenseUrl": "https://github.com/luutru433-coder/gym-local/blob/main/LICENSE",
-      "retrievedAt": "2026-08-10"
+      "retrievedAt": "2026-08-14"
     }
   ]
 }

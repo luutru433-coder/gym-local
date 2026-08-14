@@ -1,5 +1,14 @@
 # Verification report — 2026-08-13
 
+## 2026-08-14 — Offline pantry and menu checkpoint
+
+- Nutrition pack schema 2 verified with 13,835 foods, 24,907 Vietnamese aliases, 300 recipes, 1,200 ingredient links, foreign-key integrity, and pinned USDA ingredient records.
+- IndexedDB schema 4 and backup v4 passed additive migration, rollback, recovery-point, restore, and v1/v2/v3 import coverage.
+- Menu ranking passed exact-food, broad-group, quantity, meal-slot, dietary, allergen, deterministic ranking, and immutable logging tests.
+- A real 23.2 MiB schema-2 pack was installed in the local browser; three pantry groups produced 12 suggestions without console errors. The 390 px iPhone layout had no horizontal overflow, and pantry/allergen touch controls are at least 44 px high.
+- The iPhone/PWA install card was verified at 390 × 844 with no horizontal overflow. Install-environment tests cover standalone mode, Safari iOS, non-Safari iOS, native browser prompts, and generic browser guidance.
+- The exact `pnpm run release:check` gate passed with architecture, lint, TypeScript, content/license audits, 119 tests across 15 files, production PWA build, performance budgets, and 199/199 direct-video metadata coverage. The schema-2 SQLite artifact independently passed integrity/count/search/checksum verification at SHA-256 `278caa98bb378d70c93c572f87e9100f95836677313d4d34b5ff9878d9941974`.
+
 ## Local checkpoint 0.5.0
 
 - The complete verification pipeline passed on the combined worktree: architecture audit, ESLint with zero warnings, TypeScript project references, content/license validation, 103 Vitest tests across 12 files, production build, and enforced performance/PWA budgets.

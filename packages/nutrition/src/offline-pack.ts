@@ -23,6 +23,8 @@ const manifestSchema = z.object({
   foodCount: z.number().int().nonnegative(),
   aliasCount: z.number().int().nonnegative(),
   vietnameseRecipeCount: z.number().int().nonnegative(),
+  foodGroupCount: z.number().int().nonnegative().optional(),
+  recipeIngredientCount: z.number().int().nonnegative().optional(),
   sources: z.array(z.object({
     id: z.string().min(1),
     label: z.string().min(1),
@@ -31,9 +33,19 @@ const manifestSchema = z.object({
     licenseUrl: z.string().url(),
     retrievedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
   })).min(1)
+}).superRefine((manifest, context) => {
+  if (manifest.schemaVersion >= 2 && (manifest.foodGroupCount === undefined || manifest.recipeIngredientCount === undefined)) {
+    context.addIssue({ code: "custom", message: "Schema 2 nutrition packs require food and recipe relationship counts" });
+  }
 });
 
 export type NutritionPackInfo = NutritionPackWorkerInfo;
+
+export function nutritionPackSupportsMenuSuggestions(
+  manifest: Pick<NutritionPackManifest, "schemaVersion" | "recipeIngredientCount"> | undefined
+): boolean {
+  return Boolean(manifest && manifest.schemaVersion >= 2 && (manifest.recipeIngredientCount ?? 0) > 0);
+}
 
 export type NutritionPackCompatibilityCode = "app_too_old" | "unsupported_schema" | "invalid_version";
 
@@ -65,7 +77,8 @@ function compareVersions(left: string, right: string): number {
 export function assertNutritionPackCompatibility(
   manifest: Pick<NutritionPackManifest, "minimumAppVersion" | "schemaVersion">,
   appVersion: string = APP_VERSIONS.app,
-  supportedSchemaVersion: number = APP_VERSIONS.nutritionPackSchema
+  supportedSchemaVersion: number = APP_VERSIONS.nutritionPackSchema,
+  minimumSchemaVersion: number = APP_VERSIONS.minimumNutritionPackSchema
 ): void {
   if (compareVersions(appVersion, manifest.minimumAppVersion) < 0) {
     throw new NutritionPackCompatibilityError(
@@ -73,7 +86,7 @@ export function assertNutritionPackCompatibility(
       `Nutrition pack requires Gym Local ${manifest.minimumAppVersion} or newer`
     );
   }
-  if (manifest.schemaVersion !== supportedSchemaVersion) {
+  if (manifest.schemaVersion < minimumSchemaVersion || manifest.schemaVersion > supportedSchemaVersion) {
     throw new NutritionPackCompatibilityError(
       "unsupported_schema",
       `Nutrition pack schema ${manifest.schemaVersion} is not supported by schema ${supportedSchemaVersion}`
@@ -117,6 +130,8 @@ function installedManifestFallback(info: NutritionPackInfo): NutritionPackManife
     foodCount: metadataNumber(metadata, "food_count"),
     aliasCount: metadataNumber(metadata, "alias_count"),
     vietnameseRecipeCount: metadataNumber(metadata, "vietnamese_recipe_count"),
+    foodGroupCount: metadataNumber(metadata, "food_group_count") || undefined,
+    recipeIngredientCount: metadataNumber(metadata, "recipe_ingredient_count") || undefined,
     sources: []
   };
 }

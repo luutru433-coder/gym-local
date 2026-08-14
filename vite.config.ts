@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => ({
       registerType: "prompt",
       injectRegister: "script-defer",
       manifest: {
+        id: "./",
         name: "Gym Local",
         short_name: "Gym Local",
         lang: "vi",

@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { APP_VERSIONS, type BackupPayload } from "@gym/contracts";
+import { APP_VERSIONS, FOOD_GROUP_IDS, type BackupPayload } from "@gym/contracts";
 import { z } from "zod";
 
 const manifestSchema = z.object({
@@ -213,6 +213,27 @@ const foodPreferenceSchema = z.object({
   useCount: z.number().int().nonnegative()
 }).passthrough();
 
+const foodGroupSchema = z.enum(FOOD_GROUP_IDS);
+const pantryBaseSchema = z.object({
+  id: idSchema,
+  availableGrams: finiteNumber.positive().max(1_000_000).optional(),
+  createdAt: timestampSchema,
+  updatedAt: timestampSchema
+});
+const pantryItemSchema = z.discriminatedUnion("kind", [
+  pantryBaseSchema.extend({
+    kind: z.literal("food"),
+    foodId: idSchema,
+    foodNameSnapshot: localizedTextSchema,
+    groupId: foodGroupSchema.optional()
+  }),
+  pantryBaseSchema.extend({
+    kind: z.literal("group"),
+    groupId: foodGroupSchema,
+    groupNameSnapshot: localizedTextSchema
+  })
+]);
+
 const bodyMetricSchema = z.object({
   id: idSchema,
   date: dateSchema,
@@ -339,15 +360,20 @@ const legacyBackupDataSchema = z.object({
   settings: settingsSchema
 }).passthrough();
 
-const backupDataSchema = legacyBackupDataSchema.extend({
+const backupV3DataSchema = legacyBackupDataSchema.extend({
   programs: z.array(programSchema),
   recipes: z.array(recipeSchema),
   waterEntries: z.array(waterEntrySchema),
   foodPreferences: z.array(foodPreferenceSchema)
 });
+const backupDataSchema = backupV3DataSchema.extend({
+  pantryItems: z.array(pantryItemSchema)
+});
 
-const collectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
+const v3CollectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
+const collectionKeys = [...v3CollectionKeys, "pantryItems"] as const;
 type LegacyBackupData = z.infer<typeof legacyBackupDataSchema>;
+type BackupV3Data = z.infer<typeof backupV3DataSchema>;
 
 function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "programs" | "settings">): void {
   const sessionIds = new Set(data.sessions.map((session) => session.id));
@@ -368,8 +394,11 @@ function validateBackupData(data: unknown): BackupPayload["data"] {
   return parsed as unknown as BackupPayload["data"];
 }
 
-function backupCounts(data: BackupPayload["data"]): NonNullable<BackupPayload["manifest"]["counts"]> {
-  return Object.fromEntries(collectionKeys.map((key) => [key, data[key].length])) as NonNullable<BackupPayload["manifest"]["counts"]>;
+function backupCounts(
+  data: BackupPayload["data"],
+  keys: readonly typeof collectionKeys[number][] = collectionKeys
+): NonNullable<BackupPayload["manifest"]["counts"]> {
+  return Object.fromEntries(keys.map((key) => [key, data[key].length])) as NonNullable<BackupPayload["manifest"]["counts"]>;
 }
 
 function migrateV1ToV2(raw: unknown): LegacyBackupData {
@@ -409,10 +438,10 @@ function migrateNutritionTargetMetadata(profile: LegacyBackupData["profile"]): L
   };
 }
 
-function migrateV2ToV3(raw: unknown): BackupPayload["data"] {
+function migrateV2ToV3(raw: unknown): BackupV3Data {
   const legacy = legacyBackupDataSchema.parse(raw);
   const profile = migrateNutritionTargetMetadata(legacy.profile);
-  return validateBackupData({
+  return backupV3DataSchema.parse({
     ...legacy,
     profile,
     programs: [],
@@ -422,17 +451,29 @@ function migrateV2ToV3(raw: unknown): BackupPayload["data"] {
   });
 }
 
-function validateV3Manifest(manifest: BackupPayload["manifest"], data: BackupPayload["data"], serializedBytes: number): void {
-  if (manifest.format !== "gym-local-backup") throw new Error("Backup v3 format identifier is missing");
-  if (manifest.dbSchemaVersion !== APP_VERSIONS.database) throw new Error("Backup database schema metadata is invalid");
+function migrateV3ToV4(raw: unknown): BackupPayload["data"] {
+  const previous = backupV3DataSchema.parse(raw);
+  return validateBackupData({ ...previous, pantryItems: [] });
+}
+
+function validateDetailedManifest(
+  manifest: BackupPayload["manifest"],
+  data: BackupPayload["data"],
+  serializedBytes: number,
+  version: 3 | 4
+): void {
+  if (manifest.format !== "gym-local-backup") throw new Error(`Backup v${version} format identifier is missing`);
+  if (manifest.dbSchemaVersion !== version) throw new Error("Backup database schema metadata is invalid");
   if (manifest.dataBytes !== serializedBytes) throw new Error("Backup data byte count does not match");
-  const expected = backupCounts(data);
+  const keys = version === 3 ? v3CollectionKeys : collectionKeys;
+  const allowedKeys = new Set<string>(keys);
+  const expected = backupCounts(data, keys);
   const countKeys = manifest.counts ? Object.keys(manifest.counts) : [];
   if (
     !manifest.counts
-    || countKeys.length !== collectionKeys.length
-    || countKeys.some((key) => !collectionKeys.includes(key as typeof collectionKeys[number]))
-    || collectionKeys.some((key) => manifest.counts?.[key] !== expected[key])
+    || countKeys.length !== keys.length
+    || countKeys.some((key) => !allowedKeys.has(key))
+    || keys.some((key) => manifest.counts?.[key] !== expected[key])
   ) {
     throw new Error("Backup collection counts do not match data");
   }
@@ -476,7 +517,7 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
   if (!manifestFile || !dataFile) throw new Error("Backup is missing required files");
   const manifest = manifestSchema.parse(JSON.parse(await manifestFile.async("text"))) as BackupPayload["manifest"];
   if (manifest.backupVersion > APP_VERSIONS.backup) throw new Error("Backup was created by a newer app version");
-  if (manifest.backupVersion < APP_VERSIONS.backup - 2) throw new Error("Backup version is no longer supported");
+  if (manifest.backupVersion < 1) throw new Error("Backup version is no longer supported");
   const serialized = await dataFile.async("text");
   const serializedBytes = new TextEncoder().encode(serialized).byteLength;
   if (serializedBytes > 20 * 1024 * 1024) throw new Error("Backup data is too large");
@@ -485,12 +526,15 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
   let parsed: BackupPayload["data"];
   switch (manifest.backupVersion) {
     case 1:
-      parsed = migrateV2ToV3(migrateV1ToV2(raw));
+      parsed = migrateV3ToV4(migrateV2ToV3(migrateV1ToV2(raw)));
       break;
     case 2:
-      parsed = migrateV2ToV3(raw);
+      parsed = migrateV3ToV4(migrateV2ToV3(raw));
       break;
     case 3:
+      parsed = migrateV3ToV4(raw);
+      break;
+    case 4:
       parsed = validateBackupData(raw);
       break;
     default:
@@ -509,7 +553,9 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
     }
   } satisfies BackupPayload["data"];
   validateBackupRelations(data);
-  if (manifest.backupVersion === 3) validateV3Manifest(manifest, data, serializedBytes);
+  if (manifest.backupVersion === 3 || manifest.backupVersion === 4) {
+    validateDetailedManifest(manifest, data, serializedBytes, manifest.backupVersion);
+  }
   return { manifest, data };
 }
 

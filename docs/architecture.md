@@ -10,7 +10,7 @@ Gym Local is a modular monolith compiled into one static PWA. `apps/web` is the 
 
 ## Storage split
 
-- Personal profile, programs, routines, workouts, meals, recipes, water, preferences, progress, settings, recovery points, and nutrition-pack status live in Dexie/IndexedDB schema v3.
+- Personal profile, programs, routines, workouts, meals, recipes, water, preferences, pantry, progress, settings, recovery points, and nutrition-pack status live in Dexie/IndexedDB schema v4.
 - The optional public food catalog is an immutable, query-only SQLite schema v1 stored in OPFS through the official SQLite WASM SAH-pool worker.
 - The pack worker and download provider live in `packages/storage`; `packages/nutrition` accesses them only through the public `@gym/storage` entry point.
 - Backups include personal records and nutrient snapshots, but exclude the reproducible nutrition pack.

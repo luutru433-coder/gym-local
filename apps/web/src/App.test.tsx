@@ -257,6 +257,7 @@ describe("restore recovery state", () => {
       recipes: [],
       waterEntries: [],
       foodPreferences: [],
+      pantryItems: [],
       bodyMetrics: [],
       customVariants: [],
       settings: defaultSettings

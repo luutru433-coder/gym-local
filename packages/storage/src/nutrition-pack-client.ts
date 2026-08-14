@@ -21,6 +21,31 @@ export interface NutritionPackWorkerInfo {
   recoveredInvalidPack?: boolean;
 }
 
+export interface NutritionPackRecipeIngredientRow {
+  recipe_id: string;
+  position: number;
+  food_id: string;
+  query: string;
+  grams: number;
+  role: string;
+  group_id: string;
+  is_required: number;
+  name_vi: string;
+  name_en: string;
+}
+
+export interface NutritionPackRecipeTagRow {
+  recipe_id: string;
+  kind: "meal_slot" | "tag" | "dietary" | "allergen";
+  value: string;
+}
+
+export interface NutritionPackRecipeDataset {
+  recipes: Record<string, unknown>[];
+  ingredients: NutritionPackRecipeIngredientRow[];
+  tags: NutritionPackRecipeTagRow[];
+}
+
 export type NutritionPackProgressListener = (progress: { bytesDownloaded: number; totalBytes?: number }) => void;
 
 function requestId(): string {
@@ -121,6 +146,10 @@ export function installNutritionPackFile(
 
 export function searchNutritionPackRows(query: string, limit: number): Promise<Record<string, unknown>[]> {
   return nutritionPackClient.request("search", { query, limit });
+}
+
+export function loadNutritionPackRecipeDataset(): Promise<NutritionPackRecipeDataset> {
+  return nutritionPackClient.request("recipes");
 }
 
 export function removeNutritionPackFiles(): Promise<{ removed: boolean }> {

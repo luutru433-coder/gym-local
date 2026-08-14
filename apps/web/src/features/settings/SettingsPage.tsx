@@ -8,6 +8,7 @@ import { confirmNutritionTarget, estimateNutritionTarget, nutritionTargetNeedsCo
 import { exportAllData, persistentStorageStatus, requestPersistentStorage, storageEstimate } from "@gym/storage";
 import { formatDate, formatNumber } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
+import { PwaInstallCard } from "./PwaInstallCard";
 
 const goalLabels: Record<Goal, { vi: string; en: string }> = {
   hypertrophy: { vi: "Tăng cơ", en: "Build muscle" }, strength: { vi: "Sức mạnh", en: "Strength" }, fat_loss: { vi: "Giảm mỡ", en: "Fat loss" }, general: { vi: "Sức khỏe chung", en: "General fitness" }
@@ -245,6 +246,7 @@ export function SettingsPage() {
         </div>
 
         <aside className="settings-aside">
+          <PwaInstallCard locale={locale} />
           <Card className="privacy-card"><span><LockKeyhole size={28} /></span><h3>{locale === "vi" ? "Local-first" : "Local-first"}</h3><p>{locale === "vi" ? "Dữ liệu cá nhân nằm trong IndexedDB của trình duyệt. Không có tài khoản hoặc đồng bộ cloud." : "Personal data lives in browser IndexedDB. There is no account or cloud sync."}</p><div><ShieldCheck size={16} />{locale === "vi" ? "Không gửi dữ liệu tập luyện" : "No workout data upload"}</div><div><HardDrive size={16} />{locale === "vi" ? "Bạn tự giữ backup" : "You own the backup"}</div></Card>
           <Card className="storage-card"><span className="eyebrow">{locale === "vi" ? "Dung lượng cục bộ" : "Local storage"}</span><strong>{usage?.usage ? formatNumber(usage.usage / 1024 / 1024, locale) : "—"} MB</strong><p>{usage?.quota ? `${locale === "vi" ? "Giới hạn ước tính" : "Estimated quota"}: ${formatNumber(usage.quota / 1024 / 1024, locale, 0)} MB` : (locale === "vi" ? "Do trình duyệt quản lý" : "Managed by your browser")}</p><Button size="sm" variant="secondary" disabled={persistenceBusy || persistent === true} onClick={() => void askForPersistentStorage()}>{persistent ? <Check size={15} /> : <HardDrive size={15} />}{persistent ? (locale === "vi" ? "Đã chống tự xóa" : "Persistent enabled") : (locale === "vi" ? "Cho phép lưu bền vững" : "Allow persistent storage")}</Button><small>{locale === "vi" ? "Chỉ yêu cầu sau khi bạn bấm nút này." : "Requested only after you press this button."}</small></Card>
           <Card className="version-card"><div className="settings-card__heading"><span><RefreshCw size={19} /></span><div><h3>Gym Local v{APP_VERSIONS.app}</h3><p>{locale === "vi" ? "PWA cập nhật có kiểm soát" : "Controlled PWA updates"}</p></div></div><ul><li><span>Database schema</span><strong>v{APP_VERSIONS.database}</strong></li><li><span>Exercise catalog</span><strong>v{APP_VERSIONS.catalog}</strong></li><li><span>Routine templates</span><strong>v{APP_VERSIONS.routines}</strong></li><li><span>Backup format</span><strong>v{APP_VERSIONS.backup}</strong></li></ul><Notice>{locale === "vi" ? "Bản mới sẽ chờ nếu bạn đang trong một buổi tập." : "New versions wait while a workout is active."}</Notice></Card>
