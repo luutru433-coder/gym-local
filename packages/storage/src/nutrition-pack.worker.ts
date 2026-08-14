@@ -4,7 +4,7 @@ import sqlite3InitModule, { type Database, type SAHPoolUtil } from "@sqlite.org/
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex } from "@noble/hashes/utils.js";
 import { APP_VERSIONS, type NutritionPackManifest } from "@gym/contracts";
-import { commitStagedNutritionPack, downloadNutritionPack, obsoletePackFileAfterActivation } from "./providers/nutrition-pack";
+import { commitStagedNutritionPack, downloadNutritionPack, nutritionPackTransferSizeMatches, obsoletePackFileAfterActivation } from "./providers/nutrition-pack";
 
 const LEGACY_PACK_FILENAME = "/gym-local-nutrition.sqlite3";
 const CONTROL_FILENAME = "/gym-local-nutrition-control.sqlite3";
@@ -327,8 +327,9 @@ function stagedFileName(id: string, manifest: NutritionPackManifest): string {
 async function install(id: string, manifest: NutritionPackManifest) {
   validateInstallManifest(manifest);
   const response = await downloadNutritionPack(manifest.downloadUrl);
-  const declaredLength = Number(response.headers.get("content-length") ?? 0);
-  if (declaredLength && declaredLength !== manifest.sizeBytes) throw new Error("Nutrition pack size does not match its manifest");
+  if (!nutritionPackTransferSizeMatches(response, manifest.sizeBytes)) {
+    throw new Error("Nutrition pack size does not match its manifest");
+  }
 
   const installedPool = await pool();
   await installedPool.reserveMinimumCapacity(8);

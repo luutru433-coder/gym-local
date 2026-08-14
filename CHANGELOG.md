@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+- Fixed offline nutrition-pack installation from hosts that gzip the SQLite response. Transfer `Content-Length` is now treated as compressed size while decoded bytes and SHA-256 remain mandatory before activation.
+
 ## 0.6.0
 
 - Added nutrition pack schema 2 with ten bilingual food groups, 1,200 structured recipe-ingredient relationships, meal/dietary/allergen tags, and pinned USDA source food IDs for reproducible offline menus.

@@ -1,5 +1,10 @@
 # Verification report — 2026-08-13
 
+## 2026-08-14 — Nutrition pack compressed-transfer hotfix
+
+- Reproduced the production failure: GitHub Pages served the 24,334,336-byte SQLite pack with `Content-Encoding: gzip` and a 7,165,575-byte transfer `Content-Length`.
+- Version 0.6.1 skips only the unreliable preflight length comparison for encoded responses; decoded byte count, manifest size, SHA-256, SQLite integrity, schema, and content validation remain mandatory before activation.
+
 ## 2026-08-14 — Offline pantry and menu checkpoint
 
 - Nutrition pack schema 2 verified with 13,835 foods, 24,907 Vietnamese aliases, 300 recipes, 1,200 ingredient links, foreign-key integrity, and pinned USDA ingredient records.
