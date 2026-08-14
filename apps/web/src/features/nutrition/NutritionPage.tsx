@@ -6,6 +6,7 @@ import type { FoodItem, MealEntry, Recipe } from "@gym/contracts";
 import { assessNutrientCompleteness, completeFoodLookupCandidate, createMealEntry, createMealEntryFromRecipe, createRecipe, createWaterEntry, dailyNutrition, dailyNutritionWithMicronutrients, estimateNutritionTarget, nutritionTargetNeedsConfirmation, parseNutritionNumber, rankFoodsByPreference, recipeNutrition, upsertFoodPreference, validateCustomFoodDraft, validateMealInput, type FoodLookupCandidate, type NutritionEstimateInput, type NutritionValidationError } from "@gym/nutrition";
 import { formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
+import { PantryMenuSection } from "./PantryMenuSection";
 import "./NutritionPage.css";
 
 const mealLabels: Record<MealEntry["meal"], { vi: string; en: string }> = {
@@ -399,6 +400,8 @@ export function NutritionPage() {
           {packError || nutritionError ? <small className="pack-error" role="alert">{nutritionError ?? packError}</small> : null}
         </div>
       </Card>
+
+      <PantryMenuSection />
 
       <div className="meal-layout">
         <section>
