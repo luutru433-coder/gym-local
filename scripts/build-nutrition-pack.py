@@ -14,8 +14,8 @@ from pathlib import Path
 from typing import Any, Iterator
 
 
-PACK_VERSION = "2026.04"
-PACK_SCHEMA_VERSION = 1
+PACK_VERSION = "2026.08"
+PACK_SCHEMA_VERSION = 2
 NUTRIENT_COLUMNS = (
     "calories", "protein", "carbs", "fat", "fiber", "sugar", "sodium_mg",
     "calcium_mg", "iron_mg", "potassium_mg", "magnesium_mg", "zinc_mg",
@@ -53,11 +53,13 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--fndds", type=Path, required=True)
     parser.add_argument("--dictionary", type=Path, default=Path("content/vietnamese-food-dictionary.json"))
     parser.add_argument("--recipes", type=Path, default=Path("content/vietnamese-recipes.json"))
-    parser.add_argument("--output", type=Path, default=Path("outputs/gym-local-nutrition-2026.04.sqlite3"))
+    parser.add_argument("--food-groups", type=Path, default=Path("content/food-groups.json"))
+    parser.add_argument("--schema", type=Path, default=Path("content/nutrition-pack-schema-v2.sql"))
+    parser.add_argument("--output", type=Path, default=Path("outputs/gym-local-nutrition-2026.08.sqlite3"))
     parser.add_argument("--manifest", type=Path, default=Path("public/nutrition-pack-manifest.json"))
     parser.add_argument(
         "--download-url",
-        default="./gym-local-nutrition-2026.04.sqlite3",
+        default="./gym-local-nutrition-2026.08.sqlite3",
     )
     parser.add_argument("--repository-url", required=True, help="Canonical HTTPS repository URL used in source attribution")
     parser.add_argument("--limit-per-dataset", type=int)
@@ -171,55 +173,41 @@ def serving(food: dict[str, Any]) -> tuple[str | None, float | None]:
     return None, None
 
 
-def create_schema(connection: sqlite3.Connection) -> None:
-    connection.executescript(
-        """
-        PRAGMA page_size=4096;
-        PRAGMA journal_mode=OFF;
-        PRAGMA synchronous=OFF;
-        PRAGMA temp_store=MEMORY;
-        CREATE TABLE pack_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;
-        CREATE TABLE foods (
-          id TEXT PRIMARY KEY,
-          name_vi TEXT NOT NULL,
-          name_en TEXT NOT NULL,
-          source TEXT NOT NULL,
-          source_food_id TEXT,
-          source_url TEXT,
-          serving_label TEXT,
-          serving_grams REAL,
-          calories REAL NOT NULL,
-          protein REAL NOT NULL,
-          carbs REAL NOT NULL,
-          fat REAL NOT NULL,
-          fiber REAL,
-          sugar REAL,
-          sodium_mg REAL,
-          calcium_mg REAL,
-          iron_mg REAL,
-          potassium_mg REAL,
-          magnesium_mg REAL,
-          zinc_mg REAL,
-          vitamin_a_mcg REAL,
-          vitamin_c_mg REAL,
-          vitamin_d_mcg REAL,
-          vitamin_e_mg REAL,
-          vitamin_k_mcg REAL,
-          vitamin_b6_mg REAL,
-          vitamin_b12_mcg REAL,
-          folate_mcg REAL,
-          data_quality TEXT NOT NULL
-        );
-        CREATE TABLE aliases (
-          food_id TEXT NOT NULL REFERENCES foods(id) ON DELETE CASCADE,
-          alias TEXT NOT NULL,
-          language TEXT NOT NULL,
-          PRIMARY KEY (food_id, alias)
-        ) WITHOUT ROWID;
-        CREATE INDEX foods_source_food_id ON foods(source, source_food_id);
-        CREATE INDEX aliases_language ON aliases(language, alias);
-        """
-    )
+def create_schema(connection: sqlite3.Connection, schema_path: Path) -> None:
+    connection.executescript(schema_path.read_text(encoding="utf-8"))
+
+
+def stable_id(prefix: str, *parts: str) -> str:
+    source = "\x1f".join(parts).encode("utf-8")
+    return f"{prefix}_{hashlib.sha256(source).hexdigest()[:24]}"
+
+
+def alias_rows(food_id: str, aliases: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
+    return [
+        (stable_id("alias", food_id, language, alias.casefold()), food_id, alias, language)
+        for alias, language in aliases
+    ]
+
+
+def add_food_groups(connection: sqlite3.Connection, groups: list[dict[str, Any]]) -> set[str]:
+    group_ids: set[str] = set()
+    for group in groups:
+        group_id = str(group["id"])
+        if not re.fullmatch(r"[a-z][a-z0-9_]*", group_id) or group_id in group_ids:
+            raise ValueError(f"Invalid or duplicate food group ID: {group_id}")
+        connection.execute(
+            "INSERT INTO food_groups VALUES (?, ?, ?, ?, ?, 'project_content', ?)",
+            (
+                group_id,
+                str(group["nameVi"]),
+                str(group["nameEn"]),
+                str(group["descriptionVi"]),
+                str(group["descriptionEn"]),
+                "2026-08-14",
+            ),
+        )
+        group_ids.add(group_id)
+    return group_ids
 
 
 def add_usda_food(
@@ -259,8 +247,8 @@ def add_usda_food(
     if cursor.rowcount == 0:
         return False
     connection.executemany(
-        "INSERT OR IGNORE INTO aliases(food_id, alias, language) VALUES (?, ?, ?)",
-        [(food_id, alias, language) for alias, language in aliases_for(description, name_vi, changed)],
+        "INSERT OR IGNORE INTO aliases(id, food_id, alias, language) VALUES (?, ?, ?, ?)",
+        alias_rows(food_id, aliases_for(description, name_vi, changed)),
     )
     return True
 
@@ -269,7 +257,16 @@ def tokens(value: str) -> set[str]:
     return {token for token in re.findall(r"[a-z0-9]+", strip_accents(value.lower())) if len(token) > 2}
 
 
-def best_food_for_query(rows: list[sqlite3.Row], query: str) -> sqlite3.Row:
+def best_food_for_query(rows_by_id: dict[str, sqlite3.Row], query: str, source_food_id: str) -> sqlite3.Row:
+    pinned = rows_by_id.get(source_food_id)
+    if pinned is None:
+        raise ValueError(f"Pinned USDA ingredient {source_food_id} for {query} is missing from the source datasets")
+    if not tokens(query).intersection(tokens(str(pinned["name_en"]))):
+        raise ValueError(f"Pinned USDA ingredient {source_food_id} does not match recipe query: {query}")
+    return pinned
+
+
+def best_food_for_query_legacy(rows: list[sqlite3.Row], query: str) -> sqlite3.Row:
     wanted = tokens(query)
     ranked = sorted(
         rows,
@@ -285,28 +282,48 @@ def best_food_for_query(rows: list[sqlite3.Row], query: str) -> sqlite3.Row:
     return ranked[0]
 
 
-def add_recipes(connection: sqlite3.Connection, recipes: list[dict[str, Any]]) -> int:
+def add_recipes(
+    connection: sqlite3.Connection,
+    recipes: list[dict[str, Any]],
+    group_ids: set[str],
+    repository_url: str,
+) -> tuple[int, int]:
     connection.row_factory = sqlite3.Row
     ingredient_rows = connection.execute("SELECT * FROM foods WHERE source='usda_fdc'").fetchall()
+    ingredient_rows_by_id = {str(row["id"]): row for row in ingredient_rows}
     count = 0
     for recipe in recipes:
         total_grams = float(recipe["servingGrams"])
+        ingredients = recipe["ingredients"]
+        ingredient_grams = sum(float(ingredient["grams"]) for ingredient in ingredients)
+        if abs(ingredient_grams - total_grams) > 0.01:
+            raise ValueError(f"Recipe {recipe['id']} serving grams do not equal its ingredient grams")
         totals: dict[str, float] = {column: 0.0 for column in NUTRIENT_COLUMNS}
-        seen: dict[str, bool] = {column: False for column in NUTRIENT_COLUMNS}
-        matched_ids: list[str] = []
-        for ingredient in recipe["ingredients"]:
-            row = best_food_for_query(ingredient_rows, str(ingredient["query"]))
-            matched_ids.append(str(row["source_food_id"]))
+        all_known: dict[str, bool] = {column: True for column in NUTRIENT_COLUMNS}
+        matched_rows: list[sqlite3.Row] = []
+        for ingredient in ingredients:
+            group_id = str(ingredient["groupId"])
+            if group_id not in group_ids:
+                raise ValueError(f"Recipe {recipe['id']} uses unknown food group: {group_id}")
+            query = str(ingredient["query"])
+            source_food_id = str(ingredient.get("sourceFoodId") or "")
+            row = best_food_for_query(ingredient_rows_by_id, query, source_food_id) if source_food_id else best_food_for_query_legacy(ingredient_rows, query)
+            matched_rows.append(row)
             factor = float(ingredient["grams"]) / 100
             for column in NUTRIENT_COLUMNS:
                 value = row[column]
-                if value is not None:
+                if value is None:
+                    all_known[column] = False
+                else:
                     totals[column] += float(value) * factor
-                    seen[column] = True
-        per_100g = {column: (totals[column] / total_grams * 100 if seen[column] else None) for column in NUTRIENT_COLUMNS}
+        per_100g = {
+            column: (totals[column] / total_grams * 100 if all_known[column] else None)
+            for column in NUTRIENT_COLUMNS
+        }
+        matched_source_ids = [str(row["source_food_id"]) for row in matched_rows]
         values = [
             recipe["id"], recipe["nameVi"], recipe["nameEn"], "vietnamese_recipe",
-            "+".join(matched_ids), None, "1 khẩu phần", total_grams,
+            "+".join(matched_source_ids), f"{repository_url}/blob/main/content/vietnamese-recipes.json", "1 khẩu phần", total_grams,
             *[per_100g[column] if per_100g[column] is not None else (0.0 if column in NUTRIENT_COLUMNS[:4] else None) for column in NUTRIENT_COLUMNS],
             "estimated_recipe",
         ]
@@ -316,15 +333,72 @@ def add_recipes(connection: sqlite3.Connection, recipes: list[dict[str, Any]]) -
             normalize_text(strip_accents(str(recipe["nameVi"]))),
         }
         connection.executemany(
-            "INSERT OR IGNORE INTO aliases(food_id, alias, language) VALUES (?, ?, 'vi')",
-            [(recipe["id"], alias) for alias in recipe_aliases],
+            "INSERT OR IGNORE INTO aliases(id, food_id, alias, language) VALUES (?, ?, ?, 'vi')",
+            [
+                (stable_id("alias", str(recipe["id"]), "vi", alias.casefold()), recipe["id"], alias)
+                for alias in recipe_aliases
+            ],
+        )
+        connection.execute(
+            "INSERT INTO recipes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                recipe["id"],
+                recipe["id"],
+                recipe["nameVi"],
+                recipe["nameEn"],
+                total_grams,
+                recipe["estimationNote"],
+                recipe["sourceId"],
+                f"{repository_url}/blob/main/content/vietnamese-recipes.json",
+                recipe["reviewedAt"],
+            ),
+        )
+        for position, (ingredient, row) in enumerate(zip(ingredients, matched_rows, strict=True), start=1):
+            group_id = str(ingredient["groupId"])
+            food_id = str(row["id"])
+            connection.execute(
+                "INSERT INTO recipe_ingredients VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    f"{recipe['id']}_ingredient_{position}",
+                    recipe["id"],
+                    position,
+                    food_id,
+                    ingredient["query"],
+                    float(ingredient["grams"]),
+                    ingredient["role"],
+                    group_id,
+                    1 if ingredient["required"] else 0,
+                ),
+            )
+            connection.execute(
+                "INSERT OR IGNORE INTO food_group_members VALUES (?, ?, ?, 'recipe_ingredient', ?)",
+                (
+                    stable_id("group_member", food_id, group_id),
+                    food_id,
+                    group_id,
+                    recipe["reviewedAt"],
+                ),
+            )
+        tag_values = [
+            *(('meal_slot', value) for value in recipe["mealSlots"]),
+            *(('tag', value) for value in recipe["tags"]),
+            *(('dietary', value) for value in recipe["dietaryTags"]),
+            *(('allergen', value) for value in recipe["allergenTags"]),
+        ]
+        connection.executemany(
+            "INSERT INTO recipe_tags VALUES (?, ?, ?, ?)",
+            [
+                (stable_id("recipe_tag", str(recipe["id"]), kind, value), recipe["id"], kind, value)
+                for kind, value in tag_values
+            ],
         )
         count += 1
-    return count
+    ingredient_count = connection.execute("SELECT count(*) FROM recipe_ingredients").fetchone()[0]
+    return count, ingredient_count
 
 
 def finalize(connection: sqlite3.Connection, metadata: dict[str, str]) -> None:
-    connection.executemany("INSERT INTO pack_meta(key, value) VALUES (?, ?)", metadata.items())
+    connection.executemany("INSERT INTO pack_meta(id, value) VALUES (?, ?)", metadata.items())
     connection.executescript(
         """
         CREATE VIRTUAL TABLE food_fts USING fts5(
@@ -362,11 +436,13 @@ def main() -> None:
     dictionary_values = json.loads(args.dictionary.read_text(encoding="utf-8"))
     dictionary = compile_dictionary(dictionary_values)
     recipes = json.loads(args.recipes.read_text(encoding="utf-8"))
+    groups = json.loads(args.food_groups.read_text(encoding="utf-8"))
     if len(recipes) != 300:
         raise ValueError(f"Expected exactly 300 Vietnamese recipes, got {len(recipes)}")
 
     connection = sqlite3.connect(args.output)
-    create_schema(connection)
+    create_schema(connection, args.schema)
+    group_ids = add_food_groups(connection, groups)
     inserted = 0
     datasets = [args.foundation, args.sr_legacy, args.fndds]
     for path in datasets:
@@ -382,7 +458,7 @@ def main() -> None:
         connection.commit()
         print(f"{path.name}: {dataset_count} foods")
 
-    recipe_count = add_recipes(connection, recipes)
+    recipe_count, recipe_ingredient_count = add_recipes(connection, recipes, group_ids, repository_url)
     food_count = connection.execute("SELECT count(*) FROM foods").fetchone()[0]
     alias_count = connection.execute("SELECT count(*) FROM aliases WHERE language='vi'").fetchone()[0]
     if alias_count < 2000:
@@ -396,6 +472,8 @@ def main() -> None:
         "food_count": str(food_count),
         "alias_count": str(alias_count),
         "vietnamese_recipe_count": str(recipe_count),
+        "food_group_count": str(len(group_ids)),
+        "recipe_ingredient_count": str(recipe_ingredient_count),
     }
     finalize(connection, metadata)
     integrity = connection.execute("PRAGMA integrity_check").fetchone()[0]
@@ -409,7 +487,7 @@ def main() -> None:
         "version": PACK_VERSION,
         "schemaVersion": PACK_SCHEMA_VERSION,
         "createdAt": created_at,
-        "minimumAppVersion": "0.2.0",
+        "minimumAppVersion": "0.6.0",
         "fileName": args.output.name,
         "downloadUrl": args.download_url,
         "sizeBytes": args.output.stat().st_size,
@@ -417,6 +495,8 @@ def main() -> None:
         "foodCount": food_count,
         "aliasCount": alias_count,
         "vietnameseRecipeCount": recipe_count,
+        "foodGroupCount": len(group_ids),
+        "recipeIngredientCount": recipe_ingredient_count,
         "sources": [
             {
                 "id": "usda-foundation-2026-04",
@@ -448,12 +528,15 @@ def main() -> None:
                 "url": f"{repository_url}/blob/main/content/vietnamese-recipes.json",
                 "licenseId": "project-content",
                 "licenseUrl": f"{repository_url}/blob/main/LICENSE",
-                "retrievedAt": "2026-08-10",
+                "retrievedAt": "2026-08-14",
             },
         ],
     }
     args.manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Built {args.output} ({args.output.stat().st_size:,} bytes, {food_count} foods, {alias_count} VI aliases, {recipe_count} recipes)")
+    print(
+        f"Built {args.output} ({args.output.stat().st_size:,} bytes, {food_count} foods, "
+        f"{alias_count} VI aliases, {recipe_count} recipes, {recipe_ingredient_count} recipe ingredients)"
+    )
 
 
 if __name__ == "__main__":

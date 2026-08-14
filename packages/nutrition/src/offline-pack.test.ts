@@ -63,7 +63,7 @@ describe("offline nutrition pack contracts", () => {
   it("rejects packs that require a newer app or an unsupported schema", () => {
     for (const [input, code] of [
       [manifest({ minimumAppVersion: "9.0.0" }), "app_too_old"],
-      [manifest({ schemaVersion: 2 }), "unsupported_schema"]
+      [manifest({ schemaVersion: 3, foodGroupCount: 10, recipeIngredientCount: 1200 }), "unsupported_schema"]
     ] as const) {
       try {
         parseNutritionPackManifest(input, "https://example.test/manifest.json", "0.3.0", 1);
@@ -73,6 +73,17 @@ describe("offline nutrition pack contracts", () => {
         expect((error as NutritionPackCompatibilityError).code).toBe(code);
       }
     }
+  });
+
+  it("keeps schema 1 packs compatible while accepting structured schema 2 packs", () => {
+    expect(() => parseNutritionPackManifest(manifest(), "https://example.test/manifest.json", "0.6.0", 2)).not.toThrow();
+    expect(() => parseNutritionPackManifest(manifest({
+      version: "2026.08",
+      schemaVersion: 2,
+      minimumAppVersion: "0.6.0",
+      foodGroupCount: 10,
+      recipeIngredientCount: 1200
+    }), "https://example.test/manifest.json", "0.6.0", 2)).not.toThrow();
   });
 
   it("keeps an installed pack usable when the manifest request is offline", async () => {

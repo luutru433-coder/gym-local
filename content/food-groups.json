@@ -1,0 +1,72 @@
+[
+  {
+    "id": "starch",
+    "nameVi": "Tinh bột",
+    "nameEn": "Starch",
+    "descriptionVi": "Cơm, mì, bún, khoai và các nguồn carbohydrate chính.",
+    "descriptionEn": "Rice, noodles, potatoes, and other primary carbohydrate sources."
+  },
+  {
+    "id": "meat",
+    "nameVi": "Thịt",
+    "nameEn": "Meat",
+    "descriptionVi": "Gia cầm, thịt đỏ và thịt heo.",
+    "descriptionEn": "Poultry, red meat, and pork."
+  },
+  {
+    "id": "seafood",
+    "nameVi": "Cá và hải sản",
+    "nameEn": "Fish and seafood",
+    "descriptionVi": "Cá, tôm và các nguồn đạm từ biển.",
+    "descriptionEn": "Fish, shrimp, and other seafood proteins."
+  },
+  {
+    "id": "eggs",
+    "nameVi": "Trứng",
+    "nameEn": "Eggs",
+    "descriptionVi": "Trứng và món có thành phần trứng chính.",
+    "descriptionEn": "Eggs and foods where egg is a primary ingredient."
+  },
+  {
+    "id": "plant_protein",
+    "nameVi": "Đạm thực vật",
+    "nameEn": "Plant protein",
+    "descriptionVi": "Đậu, đậu hũ và các nguồn đạm thực vật.",
+    "descriptionEn": "Beans, tofu, and other plant proteins."
+  },
+  {
+    "id": "vegetables",
+    "nameVi": "Rau",
+    "nameEn": "Vegetables",
+    "descriptionVi": "Rau lá, rau củ và các loại rau khác.",
+    "descriptionEn": "Leafy greens, root vegetables, and other vegetables."
+  },
+  {
+    "id": "fruit",
+    "nameVi": "Trái cây",
+    "nameEn": "Fruit",
+    "descriptionVi": "Trái cây tươi, đông lạnh hoặc chế biến tối thiểu.",
+    "descriptionEn": "Fresh, frozen, or minimally processed fruit."
+  },
+  {
+    "id": "dairy",
+    "nameVi": "Sữa",
+    "nameEn": "Dairy",
+    "descriptionVi": "Sữa, sữa chua và sản phẩm từ sữa.",
+    "descriptionEn": "Milk, yogurt, and dairy products."
+  },
+  {
+    "id": "fats",
+    "nameVi": "Chất béo",
+    "nameEn": "Fats",
+    "descriptionVi": "Dầu, hạt và các nguồn chất béo bổ sung.",
+    "descriptionEn": "Oils, nuts, and added fat sources."
+  },
+  {
+    "id": "seasonings",
+    "nameVi": "Gia vị",
+    "nameEn": "Seasonings",
+    "descriptionVi": "Gia vị và nguyên liệu dùng lượng nhỏ để tạo vị.",
+    "descriptionEn": "Seasonings and ingredients used in small amounts for flavor."
+  }
+]

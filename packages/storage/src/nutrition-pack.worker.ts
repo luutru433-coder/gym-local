@@ -164,8 +164,14 @@ function ftsQuery(query: string): string {
 }
 
 function readMetadata(db: Database): Record<string, string> {
+  const columns = db.exec({
+    sql: "PRAGMA table_info(pack_meta)",
+    rowMode: "object",
+    returnValue: "resultRows"
+  });
+  const identifierColumn = columns.some((column) => column.name === "id") ? "id" : "key";
   const rows = db.exec({
-    sql: "SELECT key, value FROM pack_meta",
+    sql: `SELECT ${identifierColumn} AS key, value FROM pack_meta`,
     rowMode: "object",
     returnValue: "resultRows"
   });
@@ -183,18 +189,22 @@ function validatePack(db: Database, manifest?: NutritionPackManifest): Record<st
   const metadata = readMetadata(db);
   if (metadata.id !== "gym-local-nutrition") throw new Error("Nutrition pack identity is invalid");
   const schemaVersion = Number(metadata.schema_version);
-  if (schemaVersion !== APP_VERSIONS.nutritionPackSchema) {
+  if (schemaVersion < APP_VERSIONS.minimumNutritionPackSchema || schemaVersion > APP_VERSIONS.nutritionPackSchema) {
     throw new Error(`Nutrition pack schema ${metadata.schema_version || "unknown"} is not supported`);
   }
   if (manifest) {
-    if (manifest.schemaVersion !== APP_VERSIONS.nutritionPackSchema || schemaVersion !== manifest.schemaVersion) {
+    if (manifest.schemaVersion < APP_VERSIONS.minimumNutritionPackSchema
+      || manifest.schemaVersion > APP_VERSIONS.nutritionPackSchema
+      || schemaVersion !== manifest.schemaVersion) {
       throw new Error("Nutrition pack schema does not match its manifest");
     }
     if (metadata.version !== manifest.version) throw new Error("Nutrition pack version does not match its manifest");
     const expectedCounts: Array<[string, number]> = [
       ["food_count", manifest.foodCount],
       ["alias_count", manifest.aliasCount],
-      ["vietnamese_recipe_count", manifest.vietnameseRecipeCount]
+      ["vietnamese_recipe_count", manifest.vietnameseRecipeCount],
+      ...(manifest.foodGroupCount === undefined ? [] : [["food_group_count", manifest.foodGroupCount] as [string, number]]),
+      ...(manifest.recipeIngredientCount === undefined ? [] : [["recipe_ingredient_count", manifest.recipeIngredientCount] as [string, number]])
     ];
     if (expectedCounts.some(([key, value]) => Number(metadata[key]) !== value)) {
       throw new Error("Nutrition pack counts do not match its manifest");
@@ -300,7 +310,8 @@ function compareVersions(left: string, right: string): number {
 
 function validateInstallManifest(manifest: NutritionPackManifest): void {
   if (manifest.id !== "gym-local-nutrition") throw new Error("Invalid nutrition pack manifest");
-  if (manifest.schemaVersion !== APP_VERSIONS.nutritionPackSchema) throw new Error("Unsupported nutrition pack schema");
+  if (manifest.schemaVersion < APP_VERSIONS.minimumNutritionPackSchema
+    || manifest.schemaVersion > APP_VERSIONS.nutritionPackSchema) throw new Error("Unsupported nutrition pack schema");
   if (compareVersions(APP_VERSIONS.app, manifest.minimumAppVersion) < 0) throw new Error("Gym Local must be updated before installing this pack");
   if (!Number.isInteger(manifest.sizeBytes) || manifest.sizeBytes <= 0) throw new Error("Invalid nutrition pack size");
   if (!/^[a-f0-9]{64}$/i.test(manifest.sha256)) throw new Error("Invalid nutrition pack checksum");
