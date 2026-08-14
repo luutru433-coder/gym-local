@@ -16,6 +16,7 @@ function emptyData(overrides: Partial<PersonalDataSnapshot> = {}): PersonalDataS
     recipes: [],
     waterEntries: [],
     foodPreferences: [],
+    pantryItems: [],
     bodyMetrics: [],
     customVariants: [],
     settings: { ...defaultSettings },
@@ -41,8 +42,29 @@ async function legacyBackup(data: unknown, backupVersion: 1 | 2): Promise<Blob> 
   return zip.generateAsync({ type: "blob" });
 }
 
+async function v3Backup(): Promise<Blob> {
+  const data = emptyData();
+  Reflect.deleteProperty(data, "pantryItems");
+  data.settings = { ...data.settings, dbSchemaVersion: 3, backupVersion: 3 };
+  const serialized = JSON.stringify(data);
+  const collectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
+  const zip = new JSZip();
+  zip.file("manifest.json", JSON.stringify({
+    appVersion: "0.5.0",
+    backupVersion: 3,
+    exportedAt: "2026-08-13T00:00:00.000Z",
+    checksum: await sha256(serialized),
+    format: "gym-local-backup",
+    dbSchemaVersion: 3,
+    dataBytes: new TextEncoder().encode(serialized).byteLength,
+    counts: Object.fromEntries(collectionKeys.map((key) => [key, data[key].length]))
+  }));
+  zip.file("data.json", serialized);
+  return zip.generateAsync({ type: "blob" });
+}
+
 describe("backup", () => {
-  it("round-trips v3 personal data, Vietnamese text, tracking semantics, and manifest metadata", async () => {
+  it("round-trips v4 personal data, Vietnamese text, pantry, tracking semantics, and manifest metadata", async () => {
     const routine = cloneRoutineTemplate("tpl_full_body_a");
     const session = createSessionFromRoutine(routine);
     session.programId = "program_1";
@@ -110,13 +132,23 @@ describe("backup", () => {
         favorite: true,
         defaultServingGrams: 50,
         useCount: 3
+      }],
+      pantryItems: [{
+        id: "pantry_oats",
+        kind: "food",
+        foodId: "pack_usda_123",
+        foodNameSnapshot: { vi: "Yến mạch", en: "Oats" },
+        groupId: "starch",
+        availableGrams: 500,
+        createdAt: "2026-08-10T00:00:00.000Z",
+        updatedAt: "2026-08-10T00:00:00.000Z"
       }]
     });
 
     const restored = await readBackup(await createBackup(data));
 
     expect(restored.data.settings.catalogVersion).toBe(3);
-    expect(restored.manifest).toMatchObject({ backupVersion: 3, format: "gym-local-backup", dbSchemaVersion: 3 });
+    expect(restored.manifest).toMatchObject({ backupVersion: 4, format: "gym-local-backup", dbSchemaVersion: 4 });
     expect(restored.manifest.counts).toEqual({
       routines: 1,
       programs: 1,
@@ -126,6 +158,7 @@ describe("backup", () => {
       recipes: 1,
       waterEntries: 1,
       foodPreferences: 1,
+      pantryItems: 1,
       bodyMetrics: 0,
       customVariants: 0
     });
@@ -146,6 +179,7 @@ describe("backup", () => {
       defaultServingGrams: 50,
       useCount: 3
     });
+    expect(restored.data.pantryItems[0]).toMatchObject({ id: "pantry_oats", groupId: "starch", availableGrams: 500 });
     expect(restored.data.settings.activeProgramId).toBe("program_1");
   });
 
@@ -170,8 +204,8 @@ describe("backup", () => {
     const restored = await readBackup(await legacyBackup(legacy, 1));
 
     expect(restored.data.foods[0].per100g).toMatchObject({ ironMg: 2.7, vitaminCMg: 28.1 });
-    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 3, backupVersion: 3 });
-    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [] });
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 4, backupVersion: 4 });
+    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [] });
   });
 
   it("upgrades v2 nutrition metadata and accepts historical sessions without tracking snapshots", async () => {
@@ -232,10 +266,18 @@ describe("backup", () => {
       }
     });
     expect(restored.data.sessions[0].exercises[0].trackingProfileSnapshot).toBeUndefined();
-    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [] });
+    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [] });
   });
 
-  it("rejects a v3 manifest whose collection counts do not exactly match data", async () => {
+  it("migrates a detailed v3 backup to v4 with an empty pantry", async () => {
+    const restored = await readBackup(await v3Backup());
+
+    expect(restored.manifest).toMatchObject({ backupVersion: 3, dbSchemaVersion: 3 });
+    expect(restored.data.pantryItems).toEqual([]);
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 4, backupVersion: 4 });
+  });
+
+  it("rejects a v4 manifest whose collection counts do not exactly match data", async () => {
     const original = await createBackup(emptyData());
     const zip = await JSZip.loadAsync(original);
     const manifestFile = zip.file("manifest.json");
@@ -247,7 +289,7 @@ describe("backup", () => {
     await expect(readBackup(await zip.generateAsync({ type: "blob" }))).rejects.toThrow("collection counts");
   });
 
-  it("rejects a v3 manifest whose byte count does not match serialized data", async () => {
+  it("rejects a v4 manifest whose byte count does not match serialized data", async () => {
     const original = await createBackup(emptyData());
     const zip = await JSZip.loadAsync(original);
     const manifestFile = zip.file("manifest.json");
@@ -285,7 +327,15 @@ describe("backup", () => {
         foodId: "food_1",
         favorite: true,
         useCount: -1
-      }] })]
+      }] })],
+      ["pantry item", emptyData({ pantryItems: [{
+        id: "pantry_invalid",
+        kind: "group",
+        groupId: "invalid_group",
+        groupNameSnapshot: { vi: "Sai", en: "Invalid" },
+        createdAt: "2026-08-10T00:00:00.000Z",
+        updatedAt: "2026-08-10T00:00:00.000Z"
+      }] as unknown as PersonalDataSnapshot["pantryItems"] })]
     ];
 
     for (const [label, data] of invalidSnapshots) {

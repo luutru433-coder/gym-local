@@ -323,6 +323,35 @@ export interface FoodPreference {
   useCount: number;
 }
 
+export const FOOD_GROUP_IDS = [
+  "starch", "meat", "seafood", "eggs", "plant_protein",
+  "vegetables", "fruit", "dairy", "fats", "seasonings"
+] as const;
+
+export type FoodGroupId = typeof FOOD_GROUP_IDS[number];
+
+interface PantryItemBase {
+  id: Id;
+  availableGrams?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PantryFoodItem extends PantryItemBase {
+  kind: "food";
+  foodId: Id;
+  foodNameSnapshot: LocalizedText;
+  groupId?: FoodGroupId;
+}
+
+export interface PantryFoodGroupItem extends PantryItemBase {
+  kind: "group";
+  groupId: FoodGroupId;
+  groupNameSnapshot: LocalizedText;
+}
+
+export type PantryItem = PantryFoodItem | PantryFoodGroupItem;
+
 export interface NutritionPackManifest {
   id: "gym-local-nutrition";
   version: string;
@@ -465,6 +494,7 @@ export interface PersonalDataSnapshot {
   recipes: Recipe[];
   waterEntries: WaterEntry[];
   foodPreferences: FoodPreference[];
+  pantryItems: PantryItem[];
   bodyMetrics: BodyMetric[];
   customVariants: ExerciseVariant[];
   settings: AppSettings;
@@ -493,11 +523,11 @@ export interface BackupPayload {
 
 export const APP_VERSIONS = {
   app: "0.6.0",
-  database: 3,
+  database: 4,
   catalog: 3,
   routines: 2,
   nutritionFormula: 1,
-  backup: 3,
+  backup: 4,
   minimumNutritionPackSchema: 1,
   nutritionPackSchema: 2
 } as const;

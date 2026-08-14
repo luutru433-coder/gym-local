@@ -1,6 +1,7 @@
 import Dexie, { type EntityTable } from "dexie";
 import {
   APP_VERSIONS,
+  FOOD_GROUP_IDS,
   type AppSettings,
   type BodyMetric,
   type ExerciseVariant,
@@ -8,6 +9,7 @@ import {
   type FoodItem,
   type MealEntry,
   type NutritionPackRecord,
+  type PantryItem,
   type PersonalDataSnapshot,
   type Profile,
   type Program,
@@ -44,13 +46,17 @@ export class GymDatabase extends Dexie {
   recipes!: EntityTable<Recipe, "id">;
   waterEntries!: EntityTable<WaterEntry, "id">;
   foodPreferences!: EntityTable<FoodPreference, "id">;
+  pantryItems!: EntityTable<PantryItem, "id">;
   bodyMetrics!: EntityTable<BodyMetric, "id">;
   customVariants!: EntityTable<ExerciseVariant, "id">;
   settings!: EntityTable<AppSettings, "id">;
   nutritionPacks!: EntityTable<NutritionPackRecord, "id">;
   recoveryPoints!: EntityTable<RecoveryPoint, "id">;
 
-  constructor(name = "gym-local", migrationHooks: { beforeV3Commit?: () => void | Promise<void> } = {}) {
+  constructor(name = "gym-local", migrationHooks: {
+    beforeV3Commit?: () => void | Promise<void>;
+    beforeV4Commit?: () => void | Promise<void>;
+  } = {}) {
     super(name);
     this.version(1).stores({
       profiles: "id, updatedAt",
@@ -160,6 +166,46 @@ export class GymDatabase extends Dexie {
         });
       }
       await migrationHooks.beforeV3Commit?.();
+    });
+    this.version(4).stores({
+      profiles: "id, updatedAt",
+      routines: "id, goal, updatedAt, sourceTemplateId",
+      programs: "id, goal, updatedAt",
+      sessions: "id, routineId, startedAt, finishedAt, locationId",
+      foods: "id, barcode, updatedAt",
+      meals: "id, date, meal, foodId, createdAt",
+      recipes: "id, updatedAt",
+      waterEntries: "id, date, createdAt",
+      foodPreferences: "id, foodId, favorite, lastUsedAt",
+      pantryItems: "id, kind, foodId, groupId, updatedAt",
+      bodyMetrics: "id, date",
+      customVariants: "id, movementId, reviewStatus",
+      settings: "id",
+      nutritionPacks: "id, status, version, installedAt",
+      recoveryPoints: "id, createdAt"
+    }).upgrade(async (transaction) => {
+      const settingsTable = transaction.table<AppSettings>("settings");
+      const recoveryTable = transaction.table<RecoveryPoint>("recoveryPoints");
+      const settings = await settingsTable.get("app");
+      if (settings) {
+        await settingsTable.put({
+          ...settings,
+          dbSchemaVersion: 4,
+          backupVersion: 4
+        });
+      }
+      await recoveryTable.toCollection().modify((recoveryPoint) => {
+        recoveryPoint.snapshot = {
+          ...recoveryPoint.snapshot,
+          pantryItems: recoveryPoint.snapshot.pantryItems ?? [],
+          settings: {
+            ...recoveryPoint.snapshot.settings,
+            dbSchemaVersion: 4,
+            backupVersion: 4
+          }
+        };
+      });
+      await migrationHooks.beforeV4Commit?.();
     });
   }
 }
@@ -522,6 +568,31 @@ export async function deleteFoodPreference(id: string, db: GymDatabase = gymDb):
   await db.foodPreferences.delete(id);
 }
 
+export async function listPantryItems(db: GymDatabase = gymDb): Promise<PantryItem[]> {
+  return db.pantryItems.orderBy("updatedAt").reverse().toArray();
+}
+
+export async function savePantryItem(item: PantryItem, db: GymDatabase = gymDb): Promise<PantryItem> {
+  assertFiniteRecord(item, "pantry item");
+  if (item.availableGrams !== undefined && (item.availableGrams <= 0 || item.availableGrams > 1_000_000)) {
+    throw new Error("Pantry amount must be between 0 and 1,000,000 grams");
+  }
+  if (item.groupId && !FOOD_GROUP_IDS.includes(item.groupId)) throw new Error("Pantry food group is invalid");
+  if (item.kind === "food" && (!item.foodId || !item.foodNameSnapshot.vi || !item.foodNameSnapshot.en)) {
+    throw new Error("Pantry food requires an exact food snapshot");
+  }
+  if (item.kind === "group" && (!item.groupId || !item.groupNameSnapshot.vi || !item.groupNameSnapshot.en)) {
+    throw new Error("Pantry group requires a group snapshot");
+  }
+  const saved = { ...item, updatedAt: new Date().toISOString() };
+  await db.pantryItems.put(saved);
+  return saved;
+}
+
+export async function deletePantryItem(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.pantryItems.delete(id);
+}
+
 export async function listBodyMetrics(db: GymDatabase = gymDb): Promise<BodyMetric[]> {
   return db.bodyMetrics.orderBy("date").toArray();
 }
@@ -563,6 +634,7 @@ const personalTableNames = [
   "recipes",
   "waterEntries",
   "foodPreferences",
+  "pantryItems",
   "bodyMetrics",
   "customVariants",
   "settings"
@@ -573,7 +645,7 @@ function personalTables(db: GymDatabase) {
 }
 
 async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<PersonalDataSnapshot> {
-  const [profile, routines, programs, sessions, foods, meals, recipes, waterEntries, foodPreferences, bodyMetrics, customVariants, settings] = await Promise.all([
+  const [profile, routines, programs, sessions, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, bodyMetrics, customVariants, settings] = await Promise.all([
     db.profiles.toCollection().first(),
     db.routines.toArray(),
     db.programs.toArray(),
@@ -583,6 +655,7 @@ async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<Person
     db.recipes.toArray(),
     db.waterEntries.toArray(),
     db.foodPreferences.toArray(),
+    db.pantryItems.toArray(),
     db.bodyMetrics.toArray(),
     db.customVariants.toArray(),
     db.settings.get("app")
@@ -597,6 +670,7 @@ async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<Person
     recipes,
     waterEntries,
     foodPreferences,
+    pantryItems,
     bodyMetrics,
     customVariants,
     settings: settings ?? defaultSettings
@@ -614,6 +688,7 @@ async function putSnapshotInCurrentTransaction(data: PersonalDataSnapshot, db: G
   await db.recipes.bulkPut(data.recipes);
   await db.waterEntries.bulkPut(data.waterEntries);
   await db.foodPreferences.bulkPut(data.foodPreferences);
+  await db.pantryItems.bulkPut(data.pantryItems);
   await db.bodyMetrics.bulkPut(data.bodyMetrics);
   await db.customVariants.bulkPut(data.customVariants);
   await db.settings.put(data.settings);

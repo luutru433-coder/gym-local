@@ -12,12 +12,14 @@ import {
   deleteProgram,
   deleteFood,
   deleteFoodPreference,
+  deletePantryItem,
   deleteRecipe,
   deleteRoutine,
   deleteWaterEntry,
   findSavedFoodByBarcode,
   listPrograms,
   listFoodPreferences,
+  listPantryItems,
   listRecipes,
   listRecoveryPoints,
   listWaterEntries,
@@ -30,6 +32,7 @@ import {
   saveInitialSetup,
   saveFood,
   saveFoodPreference,
+  savePantryItem,
   saveMeal,
   saveMealAndRecordFoodUse,
   saveNutritionPackRecord,
@@ -113,6 +116,7 @@ function snapshot(displayName: string): PersonalDataSnapshot {
     recipes: [],
     waterEntries: [],
     foodPreferences: [],
+    pantryItems: [],
     bodyMetrics: [],
     customVariants: [],
     settings: { ...defaultSettings }
@@ -135,12 +139,53 @@ const v2Stores = {
   nutritionPacks: "id, status, version, installedAt"
 };
 
+const v3Stores = {
+  profiles: "id, updatedAt",
+  routines: "id, goal, updatedAt, sourceTemplateId",
+  programs: "id, goal, updatedAt",
+  sessions: "id, routineId, startedAt, finishedAt, locationId",
+  foods: "id, barcode, updatedAt",
+  meals: "id, date, meal, foodId, createdAt",
+  recipes: "id, updatedAt",
+  waterEntries: "id, date, createdAt",
+  foodPreferences: "id, foodId, favorite, lastUsedAt",
+  bodyMetrics: "id, date",
+  customVariants: "id, movementId, reviewStatus",
+  settings: "id",
+  nutritionPacks: "id, status, version, installedAt",
+  recoveryPoints: "id, createdAt"
+};
+
 async function createV2Database(name: string): Promise<void> {
   const legacy = new Dexie(name);
   legacy.version(1).stores(v1Stores);
   legacy.version(2).stores(v2Stores);
   await legacy.open();
   await legacy.table("settings").put({ ...defaultSettings, dbSchemaVersion: 2, backupVersion: 2 });
+  legacy.close();
+}
+
+async function createV3Database(name: string, includeRecoveryPoint = false): Promise<void> {
+  const legacy = new Dexie(name);
+  legacy.version(1).stores(v1Stores);
+  legacy.version(2).stores(v2Stores);
+  legacy.version(3).stores(v3Stores);
+  await legacy.open();
+  await legacy.table("settings").put({ ...defaultSettings, dbSchemaVersion: 3, backupVersion: 3 });
+  await legacy.table("routines").put(routine());
+  if (includeRecoveryPoint) {
+    const legacySnapshot = snapshot("Before schema v4");
+    Reflect.deleteProperty(legacySnapshot, "pantryItems");
+    await legacy.table("recoveryPoints").put({
+      id: "recovery_v3",
+      reason: "before_restore",
+      createdAt: "2026-08-10T00:00:00.000Z",
+      snapshot: {
+        ...legacySnapshot,
+        settings: { ...legacySnapshot.settings, dbSchemaVersion: 3, backupVersion: 3 }
+      }
+    });
+  }
   legacy.close();
 }
 
@@ -176,7 +221,7 @@ describe("IndexedDB schema and recovery", () => {
     expect(await db.routines.count()).toBe(0);
   });
 
-  it("initializes schema v3 and round-trips every personal-data collection", async () => {
+  it("initializes schema v4 and round-trips every personal-data collection", async () => {
     const source = makeDatabase();
     await initializeDatabase(source);
     await saveProfile(profile(), source);
@@ -199,16 +244,27 @@ describe("IndexedDB schema and recovery", () => {
     });
     await source.waterEntries.put({ id: "water_1", date: "2026-08-10", amountMl: 500, createdAt: "2026-08-10T01:00:00.000Z" });
     await source.foodPreferences.put({ id: "preference_oats", foodId: "food_oats", favorite: true, defaultServingGrams: 50, useCount: 3 });
+    await savePantryItem({
+      id: "pantry_oats",
+      kind: "food",
+      foodId: "food_oats",
+      foodNameSnapshot: { vi: "Yến mạch", en: "Oats" },
+      groupId: "starch",
+      availableGrams: 500,
+      createdAt: "2026-08-10T00:00:00.000Z",
+      updatedAt: "2026-08-10T00:00:00.000Z"
+    }, source);
     const exported = await exportAllData(source);
 
-    expect(source.verno).toBe(3);
-    expect(exported.settings.dbSchemaVersion).toBe(3);
+    expect(source.verno).toBe(4);
+    expect(exported.settings.dbSchemaVersion).toBe(4);
     expect(exported.profile?.displayName).toBe("Local lifter");
     expect(exported).toMatchObject({
       programs: [{ id: "program_starter" }],
       recipes: [{ id: "recipe_oats" }],
       waterEntries: [{ id: "water_1" }],
-      foodPreferences: [{ id: "preference_oats" }]
+      foodPreferences: [{ id: "preference_oats" }],
+      pantryItems: [{ id: "pantry_oats", groupId: "starch" }]
     });
 
     const target = makeDatabase();
@@ -241,7 +297,7 @@ describe("IndexedDB schema and recovery", () => {
     const db = new GymDatabase(name);
     databases.push(db);
     await initializeDatabase(db);
-    expect((await db.settings.get("app"))?.dbSchemaVersion).toBe(3);
+    expect((await db.settings.get("app"))?.dbSchemaVersion).toBe(4);
 
     await saveNutritionPackRecord({ id: "nutrition-pack", status: "ready", version: "2026.04", bytesDownloaded: 123, installedAt: "2026-08-10T00:00:00.000Z" }, db);
     const data = await exportAllData(db);
@@ -288,7 +344,7 @@ describe("IndexedDB schema and recovery", () => {
     databases.push(db);
     await db.open();
 
-    expect(db.verno).toBe(3);
+    expect(db.verno).toBe(4);
     expect(await db.routines.count()).toBe(1);
     expect((await db.profiles.get("profile"))?.nutritionTarget).toMatchObject({
       source: "estimated",
@@ -304,8 +360,9 @@ describe("IndexedDB schema and recovery", () => {
       db.recipes.count(),
       db.waterEntries.count(),
       db.foodPreferences.count(),
+      db.pantryItems.count(),
       db.recoveryPoints.count()
-    ])).toEqual([0, 0, 0, 0, 0]);
+    ])).toEqual([0, 0, 0, 0, 0, 0]);
   });
 
   it("rolls the entire v2-to-v3 upgrade back if its transaction fails", async () => {
@@ -338,7 +395,54 @@ describe("IndexedDB schema and recovery", () => {
     const recovered = new GymDatabase(name);
     databases.push(recovered);
     await recovered.open();
-    expect(recovered.verno).toBe(3);
+    expect(recovered.verno).toBe(4);
+    expect(await recovered.routines.count()).toBe(1);
+  });
+
+  it("migrates v3 to v4 additively and upgrades recovery snapshots with an empty pantry", async () => {
+    const name = `gym-local-v3-migration-${crypto.randomUUID()}`;
+    await createV3Database(name, true);
+
+    const db = new GymDatabase(name);
+    databases.push(db);
+    await db.open();
+
+    expect(db.verno).toBe(4);
+    expect(await db.routines.count()).toBe(1);
+    expect(await db.pantryItems.toArray()).toEqual([]);
+    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 4, backupVersion: 4 });
+    expect((await db.recoveryPoints.get("recovery_v3"))?.snapshot).toMatchObject({
+      pantryItems: [],
+      settings: { dbSchemaVersion: 4, backupVersion: 4 }
+    });
+  });
+
+  it("rolls the entire v3-to-v4 upgrade back when its transaction fails", async () => {
+    const name = `gym-local-failed-v4-migration-${crypto.randomUUID()}`;
+    await createV3Database(name);
+
+    const failing = new GymDatabase(name, {
+      beforeV4Commit: () => {
+        throw new Error("simulated v4 migration failure");
+      }
+    });
+    await expect(failing.open()).rejects.toThrow("simulated v4 migration failure");
+    failing.close();
+
+    const verifier = new Dexie(name);
+    verifier.version(1).stores(v1Stores);
+    verifier.version(2).stores(v2Stores);
+    verifier.version(3).stores(v3Stores);
+    await verifier.open();
+    expect(verifier.verno).toBe(3);
+    expect(await verifier.table("routines").count()).toBe(1);
+    expect(await verifier.table("settings").get("app")).toMatchObject({ dbSchemaVersion: 3, backupVersion: 3 });
+    verifier.close();
+
+    const recovered = new GymDatabase(name);
+    databases.push(recovered);
+    await recovered.open();
+    expect(recovered.verno).toBe(4);
     expect(await recovered.routines.count()).toBe(1);
   });
 
@@ -668,6 +772,58 @@ describe("IndexedDB schema and recovery", () => {
     await deleteFoodPreference("missing", db);
     expect(await listRecipes(db)).toEqual([]);
     expect(await listWaterEntriesForDate("2026-08-13", db)).toEqual([]);
+  });
+
+  it("stores exact foods and broad food groups in the pantry without touching nutrition history", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    await saveMeal({
+      id: "meal_before_pantry",
+      date: "2026-08-14",
+      meal: "lunch",
+      foodId: "pack_usda_2708403",
+      foodNameSnapshot: { vi: "Cơm", en: "Rice" },
+      grams: 150,
+      nutrientsSnapshot: { calories: 195, protein: 4, carbs: 42, fat: 0.5 },
+      createdAt: "2026-08-14T01:00:00.000Z"
+    }, db);
+
+    const createdAt = "2026-08-14T00:00:00.000Z";
+    await savePantryItem({
+      id: "pantry_rice",
+      kind: "food",
+      foodId: "pack_usda_2708403",
+      foodNameSnapshot: { vi: "Cơm trắng", en: "White rice" },
+      groupId: "starch",
+      availableGrams: 500,
+      createdAt,
+      updatedAt: createdAt
+    }, db);
+    await savePantryItem({
+      id: "pantry_any_meat",
+      kind: "group",
+      groupId: "meat",
+      groupNameSnapshot: { vi: "Thịt", en: "Meat" },
+      createdAt,
+      updatedAt: createdAt
+    }, db);
+
+    expect(await listPantryItems(db)).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "pantry_rice", foodId: "pack_usda_2708403", availableGrams: 500 }),
+      expect.objectContaining({ id: "pantry_any_meat", groupId: "meat" })
+    ]));
+    await expect(savePantryItem({
+      id: "pantry_invalid",
+      kind: "group",
+      groupId: "fruit",
+      groupNameSnapshot: { vi: "Trái cây", en: "Fruit" },
+      availableGrams: 0,
+      createdAt,
+      updatedAt: createdAt
+    }, db)).rejects.toThrow("Pantry amount");
+    await deletePantryItem("pantry_rice", db);
+    expect(await db.pantryItems.get("pantry_rice")).toBeUndefined();
+    expect(await db.meals.get("meal_before_pantry")).toBeDefined();
   });
 
   it("rolls back a meal when recent-food preference persistence fails", async () => {
