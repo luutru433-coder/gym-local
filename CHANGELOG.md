@@ -4,6 +4,7 @@
 
 - Added nutrition pack schema 2 with ten bilingual food groups, 1,200 structured recipe-ingredient relationships, meal/dietary/allergen tags, and pinned USDA source food IDs for reproducible offline menus.
 - Added local pantry records for exact foods or broad food groups, optional available amounts, additive IndexedDB schema v4 migration, recovery-point preservation, and backup v4 round trips.
+- Added deterministic offline menu ranking with exact-food/group matching, quantity coverage, meal/dietary/allergen filters, per-serving nutrition, and explicit missing-ingredient explanations.
 - Corrected estimated-recipe micronutrients so a nutrient stays unknown when any contributing ingredient lacks that value, instead of publishing a misleading partial total.
 - Kept already installed schema 1 packs compatible while adding manifest, foreign-key, relationship, and source-metadata validation for schema 2.
 - Kept backup v1/v2/v3 imports compatible by migrating them to an empty pantry without modifying historical nutrition or workout snapshots.

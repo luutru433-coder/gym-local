@@ -9,6 +9,7 @@ import {
   NutritionPackCompatibilityError,
   loadNutritionPackManifest,
   mapNutritionPackRow,
+  nutritionPackSupportsMenuSuggestions,
   parseNutritionPackManifest
 } from "./offline-pack";
 
@@ -84,6 +85,11 @@ describe("offline nutrition pack contracts", () => {
       foodGroupCount: 10,
       recipeIngredientCount: 1200
     }), "https://example.test/manifest.json", "0.6.0", 2)).not.toThrow();
+  });
+
+  it("enables menu suggestions only for a structured recipe pack", () => {
+    expect(nutritionPackSupportsMenuSuggestions(manifest())).toBe(false);
+    expect(nutritionPackSupportsMenuSuggestions(manifest({ schemaVersion: 2, recipeIngredientCount: 1200 }))).toBe(true);
   });
 
   it("keeps an installed pack usable when the manifest request is offline", async () => {

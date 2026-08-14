@@ -41,6 +41,12 @@ const manifestSchema = z.object({
 
 export type NutritionPackInfo = NutritionPackWorkerInfo;
 
+export function nutritionPackSupportsMenuSuggestions(
+  manifest: Pick<NutritionPackManifest, "schemaVersion" | "recipeIngredientCount"> | undefined
+): boolean {
+  return Boolean(manifest && manifest.schemaVersion >= 2 && (manifest.recipeIngredientCount ?? 0) > 0);
+}
+
 export type NutritionPackCompatibilityCode = "app_too_old" | "unsupported_schema" | "invalid_version";
 
 export class NutritionPackCompatibilityError extends Error {

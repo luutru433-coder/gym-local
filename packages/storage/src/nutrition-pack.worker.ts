@@ -14,6 +14,7 @@ type WorkerRequest =
   | { id: string; type: "init" }
   | { id: string; type: "install"; manifest: NutritionPackManifest }
   | { id: string; type: "search"; query: string; limit: number }
+  | { id: string; type: "recipes" }
   | { id: string; type: "remove" };
 
 interface PackPointer {
@@ -432,6 +433,39 @@ async function search(query: string, limit: number) {
   });
 }
 
+async function recipes() {
+  const db = await openDatabase();
+  if (!db) throw new Error("Offline nutrition pack is not installed");
+  const schemaVersion = Number(readMetadata(db).schema_version);
+  if (schemaVersion < 2) throw new Error("Install nutrition pack schema 2 to use offline menu suggestions");
+  const recipeRows = db.exec({
+    sql: `SELECT r.id, r.name_vi, r.name_en, r.serving_grams, r.estimation_note,
+      f.source, f.source_food_id, f.source_url, f.serving_label,
+      f.calories, f.protein, f.carbs, f.fat, f.fiber, f.sugar, f.sodium_mg,
+      f.calcium_mg, f.iron_mg, f.potassium_mg, f.magnesium_mg, f.zinc_mg,
+      f.vitamin_a_mcg, f.vitamin_c_mg, f.vitamin_d_mcg, f.vitamin_e_mg,
+      f.vitamin_k_mcg, f.vitamin_b6_mg, f.vitamin_b12_mcg, f.folate_mcg,
+      f.data_quality
+      FROM recipes r JOIN foods f ON f.id=r.food_id ORDER BY r.id`,
+    rowMode: "object",
+    returnValue: "resultRows"
+  });
+  const ingredientRows = db.exec({
+    sql: `SELECT ri.recipe_id, ri.position, ri.food_id, ri.query, ri.grams,
+      ri.role, ri.group_id, ri.is_required, f.name_vi, f.name_en
+      FROM recipe_ingredients ri JOIN foods f ON f.id=ri.food_id
+      ORDER BY ri.recipe_id, ri.position`,
+    rowMode: "object",
+    returnValue: "resultRows"
+  });
+  const tagRows = db.exec({
+    sql: "SELECT recipe_id, kind, value FROM recipe_tags ORDER BY recipe_id, kind, value",
+    rowMode: "object",
+    returnValue: "resultRows"
+  });
+  return { recipes: recipeRows, ingredients: ingredientRows, tags: tagRows };
+}
+
 async function remove() {
   closeDatabase();
   const installedPool = await pool();
@@ -450,6 +484,7 @@ async function handleRequest(request: WorkerRequest): Promise<void> {
     if (request.type === "init") result = await packInfo();
     else if (request.type === "install") result = await install(request.id, request.manifest);
     else if (request.type === "search") result = await search(request.query, request.limit);
+    else if (request.type === "recipes") result = await recipes();
     else result = await remove();
     post(request.id, "result", result);
   } catch (error) {
