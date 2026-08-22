@@ -8,6 +8,7 @@
 - The PWA build transformed 2,744 modules, precached 38 entries / 3,205.4 KiB, and passed budgets at 201.7 KiB entry and 609.0 KiB initial graph. The SQLite pack remains outside the service-worker precache.
 - Active-workout tests continue to prove that a waiting PWA update is not activated until the workout ends.
 - A live 390 px Pages smoke test confirmed the Vietnamese nutrition screen, manifest statistics, planner filters, schema-3 requirement, saved-plan empty state, and no console errors. The test also exposed and led to a regression-covered in-place pack-update action; update failure keeps the prior pack ready instead of forcing a reload.
+- The same live flow installed schema 3 over an existing schema-2 pack and found a target-confirmation integration defect; the planner now compares confirmed estimated targets with the current profile inputs and has a matching-profile regression test.
 
 ## Checkpoint N4 — deterministic weekly plans and personal-data v5
 

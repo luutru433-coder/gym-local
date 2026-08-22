@@ -199,4 +199,32 @@ describe("Vietnamese seven-day meal-plan UI", () => {
     expect(screen.getByText(/Mục tiêu hiện tại chưa được xác nhận/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tạo thực đơn 7 ngày" })).toBeDisabled();
   });
+
+  it("accepts a confirmed estimated target when its body inputs still match", () => {
+    const basis = {
+      biologicalSex: "male" as const,
+      age: 30,
+      heightCm: 175,
+      weightKg: 75,
+      activityFactor: 1.55 as const,
+      goal: "hypertrophy" as const
+    };
+    useGymStore.setState({
+      profile: {
+        ...profile,
+        ...basis,
+        nutritionTarget: {
+          ...profile.nutritionTarget!,
+          source: "estimated",
+          basis,
+          calculatedAt: "2026-08-13T00:00:00.000Z",
+          confirmedAt: timestamp
+        }
+      }
+    });
+    render(<MealPlanSection />);
+
+    expect(screen.queryByText(/Mục tiêu hiện tại chưa được xác nhận/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tạo thực đơn 7 ngày" })).toBeEnabled();
+  });
 });

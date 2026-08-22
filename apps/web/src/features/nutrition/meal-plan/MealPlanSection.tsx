@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { AsianCuisine, MealPlanRequest } from "@gym/contracts";
 import { CalendarDays, RefreshCw, Save, Sparkles } from "lucide-react";
 import { Button, Card, EmptyState, Field, Notice, SectionTitle } from "@gym/ui";
-import { nutritionTargetNeedsConfirmation } from "@gym/nutrition";
+import { nutritionTargetNeedsConfirmation, type NutritionEstimateInput } from "@gym/nutrition";
 import { formatNumber } from "../../../lib/i18n";
 import { useGymStore } from "../../../store/useGymStore";
 import { MealPlanDayCard } from "./MealPlanDayCard";
@@ -53,7 +53,19 @@ export function MealPlanSection() {
   const [localError, setLocalError] = useState<string>();
   const [swapRevision, setSwapRevision] = useState(0);
   const busy = status === "loading" || status === "saving";
-  const targetNeedsConfirmation = nutritionTargetNeedsConfirmation(profile.nutritionTarget);
+  const currentEstimateInput = useMemo<NutritionEstimateInput | undefined>(() => {
+    if (!profile.age || !profile.heightCm || !profile.weightKg || !profile.activityFactor
+      || (profile.biologicalSex !== "female" && profile.biologicalSex !== "male")) return undefined;
+    return {
+      age: profile.age,
+      heightCm: profile.heightCm,
+      weightKg: profile.weightKg,
+      activityFactor: profile.activityFactor,
+      biologicalSex: profile.biologicalSex,
+      goal: profile.goal
+    };
+  }, [profile.activityFactor, profile.age, profile.biologicalSex, profile.goal, profile.heightCm, profile.weightKg]);
+  const targetNeedsConfirmation = nutritionTargetNeedsConfirmation(profile.nutritionTarget, currentEstimateInput);
   const schemaReady = packRecord.status === "ready"
     && (packRecord.schemaVersion ?? packRecord.active?.schemaVersion ?? 0) >= 3
     && (packRecord.activeRecipeCount ?? packRecord.active?.activeRecipeCount ?? packManifest?.activeRecipeCount ?? 0) > 0;
