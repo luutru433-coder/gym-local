@@ -101,6 +101,9 @@ export function NutritionPage() {
   const target = targetIsCurrent ? profile.nutritionTarget : undefined;
   const filteredFoods = rankFoodsByPreference(foods, foodPreferences, locale, foodQuery);
   const visibleFoods = [...filteredFoods, ...offlineResults.filter((candidate) => !filteredFoods.some((saved) => saved.id === candidate.id))];
+  const packUpdateAvailable = packRecord.status === "ready"
+    && Boolean(packManifest)
+    && (packRecord.version !== packManifest?.version || packRecord.checksum !== packManifest?.sha256);
 
   useEffect(() => {
     void refreshNutritionPack().catch(() => undefined);
@@ -396,7 +399,7 @@ export function NutritionPage() {
         <div className="nutrition-pack-card__copy"><span className="eyebrow">Tùy chọn · chỉ tải khi bạn đồng ý</span><h2>Kho thực phẩm ngoại tuyến</h2><p>Dữ liệu được phép đóng gói, tìm bằng tiếng Việt có dấu hoặc không dấu, có vi chất, món Việt và món châu Á. Mục chưa duyệt không xuất hiện trong tìm kiếm thông thường.</p></div>
         <div className="nutrition-pack-card__stats"><span><strong>{formatNumber(packRecord.vietnameseDisplayFoodCount ?? packManifest?.vietnameseDisplayFoodCount ?? packManifest?.foodCount ?? 0, locale)}</strong>tên tiếng Việt đã duyệt</span><span><strong>{formatNumber(packRecord.activeRecipeCount ?? packManifest?.activeRecipeCount ?? packManifest?.vietnameseRecipeCount ?? 0, locale)}</strong>món Việt–Á</span><span><strong>{formatNumber(packRecord.recipeStepCount ?? packManifest?.recipeStepCount ?? 0, locale)}</strong>bước chế biến</span></div>
         <div className="nutrition-pack-card__action">
-          {packRecord.status === "ready" ? <><span className="pack-ready"><ShieldCheck size={16} />Đã cài v{packRecord.version}</span><Button size="sm" variant="ghost" onClick={() => void removePack()}>Xóa gói</Button></> : <Button disabled={!packManifest || packRecord.status === "downloading" || packRecord.status === "installing"} onClick={() => void installPack()}><Download size={17} />{packRecord.status === "downloading" ? "Đang tải…" : `Tải và cài ${packManifest ? formatBytes(packManifest.sizeBytes, locale) : ""}`}</Button>}
+          {packRecord.status === "ready" ? <><span className="pack-ready"><ShieldCheck size={16} />Đã cài v{packRecord.version}</span>{packUpdateAvailable ? <Button size="sm" onClick={() => void installPack()}><Download size={17} />Cập nhật kho {packManifest?.version}</Button> : null}<Button size="sm" variant="ghost" onClick={() => void removePack()}>Xóa gói</Button></> : <Button disabled={!packManifest || packRecord.status === "downloading" || packRecord.status === "installing"} onClick={() => void installPack()}><Download size={17} />{packRecord.status === "downloading" ? "Đang tải…" : `Tải và cài ${packManifest ? formatBytes(packManifest.sizeBytes, locale) : ""}`}</Button>}
           {packRecord.status === "downloading" ? <div className="pack-progress"><ProgressBar value={(packRecord.bytesDownloaded / Math.max(1, packRecord.totalBytes ?? 1)) * 100} /><small>{formatBytes(packRecord.bytesDownloaded, locale)} / {packRecord.totalBytes ? formatBytes(packRecord.totalBytes, locale) : "—"}</small></div> : null}
           {packError || nutritionError ? <small className="pack-error" role="alert">{nutritionError ?? packError}</small> : null}
         </div>

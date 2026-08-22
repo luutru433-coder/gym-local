@@ -164,6 +164,26 @@ function messageFrom(error: unknown): string {
   return error instanceof Error ? error.message : "Unexpected local data error";
 }
 
+export function nutritionPackRecordAfterFailedInstall(
+  current: NutritionPackRecord,
+  attempted: NutritionPackRecord,
+  failureMessage: string
+): NutritionPackRecord {
+  if (current.status !== "ready" || !current.version) {
+    return { ...attempted, status: "error", error: failureMessage };
+  }
+  return {
+    ...current,
+    status: "ready",
+    error: undefined,
+    operation: attempted.operation ? {
+      ...attempted.operation,
+      status: "failed",
+      errorCode: "update_failed"
+    } : undefined
+  };
+}
+
 async function loadSnapshot() {
   const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, settings, recoveryPoints] = await Promise.all([
     getProfile(),
@@ -389,9 +409,10 @@ export const useGymStore = create<GymState>((set, get) => ({
       await saveNutritionPackRecord(ready);
       set({ nutritionPackRecord: ready });
     } catch (error) {
-      const failed: NutritionPackRecord = { ...initial, status: "error", error: messageFrom(error) };
+      const failureMessage = messageFrom(error);
+      const failed = nutritionPackRecordAfterFailedInstall(current, initial, failureMessage);
       await saveNutritionPackRecord(failed).catch(() => undefined);
-      set({ nutritionPackRecord: failed, nutritionPackError: failed.error });
+      set({ nutritionPackRecord: failed, nutritionPackError: failureMessage });
       throw error;
     }
   },

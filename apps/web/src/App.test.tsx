@@ -4,11 +4,11 @@ import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip, Modal, ProgressBar, ToggleGroup, ToggleGroupItem } from "@gym/ui";
-import type { Profile, WorkoutSession } from "@gym/contracts";
+import type { NutritionPackRecord, Profile, WorkoutSession } from "@gym/contracts";
 import { defaultSettings, exportAllData, getProfile, gymDb, initializeDatabase, listRoutines, saveProfile, saveSession } from "@gym/storage";
 import { App } from "./App";
 import { UpdatePrompt } from "./components/UpdatePrompt";
-import { useGymStore } from "./store/useGymStore";
+import { nutritionPackRecordAfterFailedInstall, useGymStore } from "./store/useGymStore";
 
 beforeEach(async () => {
   document.documentElement.lang = "vi";
@@ -193,6 +193,41 @@ describe("PWA update prompt", () => {
       if (originalServiceWorker) Object.defineProperty(navigator, "serviceWorker", originalServiceWorker);
       else Reflect.deleteProperty(navigator, "serviceWorker");
     }
+  });
+});
+
+describe("nutrition pack update recovery", () => {
+  it("keeps the previous ready pack usable after an update fails", () => {
+    const current: NutritionPackRecord = {
+      id: "nutrition-pack",
+      status: "ready",
+      version: "2026.08",
+      schemaVersion: 2,
+      checksum: "a".repeat(64),
+      bytesDownloaded: 24_000_000
+    };
+    const attempted: NutritionPackRecord = {
+      id: "nutrition-pack",
+      status: "downloading",
+      version: "2026.08.1",
+      bytesDownloaded: 10,
+      operation: {
+        id: "pack_operation_test",
+        kind: "update",
+        status: "downloading",
+        bytesDownloaded: 10,
+        startedAt: "2026-08-22T00:00:00.000Z"
+      }
+    };
+
+    expect(nutritionPackRecordAfterFailedInstall(current, attempted, "checksum failed")).toEqual({
+      ...current,
+      operation: {
+        ...attempted.operation,
+        status: "failed",
+        errorCode: "update_failed"
+      }
+    });
   });
 });
 

@@ -9,6 +9,7 @@
 - Added append-only, idempotent day/week diary logging from saved plans and kept missing micronutrients unknown instead of converting them to zero.
 - Added a modular Vietnamese-only nutrition planner UI with independent filters, day cards, week rebalance, shopping list, and saved-plan controls, including automated 320 px and 390 px layout coverage.
 - Updated the GitHub Pages release pipeline to stage and verify `gym-local-nutrition-2026.08.1.sqlite3` before deployment.
+- Added an in-place “Cập nhật kho” action when a newer manifest is available; a failed update immediately restores the ready UI state for the still-valid active pack.
 
 ## 0.6.1
 
