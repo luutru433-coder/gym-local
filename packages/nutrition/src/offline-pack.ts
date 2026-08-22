@@ -25,6 +25,20 @@ const manifestSchema = z.object({
   vietnameseRecipeCount: z.number().int().nonnegative(),
   foodGroupCount: z.number().int().nonnegative().optional(),
   recipeIngredientCount: z.number().int().nonnegative().optional(),
+  vietnameseDisplayFoodCount: z.number().int().nonnegative().optional(),
+  activeRecipeCount: z.number().int().nonnegative().optional(),
+  deprecatedRecipeCount: z.number().int().nonnegative().optional(),
+  recipeStepCount: z.number().int().nonnegative().optional(),
+  cuisineCounts: z.object({
+    vietnamese: z.number().int().nonnegative().optional(),
+    chinese: z.number().int().nonnegative().optional(),
+    japanese: z.number().int().nonnegative().optional(),
+    korean: z.number().int().nonnegative().optional(),
+    thai: z.number().int().nonnegative().optional(),
+    taiwanese: z.number().int().nonnegative().optional(),
+    indian: z.number().int().nonnegative().optional(),
+    southeast_asian: z.number().int().nonnegative().optional()
+  }).optional(),
   sources: z.array(z.object({
     id: z.string().min(1),
     label: z.string().min(1),
@@ -34,8 +48,19 @@ const manifestSchema = z.object({
     retrievedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
   })).min(1)
 }).superRefine((manifest, context) => {
-  if (manifest.schemaVersion >= 2 && (manifest.foodGroupCount === undefined || manifest.recipeIngredientCount === undefined)) {
+  if (manifest.schemaVersion >= 2
+    && manifest.schemaVersion <= APP_VERSIONS.nutritionPackSchema
+    && (manifest.foodGroupCount === undefined || manifest.recipeIngredientCount === undefined)) {
     context.addIssue({ code: "custom", message: "Schema 2 nutrition packs require food and recipe relationship counts" });
+  }
+  if (manifest.schemaVersion === 3 && (
+    manifest.vietnameseDisplayFoodCount === undefined
+    || manifest.activeRecipeCount === undefined
+    || manifest.deprecatedRecipeCount === undefined
+    || manifest.recipeStepCount === undefined
+    || manifest.cuisineCounts === undefined
+  )) {
+    context.addIssue({ code: "custom", message: "Schema 3 nutrition packs require reviewed-name, recipe lifecycle, step, and cuisine counts" });
   }
 });
 
@@ -45,6 +70,17 @@ export function nutritionPackSupportsMenuSuggestions(
   manifest: Pick<NutritionPackManifest, "schemaVersion" | "recipeIngredientCount"> | undefined
 ): boolean {
   return Boolean(manifest && manifest.schemaVersion >= 2 && (manifest.recipeIngredientCount ?? 0) > 0);
+}
+
+export function nutritionPackSupportsMealPlans(
+  manifest: Pick<NutritionPackManifest, "schemaVersion" | "activeRecipeCount" | "recipeStepCount"> | undefined
+): boolean {
+  return Boolean(
+    manifest
+    && manifest.schemaVersion >= 3
+    && (manifest.activeRecipeCount ?? 0) > 0
+    && (manifest.recipeStepCount ?? 0) > 0
+  );
 }
 
 export type NutritionPackCompatibilityCode = "app_too_old" | "unsupported_schema" | "invalid_version";
@@ -115,6 +151,15 @@ function metadataNumber(metadata: Record<string, string> | undefined, key: strin
   return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
+function metadataCuisineCounts(metadata: Record<string, string> | undefined): NutritionPackManifest["cuisineCounts"] {
+  try {
+    const value = JSON.parse(metadata?.cuisine_counts ?? "{}");
+    return value && typeof value === "object" ? value as NutritionPackManifest["cuisineCounts"] : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function installedManifestFallback(info: NutritionPackInfo): NutritionPackManifest {
   const metadata = info.metadata;
   return {
@@ -132,11 +177,20 @@ function installedManifestFallback(info: NutritionPackInfo): NutritionPackManife
     vietnameseRecipeCount: metadataNumber(metadata, "vietnamese_recipe_count"),
     foodGroupCount: metadataNumber(metadata, "food_group_count") || undefined,
     recipeIngredientCount: metadataNumber(metadata, "recipe_ingredient_count") || undefined,
+    vietnameseDisplayFoodCount: metadataNumber(metadata, "vietnamese_display_food_count") || undefined,
+    activeRecipeCount: metadataNumber(metadata, "active_recipe_count") || undefined,
+    deprecatedRecipeCount: metadataNumber(metadata, "deprecated_recipe_count") || undefined,
+    recipeStepCount: metadataNumber(metadata, "recipe_step_count") || undefined,
+    cuisineCounts: metadataCuisineCounts(metadata),
     sources: []
   };
 }
 
 export function mapNutritionPackRow(row: Record<string, unknown>): FoodItem {
+  const source = String(row.source ?? "usda_fdc");
+  const supportedSource: FoodItem["source"] = [
+    "custom", "open_food_facts", "usda_fdc", "taiwan_fda", "korea_rda", "vietnamese_recipe", "asian_recipe"
+  ].includes(source) ? source as FoodItem["source"] : "usda_fdc";
   return {
     id: `pack_${String(row.id)}`,
     name: { vi: String(row.name_vi || row.name_en), en: String(row.name_en || row.name_vi) },
@@ -164,9 +218,16 @@ export function mapNutritionPackRow(row: Record<string, unknown>): FoodItem {
       vitaminB12Mcg: numberOrNull(row.vitamin_b12_mcg),
       folateMcg: numberOrNull(row.folate_mcg)
     },
-    source: row.source === "vietnamese_recipe" ? "vietnamese_recipe" : "usda_fdc",
+    source: supportedSource,
     sourceFoodId: row.source_food_id ? String(row.source_food_id) : undefined,
     sourceUrl: row.source_url ? String(row.source_url) : undefined,
+    sourceDatasetId: row.source_dataset_id ? String(row.source_dataset_id) : undefined,
+    sourceDatasetVersion: row.source_dataset_version ? String(row.source_dataset_version) : undefined,
+    sourceLicenseId: row.source_license_id ? String(row.source_license_id) : undefined,
+    translationStatus: ["unreviewed", "generated", "reviewed"].includes(String(row.translation_status))
+      ? String(row.translation_status) as FoodItem["translationStatus"]
+      : undefined,
+    translationReviewedAt: row.translation_reviewed_at ? String(row.translation_reviewed_at) : undefined,
     dataQuality: row.data_quality === "estimated_recipe" ? "estimated_recipe" : row.data_quality === "complete" ? "complete" : "partial",
     updatedAt: new Date().toISOString()
   };

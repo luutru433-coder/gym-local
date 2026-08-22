@@ -260,7 +260,26 @@ export interface NutrientProfile {
   folateMcg?: number | null;
 }
 
-export type FoodSource = "custom" | "open_food_facts" | "usda_fdc" | "vietnamese_recipe";
+export type FoodSource =
+  | "custom"
+  | "open_food_facts"
+  | "usda_fdc"
+  | "taiwan_fda"
+  | "korea_rda"
+  | "vietnamese_recipe"
+  | "asian_recipe";
+
+export type FoodTranslationStatus = "unreviewed" | "generated" | "reviewed";
+
+export type AsianCuisine =
+  | "vietnamese"
+  | "chinese"
+  | "japanese"
+  | "korean"
+  | "thai"
+  | "taiwanese"
+  | "indian"
+  | "southeast_asian";
 
 export interface FoodItem {
   id: Id;
@@ -274,6 +293,11 @@ export interface FoodItem {
   source: FoodSource;
   sourceFoodId?: string;
   sourceUrl?: string;
+  sourceDatasetId?: string;
+  sourceDatasetVersion?: string;
+  sourceLicenseId?: string;
+  translationStatus?: FoodTranslationStatus;
+  translationReviewedAt?: string;
   dataQuality?: "complete" | "partial" | "estimated_recipe";
   updatedAt: string;
 }
@@ -286,6 +310,8 @@ export interface MealEntry {
   foodNameSnapshot: LocalizedText;
   grams: number;
   nutrientsSnapshot: NutrientProfile;
+  sourceMealPlanId?: Id;
+  sourcePlannedMealId?: Id;
   createdAt: string;
 }
 
@@ -352,6 +378,109 @@ export interface PantryFoodGroupItem extends PantryItemBase {
 
 export type PantryItem = PantryFoodItem | PantryFoodGroupItem;
 
+export type MealPlanDurationDays = 1 | 7;
+
+export type MealPlanWarningCode =
+  | "insufficient_candidates"
+  | "partial_plan"
+  | "target_out_of_range"
+  | "missing_pantry"
+  | "unknown_nutrients"
+  | "stale_target";
+
+export interface MealPlanTargetSnapshot {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  formulaVersion: number;
+  confirmedAt?: string;
+  source?: "estimated" | "manual" | "legacy";
+}
+
+export interface MealPlanFiltersSnapshot {
+  includeSnack: boolean;
+  cuisines: AsianCuisine[];
+  dietaryTags: string[];
+  excludedAllergens: string[];
+  seed: string;
+}
+
+export interface MealPlanRequest {
+  durationDays?: MealPlanDurationDays;
+  includeSnack: boolean;
+  startDate?: string;
+  target: MealPlanTargetSnapshot;
+  cuisines?: AsianCuisine[];
+  dietaryTags?: string[];
+  excludedAllergens?: string[];
+  seed?: string;
+}
+
+export interface PlannedMealIngredient {
+  foodId: Id;
+  nameSnapshot: LocalizedText;
+  grams: number;
+  groupId: FoodGroupId;
+  required: boolean;
+  availableGrams?: number;
+  missingGrams: number;
+  nutrientsPer100gSnapshot?: NutrientProfile;
+}
+
+export interface PlannedMeal {
+  id: Id;
+  dayIndex: number;
+  meal: MealEntry["meal"];
+  recipeId: Id;
+  recipeNameSnapshot: LocalizedText;
+  cuisine: AsianCuisine;
+  servingGrams: number;
+  nutrientsSnapshot: NutrientProfile;
+  ingredientSnapshots: PlannedMealIngredient[];
+  sourcePackVersion: string;
+}
+
+export interface MealPlanDay {
+  dayIndex: number;
+  date?: string;
+  meals: PlannedMeal[];
+  totalsSnapshot: NutrientProfile;
+}
+
+export interface MealPlanShoppingItem {
+  foodId: Id;
+  nameSnapshot: LocalizedText;
+  groupId: FoodGroupId;
+  missingGrams: number;
+}
+
+export interface MealPlanWarning {
+  code: MealPlanWarningCode;
+  message: LocalizedText;
+  dayIndex?: number;
+  meal?: MealEntry["meal"];
+}
+
+export interface GeneratedMealPlan {
+  durationDays: MealPlanDurationDays;
+  startDate?: string;
+  targetSnapshot: MealPlanTargetSnapshot;
+  filtersSnapshot: MealPlanFiltersSnapshot;
+  days: MealPlanDay[];
+  shoppingListSnapshot: MealPlanShoppingItem[];
+  warnings: MealPlanWarning[];
+  algorithmVersion: number;
+  sourcePackVersion: string;
+}
+
+export interface SavedMealPlan extends GeneratedMealPlan {
+  id: Id;
+  name: LocalizedText;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface NutritionPackManifest {
   id: "gym-local-nutrition";
   version: string;
@@ -367,6 +496,11 @@ export interface NutritionPackManifest {
   vietnameseRecipeCount: number;
   foodGroupCount?: number;
   recipeIngredientCount?: number;
+  vietnameseDisplayFoodCount?: number;
+  activeRecipeCount?: number;
+  deprecatedRecipeCount?: number;
+  recipeStepCount?: number;
+  cuisineCounts?: Partial<Record<AsianCuisine, number>>;
   sources: Array<{
     id: string;
     label: string;
@@ -380,6 +514,7 @@ export interface NutritionPackManifest {
 export interface NutritionPackRecord {
   id: "nutrition-pack";
   version?: string;
+  schemaVersion?: number;
   status: "not_installed" | "downloading" | "installing" | "ready" | "error";
   bytesDownloaded: number;
   totalBytes?: number;
@@ -390,6 +525,11 @@ export interface NutritionPackRecord {
   vietnameseRecipeCount?: number;
   foodGroupCount?: number;
   recipeIngredientCount?: number;
+  vietnameseDisplayFoodCount?: number;
+  activeRecipeCount?: number;
+  deprecatedRecipeCount?: number;
+  recipeStepCount?: number;
+  cuisineCounts?: Partial<Record<AsianCuisine, number>>;
   error?: string;
   active?: InstalledNutritionPack;
   previous?: InstalledNutritionPack;
@@ -398,6 +538,7 @@ export interface NutritionPackRecord {
 
 export interface InstalledNutritionPack {
   version: string;
+  schemaVersion?: number;
   fileName: string;
   checksum: string;
   installedAt: string;
@@ -406,6 +547,11 @@ export interface InstalledNutritionPack {
   vietnameseRecipeCount?: number;
   foodGroupCount?: number;
   recipeIngredientCount?: number;
+  vietnameseDisplayFoodCount?: number;
+  activeRecipeCount?: number;
+  deprecatedRecipeCount?: number;
+  recipeStepCount?: number;
+  cuisineCounts?: Partial<Record<AsianCuisine, number>>;
 }
 
 export interface NutritionPackOperation {
@@ -495,6 +641,7 @@ export interface PersonalDataSnapshot {
   waterEntries: WaterEntry[];
   foodPreferences: FoodPreference[];
   pantryItems: PantryItem[];
+  mealPlans: SavedMealPlan[];
   bodyMetrics: BodyMetric[];
   customVariants: ExerciseVariant[];
   settings: AppSettings;
@@ -522,14 +669,14 @@ export interface BackupPayload {
 }
 
 export const APP_VERSIONS = {
-  app: "0.6.1",
-  database: 4,
+  app: "0.7.0",
+  database: 5,
   catalog: 3,
   routines: 2,
   nutritionFormula: 1,
-  backup: 4,
+  backup: 5,
   minimumNutritionPackSchema: 1,
-  nutritionPackSchema: 2
+  nutritionPackSchema: 3
 } as const;
 
 export function createId(prefix: string): Id {

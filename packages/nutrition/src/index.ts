@@ -14,6 +14,7 @@ import { lookupFoodByBarcode } from "./providers/open-food-facts";
 
 export * from "./offline-pack";
 export * from "./menu-suggestions";
+export * from "./meal-plans";
 export { lookupFoodByBarcode };
 
 export const NUTRITION_FORMULA_VERSION = 1;
@@ -108,7 +109,7 @@ function validationMessage(locale: NutritionLocale, field: NutritionValidationEr
     return locale === "vi" ? `${label} ph\u1ea3i l\u00e0 m\u1ed9t s\u1ed1 h\u1ee3p l\u1ec7.` : `${label} must be a valid number.`;
   }
   const labels = locale === "vi"
-    ? { date: "Ngày", grams: "Khối lượng", name: "Tên thực phẩm", calories: "Calories", protein: "Protein", carbs: "Carb", fat: "Fat" }
+    ? { date: "Ngày", grams: "Khối lượng", name: "Tên thực phẩm", calories: "Năng lượng", protein: "Chất đạm", carbs: "Chất bột đường", fat: "Chất béo" }
     : { date: "Date", grams: "Amount", name: "Food name", calories: "Calories", protein: "Protein", carbs: "Carbs", fat: "Fat" };
   if (code === "required") return locale === "vi" ? `${labels[field]} là bắt buộc.` : `${labels[field]} is required.`;
   if (code === "invalid_date") return locale === "vi" ? "Ngày không hợp lệ." : "Enter a valid date.";

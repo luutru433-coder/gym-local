@@ -4,7 +4,7 @@ Gym Local là ứng dụng PWA theo dõi tập luyện và dinh dưỡng dành c
 
 - Dùng app: https://luutru433-coder.github.io/gym-local/
 - Mã nguồn: https://github.com/luutru433-coder/gym-local
-- Gói dinh dưỡng: https://github.com/luutru433-coder/gym-local/releases/tag/nutrition-v2026.08
+- Gói dinh dưỡng: https://github.com/luutru433-coder/gym-local/releases/tag/nutrition-v2026.08.1
 
 ## Điểm chính
 
@@ -29,7 +29,7 @@ pnpm dev
 
 Mở URL Vite hiển thị trong terminal. Dữ liệu của localhost và bản GitHub Pages là hai kho trình duyệt riêng; dùng Backup/Restore để chuyển dữ liệu.
 
-Gói dinh dưỡng lớn không nằm trong Git. Bản phát hành chính thức được lưu ở GitHub Release và workflow Pages kiểm tra SHA-256 trước khi đưa tệp vào site. Khi self-host thủ công, đặt `gym-local-nutrition-2026.08.sqlite3` cạnh `nutrition-pack-manifest.json` trong thư mục public/deploy.
+Gói dinh dưỡng lớn không nằm trong Git. Bản phát hành chính thức được lưu ở GitHub Release và workflow Pages kiểm tra SHA-256 trước khi đưa tệp vào site. Khi self-host thủ công, đặt `gym-local-nutrition-2026.08.1.sqlite3` cạnh `nutrition-pack-manifest.json` trong thư mục public/deploy.
 
 ## Kiểm tra
 
@@ -42,7 +42,7 @@ pnpm nutrition:verify-pack
 
 ## Tự triển khai miễn phí lên GitHub Pages
 
-1. Tạo GitHub Release tag `nutrition-v2026.08` và upload tệp SQLite từ `outputs/`.
+1. Tạo GitHub Release tag `nutrition-v2026.08.1` và upload tệp SQLite từ `outputs/`.
 2. Push mã nguồn lên nhánh `main`.
 3. Bật Pages với source **GitHub Actions**.
 4. Workflow `.github/workflows/deploy-pages.yml` chỉ deploy sau khi toàn bộ kiểm tra và checksum gói đạt.

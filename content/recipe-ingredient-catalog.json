@@ -1,0 +1,777 @@
+{
+  "schemaVersion": 1,
+  "sourceId": "usda-fooddata-central-pinned",
+  "licenseId": "CC0-1.0",
+  "reviewedAt": "2026-08-14",
+  "ingredients": [
+    {
+      "key": "white_rice",
+      "query": "rice, white, cooked",
+      "sourceFoodId": "usda_2708403",
+      "nameVi": "Cơm trắng",
+      "nameEn": "Cooked white rice",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "brown_rice",
+      "query": "rice, brown, cooked",
+      "sourceFoodId": "usda_2708409",
+      "nameVi": "Cơm gạo lứt",
+      "nameEn": "Cooked brown rice",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "sticky_rice",
+      "query": "rice, glutinous, cooked",
+      "sourceFoodId": "usda_169711",
+      "nameVi": "Xôi trắng",
+      "nameEn": "Cooked glutinous rice",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "rice_noodles",
+      "query": "rice noodles, cooked",
+      "sourceFoodId": "usda_168914",
+      "nameVi": "Bún gạo",
+      "nameEn": "Cooked rice noodles",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "mung_noodles",
+      "query": "mung bean noodles, cooked",
+      "sourceFoodId": "usda_2708355",
+      "nameVi": "Miến đậu xanh",
+      "nameEn": "Cooked mung-bean glass noodles",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "egg_noodles",
+      "query": "egg noodles, cooked",
+      "sourceFoodId": "usda_168919",
+      "nameVi": "Mì trứng",
+      "nameEn": "Cooked egg noodles",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": false,
+      "allergenTags": [
+        "egg",
+        "gluten"
+      ]
+    },
+    {
+      "key": "oats",
+      "query": "oats, cooked",
+      "sourceFoodId": "usda_173905",
+      "nameVi": "Cháo yến mạch",
+      "nameEn": "Unsalted cooked oats",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "quinoa",
+      "query": "quinoa, cooked",
+      "sourceFoodId": "usda_168917",
+      "nameVi": "Diêm mạch chín",
+      "nameEn": "Cooked quinoa",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "corn",
+      "query": "sweet corn, cooked",
+      "sourceFoodId": "usda_169999",
+      "nameVi": "Bắp ngọt luộc",
+      "nameEn": "Unsalted cooked sweet corn",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "sweet_potato",
+      "query": "sweet potato, baked",
+      "sourceFoodId": "usda_168483",
+      "nameVi": "Khoai lang nướng",
+      "nameEn": "Unsalted baked sweet potato",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "white_bread",
+      "query": "bread, white wheat",
+      "sourceFoodId": "usda_167532",
+      "nameVi": "Bánh mì trắng",
+      "nameEn": "White wheat bread",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": false,
+      "allergenTags": [
+        "gluten"
+      ]
+    },
+    {
+      "key": "potato",
+      "query": "potatoes, boiled",
+      "sourceFoodId": "usda_170438",
+      "nameVi": "Khoai tây luộc",
+      "nameEn": "Unsalted boiled potato",
+      "groupId": "starch",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "chicken_breast",
+      "query": "chicken breast, roasted",
+      "sourceFoodId": "usda_171477",
+      "nameVi": "Ức gà quay bỏ da",
+      "nameEn": "Roasted skinless chicken breast",
+      "groupId": "meat",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": []
+    },
+    {
+      "key": "chicken_thigh",
+      "query": "chicken thigh, roasted",
+      "sourceFoodId": "usda_172388",
+      "nameVi": "Đùi gà quay bỏ da",
+      "nameEn": "Roasted skinless chicken thigh",
+      "groupId": "meat",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": []
+    },
+    {
+      "key": "duck",
+      "query": "duck, roasted",
+      "sourceFoodId": "usda_172411",
+      "nameVi": "Thịt vịt quay bỏ da",
+      "nameEn": "Roasted skinless duck",
+      "groupId": "meat",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": []
+    },
+    {
+      "key": "ground_beef",
+      "query": "ground beef, cooked",
+      "sourceFoodId": "usda_172161",
+      "nameVi": "Thịt bò xay chín",
+      "nameEn": "Cooked ground beef",
+      "groupId": "meat",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": []
+    },
+    {
+      "key": "pork_tenderloin",
+      "query": "pork tenderloin, roasted",
+      "sourceFoodId": "usda_168250",
+      "nameVi": "Thăn heo quay",
+      "nameEn": "Roasted pork tenderloin",
+      "groupId": "meat",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": []
+    },
+    {
+      "key": "salmon",
+      "query": "salmon, cooked",
+      "sourceFoodId": "usda_171998",
+      "nameVi": "Cá hồi chín",
+      "nameEn": "Dry-heat cooked Atlantic salmon",
+      "groupId": "seafood",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "fish"
+      ]
+    },
+    {
+      "key": "tuna",
+      "query": "yellowfin tuna, cooked",
+      "sourceFoodId": "usda_172006",
+      "nameVi": "Cá ngừ chín",
+      "nameEn": "Cooked yellowfin tuna",
+      "groupId": "seafood",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "fish"
+      ]
+    },
+    {
+      "key": "shrimp",
+      "query": "shrimp, cooked",
+      "sourceFoodId": "usda_175180",
+      "nameVi": "Tôm chín",
+      "nameEn": "Cooked shrimp",
+      "groupId": "seafood",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "shellfish"
+      ]
+    },
+    {
+      "key": "tilapia",
+      "query": "tilapia, cooked",
+      "sourceFoodId": "usda_175177",
+      "nameVi": "Cá rô phi chín",
+      "nameEn": "Dry-heat cooked tilapia",
+      "groupId": "seafood",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "fish"
+      ]
+    },
+    {
+      "key": "cod",
+      "query": "Atlantic cod, cooked",
+      "sourceFoodId": "usda_171956",
+      "nameVi": "Cá tuyết chín",
+      "nameEn": "Cooked Atlantic cod",
+      "groupId": "seafood",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "fish"
+      ]
+    },
+    {
+      "key": "mackerel",
+      "query": "Spanish mackerel, cooked",
+      "sourceFoodId": "usda_173674",
+      "nameVi": "Cá thu chín",
+      "nameEn": "Cooked Spanish mackerel",
+      "groupId": "seafood",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "fish"
+      ]
+    },
+    {
+      "key": "crab",
+      "query": "blue crab, cooked",
+      "sourceFoodId": "usda_174205",
+      "nameVi": "Thịt cua xanh chín",
+      "nameEn": "Cooked blue crab",
+      "groupId": "seafood",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "shellfish"
+      ]
+    },
+    {
+      "key": "egg",
+      "query": "egg, hard-boiled",
+      "sourceFoodId": "usda_173424",
+      "nameVi": "Trứng luộc chín",
+      "nameEn": "Hard-boiled egg",
+      "groupId": "eggs",
+      "vegetarian": true,
+      "vegan": false,
+      "allergenTags": [
+        "egg"
+      ]
+    },
+    {
+      "key": "tofu",
+      "query": "tofu, firm",
+      "sourceFoodId": "usda_172448",
+      "nameVi": "Đậu hũ cứng",
+      "nameEn": "Firm tofu",
+      "groupId": "plant_protein",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "soy"
+      ]
+    },
+    {
+      "key": "black_beans",
+      "query": "black beans, cooked",
+      "sourceFoodId": "usda_173735",
+      "nameVi": "Đậu đen luộc",
+      "nameEn": "Unsalted cooked black beans",
+      "groupId": "plant_protein",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "chickpeas",
+      "query": "chickpeas, cooked",
+      "sourceFoodId": "usda_173757",
+      "nameVi": "Đậu gà luộc",
+      "nameEn": "Unsalted cooked chickpeas",
+      "groupId": "plant_protein",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "lentils",
+      "query": "lentils, cooked",
+      "sourceFoodId": "usda_172421",
+      "nameVi": "Đậu lăng luộc",
+      "nameEn": "Unsalted cooked lentils",
+      "groupId": "plant_protein",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "edamame",
+      "query": "green soybeans, cooked",
+      "sourceFoodId": "usda_169283",
+      "nameVi": "Đậu nành xanh luộc",
+      "nameEn": "Unsalted cooked green soybeans",
+      "groupId": "plant_protein",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "soy"
+      ]
+    },
+    {
+      "key": "broccoli",
+      "query": "broccoli, cooked",
+      "sourceFoodId": "usda_169967",
+      "nameVi": "Bông cải xanh luộc",
+      "nameEn": "Unsalted boiled broccoli",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "carrots",
+      "query": "carrots, cooked",
+      "sourceFoodId": "usda_170394",
+      "nameVi": "Cà rốt luộc",
+      "nameEn": "Unsalted boiled carrots",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "cabbage",
+      "query": "cabbage, raw",
+      "sourceFoodId": "usda_169975",
+      "nameVi": "Bắp cải sống",
+      "nameEn": "Raw cabbage",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "chinese_cabbage",
+      "query": "Chinese cabbage, raw",
+      "sourceFoodId": "usda_169979",
+      "nameVi": "Cải thảo sống",
+      "nameEn": "Raw Chinese cabbage",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "spinach",
+      "query": "spinach, cooked",
+      "sourceFoodId": "usda_168463",
+      "nameVi": "Rau bina luộc",
+      "nameEn": "Unsalted boiled spinach",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "shiitake",
+      "query": "shiitake mushrooms, cooked",
+      "sourceFoodId": "usda_168437",
+      "nameVi": "Nấm hương chín",
+      "nameEn": "Unsalted cooked shiitake mushrooms",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "cucumber",
+      "query": "cucumber, raw",
+      "sourceFoodId": "usda_168409",
+      "nameVi": "Dưa leo tươi",
+      "nameEn": "Raw cucumber with peel",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "tomato",
+      "query": "tomato, raw",
+      "sourceFoodId": "usda_170457",
+      "nameVi": "Cà chua tươi",
+      "nameEn": "Raw ripe tomato",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "mung_sprouts",
+      "query": "mung bean sprouts, raw",
+      "sourceFoodId": "usda_169957",
+      "nameVi": "Giá đỗ sống",
+      "nameEn": "Raw mung bean sprouts",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "green_beans",
+      "query": "green beans, cooked",
+      "sourceFoodId": "usda_169141",
+      "nameVi": "Đậu que luộc",
+      "nameEn": "Unsalted cooked green beans",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "green_peas",
+      "query": "green peas, cooked",
+      "sourceFoodId": "usda_170420",
+      "nameVi": "Đậu Hà Lan luộc",
+      "nameEn": "Unsalted cooked green peas",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "lettuce",
+      "query": "romaine lettuce, raw",
+      "sourceFoodId": "usda_2709590",
+      "nameVi": "Xà lách romaine",
+      "nameEn": "Raw romaine lettuce",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "onion",
+      "query": "onion, raw",
+      "sourceFoodId": "usda_170000",
+      "nameVi": "Hành tây sống",
+      "nameEn": "Raw onion",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "spring_onion",
+      "query": "spring onion, raw",
+      "sourceFoodId": "usda_170005",
+      "nameVi": "Hành lá sống",
+      "nameEn": "Raw spring onion",
+      "groupId": "vegetables",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "banana",
+      "query": "banana, raw",
+      "sourceFoodId": "usda_173944",
+      "nameVi": "Chuối tươi",
+      "nameEn": "Raw banana",
+      "groupId": "fruit",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "mango",
+      "query": "mango, raw",
+      "sourceFoodId": "usda_169910",
+      "nameVi": "Xoài chín",
+      "nameEn": "Raw mango",
+      "groupId": "fruit",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "papaya",
+      "query": "papaya, raw",
+      "sourceFoodId": "usda_169926",
+      "nameVi": "Đu đủ chín",
+      "nameEn": "Raw papaya",
+      "groupId": "fruit",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "pineapple",
+      "query": "pineapple, raw",
+      "sourceFoodId": "usda_169124",
+      "nameVi": "Dứa tươi",
+      "nameEn": "Raw pineapple",
+      "groupId": "fruit",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "apple",
+      "query": "apple with skin, raw",
+      "sourceFoodId": "usda_171688",
+      "nameVi": "Táo tươi còn vỏ",
+      "nameEn": "Raw apple with skin",
+      "groupId": "fruit",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "yogurt",
+      "query": "plain whole-milk yogurt",
+      "sourceFoodId": "usda_171284",
+      "nameVi": "Sữa chua nguyên kem không đường",
+      "nameEn": "Plain whole-milk yogurt",
+      "groupId": "dairy",
+      "vegetarian": true,
+      "vegan": false,
+      "allergenTags": [
+        "dairy"
+      ]
+    },
+    {
+      "key": "milk",
+      "query": "whole milk",
+      "sourceFoodId": "usda_171265",
+      "nameVi": "Sữa bò nguyên kem",
+      "nameEn": "Whole cow's milk",
+      "groupId": "dairy",
+      "vegetarian": true,
+      "vegan": false,
+      "allergenTags": [
+        "dairy"
+      ]
+    },
+    {
+      "key": "sesame_oil",
+      "query": "sesame oil",
+      "sourceFoodId": "usda_171016",
+      "nameVi": "Dầu mè",
+      "nameEn": "Sesame oil",
+      "groupId": "fats",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "sesame"
+      ]
+    },
+    {
+      "key": "olive_oil",
+      "query": "olive oil",
+      "sourceFoodId": "usda_171413",
+      "nameVi": "Dầu ô liu",
+      "nameEn": "Olive oil",
+      "groupId": "fats",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "soy_sauce",
+      "query": "tamari soy sauce",
+      "sourceFoodId": "usda_174278",
+      "nameVi": "Nước tương tamari",
+      "nameEn": "Tamari soy sauce",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "soy"
+      ]
+    },
+    {
+      "key": "fish_sauce",
+      "query": "fish sauce",
+      "sourceFoodId": "usda_2706457",
+      "nameVi": "Nước mắm",
+      "nameEn": "Fish sauce",
+      "groupId": "seasonings",
+      "vegetarian": false,
+      "vegan": false,
+      "allergenTags": [
+        "fish"
+      ]
+    },
+    {
+      "key": "coconut_milk",
+      "query": "coconut milk, raw",
+      "sourceFoodId": "usda_170172",
+      "nameVi": "Nước cốt dừa",
+      "nameEn": "Coconut milk",
+      "groupId": "fats",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "coconut"
+      ]
+    },
+    {
+      "key": "peanuts",
+      "query": "peanuts, raw",
+      "sourceFoodId": "usda_172430",
+      "nameVi": "Đậu phộng",
+      "nameEn": "Raw peanuts",
+      "groupId": "fats",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "peanut"
+      ]
+    },
+    {
+      "key": "cashew",
+      "query": "cashew nuts, raw",
+      "sourceFoodId": "usda_170162",
+      "nameVi": "Hạt điều",
+      "nameEn": "Raw cashew nuts",
+      "groupId": "fats",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "tree_nut"
+      ]
+    },
+    {
+      "key": "sesame_seeds",
+      "query": "sesame seeds, toasted",
+      "sourceFoodId": "usda_170151",
+      "nameVi": "Hạt mè rang",
+      "nameEn": "Toasted sesame seeds",
+      "groupId": "fats",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": [
+        "sesame"
+      ]
+    },
+    {
+      "key": "garlic",
+      "query": "garlic, raw",
+      "sourceFoodId": "usda_169230",
+      "nameVi": "Tỏi",
+      "nameEn": "Raw garlic",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "ginger",
+      "query": "ginger root, raw",
+      "sourceFoodId": "usda_169231",
+      "nameVi": "Gừng tươi",
+      "nameEn": "Raw ginger root",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "chili",
+      "query": "red chili pepper, raw",
+      "sourceFoodId": "usda_170106",
+      "nameVi": "Ớt đỏ tươi",
+      "nameEn": "Raw red chili pepper",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "cilantro",
+      "query": "cilantro leaves, raw",
+      "sourceFoodId": "usda_169997",
+      "nameVi": "Ngò rí",
+      "nameEn": "Raw cilantro leaves",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "basil",
+      "query": "basil, fresh",
+      "sourceFoodId": "usda_172232",
+      "nameVi": "Húng quế",
+      "nameEn": "Fresh basil",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "lime_juice",
+      "query": "lime juice, raw",
+      "sourceFoodId": "usda_168156",
+      "nameVi": "Nước cốt chanh xanh",
+      "nameEn": "Raw lime juice",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    },
+    {
+      "key": "lemongrass",
+      "query": "lemongrass, raw",
+      "sourceFoodId": "usda_168573",
+      "nameVi": "Sả tươi",
+      "nameEn": "Raw lemongrass",
+      "groupId": "seasonings",
+      "vegetarian": true,
+      "vegan": true,
+      "allergenTags": []
+    }
+  ]
+}

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0
+
+- Replaced the synthetic 300-recipe catalog with nutrition pack schema 3: 800 source-traceable project-authored Việt–Á dishes, 480 Vietnamese and 320 from other Asian cuisines, each with real ingredient quantities, four Vietnamese preparation steps, meal/diet/allergen metadata, and immutable redirects for all 300 legacy IDs.
+- Added 11,373 reviewed Vietnamese food display names and 47,328 Vietnamese search aliases from pinned CC0 USDA datasets; normal schema-3 search excludes the remaining unreviewed translations and supports accented or unaccented Vietnamese queries.
+- Added deterministic offline seven-day meal planning with three main meals, optional snacks, confirmed-target gating, hard dietary/allergen filters, no repeated recipe or consecutive main protein, weekly pantry allocation, target-range warnings, and a non-mutating shopping list.
+- Added IndexedDB schema 5 and backup v5 for saved meal-plan snapshots, while preserving v1–v4 imports, personal nutrition history, custom recipes, pantry data, and the independently installed nutrition pack.
+- Added append-only, idempotent day/week diary logging from saved plans and kept missing micronutrients unknown instead of converting them to zero.
+- Added a modular Vietnamese-only nutrition planner UI with independent filters, day cards, week rebalance, shopping list, and saved-plan controls, including automated 320 px and 390 px layout coverage.
+- Updated the GitHub Pages release pipeline to stage and verify `gym-local-nutrition-2026.08.1.sqlite3` before deployment.
+
 ## 0.6.1
 
 - Fixed offline nutrition-pack installation from hosts that gzip the SQLite response. Transfer `Content-Length` is now treated as compressed size while decoded bytes and SHA-256 remain mandatory before activation.

@@ -1,7 +1,7 @@
 import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { PersonalDataSnapshot, Profile, Program, Routine, WorkoutSession } from "@gym/contracts";
+import type { PersonalDataSnapshot, Profile, Program, Routine, SavedMealPlan, WorkoutSession } from "@gym/contracts";
 import {
   GymDatabase,
   defaultSettings,
@@ -19,6 +19,7 @@ import {
   findSavedFoodByBarcode,
   listPrograms,
   listFoodPreferences,
+  listMealPlans,
   listPantryItems,
   listRecipes,
   listRecoveryPoints,
@@ -34,6 +35,7 @@ import {
   saveFoodPreference,
   savePantryItem,
   saveMeal,
+  saveMealPlan,
   saveMealAndRecordFoodUse,
   saveNutritionPackRecord,
   saveRecipe,
@@ -41,6 +43,8 @@ import {
   saveStartedSession,
   saveWaterEntry,
   selectProgram,
+  deleteMealPlan,
+  logMealPlanDays,
   undoLatestRestore
 } from "./index";
 
@@ -117,9 +121,73 @@ function snapshot(displayName: string): PersonalDataSnapshot {
     waterEntries: [],
     foodPreferences: [],
     pantryItems: [],
+    mealPlans: [],
     bodyMetrics: [],
     customVariants: [],
     settings: { ...defaultSettings }
+  };
+}
+
+function savedMealPlan(id = "meal_plan_1"): SavedMealPlan {
+  const nutrients = { calories: 420, protein: 28, carbs: 52, fat: 11, vitaminCMg: 18 };
+  return {
+    id,
+    name: { vi: "Thực đơn kiểm thử", en: "Test meal plan" },
+    durationDays: 1,
+    startDate: "2026-08-14",
+    targetSnapshot: {
+      calories: 2_000,
+      protein: 150,
+      carbs: 220,
+      fat: 65,
+      formulaVersion: 1,
+      confirmedAt: "2026-08-14T00:00:00.000Z",
+      source: "manual"
+    },
+    filtersSnapshot: {
+      includeSnack: false,
+      cuisines: ["vietnamese"],
+      dietaryTags: [],
+      excludedAllergens: ["peanut"],
+      seed: "storage-test"
+    },
+    days: [{
+      dayIndex: 0,
+      date: "2026-08-14",
+      meals: [{
+        id: "planned_meal_1",
+        dayIndex: 0,
+        meal: "lunch",
+        recipeId: "recipe_com_ga",
+        recipeNameSnapshot: { vi: "Cơm gà", en: "Chicken rice" },
+        cuisine: "vietnamese",
+        servingGrams: 420,
+        nutrientsSnapshot: nutrients,
+        ingredientSnapshots: [{
+          foodId: "food_rice",
+          nameSnapshot: { vi: "Gạo", en: "Rice" },
+          grams: 100,
+          groupId: "starch",
+          required: true,
+          availableGrams: 50,
+          missingGrams: 50,
+          nutrientsPer100gSnapshot: { calories: 360, protein: 7, carbs: 79, fat: 0.6 }
+        }],
+        sourcePackVersion: "2026.08.3"
+      }],
+      totalsSnapshot: nutrients
+    }],
+    shoppingListSnapshot: [{
+      foodId: "food_rice",
+      nameSnapshot: { vi: "Gạo", en: "Rice" },
+      groupId: "starch",
+      missingGrams: 50
+    }],
+    warnings: [],
+    algorithmVersion: 1,
+    sourcePackVersion: "2026.08.3",
+    createdAt: "2026-08-14T00:00:00.000Z",
+    updatedAt: "2026-08-14T00:00:00.000Z"
   };
 }
 
@@ -156,6 +224,11 @@ const v3Stores = {
   recoveryPoints: "id, createdAt"
 };
 
+const v4Stores = {
+  ...v3Stores,
+  pantryItems: "id, kind, foodId, groupId, updatedAt"
+};
+
 async function createV2Database(name: string): Promise<void> {
   const legacy = new Dexie(name);
   legacy.version(1).stores(v1Stores);
@@ -183,6 +256,31 @@ async function createV3Database(name: string, includeRecoveryPoint = false): Pro
       snapshot: {
         ...legacySnapshot,
         settings: { ...legacySnapshot.settings, dbSchemaVersion: 3, backupVersion: 3 }
+      }
+    });
+  }
+  legacy.close();
+}
+
+async function createV4Database(name: string, includeRecoveryPoint = false): Promise<void> {
+  const legacy = new Dexie(name);
+  legacy.version(1).stores(v1Stores);
+  legacy.version(2).stores(v2Stores);
+  legacy.version(3).stores(v3Stores);
+  legacy.version(4).stores(v4Stores);
+  await legacy.open();
+  await legacy.table("settings").put({ ...defaultSettings, dbSchemaVersion: 4, backupVersion: 4 });
+  await legacy.table("routines").put(routine());
+  if (includeRecoveryPoint) {
+    const legacySnapshot = snapshot("Before schema v5");
+    Reflect.deleteProperty(legacySnapshot, "mealPlans");
+    await legacy.table("recoveryPoints").put({
+      id: "recovery_v4",
+      reason: "before_restore",
+      createdAt: "2026-08-14T00:00:00.000Z",
+      snapshot: {
+        ...legacySnapshot,
+        settings: { ...legacySnapshot.settings, dbSchemaVersion: 4, backupVersion: 4 }
       }
     });
   }
@@ -221,7 +319,7 @@ describe("IndexedDB schema and recovery", () => {
     expect(await db.routines.count()).toBe(0);
   });
 
-  it("initializes schema v4 and round-trips every personal-data collection", async () => {
+  it("initializes schema v5 and round-trips every personal-data collection", async () => {
     const source = makeDatabase();
     await initializeDatabase(source);
     await saveProfile(profile(), source);
@@ -254,17 +352,19 @@ describe("IndexedDB schema and recovery", () => {
       createdAt: "2026-08-10T00:00:00.000Z",
       updatedAt: "2026-08-10T00:00:00.000Z"
     }, source);
+    await saveMealPlan(savedMealPlan(), source);
     const exported = await exportAllData(source);
 
-    expect(source.verno).toBe(4);
-    expect(exported.settings.dbSchemaVersion).toBe(4);
+    expect(source.verno).toBe(5);
+    expect(exported.settings.dbSchemaVersion).toBe(5);
     expect(exported.profile?.displayName).toBe("Local lifter");
     expect(exported).toMatchObject({
       programs: [{ id: "program_starter" }],
       recipes: [{ id: "recipe_oats" }],
       waterEntries: [{ id: "water_1" }],
       foodPreferences: [{ id: "preference_oats" }],
-      pantryItems: [{ id: "pantry_oats", groupId: "starch" }]
+      pantryItems: [{ id: "pantry_oats", groupId: "starch" }],
+      mealPlans: [{ id: "meal_plan_1", sourcePackVersion: "2026.08.3" }]
     });
 
     const target = makeDatabase();
@@ -297,7 +397,7 @@ describe("IndexedDB schema and recovery", () => {
     const db = new GymDatabase(name);
     databases.push(db);
     await initializeDatabase(db);
-    expect((await db.settings.get("app"))?.dbSchemaVersion).toBe(4);
+    expect((await db.settings.get("app"))?.dbSchemaVersion).toBe(5);
 
     await saveNutritionPackRecord({ id: "nutrition-pack", status: "ready", version: "2026.04", bytesDownloaded: 123, installedAt: "2026-08-10T00:00:00.000Z" }, db);
     const data = await exportAllData(db);
@@ -344,7 +444,7 @@ describe("IndexedDB schema and recovery", () => {
     databases.push(db);
     await db.open();
 
-    expect(db.verno).toBe(4);
+    expect(db.verno).toBe(5);
     expect(await db.routines.count()).toBe(1);
     expect((await db.profiles.get("profile"))?.nutritionTarget).toMatchObject({
       source: "estimated",
@@ -361,8 +461,9 @@ describe("IndexedDB schema and recovery", () => {
       db.waterEntries.count(),
       db.foodPreferences.count(),
       db.pantryItems.count(),
+      db.mealPlans.count(),
       db.recoveryPoints.count()
-    ])).toEqual([0, 0, 0, 0, 0, 0]);
+    ])).toEqual([0, 0, 0, 0, 0, 0, 0]);
   });
 
   it("rolls the entire v2-to-v3 upgrade back if its transaction fails", async () => {
@@ -395,11 +496,11 @@ describe("IndexedDB schema and recovery", () => {
     const recovered = new GymDatabase(name);
     databases.push(recovered);
     await recovered.open();
-    expect(recovered.verno).toBe(4);
+    expect(recovered.verno).toBe(5);
     expect(await recovered.routines.count()).toBe(1);
   });
 
-  it("migrates v3 to v4 additively and upgrades recovery snapshots with an empty pantry", async () => {
+  it("migrates v3 through v5 additively and upgrades recovery snapshots", async () => {
     const name = `gym-local-v3-migration-${crypto.randomUUID()}`;
     await createV3Database(name, true);
 
@@ -407,13 +508,15 @@ describe("IndexedDB schema and recovery", () => {
     databases.push(db);
     await db.open();
 
-    expect(db.verno).toBe(4);
+    expect(db.verno).toBe(5);
     expect(await db.routines.count()).toBe(1);
     expect(await db.pantryItems.toArray()).toEqual([]);
-    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 4, backupVersion: 4 });
+    expect(await db.mealPlans.toArray()).toEqual([]);
+    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
     expect((await db.recoveryPoints.get("recovery_v3"))?.snapshot).toMatchObject({
       pantryItems: [],
-      settings: { dbSchemaVersion: 4, backupVersion: 4 }
+      mealPlans: [],
+      settings: { dbSchemaVersion: 5, backupVersion: 5 }
     });
   });
 
@@ -442,7 +545,55 @@ describe("IndexedDB schema and recovery", () => {
     const recovered = new GymDatabase(name);
     databases.push(recovered);
     await recovered.open();
-    expect(recovered.verno).toBe(4);
+    expect(recovered.verno).toBe(5);
+    expect(await recovered.routines.count()).toBe(1);
+  });
+
+  it("migrates v4 to v5 additively and gives recovery snapshots an empty meal-plan list", async () => {
+    const name = `gym-local-v4-migration-${crypto.randomUUID()}`;
+    await createV4Database(name, true);
+
+    const db = new GymDatabase(name);
+    databases.push(db);
+    await db.open();
+
+    expect(db.verno).toBe(5);
+    expect(await db.routines.count()).toBe(1);
+    expect(await db.mealPlans.toArray()).toEqual([]);
+    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    expect((await db.recoveryPoints.get("recovery_v4"))?.snapshot).toMatchObject({
+      mealPlans: [],
+      settings: { dbSchemaVersion: 5, backupVersion: 5 }
+    });
+  });
+
+  it("rolls the entire v4-to-v5 upgrade back when its transaction fails", async () => {
+    const name = `gym-local-failed-v5-migration-${crypto.randomUUID()}`;
+    await createV4Database(name);
+
+    const failing = new GymDatabase(name, {
+      beforeV5Commit: () => {
+        throw new Error("simulated v5 migration failure");
+      }
+    });
+    await expect(failing.open()).rejects.toThrow("simulated v5 migration failure");
+    failing.close();
+
+    const verifier = new Dexie(name);
+    verifier.version(1).stores(v1Stores);
+    verifier.version(2).stores(v2Stores);
+    verifier.version(3).stores(v3Stores);
+    verifier.version(4).stores(v4Stores);
+    await verifier.open();
+    expect(verifier.verno).toBe(4);
+    expect(await verifier.table("routines").count()).toBe(1);
+    expect(await verifier.table("settings").get("app")).toMatchObject({ dbSchemaVersion: 4, backupVersion: 4 });
+    verifier.close();
+
+    const recovered = new GymDatabase(name);
+    databases.push(recovered);
+    await recovered.open();
+    expect(recovered.verno).toBe(5);
     expect(await recovered.routines.count()).toBe(1);
   });
 
@@ -824,6 +975,75 @@ describe("IndexedDB schema and recovery", () => {
     await deletePantryItem("pantry_rice", db);
     expect(await db.pantryItems.get("pantry_rice")).toBeUndefined();
     expect(await db.meals.get("meal_before_pantry")).toBeDefined();
+  });
+
+  it("creates, updates, lists, and deletes saved meal-plan snapshots", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    const original = await saveMealPlan(savedMealPlan(), db);
+    const updated = await saveMealPlan({
+      ...original,
+      name: { vi: "Thực đơn đã sửa", en: "Updated meal plan" },
+      createdAt: "2099-01-01T00:00:00.000Z"
+    }, db);
+
+    expect(updated.createdAt).toBe(original.createdAt);
+    expect((await listMealPlans(db))[0]).toMatchObject({
+      id: original.id,
+      name: { vi: "Thực đơn đã sửa" },
+      sourcePackVersion: "2026.08.3"
+    });
+
+    await deleteMealPlan(original.id, db);
+    expect(await listMealPlans(db)).toEqual([]);
+  });
+
+  it("logs a saved meal-plan day append-only, never consumes pantry, and skips duplicate writes", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    await savePantryItem({
+      id: "pantry_rice_for_plan",
+      kind: "food",
+      foodId: "food_rice",
+      foodNameSnapshot: { vi: "Gạo", en: "Rice" },
+      groupId: "starch",
+      availableGrams: 50,
+      createdAt: "2026-08-14T00:00:00.000Z",
+      updatedAt: "2026-08-14T00:00:00.000Z"
+    }, db);
+    const plan = await saveMealPlan(savedMealPlan(), db);
+
+    const first = await logMealPlanDays(plan.id, [0], db);
+    const second = await logMealPlanDays(plan.id, [0], db);
+
+    expect(first.createdMeals).toHaveLength(1);
+    expect(first.createdMeals[0]).toMatchObject({
+      date: "2026-08-14",
+      meal: "lunch",
+      foodNameSnapshot: { vi: "Cơm gà" },
+      sourceMealPlanId: plan.id,
+      sourcePlannedMealId: "planned_meal_1"
+    });
+    expect(second.createdMeals).toEqual([]);
+    expect(second.skippedPlannedMealIds).toEqual(["planned_meal_1"]);
+    expect(await db.meals.count()).toBe(1);
+    expect((await db.foodPreferences.where("foodId").equals("pack_recipe_com_ga").first())?.useCount).toBe(1);
+    expect((await db.pantryItems.get("pantry_rice_for_plan"))?.availableGrams).toBe(50);
+    expect(await db.mealPlans.get(plan.id)).toEqual(plan);
+  });
+
+  it("rolls an entire meal-plan logging transaction back when a preference write fails", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    const plan = await saveMealPlan(savedMealPlan("meal_plan_rollback"), db);
+    db.foodPreferences.hook("creating", () => {
+      throw new Error("simulated meal-plan preference failure");
+    });
+
+    await expect(logMealPlanDays(plan.id, [0], db)).rejects.toThrow("simulated meal-plan preference failure");
+    expect(await db.meals.count()).toBe(0);
+    expect(await db.foodPreferences.count()).toBe(0);
+    expect(await db.mealPlans.get(plan.id)).toEqual(plan);
   });
 
   it("rolls back a meal when recent-food preference persistence fails", async () => {

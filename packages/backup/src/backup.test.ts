@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
-import type { PersonalDataSnapshot } from "@gym/contracts";
+import type { PersonalDataSnapshot, SavedMealPlan } from "@gym/contracts";
 import { defaultSettings } from "@gym/storage";
 import { cloneRoutineTemplate, createSessionFromRoutine } from "@gym/workouts";
 import { createBackup, readBackup } from "./index";
@@ -20,7 +20,71 @@ function emptyData(overrides: Partial<PersonalDataSnapshot> = {}): PersonalDataS
     bodyMetrics: [],
     customVariants: [],
     settings: { ...defaultSettings },
-    ...overrides
+    ...overrides,
+    mealPlans: overrides.mealPlans ?? []
+  };
+}
+
+function savedMealPlan(): SavedMealPlan {
+  const nutrients = { calories: 420, protein: 28, carbs: 52, fat: 11, vitaminCMg: 18 };
+  return {
+    id: "meal_plan_1",
+    name: { vi: "Thực đơn 14 tháng 8", en: "August 14 meal plan" },
+    durationDays: 1,
+    startDate: "2026-08-14",
+    targetSnapshot: {
+      calories: 2_000,
+      protein: 150,
+      carbs: 220,
+      fat: 65,
+      formulaVersion: 1,
+      confirmedAt: "2026-08-14T00:00:00.000Z",
+      source: "manual"
+    },
+    filtersSnapshot: {
+      includeSnack: false,
+      cuisines: ["vietnamese"],
+      dietaryTags: [],
+      excludedAllergens: ["peanut"],
+      seed: "backup-test"
+    },
+    days: [{
+      dayIndex: 0,
+      date: "2026-08-14",
+      meals: [{
+        id: "planned_meal_1",
+        dayIndex: 0,
+        meal: "lunch",
+        recipeId: "recipe_com_ga",
+        recipeNameSnapshot: { vi: "Cơm gà", en: "Chicken rice" },
+        cuisine: "vietnamese",
+        servingGrams: 420,
+        nutrientsSnapshot: nutrients,
+        ingredientSnapshots: [{
+          foodId: "food_rice",
+          nameSnapshot: { vi: "Gạo", en: "Rice" },
+          grams: 100,
+          groupId: "starch",
+          required: true,
+          availableGrams: 50,
+          missingGrams: 50,
+          nutrientsPer100gSnapshot: { calories: 360, protein: 7, carbs: 79, fat: 0.6 }
+        }],
+        sourcePackVersion: "2026.08.3"
+      }],
+      totalsSnapshot: nutrients
+    }],
+    shoppingListSnapshot: [{
+      foodId: "food_rice",
+      nameSnapshot: { vi: "Gạo", en: "Rice" },
+      groupId: "starch",
+      missingGrams: 50
+    }],
+    warnings: [],
+    algorithmVersion: 1,
+    sourcePackVersion: "2026.08.3",
+    createdAt: "2026-08-14T00:00:00.000Z",
+    updatedAt: "2026-08-14T00:00:00.000Z"
   };
 }
 
@@ -45,6 +109,7 @@ async function legacyBackup(data: unknown, backupVersion: 1 | 2): Promise<Blob> 
 async function v3Backup(): Promise<Blob> {
   const data = emptyData();
   Reflect.deleteProperty(data, "pantryItems");
+  Reflect.deleteProperty(data, "mealPlans");
   data.settings = { ...data.settings, dbSchemaVersion: 3, backupVersion: 3 };
   const serialized = JSON.stringify(data);
   const collectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
@@ -63,8 +128,32 @@ async function v3Backup(): Promise<Blob> {
   return zip.generateAsync({ type: "blob" });
 }
 
+async function v4Backup(): Promise<Blob> {
+  const data = emptyData();
+  Reflect.deleteProperty(data, "mealPlans");
+  data.settings = { ...data.settings, dbSchemaVersion: 4, backupVersion: 4 };
+  const serialized = JSON.stringify(data);
+  const collectionKeys = [
+    "routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries",
+    "foodPreferences", "bodyMetrics", "customVariants", "pantryItems"
+  ] as const;
+  const zip = new JSZip();
+  zip.file("manifest.json", JSON.stringify({
+    appVersion: "0.6.0",
+    backupVersion: 4,
+    exportedAt: "2026-08-14T00:00:00.000Z",
+    checksum: await sha256(serialized),
+    format: "gym-local-backup",
+    dbSchemaVersion: 4,
+    dataBytes: new TextEncoder().encode(serialized).byteLength,
+    counts: Object.fromEntries(collectionKeys.map((key) => [key, data[key].length]))
+  }));
+  zip.file("data.json", serialized);
+  return zip.generateAsync({ type: "blob" });
+}
+
 describe("backup", () => {
-  it("round-trips v4 personal data, Vietnamese text, pantry, tracking semantics, and manifest metadata", async () => {
+  it("round-trips v5 personal data, Vietnamese text, pantry, meal plans, tracking semantics, and manifest metadata", async () => {
     const routine = cloneRoutineTemplate("tpl_full_body_a");
     const session = createSessionFromRoutine(routine);
     session.programId = "program_1";
@@ -104,6 +193,17 @@ describe("backup", () => {
         grams: 50,
         nutrientsSnapshot: { calories: 194, protein: 8.45, carbs: 33.15, fat: 3.45, ironMg: 2.35 },
         createdAt: "2026-08-10T01:00:00.000Z"
+      }, {
+        id: "meal_from_plan",
+        date: "2026-08-14",
+        meal: "lunch",
+        foodId: "pack_recipe_com_ga",
+        foodNameSnapshot: { vi: "Cơm gà", en: "Chicken rice" },
+        grams: 420,
+        nutrientsSnapshot: { calories: 420, protein: 28, carbs: 52, fat: 11, vitaminCMg: 18 },
+        sourceMealPlanId: "meal_plan_1",
+        sourcePlannedMealId: "planned_meal_1",
+        createdAt: "2026-08-14T01:00:00.000Z"
       }],
       recipes: [{
         id: "recipe_1",
@@ -142,23 +242,25 @@ describe("backup", () => {
         availableGrams: 500,
         createdAt: "2026-08-10T00:00:00.000Z",
         updatedAt: "2026-08-10T00:00:00.000Z"
-      }]
+      }],
+      mealPlans: [savedMealPlan()]
     });
 
     const restored = await readBackup(await createBackup(data));
 
     expect(restored.data.settings.catalogVersion).toBe(3);
-    expect(restored.manifest).toMatchObject({ backupVersion: 4, format: "gym-local-backup", dbSchemaVersion: 4 });
+    expect(restored.manifest).toMatchObject({ backupVersion: 5, format: "gym-local-backup", dbSchemaVersion: 5 });
     expect(restored.manifest.counts).toEqual({
       routines: 1,
       programs: 1,
       sessions: 1,
       foods: 1,
-      meals: 1,
+      meals: 2,
       recipes: 1,
       waterEntries: 1,
       foodPreferences: 1,
       pantryItems: 1,
+      mealPlans: 1,
       bodyMetrics: 0,
       customVariants: 0
     });
@@ -180,6 +282,16 @@ describe("backup", () => {
       useCount: 3
     });
     expect(restored.data.pantryItems[0]).toMatchObject({ id: "pantry_oats", groupId: "starch", availableGrams: 500 });
+    expect(restored.data.mealPlans[0]).toMatchObject({
+      id: "meal_plan_1",
+      algorithmVersion: 1,
+      sourcePackVersion: "2026.08.3",
+      days: [{ meals: [{ recipeNameSnapshot: { vi: "Cơm gà" } }] }]
+    });
+    expect(restored.data.meals[1]).toMatchObject({
+      sourceMealPlanId: "meal_plan_1",
+      sourcePlannedMealId: "planned_meal_1"
+    });
     expect(restored.data.settings.activeProgramId).toBe("program_1");
   });
 
@@ -204,8 +316,8 @@ describe("backup", () => {
     const restored = await readBackup(await legacyBackup(legacy, 1));
 
     expect(restored.data.foods[0].per100g).toMatchObject({ ironMg: 2.7, vitaminCMg: 28.1 });
-    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 4, backupVersion: 4 });
-    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [] });
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [], mealPlans: [] });
   });
 
   it("upgrades v2 nutrition metadata and accepts historical sessions without tracking snapshots", async () => {
@@ -266,18 +378,28 @@ describe("backup", () => {
       }
     });
     expect(restored.data.sessions[0].exercises[0].trackingProfileSnapshot).toBeUndefined();
-    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [] });
+    expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [], mealPlans: [] });
   });
 
-  it("migrates a detailed v3 backup to v4 with an empty pantry", async () => {
+  it("migrates a detailed v3 backup to v5 with empty pantry and meal-plan collections", async () => {
     const restored = await readBackup(await v3Backup());
 
     expect(restored.manifest).toMatchObject({ backupVersion: 3, dbSchemaVersion: 3 });
     expect(restored.data.pantryItems).toEqual([]);
-    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 4, backupVersion: 4 });
+    expect(restored.data.mealPlans).toEqual([]);
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
   });
 
-  it("rejects a v4 manifest whose collection counts do not exactly match data", async () => {
+  it("migrates a detailed v4 backup to v5 without changing older personal data", async () => {
+    const restored = await readBackup(await v4Backup());
+
+    expect(restored.manifest).toMatchObject({ backupVersion: 4, dbSchemaVersion: 4 });
+    expect(restored.data.pantryItems).toEqual([]);
+    expect(restored.data.mealPlans).toEqual([]);
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+  });
+
+  it("rejects a v5 manifest whose collection counts do not exactly match data", async () => {
     const original = await createBackup(emptyData());
     const zip = await JSZip.loadAsync(original);
     const manifestFile = zip.file("manifest.json");
@@ -289,7 +411,7 @@ describe("backup", () => {
     await expect(readBackup(await zip.generateAsync({ type: "blob" }))).rejects.toThrow("collection counts");
   });
 
-  it("rejects a v4 manifest whose byte count does not match serialized data", async () => {
+  it("rejects a v5 manifest whose byte count does not match serialized data", async () => {
     const original = await createBackup(emptyData());
     const zip = await JSZip.loadAsync(original);
     const manifestFile = zip.file("manifest.json");
@@ -341,6 +463,44 @@ describe("backup", () => {
     for (const [label, data] of invalidSnapshots) {
       await expect(createBackup(data), label).rejects.toThrow();
     }
+  });
+
+  it("rejects malformed saved meal plans and invalid append-only meal links", async () => {
+    const invalidDayPlan = savedMealPlan();
+    invalidDayPlan.days[0].dayIndex = 1;
+    await expect(createBackup(emptyData({ mealPlans: [invalidDayPlan] }))).rejects.toThrow("meal plan day");
+
+    const plan = savedMealPlan();
+    await expect(createBackup(emptyData({
+      mealPlans: [plan],
+      meals: [{
+        id: "meal_incomplete_plan_link",
+        date: "2026-08-14",
+        meal: "lunch",
+        foodId: "pack_recipe_com_ga",
+        foodNameSnapshot: { vi: "Cơm gà", en: "Chicken rice" },
+        grams: 420,
+        nutrientsSnapshot: { calories: 420, protein: 28, carbs: 52, fat: 11 },
+        sourceMealPlanId: plan.id,
+        createdAt: "2026-08-14T01:00:00.000Z"
+      }]
+    }))).rejects.toThrow("link is incomplete");
+
+    await expect(createBackup(emptyData({
+      mealPlans: [plan],
+      meals: [{
+        id: "meal_unknown_planned_meal",
+        date: "2026-08-14",
+        meal: "lunch",
+        foodId: "pack_recipe_com_ga",
+        foodNameSnapshot: { vi: "Cơm gà", en: "Chicken rice" },
+        grams: 420,
+        nutrientsSnapshot: { calories: 420, protein: 28, carbs: 52, fat: 11 },
+        sourceMealPlanId: plan.id,
+        sourcePlannedMealId: "planned_meal_missing",
+        createdAt: "2026-08-14T01:00:00.000Z"
+      }]
+    }))).rejects.toThrow("link is invalid");
   });
 
   it("rejects a backup whose data no longer matches its checksum", async () => {

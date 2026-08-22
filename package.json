@@ -1,6 +1,6 @@
 {
   "name": "gym-local",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.16.0",
@@ -24,7 +24,7 @@
     "media:health:online": "node scripts/media-health-report.mjs --online",
     "performance:report": "node scripts/performance-report.mjs",
     "nutrition:recipes": "node scripts/generate-vietnamese-recipes.mjs",
-    "nutrition:verify-pack": "python scripts/verify-nutrition-pack.py --db outputs/gym-local-nutrition-2026.08.sqlite3 --manifest public/nutrition-pack-manifest.json",
+    "nutrition:verify-pack": "python scripts/verify-nutrition-pack.py --db outputs/gym-local-nutrition-2026.08.1.sqlite3 --manifest public/nutrition-pack-manifest.json",
     "db:test-migrations": "vitest run packages/storage",
     "backup:test": "vitest run packages/backup",
     "release:check": "pnpm run verify && pnpm run media:health"

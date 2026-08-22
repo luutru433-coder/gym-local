@@ -1,0 +1,3973 @@
+[
+  {
+    "id": "asia_tw_001",
+    "status": "active",
+    "nameVi": "Đùi gà với cơm trắng và hành tây và cà chua – Đài Loan",
+    "nameEn": "Taiwanese-inspired chicken thigh with white rice with onion and ripe tomato",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 382,
+    "mealSlots": [
+      "breakfast",
+      "lunch"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 10,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 105,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chicken_thigh",
+        "query": "chicken thigh, roasted",
+        "sourceFoodId": "usda_172388",
+        "nameVi": "Đùi gà quay bỏ da",
+        "nameEn": "Roasted skinless chicken thigh",
+        "grams": 95,
+        "role": "protein",
+        "groupId": "meat",
+        "required": true
+      },
+      {
+        "key": "onion",
+        "query": "onion, raw",
+        "sourceFoodId": "usda_170000",
+        "nameVi": "Hành tây sống",
+        "nameEn": "Raw onion",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "tomato",
+        "query": "tomato, raw",
+        "sourceFoodId": "usda_170457",
+        "nameVi": "Cà chua tươi",
+        "nameEn": "Raw ripe tomato",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 5,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đùi gà quay bỏ da và hành tây sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, roasted skinless chicken thigh, and raw onion; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đùi gà quay bỏ da đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and roasted skinless chicken thigh evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "8198597dde6bf237726423c3f3eb30d9e389acbdd593d581ced2e5c018e906a2",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_002",
+    "status": "active",
+    "nameVi": "Mì trứng cá thu và rau bina – Đài Loan",
+    "nameEn": "Taiwanese-inspired egg noodles spanish mackerel with unsalted spinach",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "noodle_bowl",
+    "servingGrams": 428,
+    "mealSlots": [
+      "breakfast",
+      "lunch"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "egg",
+      "fish",
+      "gluten",
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 15,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "egg_noodles",
+        "query": "egg noodles, cooked",
+        "sourceFoodId": "usda_168919",
+        "nameVi": "Mì trứng",
+        "nameEn": "Cooked egg noodles",
+        "grams": 120,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "mackerel",
+        "query": "Spanish mackerel, cooked",
+        "sourceFoodId": "usda_173674",
+        "nameVi": "Cá thu chín",
+        "nameEn": "Cooked Spanish mackerel",
+        "grams": 110,
+        "role": "protein",
+        "groupId": "seafood",
+        "required": true
+      },
+      {
+        "key": "spinach",
+        "query": "spinach, cooked",
+        "sourceFoodId": "usda_168463",
+        "nameVi": "Rau bina luộc",
+        "nameEn": "Unsalted boiled spinach",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "ginger",
+        "query": "ginger root, raw",
+        "sourceFoodId": "usda_169231",
+        "nameVi": "Gừng tươi",
+        "nameEn": "Raw ginger root",
+        "grams": 3,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị mì trứng, cá thu chín và rau bina luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked egg noodles, cooked spanish mackerel, and unsalted boiled spinach; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng mì trứng và cá thu chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked egg noodles and cooked spanish mackerel evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Trộn nhẹ phần bún, miến hoặc mì với rau, sau đó thêm đạm lên trên.",
+        "en": "Toss the noodles gently with vegetables, then add the protein on top."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "cd01e1241c9e28b0c8340ffe2524cdd60cd5f328370d263d33661579e91a03c9",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_003",
+    "status": "active",
+    "nameVi": "Khoai lang trứng và đậu hà lan – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted sweet potato hard- egg with unsalted green peas",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "snack_box",
+    "servingGrams": 380,
+    "mealSlots": [
+      "snack"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian"
+    ],
+    "allergenTags": [
+      "egg",
+      "sesame"
+    ],
+    "prepMinutes": 15,
+    "cookMinutes": 10,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "sweet_potato",
+        "query": "sweet potato, baked",
+        "sourceFoodId": "usda_168483",
+        "nameVi": "Khoai lang nướng",
+        "nameEn": "Unsalted baked sweet potato",
+        "grams": 135,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "egg",
+        "query": "egg, hard-boiled",
+        "sourceFoodId": "usda_173424",
+        "nameVi": "Trứng luộc chín",
+        "nameEn": "Hard-boiled egg",
+        "grams": 100,
+        "role": "protein",
+        "groupId": "eggs",
+        "required": true
+      },
+      {
+        "key": "green_peas",
+        "query": "green peas, cooked",
+        "sourceFoodId": "usda_170420",
+        "nameVi": "Đậu Hà Lan luộc",
+        "nameEn": "Unsalted cooked green peas",
+        "grams": 45,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "mango",
+        "query": "mango, raw",
+        "sourceFoodId": "usda_169910",
+        "nameVi": "Xoài chín",
+        "nameEn": "Raw mango",
+        "grams": 80,
+        "role": "fruit",
+        "groupId": "fruit",
+        "required": false
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 10,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "lime_juice",
+        "query": "lime juice, raw",
+        "sourceFoodId": "usda_168156",
+        "nameVi": "Nước cốt chanh xanh",
+        "nameEn": "Raw lime juice",
+        "grams": 10,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị khoai lang nướng, trứng luộc chín và đậu hà lan luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed unsalted baked sweet potato, hard-boiled egg, and unsalted cooked green peas; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng khoai lang nướng và trứng luộc chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the unsalted baked sweet potato and hard-boiled egg evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần tinh bột, đạm và rau hoặc trái cây thành từng ngăn để dùng ngay hoặc mang theo.",
+        "en": "Arrange the starch, protein, and vegetables or fruit in separate sections for serving or packing."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước cốt chanh xanh, tỏi và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix raw lime juice, raw garlic, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "5cdde06678a5ee43269056445ced84691281aa30c1248e5174e687ea2da8712c",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_004",
+    "status": "active",
+    "nameVi": "Xôi trắng đậu nành xanh và bắp cải – Đài Loan",
+    "nameEn": "Taiwanese-inspired glutinous rice unsalted green soybeans with cabbage",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "snack_box",
+    "servingGrams": 315,
+    "mealSlots": [
+      "snack"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 20,
+    "cookMinutes": 15,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "sticky_rice",
+        "query": "rice, glutinous, cooked",
+        "sourceFoodId": "usda_169711",
+        "nameVi": "Xôi trắng",
+        "nameEn": "Cooked glutinous rice",
+        "grams": 150,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "edamame",
+        "query": "green soybeans, cooked",
+        "sourceFoodId": "usda_169283",
+        "nameVi": "Đậu nành xanh luộc",
+        "nameEn": "Unsalted cooked green soybeans",
+        "grams": 90,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "cabbage",
+        "query": "cabbage, raw",
+        "sourceFoodId": "usda_169975",
+        "nameVi": "Bắp cải sống",
+        "nameEn": "Raw cabbage",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 12,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "lime_juice",
+        "query": "lime juice, raw",
+        "sourceFoodId": "usda_168156",
+        "nameVi": "Nước cốt chanh xanh",
+        "nameEn": "Raw lime juice",
+        "grams": 3,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị xôi trắng, đậu nành xanh luộc và bắp cải sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked glutinous rice, unsalted cooked green soybeans, and raw cabbage; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng xôi trắng và đậu nành xanh luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked glutinous rice and unsalted cooked green soybeans evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần tinh bột, đạm và rau hoặc trái cây thành từng ngăn để dùng ngay hoặc mang theo.",
+        "en": "Arrange the starch, protein, and vegetables or fruit in separate sections for serving or packing."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước cốt chanh xanh, hành lá sống và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix raw lime juice, raw spring onion, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "85a8ddcbb94eabbef2f23544234f1480bc6166d5b654108d24732acfd331082c",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_005",
+    "status": "active",
+    "nameVi": "Đậu gà với cơm trắng và giá đỗ và hành lá – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted chickpeas with white rice with mung bean sprouts and spring onion",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 462,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 30,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 165,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chickpeas",
+        "query": "chickpeas, cooked",
+        "sourceFoodId": "usda_173757",
+        "nameVi": "Đậu gà luộc",
+        "nameEn": "Unsalted cooked chickpeas",
+        "grams": 105,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "mung_sprouts",
+        "query": "mung bean sprouts, raw",
+        "sourceFoodId": "usda_169957",
+        "nameVi": "Giá đỗ sống",
+        "nameEn": "Raw mung bean sprouts",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 5,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "chili",
+        "query": "red chili pepper, raw",
+        "sourceFoodId": "usda_170106",
+        "nameVi": "Ớt đỏ tươi",
+        "nameEn": "Raw red chili pepper",
+        "grams": 10,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu gà luộc và giá đỗ sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked chickpeas, and raw mung bean sprouts; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu gà luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked chickpeas evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "7c642210c929612b5fc3423dda9205bbd0e4aebe410e191a76438b7c3e1c71be",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_006",
+    "status": "active",
+    "nameVi": "Cơm trắng thịt vịt và bông cải xanh – Đài Loan",
+    "nameEn": "Taiwanese-inspired white rice duck with unsalted broccoli",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "rice_bowl",
+    "servingGrams": 470,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 10,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 180,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "duck",
+        "query": "duck, roasted",
+        "sourceFoodId": "usda_172411",
+        "nameVi": "Thịt vịt quay bỏ da",
+        "nameEn": "Roasted skinless duck",
+        "grams": 95,
+        "role": "protein",
+        "groupId": "meat",
+        "required": true
+      },
+      {
+        "key": "broccoli",
+        "query": "broccoli, cooked",
+        "sourceFoodId": "usda_169967",
+        "nameVi": "Bông cải xanh luộc",
+        "nameEn": "Unsalted boiled broccoli",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, thịt vịt quay bỏ da và bông cải xanh luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, roasted skinless duck, and unsalted boiled broccoli; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và thịt vịt quay bỏ da đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and roasted skinless duck evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần cơm ở đáy tô, thêm đạm và rau lên trên để mỗi khẩu phần có đủ thành phần.",
+        "en": "Place rice in the bowl, then add protein and vegetables so each serving contains every component."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "ba57d0333c86759f28b960c8e73143212ca790d427f616f36df7b2c0bfa1334e",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_007",
+    "status": "active",
+    "nameVi": "Mì trứng cá tuyết và dưa leo và đậu que – Đài Loan",
+    "nameEn": "Taiwanese-inspired egg noodles atlantic cod with cucumber with peel and unsalted green beans",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "noodle_bowl",
+    "servingGrams": 338,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "egg",
+      "fish",
+      "gluten",
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 15,
+    "cookMinutes": 15,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "egg_noodles",
+        "query": "egg noodles, cooked",
+        "sourceFoodId": "usda_168919",
+        "nameVi": "Mì trứng",
+        "nameEn": "Cooked egg noodles",
+        "grams": 90,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "cod",
+        "query": "Atlantic cod, cooked",
+        "sourceFoodId": "usda_171956",
+        "nameVi": "Cá tuyết chín",
+        "nameEn": "Cooked Atlantic cod",
+        "grams": 120,
+        "role": "protein",
+        "groupId": "seafood",
+        "required": true
+      },
+      {
+        "key": "cucumber",
+        "query": "cucumber, raw",
+        "sourceFoodId": "usda_168409",
+        "nameVi": "Dưa leo tươi",
+        "nameEn": "Raw cucumber with peel",
+        "grams": 45,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "green_beans",
+        "query": "green beans, cooked",
+        "sourceFoodId": "usda_169141",
+        "nameVi": "Đậu que luộc",
+        "nameEn": "Unsalted cooked green beans",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 10,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 10,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 3,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị mì trứng, cá tuyết chín và dưa leo tươi; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked egg noodles, cooked atlantic cod, and raw cucumber with peel; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng mì trứng và cá tuyết chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked egg noodles and cooked atlantic cod evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Trộn nhẹ phần bún, miến hoặc mì với rau, sau đó thêm đạm lên trên.",
+        "en": "Toss the noodles gently with vegetables, then add the protein on top."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "f99d1379f1d1700fea7dcecd5ac3d072ed5db05d6585b4768b39bf7dff1ca949",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_008",
+    "status": "active",
+    "nameVi": "Trứng với cơm gạo lứt và hành tây – Đài Loan",
+    "nameEn": "Taiwanese-inspired hard- egg with brown rice with onion",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 322,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian"
+    ],
+    "allergenTags": [
+      "egg",
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 20,
+    "cookMinutes": 20,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "brown_rice",
+        "query": "rice, brown, cooked",
+        "sourceFoodId": "usda_2708409",
+        "nameVi": "Cơm gạo lứt",
+        "nameEn": "Cooked brown rice",
+        "grams": 105,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "egg",
+        "query": "egg, hard-boiled",
+        "sourceFoodId": "usda_173424",
+        "nameVi": "Trứng luộc chín",
+        "nameEn": "Hard-boiled egg",
+        "grams": 75,
+        "role": "protein",
+        "groupId": "eggs",
+        "required": true
+      },
+      {
+        "key": "onion",
+        "query": "onion, raw",
+        "sourceFoodId": "usda_170000",
+        "nameVi": "Hành tây sống",
+        "nameEn": "Raw onion",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 12,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 3,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 60,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "ginger",
+        "query": "ginger root, raw",
+        "sourceFoodId": "usda_169231",
+        "nameVi": "Gừng tươi",
+        "nameEn": "Raw ginger root",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm gạo lứt, trứng luộc chín và hành tây sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked brown rice, hard-boiled egg, and raw onion; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm gạo lứt và trứng luộc chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked brown rice and hard-boiled egg evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "6b1882d436c54153a0ed8e48e47c71e8a3823d7f8f5a0faafe07636c490e3970",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_009",
+    "status": "active",
+    "nameVi": "Cơm trắng đậu nành xanh và rau bina và nấm hương – Đài Loan",
+    "nameEn": "Taiwanese-inspired white rice unsalted green soybeans with unsalted spinach and unsalted shiitake mushrooms",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "rice_bowl",
+    "servingGrams": 407,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 25,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 120,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "edamame",
+        "query": "green soybeans, cooked",
+        "sourceFoodId": "usda_169283",
+        "nameVi": "Đậu nành xanh luộc",
+        "nameEn": "Unsalted cooked green soybeans",
+        "grams": 105,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "spinach",
+        "query": "spinach, cooked",
+        "sourceFoodId": "usda_168463",
+        "nameVi": "Rau bina luộc",
+        "nameEn": "Unsalted boiled spinach",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "shiitake",
+        "query": "shiitake mushrooms, cooked",
+        "sourceFoodId": "usda_168437",
+        "nameVi": "Nấm hương chín",
+        "nameEn": "Unsalted cooked shiitake mushrooms",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 5,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu nành xanh luộc và rau bina luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked green soybeans, and unsalted boiled spinach; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu nành xanh luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked green soybeans evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần cơm ở đáy tô, thêm đạm và rau lên trên để mỗi khẩu phần có đủ thành phần.",
+        "en": "Place rice in the bowl, then add protein and vegetables so each serving contains every component."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "9d4731be4cee19ef1dcb13fd9d8e12eea368989efeceb6e5e9684551d35404c7",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_010",
+    "status": "active",
+    "nameVi": "Đậu gà với cơm trắng và đậu hà lan – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted chickpeas with white rice with unsalted green peas",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 450,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 30,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 135,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chickpeas",
+        "query": "chickpeas, cooked",
+        "sourceFoodId": "usda_173757",
+        "nameVi": "Đậu gà luộc",
+        "nameEn": "Unsalted cooked chickpeas",
+        "grams": 120,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "green_peas",
+        "query": "green peas, cooked",
+        "sourceFoodId": "usda_170420",
+        "nameVi": "Đậu Hà Lan luộc",
+        "nameEn": "Unsalted cooked green peas",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu gà luộc và đậu hà lan luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked chickpeas, and unsalted cooked green peas; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu gà luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked chickpeas evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "e9020b5b173b8eac4a1c13a7589c07a4cfd1871fab87701815273c074e05c3e0",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_011",
+    "status": "active",
+    "nameVi": "Thịt bò xay với cơm trắng và bắp cải và cà rốt – Đài Loan",
+    "nameEn": "Taiwanese-inspired ground beef with white rice with cabbage and unsalted carrots",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 378,
+    "mealSlots": [
+      "breakfast",
+      "lunch"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 15,
+    "cookMinutes": 10,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 150,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "ground_beef",
+        "query": "ground beef, cooked",
+        "sourceFoodId": "usda_172161",
+        "nameVi": "Thịt bò xay chín",
+        "nameEn": "Cooked ground beef",
+        "grams": 95,
+        "role": "protein",
+        "groupId": "meat",
+        "required": true
+      },
+      {
+        "key": "cabbage",
+        "query": "cabbage, raw",
+        "sourceFoodId": "usda_169975",
+        "nameVi": "Bắp cải sống",
+        "nameEn": "Raw cabbage",
+        "grams": 45,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "carrots",
+        "query": "carrots, cooked",
+        "sourceFoodId": "usda_170394",
+        "nameVi": "Cà rốt luộc",
+        "nameEn": "Unsalted boiled carrots",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 10,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 10,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 3,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "chili",
+        "query": "red chili pepper, raw",
+        "sourceFoodId": "usda_170106",
+        "nameVi": "Ớt đỏ tươi",
+        "nameEn": "Raw red chili pepper",
+        "grams": 5,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, thịt bò xay chín và bắp cải sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, cooked ground beef, and raw cabbage; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và thịt bò xay chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and cooked ground beef evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "8b198a8b7613c1a701c7a7ae01c38d7d708dca73facb713ed63c5f897b265f5b",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_012",
+    "status": "active",
+    "nameVi": "Mì trứng cá rô phi và giá đỗ – Đài Loan",
+    "nameEn": "Taiwanese-inspired egg noodles dry-heat tilapia with mung bean sprouts",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "noodle_bowl",
+    "servingGrams": 390,
+    "mealSlots": [
+      "breakfast",
+      "lunch"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "egg",
+      "fish",
+      "gluten",
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 20,
+    "cookMinutes": 15,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "egg_noodles",
+        "query": "egg noodles, cooked",
+        "sourceFoodId": "usda_168919",
+        "nameVi": "Mì trứng",
+        "nameEn": "Cooked egg noodles",
+        "grams": 165,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "tilapia",
+        "query": "tilapia, cooked",
+        "sourceFoodId": "usda_175177",
+        "nameVi": "Cá rô phi chín",
+        "nameEn": "Dry-heat cooked tilapia",
+        "grams": 90,
+        "role": "protein",
+        "groupId": "seafood",
+        "required": true
+      },
+      {
+        "key": "mung_sprouts",
+        "query": "mung bean sprouts, raw",
+        "sourceFoodId": "usda_169957",
+        "nameVi": "Giá đỗ sống",
+        "nameEn": "Raw mung bean sprouts",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 12,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 3,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 60,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị mì trứng, cá rô phi chín và giá đỗ sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked egg noodles, dry-heat cooked tilapia, and raw mung bean sprouts; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng mì trứng và cá rô phi chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked egg noodles and dry-heat cooked tilapia evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Trộn nhẹ phần bún, miến hoặc mì với rau, sau đó thêm đạm lên trên.",
+        "en": "Toss the noodles gently with vegetables, then add the protein on top."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "961102e55081e591055ede59a45339950591d52a3c7aeff1cdb22e4d5363232e",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_013",
+    "status": "active",
+    "nameVi": "Bánh mì trắng trứng và bông cải xanh – Đài Loan",
+    "nameEn": "Taiwanese-inspired white wheat bread hard- egg with unsalted broccoli",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "snack_box",
+    "servingGrams": 510,
+    "mealSlots": [
+      "snack"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian"
+    ],
+    "allergenTags": [
+      "dairy",
+      "egg",
+      "gluten"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 15,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "white_bread",
+        "query": "bread, white wheat",
+        "sourceFoodId": "usda_167532",
+        "nameVi": "Bánh mì trắng",
+        "nameEn": "White wheat bread",
+        "grams": 180,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "egg",
+        "query": "egg, hard-boiled",
+        "sourceFoodId": "usda_173424",
+        "nameVi": "Trứng luộc chín",
+        "nameEn": "Hard-boiled egg",
+        "grams": 50,
+        "role": "protein",
+        "groupId": "eggs",
+        "required": true
+      },
+      {
+        "key": "broccoli",
+        "query": "broccoli, cooked",
+        "sourceFoodId": "usda_169967",
+        "nameVi": "Bông cải xanh luộc",
+        "nameEn": "Unsalted boiled broccoli",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "mango",
+        "query": "mango, raw",
+        "sourceFoodId": "usda_169910",
+        "nameVi": "Xoài chín",
+        "nameEn": "Raw mango",
+        "grams": 120,
+        "role": "fruit",
+        "groupId": "fruit",
+        "required": false
+      },
+      {
+        "key": "yogurt",
+        "query": "plain whole-milk yogurt",
+        "sourceFoodId": "usda_171284",
+        "nameVi": "Sữa chua nguyên kem không đường",
+        "nameEn": "Plain whole-milk yogurt",
+        "grams": 80,
+        "role": "fat",
+        "groupId": "dairy",
+        "required": false
+      },
+      {
+        "key": "lime_juice",
+        "query": "lime juice, raw",
+        "sourceFoodId": "usda_168156",
+        "nameVi": "Nước cốt chanh xanh",
+        "nameEn": "Raw lime juice",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị bánh mì trắng, trứng luộc chín và bông cải xanh luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed white wheat bread, hard-boiled egg, and unsalted boiled broccoli; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng bánh mì trắng và trứng luộc chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the white wheat bread and hard-boiled egg evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần tinh bột, đạm và rau hoặc trái cây thành từng ngăn để dùng ngay hoặc mang theo.",
+        "en": "Arrange the starch, protein, and vegetables or fruit in separate sections for serving or packing."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước cốt chanh xanh, tỏi và sữa chua nguyên kem không đường; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix raw lime juice, raw garlic, and plain whole-milk yogurt; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "6c00c82af1ae1ec307875d38fff7a7875cf005353b12d77d56c4420398ad86ac",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_014",
+    "status": "active",
+    "nameVi": "Cháo yến mạch đậu nành xanh và dưa leo – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted oats unsalted green soybeans with cucumber with peel",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "snack_box",
+    "servingGrams": 315,
+    "mealSlots": [
+      "snack"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 5,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "oats",
+        "query": "oats, cooked",
+        "sourceFoodId": "usda_173905",
+        "nameVi": "Cháo yến mạch",
+        "nameEn": "Unsalted cooked oats",
+        "grams": 90,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "edamame",
+        "query": "green soybeans, cooked",
+        "sourceFoodId": "usda_169283",
+        "nameVi": "Đậu nành xanh luộc",
+        "nameEn": "Unsalted cooked green soybeans",
+        "grams": 120,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "cucumber",
+        "query": "cucumber, raw",
+        "sourceFoodId": "usda_168409",
+        "nameVi": "Dưa leo tươi",
+        "nameEn": "Raw cucumber with peel",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "lime_juice",
+        "query": "lime juice, raw",
+        "sourceFoodId": "usda_168156",
+        "nameVi": "Nước cốt chanh xanh",
+        "nameEn": "Raw lime juice",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cháo yến mạch, đậu nành xanh luộc và dưa leo tươi; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed unsalted cooked oats, unsalted cooked green soybeans, and raw cucumber with peel; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cháo yến mạch và đậu nành xanh luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the unsalted cooked oats and unsalted cooked green soybeans evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần tinh bột, đạm và rau hoặc trái cây thành từng ngăn để dùng ngay hoặc mang theo.",
+        "en": "Arrange the starch, protein, and vegetables or fruit in separate sections for serving or packing."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước cốt chanh xanh, hành lá sống và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix raw lime juice, raw spring onion, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "77915fea3a207436e02942921f7f5fde32faa4b3f1486ee443e7891e91519151",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_015",
+    "status": "active",
+    "nameVi": "Cơm trắng đậu gà và hành tây và cà chua – Đài Loan",
+    "nameEn": "Taiwanese-inspired white rice unsalted chickpeas with onion and ripe tomato",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "rice_bowl",
+    "servingGrams": 368,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 15,
+    "cookMinutes": 30,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 105,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chickpeas",
+        "query": "chickpeas, cooked",
+        "sourceFoodId": "usda_173757",
+        "nameVi": "Đậu gà luộc",
+        "nameEn": "Unsalted cooked chickpeas",
+        "grams": 135,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "onion",
+        "query": "onion, raw",
+        "sourceFoodId": "usda_170000",
+        "nameVi": "Hành tây sống",
+        "nameEn": "Raw onion",
+        "grams": 45,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "tomato",
+        "query": "tomato, raw",
+        "sourceFoodId": "usda_170457",
+        "nameVi": "Cà chua tươi",
+        "nameEn": "Raw ripe tomato",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 10,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 10,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 3,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu gà luộc và hành tây sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked chickpeas, and raw onion; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu gà luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked chickpeas evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần cơm ở đáy tô, thêm đạm và rau lên trên để mỗi khẩu phần có đủ thành phần.",
+        "en": "Place rice in the bowl, then add protein and vegetables so each serving contains every component."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "68e0c04ae9611b206841dc20a4c49c8c4df5c3e0daf2491d193cd0bd28ec10ce",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_016",
+    "status": "active",
+    "nameVi": "Thăn heo quay với cơm trắng và rau bina – Đài Loan",
+    "nameEn": "Taiwanese-inspired roasted pork tenderloin with white rice with unsalted spinach",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 350,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 20,
+    "cookMinutes": 10,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 120,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "pork_tenderloin",
+        "query": "pork tenderloin, roasted",
+        "sourceFoodId": "usda_168250",
+        "nameVi": "Thăn heo quay",
+        "nameEn": "Roasted pork tenderloin",
+        "grams": 95,
+        "role": "protein",
+        "groupId": "meat",
+        "required": true
+      },
+      {
+        "key": "spinach",
+        "query": "spinach, cooked",
+        "sourceFoodId": "usda_168463",
+        "nameVi": "Rau bina luộc",
+        "nameEn": "Unsalted boiled spinach",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 12,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 3,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 60,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, thăn heo quay và rau bina luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, roasted pork tenderloin, and unsalted boiled spinach; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và thăn heo quay đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and roasted pork tenderloin evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "9ba548dccd935096af316135036d6b41a4adfd521531bc52f3300b860ad82a31",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_017",
+    "status": "active",
+    "nameVi": "Mì trứng tôm và đậu hà lan và cải thảo – Đài Loan",
+    "nameEn": "Taiwanese-inspired egg noodles shrimp with unsalted green peas and chinese cabbage",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "noodle_bowl",
+    "servingGrams": 427,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "egg",
+      "gluten",
+      "sesame",
+      "shellfish",
+      "soy"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 15,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "egg_noodles",
+        "query": "egg noodles, cooked",
+        "sourceFoodId": "usda_168919",
+        "nameVi": "Mì trứng",
+        "nameEn": "Cooked egg noodles",
+        "grams": 135,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "shrimp",
+        "query": "shrimp, cooked",
+        "sourceFoodId": "usda_175180",
+        "nameVi": "Tôm chín",
+        "nameEn": "Cooked shrimp",
+        "grams": 100,
+        "role": "protein",
+        "groupId": "seafood",
+        "required": true
+      },
+      {
+        "key": "green_peas",
+        "query": "green peas, cooked",
+        "sourceFoodId": "usda_170420",
+        "nameVi": "Đậu Hà Lan luộc",
+        "nameEn": "Unsalted cooked green peas",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "chinese_cabbage",
+        "query": "Chinese cabbage, raw",
+        "sourceFoodId": "usda_169979",
+        "nameVi": "Cải thảo sống",
+        "nameEn": "Raw Chinese cabbage",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 5,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "chili",
+        "query": "red chili pepper, raw",
+        "sourceFoodId": "usda_170106",
+        "nameVi": "Ớt đỏ tươi",
+        "nameEn": "Raw red chili pepper",
+        "grams": 10,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị mì trứng, tôm chín và đậu hà lan luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked egg noodles, cooked shrimp, and unsalted cooked green peas; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng mì trứng và tôm chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked egg noodles and cooked shrimp evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Trộn nhẹ phần bún, miến hoặc mì với rau, sau đó thêm đạm lên trên.",
+        "en": "Toss the noodles gently with vegetables, then add the protein on top."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "8ac172ff85f2be7d8e54aa47b678605f2c1b04fc8b90daa8a4014099e640f2b0",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_018",
+    "status": "active",
+    "nameVi": "Cơm gạo lứt trứng và bắp cải – Đài Loan",
+    "nameEn": "Taiwanese-inspired brown rice hard- egg with cabbage",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "rice_bowl",
+    "servingGrams": 445,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian"
+    ],
+    "allergenTags": [
+      "egg",
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "brown_rice",
+        "query": "rice, brown, cooked",
+        "sourceFoodId": "usda_2708409",
+        "nameVi": "Cơm gạo lứt",
+        "nameEn": "Cooked brown rice",
+        "grams": 150,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "egg",
+        "query": "egg, hard-boiled",
+        "sourceFoodId": "usda_173424",
+        "nameVi": "Trứng luộc chín",
+        "nameEn": "Hard-boiled egg",
+        "grams": 100,
+        "role": "protein",
+        "groupId": "eggs",
+        "required": true
+      },
+      {
+        "key": "cabbage",
+        "query": "cabbage, raw",
+        "sourceFoodId": "usda_169975",
+        "nameVi": "Bắp cải sống",
+        "nameEn": "Raw cabbage",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm gạo lứt, trứng luộc chín và bắp cải sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked brown rice, hard-boiled egg, and raw cabbage; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm gạo lứt và trứng luộc chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked brown rice and hard-boiled egg evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần cơm ở đáy tô, thêm đạm và rau lên trên để mỗi khẩu phần có đủ thành phần.",
+        "en": "Place rice in the bowl, then add protein and vegetables so each serving contains every component."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "09e3caf50941520ba362019a17b2da566f807ba827915678e39050fd9291478b",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_019",
+    "status": "active",
+    "nameVi": "Đậu nành xanh với cơm trắng và giá đỗ và hành lá – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted green soybeans with white rice with mung bean sprouts and spring onion",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 428,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 15,
+    "cookMinutes": 25,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 165,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "edamame",
+        "query": "green soybeans, cooked",
+        "sourceFoodId": "usda_169283",
+        "nameVi": "Đậu nành xanh luộc",
+        "nameEn": "Unsalted cooked green soybeans",
+        "grams": 135,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "mung_sprouts",
+        "query": "mung bean sprouts, raw",
+        "sourceFoodId": "usda_169957",
+        "nameVi": "Giá đỗ sống",
+        "nameEn": "Raw mung bean sprouts",
+        "grams": 45,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 10,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 10,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 3,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu nành xanh luộc và giá đỗ sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked green soybeans, and raw mung bean sprouts; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu nành xanh luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked green soybeans evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "5575357a5600a25caca4f9c8847c1152b98db18013a7b1d847b852ba30403c73",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_020",
+    "status": "active",
+    "nameVi": "Đậu gà với cơm trắng và bông cải xanh – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted chickpeas with white rice with unsalted broccoli",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 412,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 20,
+    "cookMinutes": 30,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 180,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chickpeas",
+        "query": "chickpeas, cooked",
+        "sourceFoodId": "usda_173757",
+        "nameVi": "Đậu gà luộc",
+        "nameEn": "Unsalted cooked chickpeas",
+        "grams": 90,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "broccoli",
+        "query": "broccoli, cooked",
+        "sourceFoodId": "usda_169967",
+        "nameVi": "Bông cải xanh luộc",
+        "nameEn": "Unsalted boiled broccoli",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 12,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 3,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 60,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "ginger",
+        "query": "ginger root, raw",
+        "sourceFoodId": "usda_169231",
+        "nameVi": "Gừng tươi",
+        "nameEn": "Raw ginger root",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu gà luộc và bông cải xanh luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked chickpeas, and unsalted boiled broccoli; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu gà luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked chickpeas evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "46368c5c15ce14a7ae00d816d5c893bc7c0df29eaf94847154e780e0d3bc07c7",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_021",
+    "status": "active",
+    "nameVi": "Cơm trắng ức gà và dưa leo và đậu que – Đài Loan",
+    "nameEn": "Taiwanese-inspired white rice chicken breast with cucumber with peel and unsalted green beans",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "rice_bowl",
+    "servingGrams": 367,
+    "mealSlots": [
+      "breakfast",
+      "lunch"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 10,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 90,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chicken_breast",
+        "query": "chicken breast, roasted",
+        "sourceFoodId": "usda_171477",
+        "nameVi": "Ức gà quay bỏ da",
+        "nameEn": "Roasted skinless chicken breast",
+        "grams": 95,
+        "role": "protein",
+        "groupId": "meat",
+        "required": true
+      },
+      {
+        "key": "cucumber",
+        "query": "cucumber, raw",
+        "sourceFoodId": "usda_168409",
+        "nameVi": "Dưa leo tươi",
+        "nameEn": "Raw cucumber with peel",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "green_beans",
+        "query": "green beans, cooked",
+        "sourceFoodId": "usda_169141",
+        "nameVi": "Đậu que luộc",
+        "nameEn": "Unsalted cooked green beans",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 5,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, ức gà quay bỏ da và dưa leo tươi; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, roasted skinless chicken breast, and raw cucumber with peel; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và ức gà quay bỏ da đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and roasted skinless chicken breast evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần cơm ở đáy tô, thêm đạm và rau lên trên để mỗi khẩu phần có đủ thành phần.",
+        "en": "Place rice in the bowl, then add protein and vegetables so each serving contains every component."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "f9d1bc02c415099b33a5c3f039d23337982c15313f99369a58bfbe0cc34b044b",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_022",
+    "status": "active",
+    "nameVi": "Mì trứng cá ngừ và hành tây – Đài Loan",
+    "nameEn": "Taiwanese-inspired egg noodles yellowfin tuna with onion",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "noodle_bowl",
+    "servingGrams": 410,
+    "mealSlots": [
+      "breakfast",
+      "lunch"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "egg",
+      "fish",
+      "gluten",
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 15,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "egg_noodles",
+        "query": "egg noodles, cooked",
+        "sourceFoodId": "usda_168919",
+        "nameVi": "Mì trứng",
+        "nameEn": "Cooked egg noodles",
+        "grams": 105,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "tuna",
+        "query": "yellowfin tuna, cooked",
+        "sourceFoodId": "usda_172006",
+        "nameVi": "Cá ngừ chín",
+        "nameEn": "Cooked yellowfin tuna",
+        "grams": 110,
+        "role": "protein",
+        "groupId": "seafood",
+        "required": true
+      },
+      {
+        "key": "onion",
+        "query": "onion, raw",
+        "sourceFoodId": "usda_170000",
+        "nameVi": "Hành tây sống",
+        "nameEn": "Raw onion",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị mì trứng, cá ngừ chín và hành tây sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked egg noodles, cooked yellowfin tuna, and raw onion; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng mì trứng và cá ngừ chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked egg noodles and cooked yellowfin tuna evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Trộn nhẹ phần bún, miến hoặc mì với rau, sau đó thêm đạm lên trên.",
+        "en": "Toss the noodles gently with vegetables, then add the protein on top."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "05fb1683fd2cef43ec7cb08327c0ec65f68b86755ee958fd1a22f6466318f0c9",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_023",
+    "status": "active",
+    "nameVi": "Cháo yến mạch trứng và rau bina – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted oats hard- egg with unsalted spinach",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "snack_box",
+    "servingGrams": 340,
+    "mealSlots": [
+      "snack"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian"
+    ],
+    "allergenTags": [
+      "egg",
+      "sesame"
+    ],
+    "prepMinutes": 15,
+    "cookMinutes": 5,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "oats",
+        "query": "oats, cooked",
+        "sourceFoodId": "usda_173905",
+        "nameVi": "Cháo yến mạch",
+        "nameEn": "Unsalted cooked oats",
+        "grams": 120,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "egg",
+        "query": "egg, hard-boiled",
+        "sourceFoodId": "usda_173424",
+        "nameVi": "Trứng luộc chín",
+        "nameEn": "Hard-boiled egg",
+        "grams": 75,
+        "role": "protein",
+        "groupId": "eggs",
+        "required": true
+      },
+      {
+        "key": "spinach",
+        "query": "spinach, cooked",
+        "sourceFoodId": "usda_168463",
+        "nameVi": "Rau bina luộc",
+        "nameEn": "Unsalted boiled spinach",
+        "grams": 45,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "mango",
+        "query": "mango, raw",
+        "sourceFoodId": "usda_169910",
+        "nameVi": "Xoài chín",
+        "nameEn": "Raw mango",
+        "grams": 80,
+        "role": "fruit",
+        "groupId": "fruit",
+        "required": false
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 10,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "lime_juice",
+        "query": "lime juice, raw",
+        "sourceFoodId": "usda_168156",
+        "nameVi": "Nước cốt chanh xanh",
+        "nameEn": "Raw lime juice",
+        "grams": 10,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cháo yến mạch, trứng luộc chín và rau bina luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed unsalted cooked oats, hard-boiled egg, and unsalted boiled spinach; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cháo yến mạch và trứng luộc chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the unsalted cooked oats and hard-boiled egg evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần tinh bột, đạm và rau hoặc trái cây thành từng ngăn để dùng ngay hoặc mang theo.",
+        "en": "Arrange the starch, protein, and vegetables or fruit in separate sections for serving or packing."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước cốt chanh xanh, tỏi và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix raw lime juice, raw garlic, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "451c210725ef1ed59f929717257bd784188518b01ce751249325294648cb6c0f",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_024",
+    "status": "active",
+    "nameVi": "Khoai lang đậu nành xanh và đậu hà lan – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted sweet potato unsalted green soybeans with unsalted green peas",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "snack_box",
+    "servingGrams": 300,
+    "mealSlots": [
+      "snack"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 20,
+    "cookMinutes": 10,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "sweet_potato",
+        "query": "sweet potato, baked",
+        "sourceFoodId": "usda_168483",
+        "nameVi": "Khoai lang nướng",
+        "nameEn": "Unsalted baked sweet potato",
+        "grams": 135,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "edamame",
+        "query": "green soybeans, cooked",
+        "sourceFoodId": "usda_169283",
+        "nameVi": "Đậu nành xanh luộc",
+        "nameEn": "Unsalted cooked green soybeans",
+        "grams": 90,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "green_peas",
+        "query": "green peas, cooked",
+        "sourceFoodId": "usda_170420",
+        "nameVi": "Đậu Hà Lan luộc",
+        "nameEn": "Unsalted cooked green peas",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 12,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "lime_juice",
+        "query": "lime juice, raw",
+        "sourceFoodId": "usda_168156",
+        "nameVi": "Nước cốt chanh xanh",
+        "nameEn": "Raw lime juice",
+        "grams": 3,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị khoai lang nướng, đậu nành xanh luộc và đậu hà lan luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed unsalted baked sweet potato, unsalted cooked green soybeans, and unsalted cooked green peas; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng khoai lang nướng và đậu nành xanh luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the unsalted baked sweet potato and unsalted cooked green soybeans evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần tinh bột, đạm và rau hoặc trái cây thành từng ngăn để dùng ngay hoặc mang theo.",
+        "en": "Arrange the starch, protein, and vegetables or fruit in separate sections for serving or packing."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước cốt chanh xanh, hành lá sống và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix raw lime juice, raw spring onion, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "069dc84142e0b73ea96d7de5eba2b2c7d3f7eef2e15511b7908089c486f9422b",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_025",
+    "status": "active",
+    "nameVi": "Đậu gà với cơm trắng và bắp cải và cà rốt – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted chickpeas with white rice with cabbage and unsalted carrots",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 437,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 30,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 150,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chickpeas",
+        "query": "chickpeas, cooked",
+        "sourceFoodId": "usda_173757",
+        "nameVi": "Đậu gà luộc",
+        "nameEn": "Unsalted cooked chickpeas",
+        "grams": 105,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "cabbage",
+        "query": "cabbage, raw",
+        "sourceFoodId": "usda_169975",
+        "nameVi": "Bắp cải sống",
+        "nameEn": "Raw cabbage",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "carrots",
+        "query": "carrots, cooked",
+        "sourceFoodId": "usda_170394",
+        "nameVi": "Cà rốt luộc",
+        "nameEn": "Unsalted boiled carrots",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 5,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu gà luộc và bắp cải sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked chickpeas, and raw cabbage; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu gà luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked chickpeas evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "eb7d12cd69f295fe9f4331c0791d4154069baf8d4b0d9bd64f8e91630a56e5c0",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_026",
+    "status": "active",
+    "nameVi": "Đùi gà với cơm trắng và giá đỗ – Đài Loan",
+    "nameEn": "Taiwanese-inspired chicken thigh with white rice with mung bean sprouts",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 458,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 10,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 165,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chicken_thigh",
+        "query": "chicken thigh, roasted",
+        "sourceFoodId": "usda_172388",
+        "nameVi": "Đùi gà quay bỏ da",
+        "nameEn": "Roasted skinless chicken thigh",
+        "grams": 95,
+        "role": "protein",
+        "groupId": "meat",
+        "required": true
+      },
+      {
+        "key": "mung_sprouts",
+        "query": "mung bean sprouts, raw",
+        "sourceFoodId": "usda_169957",
+        "nameVi": "Giá đỗ sống",
+        "nameEn": "Raw mung bean sprouts",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "ginger",
+        "query": "ginger root, raw",
+        "sourceFoodId": "usda_169231",
+        "nameVi": "Gừng tươi",
+        "nameEn": "Raw ginger root",
+        "grams": 3,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đùi gà quay bỏ da và giá đỗ sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, roasted skinless chicken thigh, and raw mung bean sprouts; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đùi gà quay bỏ da đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and roasted skinless chicken thigh evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "2c52bdaf88ad39bba4def11a78eacbc7c8581812f5b2f9525f4aa5bcbf25d06d",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_027",
+    "status": "active",
+    "nameVi": "Mì trứng cá hồi và bông cải xanh và xà lách romaine – Đài Loan",
+    "nameEn": "Taiwanese-inspired egg noodles dry-heat atlantic salmon with unsalted broccoli and romaine lettuce",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "noodle_bowl",
+    "servingGrams": 428,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [],
+    "allergenTags": [
+      "egg",
+      "fish",
+      "gluten",
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 15,
+    "cookMinutes": 15,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "egg_noodles",
+        "query": "egg noodles, cooked",
+        "sourceFoodId": "usda_168919",
+        "nameVi": "Mì trứng",
+        "nameEn": "Cooked egg noodles",
+        "grams": 180,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "salmon",
+        "query": "salmon, cooked",
+        "sourceFoodId": "usda_171998",
+        "nameVi": "Cá hồi chín",
+        "nameEn": "Dry-heat cooked Atlantic salmon",
+        "grams": 120,
+        "role": "protein",
+        "groupId": "seafood",
+        "required": true
+      },
+      {
+        "key": "broccoli",
+        "query": "broccoli, cooked",
+        "sourceFoodId": "usda_169967",
+        "nameVi": "Bông cải xanh luộc",
+        "nameEn": "Unsalted boiled broccoli",
+        "grams": 45,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "lettuce",
+        "query": "romaine lettuce, raw",
+        "sourceFoodId": "usda_2709590",
+        "nameVi": "Xà lách romaine",
+        "nameEn": "Raw romaine lettuce",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 10,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 10,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 3,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị mì trứng, cá hồi chín và bông cải xanh luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked egg noodles, dry-heat cooked atlantic salmon, and unsalted boiled broccoli; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng mì trứng và cá hồi chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked egg noodles and dry-heat cooked atlantic salmon evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Trộn nhẹ phần bún, miến hoặc mì với rau, sau đó thêm đạm lên trên.",
+        "en": "Toss the noodles gently with vegetables, then add the protein on top."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "ea90c4aaaf80bdd049d54c93fd2a99abb7e8ec4ac4a0487ec56f47b722e8a694",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_028",
+    "status": "active",
+    "nameVi": "Trứng với cơm gạo lứt và dưa leo – Đài Loan",
+    "nameEn": "Taiwanese-inspired hard- egg with brown rice with cucumber with peel",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 275,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian"
+    ],
+    "allergenTags": [
+      "egg",
+      "peanut",
+      "soy"
+    ],
+    "prepMinutes": 20,
+    "cookMinutes": 20,
+    "difficulty": "medium",
+    "ingredients": [
+      {
+        "key": "brown_rice",
+        "query": "rice, brown, cooked",
+        "sourceFoodId": "usda_2708409",
+        "nameVi": "Cơm gạo lứt",
+        "nameEn": "Cooked brown rice",
+        "grams": 90,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "egg",
+        "query": "egg, hard-boiled",
+        "sourceFoodId": "usda_173424",
+        "nameVi": "Trứng luộc chín",
+        "nameEn": "Hard-boiled egg",
+        "grams": 50,
+        "role": "protein",
+        "groupId": "eggs",
+        "required": true
+      },
+      {
+        "key": "cucumber",
+        "query": "cucumber, raw",
+        "sourceFoodId": "usda_168409",
+        "nameVi": "Dưa leo tươi",
+        "nameEn": "Raw cucumber with peel",
+        "grams": 60,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "peanuts",
+        "query": "peanuts, raw",
+        "sourceFoodId": "usda_172430",
+        "nameVi": "Đậu phộng",
+        "nameEn": "Raw peanuts",
+        "grams": 12,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 3,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 60,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm gạo lứt, trứng luộc chín và dưa leo tươi; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked brown rice, hard-boiled egg, and raw cucumber with peel; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm gạo lứt và trứng luộc chín đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked brown rice and hard-boiled egg evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và đậu phộng; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and raw peanuts; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "4d33ee93c937da473e9802918bc4dc28e170e573b18d3d72319a6f94add7d986",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_029",
+    "status": "active",
+    "nameVi": "Đậu nành xanh với cơm trắng và hành tây và cà chua – Đài Loan",
+    "nameEn": "Taiwanese-inspired unsalted green soybeans with white rice with onion and ripe tomato",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "balanced_plate",
+    "servingGrams": 402,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 5,
+    "cookMinutes": 25,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 105,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "edamame",
+        "query": "green soybeans, cooked",
+        "sourceFoodId": "usda_169283",
+        "nameVi": "Đậu nành xanh luộc",
+        "nameEn": "Unsalted cooked green soybeans",
+        "grams": 105,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "onion",
+        "query": "onion, raw",
+        "sourceFoodId": "usda_170000",
+        "nameVi": "Hành tây sống",
+        "nameEn": "Raw onion",
+        "grams": 75,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "tomato",
+        "query": "tomato, raw",
+        "sourceFoodId": "usda_170457",
+        "nameVi": "Cà chua tươi",
+        "nameEn": "Raw ripe tomato",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": false
+      },
+      {
+        "key": "sesame_seeds",
+        "query": "sesame seeds, toasted",
+        "sourceFoodId": "usda_170151",
+        "nameVi": "Hạt mè rang",
+        "nameEn": "Toasted sesame seeds",
+        "grams": 5,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 5,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "garlic",
+        "query": "garlic, raw",
+        "sourceFoodId": "usda_169230",
+        "nameVi": "Tỏi",
+        "nameEn": "Raw garlic",
+        "grams": 7,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "chili",
+        "query": "red chili pepper, raw",
+        "sourceFoodId": "usda_170106",
+        "nameVi": "Ớt đỏ tươi",
+        "nameEn": "Raw red chili pepper",
+        "grams": 10,
+        "role": "aromatic",
+        "groupId": "seasonings",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu nành xanh luộc và hành tây sống; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked green soybeans, and raw onion; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu nành xanh luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked green soybeans evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Chia đĩa thành phần tinh bột, đạm và rau; giữ đúng khối lượng đã ghi cho một khẩu phần.",
+        "en": "Divide the plate into starch, protein, and vegetables using the listed serving amounts."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, tỏi và hạt mè rang; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw garlic, and toasted sesame seeds; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "38b69bedd5b71622e57555d4e53969390bae4521b677f5785d3d596aabd13b03",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  },
+  {
+    "id": "asia_tw_030",
+    "status": "active",
+    "nameVi": "Cơm trắng đậu gà và rau bina – Đài Loan",
+    "nameEn": "Taiwanese-inspired white rice unsalted chickpeas with unsalted spinach",
+    "cuisine": "taiwanese",
+    "region": "national",
+    "dishType": "rice_bowl",
+    "servingGrams": 435,
+    "mealSlots": [
+      "lunch",
+      "dinner"
+    ],
+    "tags": [
+      "balanced_meal",
+      "pantry_matchable",
+      "project_authored"
+    ],
+    "dietaryTags": [
+      "vegetarian",
+      "vegan"
+    ],
+    "allergenTags": [
+      "sesame",
+      "soy"
+    ],
+    "prepMinutes": 10,
+    "cookMinutes": 30,
+    "difficulty": "easy",
+    "ingredients": [
+      {
+        "key": "white_rice",
+        "query": "rice, white, cooked",
+        "sourceFoodId": "usda_2708403",
+        "nameVi": "Cơm trắng",
+        "nameEn": "Cooked white rice",
+        "grams": 120,
+        "role": "base",
+        "groupId": "starch",
+        "required": true
+      },
+      {
+        "key": "chickpeas",
+        "query": "chickpeas, cooked",
+        "sourceFoodId": "usda_173757",
+        "nameVi": "Đậu gà luộc",
+        "nameEn": "Unsalted cooked chickpeas",
+        "grams": 120,
+        "role": "protein",
+        "groupId": "plant_protein",
+        "required": true
+      },
+      {
+        "key": "spinach",
+        "query": "spinach, cooked",
+        "sourceFoodId": "usda_168463",
+        "nameVi": "Rau bina luộc",
+        "nameEn": "Unsalted boiled spinach",
+        "grams": 90,
+        "role": "vegetable",
+        "groupId": "vegetables",
+        "required": true
+      },
+      {
+        "key": "sesame_oil",
+        "query": "sesame oil",
+        "sourceFoodId": "usda_171016",
+        "nameVi": "Dầu mè",
+        "nameEn": "Sesame oil",
+        "grams": 8,
+        "role": "fat",
+        "groupId": "fats",
+        "required": false
+      },
+      {
+        "key": "soy_sauce",
+        "query": "tamari soy sauce",
+        "sourceFoodId": "usda_174278",
+        "nameVi": "Nước tương tamari",
+        "nameEn": "Tamari soy sauce",
+        "grams": 7,
+        "role": "seasoning",
+        "groupId": "seasonings",
+        "required": false
+      },
+      {
+        "key": "spring_onion",
+        "query": "spring onion, raw",
+        "sourceFoodId": "usda_170005",
+        "nameVi": "Hành lá sống",
+        "nameEn": "Raw spring onion",
+        "grams": 90,
+        "role": "aromatic",
+        "groupId": "vegetables",
+        "required": false
+      }
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "vi": "Chuẩn bị cơm trắng, đậu gà luộc và rau bina luộc; cân đúng khối lượng trong công thức.",
+        "en": "Prepare the listed cooked white rice, unsalted cooked chickpeas, and unsalted boiled spinach; weigh each amount."
+      },
+      {
+        "position": 2,
+        "vi": "Làm nóng cơm trắng và đậu gà luộc đến nóng đều; giữ riêng rau ăn sống và thực phẩm đã chín.",
+        "en": "Heat the cooked white rice and unsalted cooked chickpeas evenly; keep raw vegetables separate from cooked foods."
+      },
+      {
+        "position": 3,
+        "vi": "Xếp phần cơm ở đáy tô, thêm đạm và rau lên trên để mỗi khẩu phần có đủ thành phần.",
+        "en": "Place rice in the bowl, then add protein and vegetables so each serving contains every component."
+      },
+      {
+        "position": 4,
+        "vi": "Trộn nước tương tamari, hành lá sống và dầu mè; rưới vừa đủ, hoàn thiện theo phong cách Đài Loan rồi dùng ngay.",
+        "en": "Mix tamari soy sauce, raw spring onion, and sesame oil; dress lightly, finish in a Taiwanese-inspired style, and serve."
+      }
+    ],
+    "signature": "b59aae61605c42d23949f6400a7d1177fb1bb93c5e7ee2191ac13427d38a0de0",
+    "estimationNote": "Nutrients are estimated from pinned USDA ingredient records. Cooking yield, brands, sauces, and local preparation can change the result; an unknown optional nutrient remains unknown rather than becoming zero.",
+    "sourceId": "gym-local-project-authored-asian-recipes",
+    "sourceKind": "project_authored",
+    "licenseId": "project-content",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-14"
+  }
+]

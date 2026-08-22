@@ -10,8 +10,8 @@ Gym Local is a modular monolith compiled into one static PWA. `apps/web` is the 
 
 ## Storage split
 
-- Personal profile, programs, routines, workouts, meals, recipes, water, preferences, pantry, progress, settings, recovery points, and nutrition-pack status live in Dexie/IndexedDB schema v4.
-- The optional public food catalog is an immutable, query-only SQLite schema v1 stored in OPFS through the official SQLite WASM SAH-pool worker.
+- Personal profile, programs, routines, workouts, meals, recipes, water, preferences, pantry, saved meal plans, progress, settings, recovery points, and nutrition-pack status live in Dexie/IndexedDB schema v5.
+- The optional public food catalog is an immutable, query-only SQLite schema v1–v3 stored in OPFS through the official SQLite WASM SAH-pool worker. Seven-day planning requires schema 3; older packs remain readable for search and logging.
 - The pack worker and download provider live in `packages/storage`; `packages/nutrition` accesses them only through the public `@gym/storage` entry point.
 - Backups include personal records and nutrient snapshots, but exclude the reproducible nutrition pack.
 - Restore snapshots the current personal tables, replaces them transactionally, supports one-click undo, and preserves the installed pack.
@@ -25,12 +25,12 @@ Gym Local is a modular monolith compiled into one static PWA. `apps/web` is the 
 
 ## Independent versions
 
-- App: `0.5.0`
-- Database schema: `3`
+- App: `0.7.0`
+- Database schema: `5`
 - Catalog: `3`
 - Routine templates: `2`
 - Nutrition formula: `1`
-- Backup: `3`
-- Nutrition pack schema: `1`
+- Backup: `5`
+- Nutrition pack schema: `3`
 
-Historical workout and meal records store snapshots so catalog, source, and formula updates do not rewrite the past. See `docs/adr/0002-nutrition-pack-and-backup-v2.md` for nutrition-pack ownership, `docs/adr/0005-personal-data-v3-and-recovery.md` for personal-data recovery, and `docs/adr/0007-nutrition-workflows-and-release-gates.md` for snapshot-safe nutrition workflows and measured release gates.
+Historical workout, meal, and saved-plan records store snapshots so catalog, source, formula, pack, and algorithm updates do not rewrite the past. See ADRs 0011–0015 for the schema-3 Việt–Á catalog and seven-day planning decisions.

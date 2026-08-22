@@ -205,7 +205,11 @@ function validatePack(db: Database, manifest?: NutritionPackManifest): Record<st
       ["alias_count", manifest.aliasCount],
       ["vietnamese_recipe_count", manifest.vietnameseRecipeCount],
       ...(manifest.foodGroupCount === undefined ? [] : [["food_group_count", manifest.foodGroupCount] as [string, number]]),
-      ...(manifest.recipeIngredientCount === undefined ? [] : [["recipe_ingredient_count", manifest.recipeIngredientCount] as [string, number]])
+      ...(manifest.recipeIngredientCount === undefined ? [] : [["recipe_ingredient_count", manifest.recipeIngredientCount] as [string, number]]),
+      ...(manifest.vietnameseDisplayFoodCount === undefined ? [] : [["vietnamese_display_food_count", manifest.vietnameseDisplayFoodCount] as [string, number]]),
+      ...(manifest.activeRecipeCount === undefined ? [] : [["active_recipe_count", manifest.activeRecipeCount] as [string, number]]),
+      ...(manifest.deprecatedRecipeCount === undefined ? [] : [["deprecated_recipe_count", manifest.deprecatedRecipeCount] as [string, number]]),
+      ...(manifest.recipeStepCount === undefined ? [] : [["recipe_step_count", manifest.recipeStepCount] as [string, number]])
     ];
     if (expectedCounts.some(([key, value]) => Number(metadata[key]) !== value)) {
       throw new Error("Nutrition pack counts do not match its manifest");
@@ -213,11 +217,13 @@ function validatePack(db: Database, manifest?: NutritionPackManifest): Record<st
   }
 
   const sampleRows = db.exec({
-    sql: "SELECT name_en FROM foods WHERE name_en <> '' LIMIT 1",
+    sql: schemaVersion >= 3
+      ? "SELECT name_vi AS sample_name FROM foods WHERE name_vi <> '' AND translation_status='reviewed' LIMIT 1"
+      : "SELECT name_en AS sample_name FROM foods WHERE name_en <> '' LIMIT 1",
     rowMode: "object",
     returnValue: "resultRows"
   });
-  const sampleName = String(sampleRows[0]?.name_en ?? "");
+  const sampleName = String(sampleRows[0]?.sample_name ?? "");
   if (!sampleName) throw new Error("Nutrition pack contains no searchable foods");
   const match = ftsQuery(sampleName.split(/\s+/)[0] ?? "");
   const searchRows = db.exec({
@@ -417,17 +423,24 @@ async function install(id: string, manifest: NutritionPackManifest) {
 async function search(query: string, limit: number) {
   const db = await openDatabase();
   if (!db) throw new Error("Offline nutrition pack is not installed");
+  const schemaVersion = Number(readMetadata(db).schema_version);
   const match = ftsQuery(String(query));
   if (!match) return [];
+  const schema3Columns = schemaVersion >= 3
+    ? `, f.source_dataset_id, f.source_dataset_version, f.source_license_id,
+      f.translation_status, f.translation_reviewed_at`
+    : `, NULL AS source_dataset_id, NULL AS source_dataset_version, NULL AS source_license_id,
+      NULL AS translation_status, NULL AS translation_reviewed_at`;
+  const visibilityFilter = schemaVersion >= 3 ? "AND f.translation_status='reviewed'" : "";
   return db.exec({
     sql: `SELECT f.id, f.name_vi, f.name_en, f.source, f.source_food_id, f.source_url,
       f.serving_label, f.serving_grams, f.calories, f.protein, f.carbs, f.fat,
       f.fiber, f.sugar, f.sodium_mg, f.calcium_mg, f.iron_mg, f.potassium_mg,
       f.magnesium_mg, f.zinc_mg, f.vitamin_a_mcg, f.vitamin_c_mg, f.vitamin_d_mcg,
       f.vitamin_e_mg, f.vitamin_k_mcg, f.vitamin_b6_mg, f.vitamin_b12_mcg,
-      f.folate_mcg, f.data_quality
+      f.folate_mcg, f.data_quality ${schema3Columns}
       FROM food_fts JOIN foods f ON f.rowid = food_fts.rowid
-      WHERE food_fts MATCH $match ORDER BY bm25(food_fts) LIMIT $limit`,
+      WHERE food_fts MATCH $match ${visibilityFilter} ORDER BY bm25(food_fts) LIMIT $limit`,
     bind: { $match: match, $limit: Math.min(50, Math.max(1, Number(limit) || 30)) },
     rowMode: "object",
     returnValue: "resultRows"
@@ -439,6 +452,11 @@ async function recipes() {
   if (!db) throw new Error("Offline nutrition pack is not installed");
   const schemaVersion = Number(readMetadata(db).schema_version);
   if (schemaVersion < 2) throw new Error("Install nutrition pack schema 2 to use offline menu suggestions");
+  const metadata = readMetadata(db);
+  const schema3RecipeColumns = schemaVersion >= 3
+    ? ", r.cuisine, r.region, r.dish_type, r.prep_minutes, r.cook_minutes, r.difficulty, r.signature, r.source_id, r.source_kind, r.source_url AS recipe_source_url, r.license_id, r.review_status, r.reviewed_at"
+    : ", NULL AS cuisine, NULL AS region, NULL AS dish_type, NULL AS prep_minutes, NULL AS cook_minutes, NULL AS difficulty, NULL AS signature, NULL AS source_id, NULL AS source_kind, NULL AS recipe_source_url, NULL AS license_id, NULL AS review_status, NULL AS reviewed_at";
+  const activeRecipeFilter = schemaVersion >= 3 ? "WHERE r.status='active'" : "";
   const recipeRows = db.exec({
     sql: `SELECT r.id, r.name_vi, r.name_en, r.serving_grams, r.estimation_note,
       f.source, f.source_food_id, f.source_url, f.serving_label,
@@ -446,8 +464,8 @@ async function recipes() {
       f.calcium_mg, f.iron_mg, f.potassium_mg, f.magnesium_mg, f.zinc_mg,
       f.vitamin_a_mcg, f.vitamin_c_mg, f.vitamin_d_mcg, f.vitamin_e_mg,
       f.vitamin_k_mcg, f.vitamin_b6_mg, f.vitamin_b12_mcg, f.folate_mcg,
-      f.data_quality
-      FROM recipes r JOIN foods f ON f.id=r.food_id ORDER BY r.id`,
+      f.data_quality ${schema3RecipeColumns}
+      FROM recipes r JOIN foods f ON f.id=r.food_id ${activeRecipeFilter} ORDER BY r.id`,
     rowMode: "object",
     returnValue: "resultRows"
   });
@@ -464,7 +482,19 @@ async function recipes() {
     rowMode: "object",
     returnValue: "resultRows"
   });
-  return { recipes: recipeRows, ingredients: ingredientRows, tags: tagRows };
+  const stepRows = schemaVersion >= 3 ? db.exec({
+    sql: "SELECT recipe_id, position, text_vi, text_en FROM recipe_steps ORDER BY recipe_id, position",
+    rowMode: "object",
+    returnValue: "resultRows"
+  }) : [];
+  return {
+    schemaVersion,
+    sourcePackVersion: metadata.version,
+    recipes: recipeRows,
+    ingredients: ingredientRows,
+    tags: tagRows,
+    steps: stepRows
+  };
 }
 
 async function remove() {

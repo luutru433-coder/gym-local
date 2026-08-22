@@ -7,6 +7,7 @@ import { assessNutrientCompleteness, completeFoodLookupCandidate, createMealEntr
 import { formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { PantryMenuSection } from "./PantryMenuSection";
+import { MealPlanSection } from "./meal-plan/MealPlanSection";
 import "./NutritionPage.css";
 
 const mealLabels: Record<MealEntry["meal"], { vi: string; en: string }> = {
@@ -49,7 +50,7 @@ export function NutritionPage() {
   const removeOfflineNutritionPack = useGymStore((state) => state.removeOfflineNutritionPack);
   const searchOfflineNutritionFoods = useGymStore((state) => state.searchOfflineNutritionFoods);
   const lookupBarcodeFood = useGymStore((state) => state.lookupBarcodeFood);
-  const locale = profile.locale;
+  const locale = "vi" as const;
   const [date, setDate] = useState(localDate());
   const [addOpen, setAddOpen] = useState(false);
   const [mealType, setMealType] = useState<MealEntry["meal"]>("breakfast");
@@ -364,7 +365,7 @@ export function NutritionPage() {
   return (
     <div className="page nutrition-page">
       <header className="page-header nutrition-header">
-        <div><span className="eyebrow">{locale === "vi" ? "Theo dõi đơn giản" : "Simple tracking"}</span><h1>{locale === "vi" ? "Dinh dưỡng" : "Nutrition"}</h1><p>{locale === "vi" ? "Calories và macro được tính theo đúng lượng thực phẩm bạn nhập." : "Calories and macros use the exact food amount you log."}</p></div>
+        <div><span className="eyebrow">{locale === "vi" ? "Theo dõi đơn giản" : "Simple tracking"}</span><h1>{locale === "vi" ? "Dinh dưỡng" : "Nutrition"}</h1><p>{locale === "vi" ? "Năng lượng và các chất đa lượng được tính theo đúng lượng thực phẩm bạn nhập." : "Calories and macros use the exact food amount you log."}</p></div>
         <label className="date-control"><span>{locale === "vi" ? "Ngày" : "Date"}</span><input type="date" value={date} onChange={(event) => setDate(event.target.value)} /></label>
       </header>
 
@@ -376,9 +377,9 @@ export function NutritionPage() {
             <em>{Math.max(0, target.calories - total.calories)}<small>{locale === "vi" ? "còn lại" : "remaining"}</small></em>
           </div>
           <div className="ring-row ring-row--nutrition">
-            <MetricRing value={total.protein} max={target.protein} label="Protein" unit="g" tone="coral" />
-            <MetricRing value={total.carbs} max={target.carbs} label="Carbs" unit="g" tone="sky" />
-            <MetricRing value={total.fat} max={target.fat} label="Fat" unit="g" tone="gold" />
+            <MetricRing value={total.protein} max={target.protein} label="Chất đạm" unit="g" tone="coral" />
+            <MetricRing value={total.carbs} max={target.carbs} label="Chất bột đường" unit="g" tone="sky" />
+            <MetricRing value={total.fat} max={target.fat} label="Chất béo" unit="g" tone="gold" />
           </div>
         </Card>
       ) : <Notice tone="warning">{profile.nutritionTarget && !targetIsCurrent ? (locale === "vi" ? "Mục tiêu cũ không còn khớp thông tin cơ thể hiện tại. Hãy kiểm tra và lưu lại trong Cài đặt." : "The previous target no longer matches your current body details. Review and save them in Settings.") : (locale === "vi" ? "Chưa có mục tiêu dinh dưỡng. Bạn có thể thêm số đo trong Cài đặt để app ước tính calories và macro." : "No nutrition target yet. Add body details in Settings for an estimate.")}</Notice>}
@@ -387,21 +388,22 @@ export function NutritionPage() {
 
       <section className="recipe-section">
         <SectionTitle eyebrow={`${recipes.length} ${locale === "vi" ? "công thức" : "recipes"}`} title={locale === "vi" ? "Món tự nấu" : "My recipes"} action={<Button size="sm" variant="secondary" disabled={!foods.length} onClick={() => openRecipeEditor()}><Plus size={16} />{locale === "vi" ? "Tạo công thức" : "Create recipe"}</Button>} />
-        {recipes.length ? <div className="recipe-grid">{recipes.map((recipe) => { const nutrition = recipeNutrition(recipe); const serving = nutrition.perServing ?? nutrition.total; return <Card className="recipe-card" key={recipe.id}><span className="recipe-card__icon"><CookingPot size={20} /></span><div><h3>{localize(recipe.name, locale)}</h3><p>{recipe.ingredients.length} {locale === "vi" ? "nguyên liệu" : "ingredients"} · {recipe.servings ?? 1} {locale === "vi" ? "khẩu phần" : "servings"}</p><strong>{serving.calories} kcal · P {serving.protein}g · C {serving.carbs}g · F {serving.fat}g</strong><small>{nutrition.completeness.percent}% {locale === "vi" ? "vi chất có dữ liệu" : "micronutrient data available"}</small></div><div className="recipe-card__actions"><Button size="sm" onClick={() => void logRecipeServing(recipe)}>{locale === "vi" ? "+ 1 phần" : "+ 1 serving"}</Button><button type="button" onClick={() => openRecipeEditor(recipe)} aria-label={locale === "vi" ? `Sửa ${localize(recipe.name, locale)}` : `Edit ${localize(recipe.name, locale)}`}><Pencil size={15} /></button><button type="button" onClick={() => { if (window.confirm(locale === "vi" ? "Xóa công thức? Nhật ký cũ vẫn được giữ." : "Delete recipe? Existing diary entries remain.")) void removeRecipe(recipe.id); }} aria-label={locale === "vi" ? `Xóa ${localize(recipe.name, locale)}` : `Delete ${localize(recipe.name, locale)}`}><Trash2 size={15} /></button></div></Card>; })}</div> : <p className="recipe-empty">{foods.length ? (locale === "vi" ? "Ghép thực phẩm đã lưu thành công thức để ghi nhanh theo khẩu phần." : "Combine saved foods into recipes for quick serving-based logging.") : (locale === "vi" ? "Hãy tạo hoặc lưu ít nhất một thực phẩm trước." : "Create or save at least one food first.")}</p>}
+        {recipes.length ? <div className="recipe-grid">{recipes.map((recipe) => { const nutrition = recipeNutrition(recipe); const serving = nutrition.perServing ?? nutrition.total; return <Card className="recipe-card" key={recipe.id}><span className="recipe-card__icon"><CookingPot size={20} /></span><div><h3>{localize(recipe.name, locale)}</h3><p>{recipe.ingredients.length} {locale === "vi" ? "nguyên liệu" : "ingredients"} · {recipe.servings ?? 1} {locale === "vi" ? "khẩu phần" : "servings"}</p><strong>{serving.calories} kcal · Đạm {serving.protein}g · Bột đường {serving.carbs}g · Béo {serving.fat}g</strong><small>{nutrition.completeness.percent}% {locale === "vi" ? "vi chất có dữ liệu" : "micronutrient data available"}</small></div><div className="recipe-card__actions"><Button size="sm" onClick={() => void logRecipeServing(recipe)}>{locale === "vi" ? "+ 1 phần" : "+ 1 serving"}</Button><button type="button" onClick={() => openRecipeEditor(recipe)} aria-label={locale === "vi" ? `Sửa ${localize(recipe.name, locale)}` : `Edit ${localize(recipe.name, locale)}`}><Pencil size={15} /></button><button type="button" onClick={() => { if (window.confirm(locale === "vi" ? "Xóa công thức? Nhật ký cũ vẫn được giữ." : "Delete recipe? Existing diary entries remain.")) void removeRecipe(recipe.id); }} aria-label={locale === "vi" ? `Xóa ${localize(recipe.name, locale)}` : `Delete ${localize(recipe.name, locale)}`}><Trash2 size={15} /></button></div></Card>; })}</div> : <p className="recipe-empty">{foods.length ? (locale === "vi" ? "Ghép thực phẩm đã lưu thành công thức để ghi nhanh theo khẩu phần." : "Combine saved foods into recipes for quick serving-based logging.") : (locale === "vi" ? "Hãy tạo hoặc lưu ít nhất một thực phẩm trước." : "Create or save at least one food first.")}</p>}
       </section>
 
       <Card className="nutrition-pack-card">
         <div className="nutrition-pack-card__icon"><Database size={27} /></div>
-        <div className="nutrition-pack-card__copy"><span className="eyebrow">{locale === "vi" ? "Tùy chọn · chỉ tải khi bạn đồng ý" : "Optional · downloads only on your click"}</span><h2>{locale === "vi" ? "Kho thực phẩm offline" : "Offline food library"}</h2><p>{locale === "vi" ? "USDA Foundation + SR Legacy + FNDDS, tìm tiếng Việt/không dấu, gồm vi chất và 300 món Việt ước tính." : "USDA Foundation + SR Legacy + FNDDS, Vietnamese/accentless search, micronutrients, and 300 estimated Vietnamese dishes."}</p></div>
-        <div className="nutrition-pack-card__stats"><span><strong>{formatNumber(packManifest?.foodCount ?? 13_835, locale)}</strong>{locale === "vi" ? "thực phẩm" : "foods"}</span><span><strong>{formatNumber(packManifest?.aliasCount ?? 24_907, locale)}</strong>{locale === "vi" ? "alias VI" : "VI aliases"}</span><span><strong>300</strong>{locale === "vi" ? "món Việt" : "VI dishes"}</span></div>
+        <div className="nutrition-pack-card__copy"><span className="eyebrow">Tùy chọn · chỉ tải khi bạn đồng ý</span><h2>Kho thực phẩm ngoại tuyến</h2><p>Dữ liệu được phép đóng gói, tìm bằng tiếng Việt có dấu hoặc không dấu, có vi chất, món Việt và món châu Á. Mục chưa duyệt không xuất hiện trong tìm kiếm thông thường.</p></div>
+        <div className="nutrition-pack-card__stats"><span><strong>{formatNumber(packRecord.vietnameseDisplayFoodCount ?? packManifest?.vietnameseDisplayFoodCount ?? packManifest?.foodCount ?? 0, locale)}</strong>tên tiếng Việt đã duyệt</span><span><strong>{formatNumber(packRecord.activeRecipeCount ?? packManifest?.activeRecipeCount ?? packManifest?.vietnameseRecipeCount ?? 0, locale)}</strong>món Việt–Á</span><span><strong>{formatNumber(packRecord.recipeStepCount ?? packManifest?.recipeStepCount ?? 0, locale)}</strong>bước chế biến</span></div>
         <div className="nutrition-pack-card__action">
-          {packRecord.status === "ready" ? <><span className="pack-ready"><ShieldCheck size={16} />{locale === "vi" ? `Đã cài v${packRecord.version}` : `Installed v${packRecord.version}`}</span><Button size="sm" variant="ghost" onClick={() => void removePack()}>{locale === "vi" ? "Xóa gói" : "Remove"}</Button></> : <Button disabled={!packManifest || packRecord.status === "downloading" || packRecord.status === "installing"} onClick={() => void installPack()}><Download size={17} />{packRecord.status === "downloading" ? (locale === "vi" ? "Đang tải…" : "Downloading…") : `${locale === "vi" ? "Tải & cài" : "Download & install"} ${packManifest ? formatBytes(packManifest.sizeBytes, locale) : ""}`}</Button>}
+          {packRecord.status === "ready" ? <><span className="pack-ready"><ShieldCheck size={16} />Đã cài v{packRecord.version}</span><Button size="sm" variant="ghost" onClick={() => void removePack()}>Xóa gói</Button></> : <Button disabled={!packManifest || packRecord.status === "downloading" || packRecord.status === "installing"} onClick={() => void installPack()}><Download size={17} />{packRecord.status === "downloading" ? "Đang tải…" : `Tải và cài ${packManifest ? formatBytes(packManifest.sizeBytes, locale) : ""}`}</Button>}
           {packRecord.status === "downloading" ? <div className="pack-progress"><ProgressBar value={(packRecord.bytesDownloaded / Math.max(1, packRecord.totalBytes ?? 1)) * 100} /><small>{formatBytes(packRecord.bytesDownloaded, locale)} / {packRecord.totalBytes ? formatBytes(packRecord.totalBytes, locale) : "—"}</small></div> : null}
           {packError || nutritionError ? <small className="pack-error" role="alert">{nutritionError ?? packError}</small> : null}
         </div>
       </Card>
 
       <PantryMenuSection />
+      <MealPlanSection />
 
       <div className="meal-layout">
         <section>
@@ -413,7 +415,7 @@ export function NutritionPage() {
               return (
                 <Card className="meal-card" key={meal}>
                   <header><span className="meal-card__icon"><Utensils size={18} /></span><div><h3>{mealLabels[meal][locale]}</h3><p>{calories} kcal</p></div><button type="button" className="icon-button" onClick={() => openAdd(meal)} aria-label={`Add ${meal}`}><Plus size={20} /></button></header>
-                  {entries.length ? <ul>{entries.map((entry) => <li key={entry.id}><div><strong>{localize(entry.foodNameSnapshot, locale)}</strong><small>{entry.grams}g · P {entry.nutrientsSnapshot.protein}g · C {entry.nutrientsSnapshot.carbs}g · F {entry.nutrientsSnapshot.fat}g</small></div><span>{entry.nutrientsSnapshot.calories} kcal</span><span className="meal-entry-actions"><button type="button" onClick={() => editMealEntry(entry)} aria-label={locale === "vi" ? `Sửa ${localize(entry.foodNameSnapshot, locale)}` : `Edit ${localize(entry.foodNameSnapshot, locale)}`}><Pencil size={15} /></button><button type="button" onClick={() => void removeMealEntry(entry.id)} aria-label={locale === "vi" ? `Xóa ${localize(entry.foodNameSnapshot, locale)}` : `Delete ${localize(entry.foodNameSnapshot, locale)}`}><Trash2 size={15} /></button></span></li>)}</ul> : <button className="meal-card__empty" type="button" onClick={() => openAdd(meal)}><Plus size={16} />{locale === "vi" ? "Thêm món" : "Add food"}</button>}
+                  {entries.length ? <ul>{entries.map((entry) => <li key={entry.id}><div><strong>{localize(entry.foodNameSnapshot, locale)}</strong><small>{entry.grams}g · Đạm {entry.nutrientsSnapshot.protein}g · Bột đường {entry.nutrientsSnapshot.carbs}g · Béo {entry.nutrientsSnapshot.fat}g</small></div><span>{entry.nutrientsSnapshot.calories} kcal</span><span className="meal-entry-actions"><button type="button" onClick={() => editMealEntry(entry)} aria-label={locale === "vi" ? `Sửa ${localize(entry.foodNameSnapshot, locale)}` : `Edit ${localize(entry.foodNameSnapshot, locale)}`}><Pencil size={15} /></button><button type="button" onClick={() => void removeMealEntry(entry.id)} aria-label={locale === "vi" ? `Xóa ${localize(entry.foodNameSnapshot, locale)}` : `Delete ${localize(entry.foodNameSnapshot, locale)}`}><Trash2 size={15} /></button></span></li>)}</ul> : <button className="meal-card__empty" type="button" onClick={() => openAdd(meal)}><Plus size={16} />{locale === "vi" ? "Thêm món" : "Add food"}</button>}
                 </Card>
               );
             })}
@@ -454,7 +456,7 @@ export function NutritionPage() {
         <div className="custom-food-form">
           <Notice>{locale === "vi" ? "Nhập các giá trị trên 100g theo nhãn dinh dưỡng." : "Enter per-100g values from the nutrition label."}</Notice>
           <Field label={locale === "vi" ? "Tên thực phẩm" : "Food name"}><input value={custom.name} onChange={(event) => setCustom((value) => ({ ...value, name: event.target.value }))} autoFocus /></Field>
-          <div className="form-grid form-grid--4"><Field label="kcal"><input inputMode="decimal" value={custom.calories} onChange={(event) => setCustom((value) => ({ ...value, calories: event.target.value }))} /></Field><Field label="Protein (g)"><input inputMode="decimal" value={custom.protein} onChange={(event) => setCustom((value) => ({ ...value, protein: event.target.value }))} /></Field><Field label="Carb (g)"><input inputMode="decimal" value={custom.carbs} onChange={(event) => setCustom((value) => ({ ...value, carbs: event.target.value }))} /></Field><Field label="Fat (g)"><input inputMode="decimal" value={custom.fat} onChange={(event) => setCustom((value) => ({ ...value, fat: event.target.value }))} /></Field></div>
+          <div className="form-grid form-grid--4"><Field label="Năng lượng (kcal)"><input inputMode="decimal" value={custom.calories} onChange={(event) => setCustom((value) => ({ ...value, calories: event.target.value }))} /></Field><Field label="Chất đạm (g)"><input inputMode="decimal" value={custom.protein} onChange={(event) => setCustom((value) => ({ ...value, protein: event.target.value }))} /></Field><Field label="Chất bột đường (g)"><input inputMode="decimal" value={custom.carbs} onChange={(event) => setCustom((value) => ({ ...value, carbs: event.target.value }))} /></Field><Field label="Chất béo (g)"><input inputMode="decimal" value={custom.fat} onChange={(event) => setCustom((value) => ({ ...value, fat: event.target.value }))} /></Field></div>
           {formErrors.length ? <Notice tone="warning"><ul>{formErrors.map((error, index) => <li key={`${error.field}-${error.code}-${index}`}>{error.message}</li>)}</ul></Notice> : null}
           <div className="modal-actions"><Button variant="ghost" onClick={() => setCustomOpen(false)}>{locale === "vi" ? "Hủy" : "Cancel"}</Button><Button disabled={!custom.name.trim()} onClick={() => void submitCustom()}>{locale === "vi" ? "Lưu & chọn" : "Save & select"}</Button></div>
         </div>
@@ -492,7 +494,7 @@ function NutrientDetails({ food, locale }: { food: FoodItem; locale: "vi" | "en"
     ["Vitamin K", food.per100g.vitaminKMcg, "µg"],
     ["Vitamin B6", food.per100g.vitaminB6Mg, "mg"],
     ["Vitamin B12", food.per100g.vitaminB12Mcg, "µg"],
-    [locale === "vi" ? "Folate" : "Folate", food.per100g.folateMcg, "µg"]
+    [locale === "vi" ? "Axit folic" : "Folate", food.per100g.folateMcg, "µg"]
   ].filter((entry) => entry[1] !== null && entry[1] !== undefined) as Array<[string, number, string]>;
   return <div className="nutrient-details"><header><strong>{locale === "vi" ? "Vi chất trên 100g" : "Micronutrients per 100g"}</strong><small>{food.dataQuality === "estimated_recipe" ? (locale === "vi" ? "Ước tính từ nguyên liệu USDA" : "Estimated from USDA ingredients") : food.source === "usda_fdc" ? "USDA FoodData Central · CC0" : (locale === "vi" ? "Có thể thiếu dữ liệu" : "Some values may be missing")}</small></header>{nutrients.length ? <div>{nutrients.map(([label, value, unit]) => <span key={label}><small>{label}</small><strong>{formatNumber(value, locale, value < 10 ? 2 : 1)} {unit}</strong></span>)}</div> : <p>{locale === "vi" ? "Nguồn này chưa cung cấp vi chất; không tự gán bằng 0." : "This source does not provide micronutrients; missing values are not shown as zero."}</p>}</div>;
 }

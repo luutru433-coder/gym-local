@@ -40,10 +40,20 @@ export interface NutritionPackRecipeTagRow {
   value: string;
 }
 
+export interface NutritionPackRecipeStepRow {
+  recipe_id: string;
+  position: number;
+  text_vi: string;
+  text_en: string;
+}
+
 export interface NutritionPackRecipeDataset {
+  schemaVersion?: number;
+  sourcePackVersion?: string;
   recipes: Record<string, unknown>[];
   ingredients: NutritionPackRecipeIngredientRow[];
   tags: NutritionPackRecipeTagRow[];
+  steps?: NutritionPackRecipeStepRow[];
 }
 
 export type NutritionPackProgressListener = (progress: { bytesDownloaded: number; totalBytes?: number }) => void;

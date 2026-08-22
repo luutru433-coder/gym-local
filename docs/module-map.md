@@ -7,16 +7,17 @@ Use this map before changing behavior. A change starts in the primary owner and 
 | Exercise names, equipment, instructions, tracking semantics, and guide metadata | `packages/catalog` | `packages/media` for remote media policy | `features/catalog` | catalog tests and content gates |
 | Routine templates, session mutations, set types, and progression rules | `packages/workouts` | `packages/storage` for persistence | `features/routines`, `features/workout` | workout tests; full verify when snapshots change |
 | Previous values, volume, e1RM, PR, muscle sets, and charts | `packages/progress` | `packages/storage` supplies sessions | `features/progress` | progress calculation matrix |
-| Food validation, nutrient math, recipes, targets, and provider result mapping | `packages/nutrition` | nutrition providers for network; `packages/storage` for SQLite/OPFS | `features/nutrition` | nutrition tests and pack audit |
+| Food validation, nutrient math, recipes, targets, deterministic meal planning, and provider result mapping | `packages/nutrition` | nutrition providers for network; `packages/storage` for SQLite/OPFS | `features/nutrition`, including isolated `meal-plan` components | nutrition/planner tests and pack audit |
 | IndexedDB, OPFS, SQLite, migrations, and transactions | `packages/storage` | owned here | called through app store/controllers | migration, failure, and backup round-trip tests |
 | Backup parsing, migration, checksum, and CSV serialization | `packages/backup` | browser download is composed by the app | `features/settings` | current and two previous backup versions |
 | Accessible visual primitives and design tokens | `packages/ui` | none | all features | component, accessibility, and visual tests |
 | PWA update lifecycle and application routing | `apps/web/src/app`, `apps/web/src/pwa` | service worker registration | app shell | active-workout update and offline E2E |
 
-Personal-data ownership in schema v3:
+Personal-data ownership in schema v5:
 
 - `programs` and `routines`: workout programming; backup and recovery included.
 - `recipes`, `waterEntries`, and `foodPreferences`: nutrition; backup and recovery included.
+- `mealPlans`: immutable target/filter/content snapshots for generated plans; backup and recovery included. Diary writes reference planned-meal IDs and are append-only/idempotent.
 - `recoveryPoints`: storage-only safety data; deliberately excluded from backup.
 - `nutritionPacks`: reproducible public data status; deliberately excluded from backup and restore.
 

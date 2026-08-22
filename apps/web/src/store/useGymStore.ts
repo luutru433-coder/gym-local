@@ -1,8 +1,27 @@
 import { create } from "zustand";
-import type { AppSettings, BodyMetric, FoodItem, FoodPreference, MealEntry, NutritionPackManifest, NutritionPackRecord, PantryItem, Profile, Program, Recipe, Routine, WaterEntry, WorkoutSession } from "@gym/contracts";
+import type {
+  AppSettings,
+  BodyMetric,
+  FoodItem,
+  FoodPreference,
+  GeneratedMealPlan,
+  MealEntry,
+  MealPlanRequest,
+  NutritionPackManifest,
+  NutritionPackRecord,
+  PantryItem,
+  Profile,
+  Program,
+  Recipe,
+  Routine,
+  SavedMealPlan,
+  WaterEntry,
+  WorkoutSession
+} from "@gym/contracts";
 import { cloneRoutineTemplate, createFreestyleSession, createSessionFromRoutine, finishSession } from "@gym/workouts";
 import {
   installNutritionPack,
+  generateOfflineMealPlan,
   loadNutritionPackManifest,
   lookupFoodByBarcode,
   nutritionPackInfo,
@@ -27,6 +46,7 @@ import {
   listFoods,
   listFoodPreferences,
   listMeals,
+  listMealPlans,
   listPantryItems,
   listPrograms,
   listRecoveryPoints,
@@ -39,6 +59,7 @@ import {
   saveFood,
   saveFoodPreference,
   saveMeal,
+  saveMealPlan,
   saveMealAndRecordFoodUse,
   savePantryItem,
   saveNutritionPackRecord,
@@ -57,6 +78,9 @@ import {
   deletePantryItem,
   deleteRecipe,
   deleteWaterEntry,
+  deleteMealPlan,
+  loadNutritionPackRecipeDataset,
+  logMealPlanDays,
   undoLatestRestore
 } from "@gym/storage";
 import type { BackupPayload } from "@gym/contracts";
@@ -77,6 +101,10 @@ interface GymState {
   waterEntries: WaterEntry[];
   foodPreferences: FoodPreference[];
   pantryItems: PantryItem[];
+  mealPlans: SavedMealPlan[];
+  generatedMealPlan?: GeneratedMealPlan;
+  mealPlanStatus: "idle" | "loading" | "ready" | "saving" | "error";
+  mealPlanError?: string;
   menuSuggestions: OfflineMenuSuggestion[];
   menuSuggestionStatus: "idle" | "loading" | "ready" | "error";
   menuSuggestionError?: string;
@@ -116,6 +144,11 @@ interface GymState {
   saveUserPantryItem: (item: PantryItem) => Promise<PantryItem>;
   removePantryItem: (id: string) => Promise<void>;
   refreshMenuSuggestions: (options?: MenuSuggestionOptions) => Promise<OfflineMenuSuggestion[]>;
+  generateUserMealPlan: (request: MealPlanRequest) => Promise<GeneratedMealPlan>;
+  clearGeneratedMealPlan: () => void;
+  saveGeneratedMealPlan: (name: string) => Promise<SavedMealPlan>;
+  removeSavedMealPlan: (id: string) => Promise<void>;
+  logSavedMealPlanDays: (planId: string, dayIndexes: number[]) => Promise<MealEntry[]>;
   refreshNutritionPack: () => Promise<void>;
   installOfflineNutritionPack: () => Promise<void>;
   removeOfflineNutritionPack: () => Promise<void>;
@@ -132,7 +165,7 @@ function messageFrom(error: unknown): string {
 }
 
 async function loadSnapshot() {
-  const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, bodyMetrics, settings, recoveryPoints] = await Promise.all([
+  const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, settings, recoveryPoints] = await Promise.all([
     getProfile(),
     listRoutines(),
     listPrograms(),
@@ -144,11 +177,12 @@ async function loadSnapshot() {
     listWaterEntries(),
     listFoodPreferences(),
     listPantryItems(),
+    listMealPlans(),
     listBodyMetrics(),
     getSettings(),
     listRecoveryPoints()
   ]);
-  return { profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
+  return { profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
 }
 
 let lastPersistedActiveSession: WorkoutSession | undefined;
@@ -165,6 +199,8 @@ export const useGymStore = create<GymState>((set, get) => ({
   waterEntries: [],
   foodPreferences: [],
   pantryItems: [],
+  mealPlans: [],
+  mealPlanStatus: "idle",
   menuSuggestions: [],
   menuSuggestionStatus: "idle",
   nutritionPackRecord: { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 },
@@ -194,18 +230,44 @@ export const useGymStore = create<GymState>((set, get) => ({
         loadNutritionPackManifest()
       ]);
       if (info.installed) {
+        const installedAt = stored.active?.installedAt ?? stored.installedAt ?? new Date().toISOString();
+        const checksum = info.manifest?.sha256 ?? info.metadata?.sha256 ?? stored.active?.checksum ?? stored.checksum ?? "";
+        const schemaVersion = Number(info.metadata?.schema_version ?? info.manifest?.schemaVersion ?? stored.schemaVersion ?? 0) || undefined;
         const ready: NutritionPackRecord = {
           ...stored,
           id: "nutrition-pack",
           status: "ready",
           version: info.metadata?.version ?? stored.version,
+          schemaVersion,
           bytesDownloaded: stored.bytesDownloaded || manifest.sizeBytes,
           totalBytes: manifest.sizeBytes,
           foodCount: Number(info.metadata?.food_count ?? manifest.foodCount),
           aliasCount: Number(info.metadata?.alias_count ?? manifest.aliasCount),
           vietnameseRecipeCount: Number(info.metadata?.vietnamese_recipe_count ?? manifest.vietnameseRecipeCount),
           foodGroupCount: Number(info.metadata?.food_group_count ?? manifest.foodGroupCount ?? 0) || undefined,
-          recipeIngredientCount: Number(info.metadata?.recipe_ingredient_count ?? manifest.recipeIngredientCount ?? 0) || undefined
+          recipeIngredientCount: Number(info.metadata?.recipe_ingredient_count ?? manifest.recipeIngredientCount ?? 0) || undefined,
+          vietnameseDisplayFoodCount: Number(info.metadata?.vietnamese_display_food_count ?? manifest.vietnameseDisplayFoodCount ?? 0) || undefined,
+          activeRecipeCount: Number(info.metadata?.active_recipe_count ?? manifest.activeRecipeCount ?? 0) || undefined,
+          deprecatedRecipeCount: Number(info.metadata?.deprecated_recipe_count ?? manifest.deprecatedRecipeCount ?? 0) || undefined,
+          recipeStepCount: Number(info.metadata?.recipe_step_count ?? manifest.recipeStepCount ?? 0) || undefined,
+          cuisineCounts: info.manifest?.cuisineCounts ?? manifest.cuisineCounts,
+          active: checksum && (info.metadata?.version ?? stored.version) ? {
+            version: info.metadata?.version ?? stored.version!,
+            schemaVersion,
+            fileName: info.activeFileName?.replace(/^\//, "") ?? info.manifest?.fileName ?? stored.active?.fileName ?? "installed-nutrition-pack.sqlite3",
+            checksum,
+            installedAt,
+            foodCount: Number(info.metadata?.food_count ?? manifest.foodCount),
+            aliasCount: Number(info.metadata?.alias_count ?? manifest.aliasCount),
+            vietnameseRecipeCount: Number(info.metadata?.vietnamese_recipe_count ?? manifest.vietnameseRecipeCount),
+            foodGroupCount: Number(info.metadata?.food_group_count ?? manifest.foodGroupCount ?? 0) || undefined,
+            recipeIngredientCount: Number(info.metadata?.recipe_ingredient_count ?? manifest.recipeIngredientCount ?? 0) || undefined,
+            vietnameseDisplayFoodCount: Number(info.metadata?.vietnamese_display_food_count ?? manifest.vietnameseDisplayFoodCount ?? 0) || undefined,
+            activeRecipeCount: Number(info.metadata?.active_recipe_count ?? manifest.activeRecipeCount ?? 0) || undefined,
+            deprecatedRecipeCount: Number(info.metadata?.deprecated_recipe_count ?? manifest.deprecatedRecipeCount ?? 0) || undefined,
+            recipeStepCount: Number(info.metadata?.recipe_step_count ?? manifest.recipeStepCount ?? 0) || undefined,
+            cuisineCounts: info.manifest?.cuisineCounts ?? manifest.cuisineCounts
+          } : stored.active
         };
         await saveNutritionPackRecord(ready);
         set({ nutritionPackManifest: manifest, nutritionPackRecord: ready, nutritionPackError: undefined });
@@ -226,12 +288,24 @@ export const useGymStore = create<GymState>((set, get) => ({
   async installOfflineNutritionPack() {
     const manifest = get().nutritionPackManifest;
     if (!manifest) throw new Error("Nutrition pack manifest is unavailable");
+    const current = get().nutritionPackRecord;
+    const operationStartedAt = new Date().toISOString();
     const initial: NutritionPackRecord = {
       id: "nutrition-pack",
       status: "downloading",
       version: manifest.version,
       bytesDownloaded: 0,
-      totalBytes: manifest.sizeBytes
+      totalBytes: manifest.sizeBytes,
+      active: current.active,
+      previous: current.previous,
+      operation: {
+        id: `pack_operation_${crypto.randomUUID()}`,
+        kind: current.status === "ready" || current.active ? "update" : "install",
+        status: "downloading",
+        bytesDownloaded: 0,
+        totalBytes: manifest.sizeBytes,
+        startedAt: operationStartedAt
+      }
     };
     set({ nutritionPackRecord: initial, nutritionPackError: undefined });
     await saveNutritionPackRecord(initial);
@@ -242,23 +316,75 @@ export const useGymStore = create<GymState>((set, get) => ({
             ...state.nutritionPackRecord,
             status: "downloading",
             bytesDownloaded: progress.bytesDownloaded,
-            totalBytes: progress.totalBytes ?? manifest.sizeBytes
+            totalBytes: progress.totalBytes ?? manifest.sizeBytes,
+            operation: state.nutritionPackRecord.operation ? {
+              ...state.nutritionPackRecord.operation,
+              bytesDownloaded: progress.bytesDownloaded,
+              totalBytes: progress.totalBytes ?? manifest.sizeBytes
+            } : undefined
           }
         }));
       });
+      const installedAt = new Date().toISOString();
+      const previous = current.active ?? (
+        current.status === "ready" && current.version && current.checksum
+          ? {
+            version: current.version,
+            schemaVersion: current.schemaVersion,
+            fileName: "installed-nutrition-pack.sqlite3",
+            checksum: current.checksum,
+            installedAt: current.installedAt ?? installedAt,
+            foodCount: current.foodCount,
+            aliasCount: current.aliasCount,
+            vietnameseRecipeCount: current.vietnameseRecipeCount,
+            foodGroupCount: current.foodGroupCount,
+            recipeIngredientCount: current.recipeIngredientCount,
+            vietnameseDisplayFoodCount: current.vietnameseDisplayFoodCount,
+            activeRecipeCount: current.activeRecipeCount,
+            deprecatedRecipeCount: current.deprecatedRecipeCount,
+            recipeStepCount: current.recipeStepCount,
+            cuisineCounts: current.cuisineCounts
+          }
+          : undefined
+      );
+      const active = {
+        version: manifest.version,
+        schemaVersion: manifest.schemaVersion,
+        fileName: manifest.fileName,
+        checksum: result.checksum,
+        installedAt,
+        foodCount: manifest.foodCount,
+        aliasCount: manifest.aliasCount,
+        vietnameseRecipeCount: manifest.vietnameseRecipeCount,
+        foodGroupCount: manifest.foodGroupCount,
+        recipeIngredientCount: manifest.recipeIngredientCount,
+        vietnameseDisplayFoodCount: manifest.vietnameseDisplayFoodCount,
+        activeRecipeCount: manifest.activeRecipeCount,
+        deprecatedRecipeCount: manifest.deprecatedRecipeCount,
+        recipeStepCount: manifest.recipeStepCount,
+        cuisineCounts: manifest.cuisineCounts
+      };
       const ready: NutritionPackRecord = {
         id: "nutrition-pack",
         status: "ready",
         version: manifest.version,
+        schemaVersion: manifest.schemaVersion,
         bytesDownloaded: result.bytesDownloaded,
         totalBytes: manifest.sizeBytes,
-        installedAt: new Date().toISOString(),
+        installedAt,
         checksum: result.checksum,
         foodCount: manifest.foodCount,
         aliasCount: manifest.aliasCount,
         vietnameseRecipeCount: manifest.vietnameseRecipeCount,
         foodGroupCount: manifest.foodGroupCount,
-        recipeIngredientCount: manifest.recipeIngredientCount
+        recipeIngredientCount: manifest.recipeIngredientCount,
+        vietnameseDisplayFoodCount: manifest.vietnameseDisplayFoodCount,
+        activeRecipeCount: manifest.activeRecipeCount,
+        deprecatedRecipeCount: manifest.deprecatedRecipeCount,
+        recipeStepCount: manifest.recipeStepCount,
+        cuisineCounts: manifest.cuisineCounts,
+        active,
+        previous: previous?.checksum === active.checksum ? current.previous : previous
       };
       await saveNutritionPackRecord(ready);
       set({ nutritionPackRecord: ready });
@@ -524,6 +650,89 @@ export const useGymStore = create<GymState>((set, get) => ({
     } catch (error) {
       const message = messageFrom(error);
       set({ menuSuggestions: [], menuSuggestionStatus: "error", menuSuggestionError: message });
+      throw error;
+    }
+  },
+
+  async generateUserMealPlan(request) {
+    set({ mealPlanStatus: "loading", mealPlanError: undefined });
+    try {
+      const info = await nutritionPackInfo();
+      if (!info.installed) throw new Error("Hãy cài kho dinh dưỡng ngoại tuyến trước khi lập thực đơn.");
+      const schemaVersion = Number(info.metadata?.schema_version);
+      if (!Number.isFinite(schemaVersion) || schemaVersion < 3) {
+        throw new Error("Lập thực đơn 7 ngày cần kho dinh dưỡng schema 3. Hãy cập nhật kho dinh dưỡng.");
+      }
+      const sourcePackVersion = info.metadata?.version?.trim();
+      if (!sourcePackVersion) throw new Error("Không đọc được phiên bản kho dinh dưỡng đang cài.");
+      const dataset = await loadNutritionPackRecipeDataset();
+      const generatedMealPlan = generateOfflineMealPlan(dataset, get().pantryItems, request, sourcePackVersion);
+      set({ generatedMealPlan, mealPlanStatus: "ready" });
+      return generatedMealPlan;
+    } catch (error) {
+      const message = messageFrom(error);
+      set({ generatedMealPlan: undefined, mealPlanStatus: "error", mealPlanError: message });
+      throw error;
+    }
+  },
+
+  clearGeneratedMealPlan() {
+    set({ generatedMealPlan: undefined, mealPlanStatus: "idle", mealPlanError: undefined });
+  },
+
+  async saveGeneratedMealPlan(name) {
+    const generated = get().generatedMealPlan;
+    if (!generated) throw new Error("Chưa có thực đơn để lưu.");
+    const normalizedName = name.trim();
+    if (!normalizedName) throw new Error("Hãy đặt tên cho thực đơn.");
+    set({ mealPlanStatus: "saving", mealPlanError: undefined });
+    try {
+      const now = new Date().toISOString();
+      const saved = await saveMealPlan({
+        ...generated,
+        id: `meal_plan_${crypto.randomUUID()}`,
+        name: { vi: normalizedName, en: normalizedName },
+        createdAt: now,
+        updatedAt: now
+      });
+      set((state) => ({
+        mealPlans: [saved, ...state.mealPlans.filter((plan) => plan.id !== saved.id)],
+        mealPlanStatus: "ready",
+        notice: "Đã lưu thực đơn vào thiết bị."
+      }));
+      return saved;
+    } catch (error) {
+      const message = messageFrom(error);
+      set({ mealPlanStatus: "error", mealPlanError: message });
+      throw error;
+    }
+  },
+
+  async removeSavedMealPlan(id) {
+    await deleteMealPlan(id);
+    set((state) => ({
+      mealPlans: state.mealPlans.filter((plan) => plan.id !== id),
+      notice: "Đã xóa thực đơn đã lưu."
+    }));
+  },
+
+  async logSavedMealPlanDays(planId, dayIndexes) {
+    set({ mealPlanStatus: "saving", mealPlanError: undefined });
+    try {
+      const result = await logMealPlanDays(planId, dayIndexes);
+      const [meals, foodPreferences] = await Promise.all([listMeals(), listFoodPreferences()]);
+      set({
+        meals,
+        foodPreferences,
+        mealPlanStatus: "ready",
+        notice: result.createdMeals.length
+          ? `Đã ghi ${result.createdMeals.length} bữa vào nhật ký.`
+          : "Các bữa đã được ghi trước đó; không tạo bản ghi trùng."
+      });
+      return result.createdMeals;
+    } catch (error) {
+      const message = messageFrom(error);
+      set({ mealPlanStatus: "error", mealPlanError: message });
       throw error;
     }
   },

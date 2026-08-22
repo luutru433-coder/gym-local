@@ -9,6 +9,7 @@ import {
   NutritionPackCompatibilityError,
   loadNutritionPackManifest,
   mapNutritionPackRow,
+  nutritionPackSupportsMealPlans,
   nutritionPackSupportsMenuSuggestions,
   parseNutritionPackManifest
 } from "./offline-pack";
@@ -64,7 +65,16 @@ describe("offline nutrition pack contracts", () => {
   it("rejects packs that require a newer app or an unsupported schema", () => {
     for (const [input, code] of [
       [manifest({ minimumAppVersion: "9.0.0" }), "app_too_old"],
-      [manifest({ schemaVersion: 3, foodGroupCount: 10, recipeIngredientCount: 1200 }), "unsupported_schema"]
+      [manifest({
+        schemaVersion: 3,
+        foodGroupCount: 10,
+        recipeIngredientCount: 3_200,
+        vietnameseDisplayFoodCount: 10_000,
+        activeRecipeCount: 800,
+        deprecatedRecipeCount: 300,
+        recipeStepCount: 2_400,
+        cuisineCounts: { vietnamese: 480, chinese: 50 }
+      }), "unsupported_schema"]
     ] as const) {
       try {
         parseNutritionPackManifest(input, "https://example.test/manifest.json", "0.3.0", 1);
@@ -90,6 +100,53 @@ describe("offline nutrition pack contracts", () => {
   it("enables menu suggestions only for a structured recipe pack", () => {
     expect(nutritionPackSupportsMenuSuggestions(manifest())).toBe(false);
     expect(nutritionPackSupportsMenuSuggestions(manifest({ schemaVersion: 2, recipeIngredientCount: 1200 }))).toBe(true);
+  });
+
+  it("accepts complete schema 3 manifests and gates the seven-day planner on active recipes and steps", () => {
+    const schema3 = manifest({
+      version: "2026.08.3",
+      schemaVersion: 3,
+      minimumAppVersion: "0.7.0",
+      foodGroupCount: 10,
+      recipeIngredientCount: 3_200,
+      vietnameseDisplayFoodCount: 10_000,
+      activeRecipeCount: 800,
+      deprecatedRecipeCount: 300,
+      recipeStepCount: 2_400,
+      cuisineCounts: { vietnamese: 480, chinese: 50, japanese: 50, korean: 50, thai: 50, taiwanese: 30, indian: 30, southeast_asian: 60 }
+    });
+
+    expect(() => parseNutritionPackManifest(schema3, "https://example.test/manifest.json", "0.7.0", 3)).not.toThrow();
+    expect(nutritionPackSupportsMealPlans(schema3)).toBe(true);
+    expect(nutritionPackSupportsMealPlans({ ...schema3, recipeStepCount: 0 })).toBe(false);
+  });
+
+  it("preserves schema 3 source, license, and Vietnamese review metadata", () => {
+    const food = mapNutritionPackRow({
+      id: "taiwan_1",
+      name_vi: "Đậu phụ",
+      name_en: "Tofu",
+      source: "taiwan_fda",
+      source_food_id: "1",
+      source_dataset_id: "taiwan-fda-food-nutrition",
+      source_dataset_version: "2026-08-14",
+      source_license_id: "OGDL-1.0",
+      translation_status: "reviewed",
+      translation_reviewed_at: "2026-08-14T00:00:00.000Z",
+      calories: 80,
+      protein: 8,
+      carbs: 2,
+      fat: 4,
+      data_quality: "partial"
+    });
+
+    expect(food).toMatchObject({
+      source: "taiwan_fda",
+      sourceDatasetId: "taiwan-fda-food-nutrition",
+      sourceLicenseId: "OGDL-1.0",
+      translationStatus: "reviewed",
+      translationReviewedAt: "2026-08-14T00:00:00.000Z"
+    });
   });
 
   it("keeps an installed pack usable when the manifest request is offline", async () => {

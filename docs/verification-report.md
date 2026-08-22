@@ -1,4 +1,37 @@
-# Verification report — 2026-08-13
+# Verification report — 2026-08-22
+
+## Checkpoint N5 — mobile/offline release candidate
+
+- The exact `pnpm run verify` gate passed: architecture audit, ESLint with zero warnings, TypeScript project references, content/license audits, 145 tests across 18 files, production PWA build, and performance budgets. The packaged pnpm runtime reported only that its global-virtual-store setting differs from the existing `node_modules`; verification itself completed successfully.
+- `pnpm content:validate`, `pnpm nutrition:verify-pack`, and `pnpm run verify:affected` passed independently.
+- Planner component tests render at 320 px and 390 px, keep nutrition labels Vietnamese even when the profile locale is English, cover confirmed-target gating, and exercise generate/save/log controls. Physical iPhone Home Screen, camera permission, and offline-relaunch checks remain release-device steps.
+- The PWA build transformed 2,744 modules, precached 38 entries / 3,205.4 KiB, and passed budgets at 201.7 KiB entry and 609.0 KiB initial graph. The SQLite pack remains outside the service-worker precache.
+- Active-workout tests continue to prove that a waiting PWA update is not activated until the workout ends.
+
+## Checkpoint N4 — deterministic weekly plans and personal-data v5
+
+- IndexedDB schema 5 migration, rollback hooks, meal-plan CRUD, personal snapshot/restore, and append-only idempotent day/week logging passed. Logging failure rolls back both diary rows and food-preference updates in one transaction.
+- Backup v5 round trips saved plan snapshots and imports backup v1–v4 by adding an empty `mealPlans` list without changing historical nutrition, workouts, custom recipes, pantry, or the independently installed pack.
+- Planner tests cover deterministic 7×3 generation, optional snacks, hard allergen/diet filters, no repeated recipe/signature or consecutive main protein, weekly finite-pantry allocation without mutation, target bands, warnings, and unknown micronutrients remaining unknown.
+
+## Checkpoint N3 — complete Việt–Á catalog and atomic release
+
+- Pack schema 3 contains exactly 800 active dishes: Việt Nam 480; Trung Hoa/Nhật/Hàn/Thái 50 each; Đài Loan/Ấn Độ 30 each; other Southeast Asia 60. Coverage is breakfast 160, lunch 640, dinner 480, snack 160, vegetarian 480, vegan 320.
+- All active dishes have unique IDs, names, and measured ingredient signatures, 5,210 ingredient rows, 3,200 Vietnamese/English preparation steps, source/license/review metadata, dietary/allergen tags, and no unresolved placeholders.
+- Content is split into eight independently generated cuisine files. A repeat generation produced byte-identical content and SQLite output.
+- The worker stages a new filename, validates it before pointer activation, retains one previous ready file, and removes only the obsolete older rollback file. Failure tests preserve the working pack.
+
+## Checkpoint N2 — schema 3, reviewed Vietnamese search, and legacy redirects
+
+- The verified pack contains 14,335 total foods, 47,328 Vietnamese aliases, and 11,373 reviewed Vietnamese display names. The remaining 2,962 insufficiently translated USDA rows are explicitly `unreviewed` and absent from normal FTS/search instead of receiving a misleading generic Vietnamese label.
+- Exactly 300 immutable schema-2 recipe IDs are deprecated and redirected; none is reused by an active recipe.
+- The SQLite schema passed the database-schema-validator policy check, foreign-key/integrity validation, accented/unaccented Vietnamese FTS checks, source-license gates, manifest count checks, byte-size validation, and SHA-256 validation.
+- Artifact: `gym-local-nutrition-2026.08.1.sqlite3`, 37,552,128 bytes, SHA-256 `190d69434927b583ac231594bd3c2253a6375b654fe1047ae17cce67f919e881`.
+
+## Checkpoint N1 — Vietnamese nutrition boundary
+
+- Nutrition pages use Vietnamese presentation regardless of profile locale; workout localization remains unchanged.
+- Nutrient labels, current pantry/menu ingredient names, source mapping, and allergen metadata have regression coverage. Internal English contract fields remain stable for old backups and provider adapters.
 
 ## 2026-08-14 — Nutrition pack compressed-transfer hotfix
 

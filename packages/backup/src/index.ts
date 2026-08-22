@@ -161,9 +161,14 @@ const foodSchema = z.object({
   servingGrams: nonNegativeNumber.optional(),
   aliases: z.array(z.string()).optional(),
   per100g: nutrientSchema,
-  source: z.enum(["custom", "open_food_facts", "usda_fdc", "vietnamese_recipe"]),
+  source: z.enum(["custom", "open_food_facts", "usda_fdc", "taiwan_fda", "korea_rda", "vietnamese_recipe", "asian_recipe"]),
   sourceFoodId: z.string().optional(),
   sourceUrl: z.string().url().optional(),
+  sourceDatasetId: z.string().optional(),
+  sourceDatasetVersion: z.string().optional(),
+  sourceLicenseId: z.string().optional(),
+  translationStatus: z.enum(["unreviewed", "generated", "reviewed"]).optional(),
+  translationReviewedAt: timestampSchema.optional(),
   dataQuality: z.enum(["complete", "partial", "estimated_recipe"]).optional(),
   updatedAt: timestampSchema
 }).passthrough();
@@ -176,6 +181,8 @@ const mealSchema = z.object({
   foodNameSnapshot: localizedTextSchema,
   grams: nonNegativeNumber,
   nutrientsSnapshot: nutrientSchema,
+  sourceMealPlanId: idSchema.optional(),
+  sourcePlannedMealId: idSchema.optional(),
   createdAt: timestampSchema
 }).passthrough();
 
@@ -233,6 +240,81 @@ const pantryItemSchema = z.discriminatedUnion("kind", [
     groupNameSnapshot: localizedTextSchema
   })
 ]);
+
+const asianCuisineSchema = z.enum([
+  "vietnamese", "chinese", "japanese", "korean", "thai", "taiwanese", "indian", "southeast_asian"
+]);
+const mealPlanTargetSchema = z.object({
+  calories: nonNegativeNumber,
+  protein: nonNegativeNumber,
+  carbs: nonNegativeNumber,
+  fat: nonNegativeNumber,
+  formulaVersion: z.number().int().positive(),
+  confirmedAt: timestampSchema.optional(),
+  source: z.enum(["estimated", "manual", "legacy"]).optional()
+}).passthrough();
+const mealPlanFiltersSchema = z.object({
+  includeSnack: z.boolean(),
+  cuisines: z.array(asianCuisineSchema),
+  dietaryTags: z.array(z.string()),
+  excludedAllergens: z.array(z.string()),
+  seed: z.string().min(1)
+}).passthrough();
+const plannedMealIngredientSchema = z.object({
+  foodId: idSchema,
+  nameSnapshot: localizedTextSchema,
+  grams: finiteNumber.positive(),
+  groupId: foodGroupSchema,
+  required: z.boolean(),
+  availableGrams: finiteNumber.nonnegative().optional(),
+  missingGrams: finiteNumber.nonnegative(),
+  nutrientsPer100gSnapshot: nutrientSchema.optional()
+}).passthrough();
+const plannedMealSchema = z.object({
+  id: idSchema,
+  dayIndex: z.number().int().min(0).max(6),
+  meal: z.enum(["breakfast", "lunch", "dinner", "snack"]),
+  recipeId: idSchema,
+  recipeNameSnapshot: localizedTextSchema,
+  cuisine: asianCuisineSchema,
+  servingGrams: finiteNumber.positive(),
+  nutrientsSnapshot: nutrientSchema,
+  ingredientSnapshots: z.array(plannedMealIngredientSchema).min(1),
+  sourcePackVersion: z.string().min(1)
+}).passthrough();
+const mealPlanDaySchema = z.object({
+  dayIndex: z.number().int().min(0).max(6),
+  date: dateSchema.optional(),
+  meals: z.array(plannedMealSchema),
+  totalsSnapshot: nutrientSchema
+}).passthrough();
+const mealPlanShoppingItemSchema = z.object({
+  foodId: idSchema,
+  nameSnapshot: localizedTextSchema,
+  groupId: foodGroupSchema,
+  missingGrams: finiteNumber.positive()
+}).passthrough();
+const mealPlanWarningSchema = z.object({
+  code: z.enum(["insufficient_candidates", "partial_plan", "target_out_of_range", "missing_pantry", "unknown_nutrients", "stale_target"]),
+  message: localizedTextSchema,
+  dayIndex: z.number().int().min(0).max(6).optional(),
+  meal: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional()
+}).passthrough();
+const savedMealPlanSchema = z.object({
+  id: idSchema,
+  name: localizedTextSchema,
+  durationDays: z.union([z.literal(1), z.literal(7)]),
+  startDate: dateSchema.optional(),
+  targetSnapshot: mealPlanTargetSchema,
+  filtersSnapshot: mealPlanFiltersSchema,
+  days: z.array(mealPlanDaySchema),
+  shoppingListSnapshot: z.array(mealPlanShoppingItemSchema),
+  warnings: z.array(mealPlanWarningSchema),
+  algorithmVersion: z.number().int().positive(),
+  sourcePackVersion: z.string().min(1),
+  createdAt: timestampSchema,
+  updatedAt: timestampSchema
+}).passthrough();
 
 const bodyMetricSchema = z.object({
   id: idSchema,
@@ -366,16 +448,21 @@ const backupV3DataSchema = legacyBackupDataSchema.extend({
   waterEntries: z.array(waterEntrySchema),
   foodPreferences: z.array(foodPreferenceSchema)
 });
-const backupDataSchema = backupV3DataSchema.extend({
+const backupV4DataSchema = backupV3DataSchema.extend({
   pantryItems: z.array(pantryItemSchema)
+});
+const backupDataSchema = backupV4DataSchema.extend({
+  mealPlans: z.array(savedMealPlanSchema)
 });
 
 const v3CollectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
-const collectionKeys = [...v3CollectionKeys, "pantryItems"] as const;
+const v4CollectionKeys = [...v3CollectionKeys, "pantryItems"] as const;
+const collectionKeys = [...v4CollectionKeys, "mealPlans"] as const;
 type LegacyBackupData = z.infer<typeof legacyBackupDataSchema>;
 type BackupV3Data = z.infer<typeof backupV3DataSchema>;
+type BackupV4Data = z.infer<typeof backupV4DataSchema>;
 
-function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "programs" | "settings">): void {
+function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "programs" | "settings" | "meals" | "mealPlans">): void {
   const sessionIds = new Set(data.sessions.map((session) => session.id));
   if (data.settings.activeSessionId) {
     const active = data.sessions.find((session) => session.id === data.settings.activeSessionId);
@@ -385,6 +472,30 @@ function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | 
   }
   if (data.settings.activeProgramId && !data.programs.some((program) => program.id === data.settings.activeProgramId)) {
     throw new Error("Backup active program pointer is invalid");
+  }
+  const planIds = new Set<string>();
+  const plannedMealsByPlan = new Map<string, Set<string>>();
+  for (const plan of data.mealPlans) {
+    if (planIds.has(plan.id) || plan.days.length !== plan.durationDays) throw new Error("Backup meal plan structure is invalid");
+    planIds.add(plan.id);
+    const dayIndexes = new Set<number>();
+    const plannedIds = new Set<string>();
+    for (const day of plan.days) {
+      if (dayIndexes.has(day.dayIndex) || day.dayIndex >= plan.durationDays) throw new Error("Backup meal plan day is invalid");
+      dayIndexes.add(day.dayIndex);
+      for (const meal of day.meals) {
+        if (meal.dayIndex !== day.dayIndex || plannedIds.has(meal.id)) throw new Error("Backup planned meal relationship is invalid");
+        plannedIds.add(meal.id);
+      }
+    }
+    plannedMealsByPlan.set(plan.id, plannedIds);
+  }
+  for (const meal of data.meals) {
+    if (Boolean(meal.sourceMealPlanId) !== Boolean(meal.sourcePlannedMealId)) throw new Error("Backup meal-plan log link is incomplete");
+    if (!meal.sourceMealPlanId || !meal.sourcePlannedMealId) continue;
+    if (!plannedMealsByPlan.get(meal.sourceMealPlanId)?.has(meal.sourcePlannedMealId)) {
+      throw new Error("Backup meal-plan log link is invalid");
+    }
   }
 }
 
@@ -451,21 +562,26 @@ function migrateV2ToV3(raw: unknown): BackupV3Data {
   });
 }
 
-function migrateV3ToV4(raw: unknown): BackupPayload["data"] {
+function migrateV3ToV4(raw: unknown): BackupV4Data {
   const previous = backupV3DataSchema.parse(raw);
-  return validateBackupData({ ...previous, pantryItems: [] });
+  return backupV4DataSchema.parse({ ...previous, pantryItems: [] });
+}
+
+function migrateV4ToV5(raw: unknown): BackupPayload["data"] {
+  const previous = backupV4DataSchema.parse(raw);
+  return validateBackupData({ ...previous, mealPlans: [] });
 }
 
 function validateDetailedManifest(
   manifest: BackupPayload["manifest"],
   data: BackupPayload["data"],
   serializedBytes: number,
-  version: 3 | 4
+  version: 3 | 4 | 5
 ): void {
   if (manifest.format !== "gym-local-backup") throw new Error(`Backup v${version} format identifier is missing`);
   if (manifest.dbSchemaVersion !== version) throw new Error("Backup database schema metadata is invalid");
   if (manifest.dataBytes !== serializedBytes) throw new Error("Backup data byte count does not match");
-  const keys = version === 3 ? v3CollectionKeys : collectionKeys;
+  const keys = version === 3 ? v3CollectionKeys : version === 4 ? v4CollectionKeys : collectionKeys;
   const allowedKeys = new Set<string>(keys);
   const expected = backupCounts(data, keys);
   const countKeys = manifest.counts ? Object.keys(manifest.counts) : [];
@@ -526,15 +642,18 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
   let parsed: BackupPayload["data"];
   switch (manifest.backupVersion) {
     case 1:
-      parsed = migrateV3ToV4(migrateV2ToV3(migrateV1ToV2(raw)));
+      parsed = migrateV4ToV5(migrateV3ToV4(migrateV2ToV3(migrateV1ToV2(raw))));
       break;
     case 2:
-      parsed = migrateV3ToV4(migrateV2ToV3(raw));
+      parsed = migrateV4ToV5(migrateV3ToV4(migrateV2ToV3(raw)));
       break;
     case 3:
-      parsed = migrateV3ToV4(raw);
+      parsed = migrateV4ToV5(migrateV3ToV4(raw));
       break;
     case 4:
+      parsed = migrateV4ToV5(raw);
+      break;
+    case 5:
       parsed = validateBackupData(raw);
       break;
     default:
@@ -553,7 +672,7 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
     }
   } satisfies BackupPayload["data"];
   validateBackupRelations(data);
-  if (manifest.backupVersion === 3 || manifest.backupVersion === 4) {
+  if (manifest.backupVersion === 3 || manifest.backupVersion === 4 || manifest.backupVersion === 5) {
     validateDetailedManifest(manifest, data, serializedBytes, manifest.backupVersion);
   }
   return { manifest, data };

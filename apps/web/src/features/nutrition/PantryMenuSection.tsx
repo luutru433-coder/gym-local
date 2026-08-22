@@ -66,7 +66,7 @@ export function PantryMenuSection() {
   const refreshMenuSuggestions = useGymStore((state) => state.refreshMenuSuggestions);
   const searchOfflineNutritionFoods = useGymStore((state) => state.searchOfflineNutritionFoods);
   const addMeal = useGymStore((state) => state.addMeal);
-  const locale = profile.locale;
+  const locale = "vi" as const;
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FoodItem[]>([]);
   const [searching, setSearching] = useState(false);
@@ -227,7 +227,7 @@ export function PantryMenuSection() {
       {error || suggestionError ? <Notice tone="warning">{error ?? suggestionError}</Notice> : null}
       <div className="menu-results" aria-live="polite">
         {suggestions.map((suggestion) => <Card className="menu-suggestion" key={suggestion.recipeId}>
-          <header><div><span className={suggestion.completeRequired ? "menu-match menu-match--complete" : "menu-match"}>{suggestion.completeRequired ? (locale === "vi" ? "Đủ nguyên liệu chính" : "Main ingredients ready") : `${Math.round(suggestion.requiredCoverage * 100)}% ${locale === "vi" ? "phù hợp" : "matched"}`}</span><h3>{localize(suggestion.name, locale)}</h3><p>{formatNumber(suggestion.nutrients.calories, locale)} kcal · P {formatNumber(suggestion.nutrients.protein, locale)}g · C {formatNumber(suggestion.nutrients.carbs, locale)}g · F {formatNumber(suggestion.nutrients.fat, locale)}g</p></div><Utensils size={22} /></header>
+          <header><div><span className={suggestion.completeRequired ? "menu-match menu-match--complete" : "menu-match"}>{suggestion.completeRequired ? (locale === "vi" ? "Đủ nguyên liệu chính" : "Main ingredients ready") : `${Math.round(suggestion.requiredCoverage * 100)}% ${locale === "vi" ? "phù hợp" : "matched"}`}</span><h3>{localize(suggestion.name, locale)}</h3><p>{formatNumber(suggestion.nutrients.calories, locale)} kcal · Đạm {formatNumber(suggestion.nutrients.protein, locale)}g · Bột đường {formatNumber(suggestion.nutrients.carbs, locale)}g · Béo {formatNumber(suggestion.nutrients.fat, locale)}g</p></div><Utensils size={22} /></header>
           <ul>{suggestion.ingredients.map((ingredient) => {
             const sufficient = ingredient.availabilityRatio >= 1;
             const status = sufficient ? ingredient.matchedBy : "missing";

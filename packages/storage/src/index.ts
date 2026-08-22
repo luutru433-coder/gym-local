@@ -16,6 +16,7 @@ import {
   type Recipe,
   type RecoveryPoint,
   type Routine,
+  type SavedMealPlan,
   type WaterEntry,
   type WorkoutSession
 } from "@gym/contracts";
@@ -47,6 +48,7 @@ export class GymDatabase extends Dexie {
   waterEntries!: EntityTable<WaterEntry, "id">;
   foodPreferences!: EntityTable<FoodPreference, "id">;
   pantryItems!: EntityTable<PantryItem, "id">;
+  mealPlans!: EntityTable<SavedMealPlan, "id">;
   bodyMetrics!: EntityTable<BodyMetric, "id">;
   customVariants!: EntityTable<ExerciseVariant, "id">;
   settings!: EntityTable<AppSettings, "id">;
@@ -56,6 +58,7 @@ export class GymDatabase extends Dexie {
   constructor(name = "gym-local", migrationHooks: {
     beforeV3Commit?: () => void | Promise<void>;
     beforeV4Commit?: () => void | Promise<void>;
+    beforeV5Commit?: () => void | Promise<void>;
   } = {}) {
     super(name);
     this.version(1).stores({
@@ -206,6 +209,47 @@ export class GymDatabase extends Dexie {
         };
       });
       await migrationHooks.beforeV4Commit?.();
+    });
+    this.version(5).stores({
+      profiles: "id, updatedAt",
+      routines: "id, goal, updatedAt, sourceTemplateId",
+      programs: "id, goal, updatedAt",
+      sessions: "id, routineId, startedAt, finishedAt, locationId",
+      foods: "id, barcode, updatedAt",
+      meals: "id, date, meal, foodId, sourceMealPlanId, sourcePlannedMealId, createdAt",
+      recipes: "id, updatedAt",
+      waterEntries: "id, date, createdAt",
+      foodPreferences: "id, foodId, favorite, lastUsedAt",
+      pantryItems: "id, kind, foodId, groupId, updatedAt",
+      mealPlans: "id, durationDays, startDate, createdAt, updatedAt",
+      bodyMetrics: "id, date",
+      customVariants: "id, movementId, reviewStatus",
+      settings: "id",
+      nutritionPacks: "id, status, version, installedAt",
+      recoveryPoints: "id, createdAt"
+    }).upgrade(async (transaction) => {
+      const settingsTable = transaction.table<AppSettings>("settings");
+      const recoveryTable = transaction.table<RecoveryPoint>("recoveryPoints");
+      const settings = await settingsTable.get("app");
+      if (settings) {
+        await settingsTable.put({
+          ...settings,
+          dbSchemaVersion: 5,
+          backupVersion: 5
+        });
+      }
+      await recoveryTable.toCollection().modify((recoveryPoint) => {
+        recoveryPoint.snapshot = {
+          ...recoveryPoint.snapshot,
+          mealPlans: recoveryPoint.snapshot.mealPlans ?? [],
+          settings: {
+            ...recoveryPoint.snapshot.settings,
+            dbSchemaVersion: 5,
+            backupVersion: 5
+          }
+        };
+      });
+      await migrationHooks.beforeV5Commit?.();
     });
   }
 }
@@ -593,6 +637,121 @@ export async function deletePantryItem(id: string, db: GymDatabase = gymDb): Pro
   await db.pantryItems.delete(id);
 }
 
+function mealPlanDate(startDate: string, dayIndex: number): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) throw new Error("Meal plan start date is invalid");
+  const date = new Date(`${startDate}T00:00:00Z`);
+  if (!Number.isFinite(date.getTime())) throw new Error("Meal plan start date is invalid");
+  date.setUTCDate(date.getUTCDate() + dayIndex);
+  return date.toISOString().slice(0, 10);
+}
+
+function validateMealPlan(plan: SavedMealPlan): void {
+  assertFiniteRecord(plan, "meal plan");
+  if (plan.durationDays !== 1 && plan.durationDays !== 7) throw new Error("Meal plan duration is invalid");
+  if (!plan.name.vi.trim() || !plan.name.en.trim()) throw new Error("Meal plan name is required");
+  if (plan.days.length !== plan.durationDays) throw new Error("Meal plan day count does not match its duration");
+  const dayIndexes = new Set<number>();
+  const plannedMealIds = new Set<string>();
+  for (const day of plan.days) {
+    if (!Number.isInteger(day.dayIndex) || day.dayIndex < 0 || day.dayIndex >= plan.durationDays || dayIndexes.has(day.dayIndex)) {
+      throw new Error("Meal plan contains an invalid day index");
+    }
+    dayIndexes.add(day.dayIndex);
+    if (day.date && !/^\d{4}-\d{2}-\d{2}$/.test(day.date)) throw new Error("Meal plan contains an invalid date");
+    for (const meal of day.meals) {
+      if (meal.dayIndex !== day.dayIndex || plannedMealIds.has(meal.id)) throw new Error("Meal plan contains an invalid meal relationship");
+      if (!meal.recipeNameSnapshot.vi.trim() || !meal.recipeNameSnapshot.en.trim() || meal.servingGrams <= 0) {
+        throw new Error("Meal plan contains an invalid meal snapshot");
+      }
+      plannedMealIds.add(meal.id);
+    }
+  }
+  if (!Number.isInteger(plan.algorithmVersion) || plan.algorithmVersion < 1 || !plan.sourcePackVersion.trim()) {
+    throw new Error("Meal plan version metadata is invalid");
+  }
+}
+
+export async function listMealPlans(db: GymDatabase = gymDb): Promise<SavedMealPlan[]> {
+  return db.mealPlans.orderBy("updatedAt").reverse().toArray();
+}
+
+export async function saveMealPlan(plan: SavedMealPlan, db: GymDatabase = gymDb): Promise<SavedMealPlan> {
+  validateMealPlan(plan);
+  const existing = await db.mealPlans.get(plan.id);
+  const saved: SavedMealPlan = {
+    ...plan,
+    createdAt: existing?.createdAt ?? plan.createdAt,
+    updatedAt: new Date().toISOString()
+  };
+  await db.mealPlans.put(saved);
+  return saved;
+}
+
+export async function deleteMealPlan(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.mealPlans.delete(id);
+}
+
+export interface LogMealPlanDaysResult {
+  createdMeals: MealEntry[];
+  skippedPlannedMealIds: string[];
+}
+
+export async function logMealPlanDays(
+  planId: string,
+  dayIndexes: number[],
+  db: GymDatabase = gymDb
+): Promise<LogMealPlanDaysResult> {
+  const plan = await db.mealPlans.get(planId);
+  if (!plan) throw new Error("Meal plan not found");
+  validateMealPlan(plan);
+  const selected = new Set(dayIndexes);
+  if (!selected.size || [...selected].some((dayIndex) => !Number.isInteger(dayIndex) || dayIndex < 0 || dayIndex >= plan.durationDays)) {
+    throw new Error("Select at least one valid meal-plan day");
+  }
+  const createdMeals: MealEntry[] = [];
+  const skippedPlannedMealIds: string[] = [];
+  await db.transaction("rw", db.meals, db.foodPreferences, async () => {
+    const existing = await db.meals.where("sourceMealPlanId").equals(plan.id).toArray();
+    const existingPlannedIds = new Set(existing.map((meal) => meal.sourcePlannedMealId).filter(Boolean));
+    for (const day of plan.days.filter((candidate) => selected.has(candidate.dayIndex))) {
+      const date = day.date ?? (plan.startDate ? mealPlanDate(plan.startDate, day.dayIndex) : undefined);
+      if (!date) throw new Error("Meal-plan day needs a date before it can be logged");
+      for (const planned of day.meals) {
+        if (existingPlannedIds.has(planned.id)) {
+          skippedPlannedMealIds.push(planned.id);
+          continue;
+        }
+        const createdAt = new Date().toISOString();
+        const entry: MealEntry = {
+          id: `meal_${crypto.randomUUID()}`,
+          date,
+          meal: planned.meal,
+          foodId: `pack_${planned.recipeId}`,
+          foodNameSnapshot: { ...planned.recipeNameSnapshot },
+          grams: planned.servingGrams,
+          nutrientsSnapshot: { ...planned.nutrientsSnapshot },
+          sourceMealPlanId: plan.id,
+          sourcePlannedMealId: planned.id,
+          createdAt
+        };
+        await db.meals.add(entry);
+        const foodPreference = await db.foodPreferences.where("foodId").equals(entry.foodId).first();
+        await db.foodPreferences.put({
+          id: foodPreference?.id ?? `food_preference_${crypto.randomUUID()}`,
+          foodId: entry.foodId,
+          favorite: foodPreference?.favorite ?? false,
+          defaultServingGrams: foodPreference?.defaultServingGrams ?? entry.grams,
+          lastUsedAt: createdAt,
+          useCount: (foodPreference?.useCount ?? 0) + 1
+        });
+        existingPlannedIds.add(planned.id);
+        createdMeals.push(entry);
+      }
+    }
+  });
+  return { createdMeals, skippedPlannedMealIds };
+}
+
 export async function listBodyMetrics(db: GymDatabase = gymDb): Promise<BodyMetric[]> {
   return db.bodyMetrics.orderBy("date").toArray();
 }
@@ -635,6 +794,7 @@ const personalTableNames = [
   "waterEntries",
   "foodPreferences",
   "pantryItems",
+  "mealPlans",
   "bodyMetrics",
   "customVariants",
   "settings"
@@ -645,7 +805,7 @@ function personalTables(db: GymDatabase) {
 }
 
 async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<PersonalDataSnapshot> {
-  const [profile, routines, programs, sessions, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, bodyMetrics, customVariants, settings] = await Promise.all([
+  const [profile, routines, programs, sessions, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, customVariants, settings] = await Promise.all([
     db.profiles.toCollection().first(),
     db.routines.toArray(),
     db.programs.toArray(),
@@ -656,6 +816,7 @@ async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<Person
     db.waterEntries.toArray(),
     db.foodPreferences.toArray(),
     db.pantryItems.toArray(),
+    db.mealPlans.toArray(),
     db.bodyMetrics.toArray(),
     db.customVariants.toArray(),
     db.settings.get("app")
@@ -671,6 +832,7 @@ async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<Person
     waterEntries,
     foodPreferences,
     pantryItems,
+    mealPlans,
     bodyMetrics,
     customVariants,
     settings: settings ?? defaultSettings
@@ -689,6 +851,7 @@ async function putSnapshotInCurrentTransaction(data: PersonalDataSnapshot, db: G
   await db.waterEntries.bulkPut(data.waterEntries);
   await db.foodPreferences.bulkPut(data.foodPreferences);
   await db.pantryItems.bulkPut(data.pantryItems);
+  await db.mealPlans.bulkPut(data.mealPlans);
   await db.bodyMetrics.bulkPut(data.bodyMetrics);
   await db.customVariants.bulkPut(data.customVariants);
   await db.settings.put(data.settings);

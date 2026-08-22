@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-08-14",
+  "sources": [
+    {
+      "id": "gym-local-project-authored-asian-recipes",
+      "kind": "project_authored",
+      "label": "Gym Local project-authored Việt–Á recipe estimates",
+      "contentPath": "content/nutrition-recipes/",
+      "licenseId": "project-content",
+      "allowedCuisines": [
+        "vietnamese",
+        "chinese",
+        "japanese",
+        "korean",
+        "thai",
+        "taiwanese",
+        "indian",
+        "southeast_asian"
+      ],
+      "reviewStatus": "reviewed"
+    }
+  ],
+  "externalImports": []
+}
