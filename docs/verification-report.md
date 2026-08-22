@@ -2,19 +2,20 @@
 
 ## Checkpoint N5 — mobile/offline release candidate
 
-- The exact `pnpm run verify` gate passed: architecture audit, ESLint with zero warnings, TypeScript project references, content/license audits, 145 tests across 18 files, production PWA build, and performance budgets. The packaged pnpm runtime reported only that its global-virtual-store setting differs from the existing `node_modules`; verification itself completed successfully.
+- The exact `pnpm run verify` gate passed: architecture audit, ESLint with zero warnings, TypeScript project references, content/license audits, 149 tests across 18 files, production PWA build, and performance budgets. The packaged pnpm runtime reported only that its global-virtual-store setting differs from the existing `node_modules`; verification itself completed successfully.
 - `pnpm content:validate`, `pnpm nutrition:verify-pack`, and `pnpm run verify:affected` passed independently.
 - Planner component tests render at 320 px and 390 px, keep nutrition labels Vietnamese even when the profile locale is English, cover confirmed-target gating, and exercise generate/save/log controls. Physical iPhone Home Screen, camera permission, and offline-relaunch checks remain release-device steps.
-- The PWA build transformed 2,744 modules, precached 38 entries / 3,205.4 KiB, and passed budgets at 201.7 KiB entry and 609.0 KiB initial graph. The SQLite pack remains outside the service-worker precache.
+- The PWA build transformed 2,744 modules, precached 38 entries / 3,206.6 KiB, and passed budgets at 202.3 KiB entry and 609.6 KiB initial graph. The SQLite pack remains outside the service-worker precache.
 - Active-workout tests continue to prove that a waiting PWA update is not activated until the workout ends.
 - A live 390 px Pages smoke test confirmed the Vietnamese nutrition screen, manifest statistics, planner filters, schema-3 requirement, saved-plan empty state, and no console errors. The test also exposed and led to a regression-covered in-place pack-update action; update failure keeps the prior pack ready instead of forcing a reload.
 - The same live flow installed schema 3 over an existing schema-2 pack and found a target-confirmation integration defect; the planner now compares confirmed estimated targets with the current profile inputs and has a matching-profile regression test.
+- GitHub Pages run `32578319677` passed the full gate and deployed commit `79fc2db`. A live 390 px update retained the installed schema-3 pack, the saved algorithm-1 plan, and three existing diary rows. Algorithm 2 then generated and saved a 7×3 plan for a confirmed 2,765 kcal target: all seven days reached 2,623–2,758 kcal, 119.4–123.5 g protein, 369–408.6 g carbohydrate, and 74.8–83.8 g fat, with no target-range warning. The page had no horizontal overflow and no browser console warning/error.
 
 ## Checkpoint N4 — deterministic weekly plans and personal-data v5
 
 - IndexedDB schema 5 migration, rollback hooks, meal-plan CRUD, personal snapshot/restore, and append-only idempotent day/week logging passed. Logging failure rolls back both diary rows and food-preference updates in one transaction.
 - Backup v5 round trips saved plan snapshots and imports backup v1–v4 by adding an empty `mealPlans` list without changing historical nutrition, workouts, custom recipes, pantry, or the independently installed pack.
-- Planner tests cover deterministic 7×3 generation, optional snacks, hard allergen/diet filters, no repeated recipe/signature or consecutive main protein, weekly finite-pantry allocation without mutation, target bands, warnings, and unknown micronutrients remaining unknown.
+- Planner tests cover deterministic 7×3 generation, optional snacks, hard allergen/diet filters, no repeated recipe/signature or consecutive main protein, weekly finite-pantry allocation without mutation, target bands, warnings, and unknown micronutrients remaining unknown. Algorithm 2 additionally verifies deterministic 0.5–2.5 portion scaling and consistent nutrient, ingredient, pantry, shopping, saved-plan, and diary snapshots.
 
 ## Checkpoint N3 — complete Việt–Á catalog and atomic release
 
