@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-08-22 — Nutrition planner algorithm 2
+
+- Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.
+- Keep saved nutrient, ingredient, pantry, shopping, and diary snapshots consistent with the selected portion.
+
 ## 0.7.0
 
 - Replaced the synthetic 300-recipe catalog with nutrition pack schema 3: 800 source-traceable project-authored Việt–Á dishes, 480 Vietnamese and 320 from other Asian cuisines, each with real ingredient quantities, four Vietnamese preparation steps, meal/diet/allergen metadata, and immutable redirects for all 300 legacy IDs.

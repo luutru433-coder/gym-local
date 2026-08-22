@@ -11,6 +11,7 @@ A saved weekly plan must survive catalog and algorithm updates, while generation
 ## Decision
 
 - `generateOfflineMealPlan()` is a pure deterministic function with a versioned algorithm and seed. It requires a current confirmed target, treats diet/allergen filters as hard constraints, prevents repeated recipes and consecutive main proteins, and allocates pantry quantities across the whole week without mutating pantry data.
+- Algorithm version 2 evaluates practical 0.5–2.5 portion multiples in 0.25 increments for every candidate. The selected portion, nutrient snapshot, ingredient quantities, pantry allocation, shopping list, and diary entry all use the same multiplier. This lets three-meal plans approach high-energy targets without inventing foods or silently changing the recipe composition.
 - The planner prioritizes daily kcal ±10%, protein 90–110%, carbohydrate/fat ±15%, then pantry coverage and diversity. The closest feasible plan carries warnings and a shopping-list snapshot; unknown micronutrients remain unknown.
 - IndexedDB schema 5 adds `mealPlans`. Saved plans snapshot targets, filters, names, ingredients, nutrients, pack version, and algorithm version.
 - Backup v5 includes meal plans and imports v1–v4 by adding an empty list only. The reproducible pack remains excluded.

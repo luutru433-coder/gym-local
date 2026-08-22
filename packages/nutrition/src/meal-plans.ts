@@ -22,7 +22,7 @@ import type {
 } from "@gym/storage";
 import { mapNutritionPackRow } from "./offline-pack";
 
-export const OFFLINE_MEAL_PLAN_ALGORITHM_VERSION = 1;
+export const OFFLINE_MEAL_PLAN_ALGORITHM_VERSION = 2;
 
 export const DEFAULT_MEAL_PLAN_TARGET_TOLERANCE = {
   calories: 0.1,
@@ -43,6 +43,7 @@ const PROTEIN_GROUPS = new Set<FoodGroupId>(["meat", "seafood", "eggs", "plant_p
 const ASIAN_CUISINES: AsianCuisine[] = [
   "vietnamese", "chinese", "japanese", "korean", "thai", "taiwanese", "indian", "southeast_asian"
 ];
+const PORTION_FACTORS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5] as const;
 
 export type MealPlanMacroTarget = Pick<MealPlanTargetSnapshot, "calories" | "protein" | "carbs" | "fat">;
 
@@ -103,6 +104,12 @@ interface CandidateAllocation {
   remainingPantry: Map<string, number | undefined>;
   requiredCoverage: number;
   exactCoverage: number;
+}
+
+interface CandidatePortion {
+  factor: number;
+  nutrients: NutrientProfile;
+  targetScore: MealPlanTargetScore;
 }
 
 function round(value: number, precision = 3): number {
@@ -313,7 +320,8 @@ function pantryBuckets(pantryItems: PantryItem[]): PantryBucket[] {
 function allocateCandidate(
   candidate: MealPlanRecipeCandidate,
   buckets: PantryBucket[],
-  currentRemaining: Map<string, number | undefined>
+  currentRemaining: Map<string, number | undefined>,
+  portionFactor: number
 ): CandidateAllocation {
   const remainingPantry = new Map(currentRemaining);
   const ingredients: PlannedMealIngredient[] = [];
@@ -321,7 +329,8 @@ function allocateCandidate(
   let coveredRequiredGrams = 0;
   let exactRequiredGrams = 0;
   for (const ingredient of candidate.ingredients) {
-    let missingGrams = ingredient.grams;
+    const portionGrams = round(ingredient.grams * portionFactor, 1);
+    let missingGrams = portionGrams;
     let availableGrams = 0;
     const groupId = requiredFoodGroup(ingredient.group_id);
     const exactBuckets = buckets.filter((bucket) => bucket.kind === "food" && bucket.foodId === normalizedFoodId(ingredient.food_id));
@@ -337,13 +346,13 @@ function allocateCandidate(
       if (remaining !== undefined) remainingPantry.set(bucket.id, round(remaining - grams, 1));
     }
     if (ingredient.is_required === 1) {
-      requiredGrams += ingredient.grams;
+      requiredGrams += portionGrams;
       coveredRequiredGrams += availableGrams;
     }
     ingredients.push({
       foodId: ingredient.food_id,
       nameSnapshot: { vi: ingredient.name_vi, en: ingredient.name_en },
-      grams: ingredient.grams,
+      grams: portionGrams,
       groupId,
       required: ingredient.is_required === 1,
       availableGrams: availableGrams > 0 ? round(availableGrams, 1) : undefined,
@@ -356,6 +365,23 @@ function allocateCandidate(
     requiredCoverage: requiredGrams ? coveredRequiredGrams / requiredGrams : 1,
     exactCoverage: requiredGrams ? exactRequiredGrams / requiredGrams : 0
   };
+}
+
+function bestCandidatePortion(
+  candidate: MealPlanRecipeCandidate,
+  target: MealPlanMacroTarget
+): CandidatePortion {
+  return PORTION_FACTORS.map((factor): CandidatePortion => {
+    const nutrients = scaleNutrients(candidate.nutrients, factor);
+    return { factor, nutrients, targetScore: scoreMealPlanTarget(nutrients, target) };
+  }).sort((left, right) => {
+    if (left.targetScore.withinTolerance !== right.targetScore.withinTolerance) {
+      return Number(right.targetScore.withinTolerance) - Number(left.targetScore.withinTolerance);
+    }
+    return right.targetScore.score - left.targetScore.score
+      || Math.abs(left.factor - 1) - Math.abs(right.factor - 1)
+      || left.factor - right.factor;
+  })[0];
 }
 
 function targetForSlot(
@@ -463,11 +489,13 @@ export function generateOfflineMealPlan(
         if (!candidate.mealSlots.includes(meal)) return [];
         if (usedRecipeIds.has(candidate.recipeId) || usedSignatures.has(candidate.signature)) return [];
         if (previousProteinKey && candidate.mainProteinKey === previousProteinKey) return [];
-        const allocation = allocateCandidate(candidate, buckets, remainingPantry);
+        const portion = bestCandidatePortion(candidate, slotTarget);
+        const allocation = allocateCandidate(candidate, buckets, remainingPantry, portion.factor);
         return [{
           candidate,
           allocation,
-          targetScore: scoreMealPlanTarget(candidate.nutrients, slotTarget),
+          portion,
+          targetScore: portion.targetScore,
           seedRank: deterministicHash(`${seed}|${dayIndex}|${meal}|${candidate.recipeId}`)
         }];
       }).sort((left, right) => {
@@ -499,8 +527,8 @@ export function generateOfflineMealPlan(
         recipeId: selected.candidate.recipeId,
         recipeNameSnapshot: { ...selected.candidate.name },
         cuisine: selectedCuisine(selected.candidate, cuisines),
-        servingGrams: selected.candidate.servingGrams,
-        nutrientsSnapshot: { ...selected.candidate.nutrients },
+        servingGrams: round(selected.candidate.servingGrams * selected.portion.factor, 1),
+        nutrientsSnapshot: { ...selected.portion.nutrients },
         ingredientSnapshots: selected.allocation.ingredients,
         sourcePackVersion
       };

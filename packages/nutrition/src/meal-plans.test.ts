@@ -239,6 +239,25 @@ describe("offline seven-day meal plans", () => {
     expect(score.withinTolerance).toBe(false);
   });
 
+  it("scales practical portions to reach a confirmed high-energy target", () => {
+    const dataset = datasetForSlots(["breakfast", "lunch", "dinner"]);
+    dataset.recipes = dataset.recipes.map((row) => ({
+      ...row,
+      calories: Number(row.calories) / 2,
+      protein: Number(row.protein) / 2,
+      carbs: Number(row.carbs) / 2,
+      fat: Number(row.fat) / 2
+    }));
+
+    const plan = generateOfflineMealPlan(dataset, [], request({ durationDays: 1 }), "2026.08.1");
+
+    expect(plan.days[0].meals.every((meal) => meal.servingGrams === 200)).toBe(true);
+    expect(plan.days[0].meals[0].ingredientSnapshots.map((ingredient) => ingredient.grams)).toEqual([200, 40]);
+    expect(plan.shoppingListSnapshot.find((item) => item.foodId === "food_starch_0")?.missingGrams).toBe(200);
+    expect(scoreMealPlanTarget(plan.days[0].totalsSnapshot, target).withinTolerance).toBe(true);
+    expect(plan.algorithmVersion).toBe(2);
+  });
+
   it("preserves null and undefined optional nutrients while aggregating", () => {
     expect(aggregateMealPlanNutrients([
       { calories: 100, protein: 10, carbs: 10, fat: 2, ironMg: 1, folateMcg: undefined },
