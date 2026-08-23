@@ -83,4 +83,3 @@ After `BLOCKED`, do not create a fixer automatically. Resolve the missing author
 ## Merge gate
 
 Merge only when the latest cold-review report is committed, matches the reviewed HEAD/range, says `PASS`, and has `merge_authorized: true`. Re-run release checks if merge resolution changes candidate bytes. Record the merge commit in the coordinator ledger; never infer approval from chat text alone.
-

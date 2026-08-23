@@ -87,4 +87,3 @@ Complete contract, builder, storage, and player foundation packets before a 10â€
 - **Produce all assets before foundation work:** rejected because pack/player/rig changes would multiply rework and license review risk.
 - **Use animation from a similar equipment variant:** rejected because it can teach the wrong setup and violates exact-variant semantics.
 - **Store pack data in personal backup:** rejected because packs are reproducible release artifacts and would make backups large and version-coupled.
-

@@ -89,4 +89,3 @@ review_target:
   diff: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..be58060fd17edca54ed32da30e0c549bcdf0c48f"
   handoff_path: "docs/ai/reviews/FOUNDATION-01-handoff.yaml"
   next_task: "Open a new gpt-5.6-sol cold-review task; do not edit files; return PASS, FAIL, or BLOCKED."
-

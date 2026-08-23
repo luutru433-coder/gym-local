@@ -101,4 +101,3 @@ merge:
   allowed_only_after: "PASS"
   target: "main"
   squash_policy: "packet-defined"
-
