@@ -11,15 +11,16 @@ The reviewer reads only:
 1. Root and applicable nested `AGENTS.md` files.
 2. `docs/ai/master-plan.md`.
 3. The exact coordinate packet.
-4. The immutable diff from `base_commit` through the candidate branch HEAD.
-5. The handoff report and referenced command output, renders, manifests, checksums, and license records.
-6. Existing ADRs or contracts explicitly listed by the packet.
+4. The immutable candidate diff from `base_commit` through the handoff's `candidate_commit`.
+5. The metadata diff from `candidate_commit` through branch HEAD, which must contain only the packet's handoff report.
+6. The handoff report and referenced command output, renders, manifests, checksums, and license records.
+7. Existing ADRs or contracts explicitly listed by the packet.
 
 If any required input is absent or the candidate commit cannot be resolved, return `BLOCKED`.
 
 ## Review order
 
-1. Verify model, packet ID, base commit, branch, clean candidate worktree, and one-packet scope.
+1. Verify model, packet ID, base commit, candidate commit, branch, clean candidate worktree, and one-packet scope. Confirm the only post-candidate change is the handoff report; otherwise return `FAIL`.
 2. Compare every changed path with `allowed_paths`. Any unexplained out-of-scope path is `FAIL`; an ambiguous authority boundary is `BLOCKED`.
 3. Check every stop gate and confirm the producer did not continue through a triggered gate.
 4. Review decisions and contracts for compatibility, immutable IDs, exact equipment-variant mapping, offline behavior, personal-data safety, rollback, and optional external-video fallback.
@@ -82,4 +83,4 @@ After `BLOCKED`, do not create a fixer automatically. Resolve the missing author
 
 ## Merge gate
 
-Merge only when the latest cold-review report is committed, matches the reviewed HEAD/range, says `PASS`, and has `merge_authorized: true`. Re-run release checks if merge resolution changes candidate bytes. Record the merge commit in the coordinator ledger; never infer approval from chat text alone.
+Merge only when the latest cold-review report is committed, matches the reviewed candidate and metadata ranges, says `PASS`, and has `merge_authorized: true`. Re-run release checks if merge resolution changes candidate bytes. Record the merge commit in the coordinator ledger; never infer approval from chat text alone.

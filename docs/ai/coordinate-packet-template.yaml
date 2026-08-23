@@ -74,6 +74,8 @@ stop_gates:
 
 handoff:
   report_path: "docs/ai/reviews/PACKET-ID-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After candidate_commit, only report_path may change before cold review."
   required_fields:
     - "packet_id"
     - "status"
@@ -96,6 +98,9 @@ cold_review:
     - "FAIL"
     - "BLOCKED"
   report_path: "docs/ai/reviews/PACKET-ID-cold-review.yaml"
+  immutable_ranges:
+    candidate: "base_commit..candidate_commit"
+    handoff_metadata: "candidate_commit..branch HEAD; report_path only"
 
 merge:
   allowed_only_after: "PASS"
