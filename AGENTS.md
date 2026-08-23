@@ -1,33 +1,27 @@
 # Gym Local repository guidance
 
+## Packet execution
+
+- Use `gpt-5.6-sol` for repository implementation and cold-review tasks. Stop if that model is unavailable.
+- One Codex task handles exactly one coordinate packet.
+- Read the root and applicable nested `AGENTS.md`, `docs/ai/master-plan.md`, the packet, and `docs/ai/review-procedure.md` before changing files.
+- Do not edit outside the packet's `allowed_paths`; do not widen scope implicitly.
+- Stop at any packet stop gate and write a blocker report instead of continuing.
+- Run every check required by the packet. A missing handoff report means the packet is incomplete.
+
 ## Product invariants
 
-- The app is local-first, single-profile, bilingual Vietnamese/English, and usable without an account.
-- Workout, nutrition, catalog, progress, media, storage, backup, and UI are separate modules.
+- The app is local-first, single-profile, usable without an account, and keeps workout UI bilingual while nutrition presentation remains Vietnamese-only.
+- Workout, nutrition, catalog, progress, media, storage, backup, and UI remain separate modules and interact only through public `@gym/*` entry points.
 - Never mix performance history or PR values between equipment variants.
-- Never overwrite user routines, sessions, custom exercises, or nutrition history during catalog updates.
-- Rich media is online-only; core text, routines, logs, and backups must work offline.
-- Never scrape or bundle media without an explicit source and license.
-
-## Architecture rules
-
-- Import another module only through its `@gym/*` public entry point.
-- UI must not access IndexedDB or external APIs directly.
-- Only `packages/storage` owns database access and migrations.
-- Only provider modules may perform network requests.
-- Contract or schema changes require an ADR and migration/round-trip tests.
-- Stable catalog IDs are immutable; deprecate and redirect instead of reusing IDs.
+- Catalog or pack updates never overwrite user routines, sessions, custom exercises, nutrition history, pantry, or saved plans.
+- Text, workout data, and installed animation packs work offline; external video is optional and online-only.
+- Never scrape or bundle media without an explicit source, redistribution right, attribution, and review record.
+- Only `packages/storage` owns database access and migrations; UI does not access IndexedDB, OPFS, or external APIs directly.
+- Stable IDs are immutable. Contract or schema changes require an ADR and compatibility tests.
 
 ## Verification
 
-- Run `pnpm run verify:affected` for scoped changes.
-- Run `pnpm run verify` for contracts, storage, backup, release, or cross-module changes.
-- Content changes must pass `pnpm content:validate` and update source/review metadata.
-- Review against `docs/code-review.md` before considering a task complete.
-
-## Update safety
-
-- Do not activate a PWA update while a workout session is active.
-- Use additive expand-migrate-contract database changes.
-- Preserve compatibility with the current and two previous backup versions.
-- Add a changelog entry for user-visible behavior, schema, formulas, or catalog changes.
+- Run `pnpm run verify:affected` for scoped packets and `pnpm run verify` for contract, storage, backup, release, or cross-module packets.
+- Content packets also run `pnpm content:validate` and `pnpm content:audit` and update source/review metadata.
+- Review against `docs/code-review.md`; do not activate a PWA update during an active workout.

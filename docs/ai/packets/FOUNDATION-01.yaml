@@ -1,0 +1,180 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-01"
+  title: "Decide the offline animation-pack foundation"
+  type: "foundation"
+  status: "candidate"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+  target_branch: "codex/foundation-01"
+  worktree_required: false
+  worktree_exception: "The clean local checkout was branched directly from the immutable base before edits; future producer packets use Codex worktrees."
+  sequential_after: []
+
+authority:
+  allowed_paths:
+    - "AGENTS.md"
+    - "docs/ai/**"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+  forbidden_paths:
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "outputs/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  generated_binary_assets_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "packages/workouts/AGENTS.md"
+    - "packages/storage/AGENTS.md"
+    - "packages/nutrition/AGENTS.md"
+    - "content/AGENTS.md"
+    - "docs/architecture.md"
+    - "docs/module-map.md"
+    - "docs/content-policy.md"
+    - "docs/code-review.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/packets/FOUNDATION-01.yaml"
+  accepted_adrs: []
+  assumptions:
+    - "Installed animation packs must be usable offline; external video remains optional and online-only."
+    - "No source, contract, storage, player, dependency, or production asset change is authorized."
+
+outcome:
+  objective: "Record the architectural decision, independent version boundaries, proposed public contracts, and paper acceptance gates for licensed offline exercise animation packs."
+  user_visible_result: "None; design-only foundation packet."
+  deliverables:
+    - "Short durable root AGENTS.md guidance"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "Candidate commit and schema-valid handoff report"
+  non_goals:
+    - "No TypeScript contracts or runtime version bump"
+    - "No database, backup, storage, player, UI, or PWA change"
+    - "No dependency"
+    - "No production or pilot animation asset"
+    - "No animation scraping or license acquisition"
+
+preflight:
+  report_before_editing:
+    - "branch_and_base_commit"
+    - "dirty_files"
+    - "allowed_paths"
+    - "applicable_stop_gates"
+    - "rich_media_invariant_conflict"
+  observed:
+    branch: "codex/nutrition-viet-asian-plans before creating codex/foundation-01"
+    head: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+    origin_main: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+    local_main: "629af997950de4817fae503b21a227e96d26fed2 (stale; not used)"
+    dirty_files: []
+    conflict: "Root guidance said all rich media is online-only; ADR 0016 distinguishes installed licensed animation packs from optional external video."
+  required_conditions:
+    clean_worktree: true
+    head_matches_base_commit: true
+    instructions_read: true
+    required_inputs_present: true
+
+decisions:
+  contract_or_schema_change: "proposal_only"
+  version_decisions:
+    - "animationPackSchemaVersion 1"
+    - "animationPlayerProtocolVersion 1"
+    - "animationCatalogVersion 1"
+    - "Independent pack semantic version and minimumAppVersion"
+    - "No runtime APP_VERSIONS bump in FOUNDATION-01"
+  migration_or_rollback: "proposal"
+  source_or_license_impact: "metadata_only"
+
+acceptance_tests:
+  - id: "F01-AC-01"
+    requirement: "ADR resolves the online-only invariant without permitting external-video caching."
+    evidence: "ADR 0016 decision and updated root invariant"
+  - id: "F01-AC-02"
+    requirement: "Version decisions remain independent from app, DB, backup, catalog, and nutrition pack."
+    evidence: "Master-plan version table and ADR 0016"
+  - id: "F01-AC-03"
+    requirement: "Contract proposal covers manifest, entries, assets, sources/licenses, installation state, player request/state, and stable errors."
+    evidence: "Master-plan proposed public contracts and ADR consequences"
+  - id: "F01-AC-04"
+    requirement: "Paper acceptance gates cover exact variant mapping, deterministic pack/checksum, offline behavior, atomic rollback, personal-data safety, accessibility, performance, and licensing."
+    evidence: "Master-plan required release evidence and ADR acceptance criteria"
+  - id: "F01-AC-05"
+    requirement: "Diff contains documentation only and stays within allowed paths."
+    evidence: "git diff --name-only base...HEAD and packet validation"
+  - id: "F01-AC-06"
+    requirement: "Packet and handoff YAML parse successfully and contain required fields."
+    evidence: "YAML parse check recorded in handoff"
+
+required_checks:
+  commands:
+    - "git diff --check"
+    - "git diff --name-only 52dd9b25bcd29d0c7ac058e459cd248ab2e970ae...HEAD"
+    - "YAML parse check for template, packet, and handoff"
+    - "pnpm run verify:affected"
+  manual_reviews:
+    - "docs/code-review.md"
+    - "No source/dependency/binary change"
+    - "No license claim beyond a future release gate"
+  evidence_paths:
+    - "docs/ai/reviews/FOUNDATION-01-handoff.yaml"
+
+stop_gates:
+  - id: "F01-STOP-01"
+    condition: "HEAD or worktree differs from the recorded clean base before edits."
+    action: "Stop and write blocker report."
+  - id: "F01-STOP-02"
+    condition: "A required decision needs an actual contract, schema, dependency, runtime, or asset change."
+    action: "Defer it to a later packet; do not edit source."
+  - id: "F01-STOP-03"
+    condition: "Any animation/model source lacks explicit offline redistribution rights."
+    action: "Exclude it; do not download or bundle it."
+  - id: "F01-STOP-04"
+    condition: "A changed path falls outside allowed_paths."
+    action: "Stop, revert only the packet's out-of-scope edit, and record the event."
+  - id: "F01-STOP-05"
+    condition: "gpt-5.6-sol is unavailable for a producer or cold-review task."
+    action: "Do not substitute another model; return BLOCKED."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-01-handoff.yaml"
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "base_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "acceptance_evidence"
+    - "checks"
+    - "licenses"
+    - "known_risks"
+    - "review_target"
+
+cold_review:
+  required: true
+  inherits_producer_explanation: false
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: "docs/ai/reviews/FOUNDATION-01-cold-review.yaml"
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"
+  squash_policy: "Keep the candidate and handoff commits until cold review; coordinator may squash only after PASS."

@@ -1,0 +1,104 @@
+schema_version: 1
+packet:
+  id: "PACKET-ID"
+  title: "Short outcome"
+  type: "foundation|implementation|content|review-fix"
+  status: "draft|ready|in_progress|candidate|passed|failed|blocked|merged"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "40-character commit SHA"
+  target_branch: "codex/packet-branch"
+  worktree_required: true
+  sequential_after: []
+
+authority:
+  allowed_paths:
+    - "exact/path/or/glob/**"
+  forbidden_paths:
+    - "path/outside/scope/**"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  generated_binary_assets_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/packets/PACKET-ID.yaml"
+  accepted_adrs: []
+  assumptions: []
+
+outcome:
+  objective: "One measurable outcome"
+  user_visible_result: "What changes for the user, or 'none; design-only packet'"
+  deliverables: []
+  non_goals: []
+
+preflight:
+  report_before_editing:
+    - "branch_and_base_commit"
+    - "dirty_files"
+    - "allowed_paths"
+    - "applicable_stop_gates"
+    - "known_invariant_conflicts"
+  required_conditions:
+    clean_worktree: true
+    head_matches_base_commit: true
+    instructions_read: true
+    required_inputs_present: true
+
+decisions:
+  contract_or_schema_change: "none|proposal_only|runtime_change"
+  version_decisions: []
+  migration_or_rollback: "not_applicable|proposal|implementation"
+  source_or_license_impact: "none|metadata_only|bundled_assets"
+
+acceptance_tests:
+  - id: "AC-01"
+    requirement: "Observable requirement"
+    evidence: "File, command, test, render, or report expected"
+
+required_checks:
+  commands: []
+  manual_reviews: []
+  evidence_paths: []
+
+stop_gates:
+  - id: "STOP-01"
+    condition: "Condition that invalidates safe continuation"
+    action: "Stop without widening scope and write a blocker handoff report"
+
+handoff:
+  report_path: "docs/ai/reviews/PACKET-ID-handoff.yaml"
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "base_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "acceptance_evidence"
+    - "checks"
+    - "licenses"
+    - "known_risks"
+    - "review_target"
+
+cold_review:
+  required: true
+  inherits_producer_explanation: false
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: "docs/ai/reviews/PACKET-ID-cold-review.yaml"
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"
+  squash_policy: "packet-defined"
+
