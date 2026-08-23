@@ -1,0 +1,127 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-01-FIX-01"
+  title: "Remove the animation pack checksum self-reference"
+  type: "fixer"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  lineage_base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+  failed_candidate_commit: "e496e71d74b07c7b8cf3611927895116136666c2"
+  failed_review_commit: "47cea0ca86a500029cd999286e8aa5550b871963"
+  target_branch: "codex/foundation-01-fix-01"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-01"
+
+authority:
+  allowed_paths:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/reviews/FOUNDATION-01-FIX-01-handoff.yaml"
+  forbidden_paths:
+    - "AGENTS.md"
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "outputs/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  generated_binary_assets_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "packages/workouts/AGENTS.md"
+    - "packages/storage/AGENTS.md"
+    - "packages/nutrition/AGENTS.md"
+    - "content/AGENTS.md"
+    - "docs/architecture.md"
+    - "docs/module-map.md"
+    - "docs/content-policy.md"
+    - "docs/code-review.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/packets/FOUNDATION-01.yaml"
+    - "docs/ai/packets/FOUNDATION-01-FIX-01.yaml"
+    - "docs/ai/reviews/FOUNDATION-01-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-01-cold-review.yaml"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+  review_finding:
+    severity: "P1"
+    summary: "The whole archive digest cannot be embedded in a manifest inside the same archive."
+
+outcome:
+  objective: "Make the paper integrity model deterministic and non-self-referential without changing runtime code or broadening FOUNDATION-01."
+  deliverables:
+    - "ADR 0016 defines a trusted external release descriptor or sidecar for the complete archive SHA-256."
+    - "The in-archive manifest contains only non-self-referential content and per-asset integrity fields."
+    - "The master-plan contract proposal and release evidence use the same integrity boundary."
+    - "Candidate commit and schema-valid fixer handoff report."
+  non_goals:
+    - "No TypeScript contract or schema implementation"
+    - "No builder, storage, player, UI, dependency, or asset change"
+    - "No unrelated rewording"
+
+acceptance_tests:
+  - id: "F01-FIX-AC-01"
+    requirement: "The complete archive SHA-256 is outside the bytes it authenticates and is bound to immutable pack identity and version."
+  - id: "F01-FIX-AC-02"
+    requirement: "The in-archive manifest retains deterministic per-entry and asset integrity without containing the complete archive digest."
+  - id: "F01-FIX-AC-03"
+    requirement: "ADR 0016, the public-contract proposal, and release evidence use identical checksum terminology and trust boundaries."
+  - id: "F01-FIX-AC-04"
+    requirement: "The complete updated candidate range remains documentation-only and in scope."
+
+required_checks:
+  commands:
+    - "git diff --check"
+    - "git diff --name-only 52dd9b25bcd29d0c7ac058e459cd248ab2e970ae...HEAD"
+    - "YAML parse check for the fixer packet and handoff"
+    - "pnpm run verify:affected"
+  manual_reviews:
+    - "Trace archive digest ownership from release descriptor through download verification."
+    - "Confirm the manifest has no self-referential archive digest."
+    - "Confirm no source, dependency, binary, or runtime change."
+
+stop_gates:
+  - id: "F01-FIX-STOP-01"
+    condition: "The finding cannot be fixed without an actual runtime contract, dependency, schema, or asset change."
+    action: "Stop and write a blocker report; do not widen scope."
+  - id: "F01-FIX-STOP-02"
+    condition: "Any edit is needed outside authority.allowed_paths."
+    action: "Stop and report the path; do not edit it."
+  - id: "F01-FIX-STOP-03"
+    condition: "gpt-5.6-sol is unavailable."
+    action: "Return BLOCKED; do not substitute a model."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-01-FIX-01-handoff.yaml"
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "lineage_base_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "finding_resolution"
+    - "acceptance_evidence"
+    - "checks"
+    - "review_target"
+
+cold_review:
+  required: true
+  inherits_producer_explanation: false
+  may_edit_files: false
+  report_path: "docs/ai/reviews/FOUNDATION-01-FIX-01-cold-review.yaml"
+  complete_updated_range: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..NEW_CANDIDATE"
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"

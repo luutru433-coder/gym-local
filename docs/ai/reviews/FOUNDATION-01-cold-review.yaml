@@ -1,0 +1,69 @@
+schema_version: 1
+packet_id: "FOUNDATION-01"
+verdict: "FAIL"
+reviewed_base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+reviewed_head_commit: "e496e71d74b07c7b8cf3611927895116136666c2"
+reviewed_metadata_commit: "47cea0ca86a500029cd999286e8aa5550b871963"
+reviewed_at: "2026-08-23T23:53:07+07:00"
+reviewer_model: "gpt-5.6-sol"
+reviewer_task_id: "01a02f86-5017-76e3-8e6c-13de90939678"
+
+scope:
+  changed_paths_in_scope: true
+  unexpected_paths: []
+  metadata_only_handoff: true
+  paper_only: true
+
+acceptance:
+  - id: "F01-AC-01"
+    result: "pass"
+    evidence:
+      - "ADR 0016 separates installed licensed animation packs from optional online external video."
+  - id: "F01-AC-02"
+    result: "pass"
+    evidence:
+      - "Pack, player, catalog, app, database, backup, and nutrition versions remain independent."
+  - id: "F01-AC-03"
+    result: "pass"
+    evidence:
+      - "The proposal covers all required contract families."
+  - id: "F01-AC-04"
+    result: "fail"
+    evidence:
+      - "The complete ZIP digest is specified inside a manifest contained by that ZIP, so the deterministic checksum gate is self-referential."
+  - id: "F01-AC-05"
+    result: "pass"
+    evidence:
+      - "The candidate contains documentation only and all paths are allowed."
+  - id: "F01-AC-06"
+    result: "pass"
+    evidence:
+      - "Packet, template, and handoff YAML parsing evidence is present."
+
+checks:
+  - command: "git diff --check 52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..e496e71d74b07c7b8cf3611927895116136666c2"
+    result: "pass"
+    evidence: "No whitespace errors."
+  - command: "candidate allowed-path inspection"
+    result: "pass"
+    evidence: "Only AGENTS.md, ADR 0016, and docs/ai planning files changed."
+  - command: "metadata range inspection"
+    result: "pass"
+    evidence: "The post-candidate range adds only FOUNDATION-01-handoff.yaml."
+  - command: "pnpm run verify:affected"
+    result: "pass"
+    evidence: "Recorded by the immutable handoff report for the reviewed candidate."
+
+licenses:
+  result: "not_applicable"
+  findings: []
+
+findings:
+  - severity: "P1"
+    path: "docs/adr/0016-offline-animation-pack-foundation.md"
+    line: 35
+    issue: "The design requires the complete ZIP SHA-256 inside a manifest that is itself contained in the ZIP, creating an undefined circular checksum."
+    required_fix: "Move the complete archive digest to trusted external release metadata or a sidecar, or define a canonical non-self-referential digest scope; align the ADR, proposed manifest contract, and acceptance evidence."
+
+residual_risks: []
+merge_authorized: false
