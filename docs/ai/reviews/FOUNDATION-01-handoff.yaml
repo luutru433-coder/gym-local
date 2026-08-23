@@ -4,7 +4,7 @@ status: "candidate"
 producer_model: "gpt-5.6-sol"
 subagents_used: false
 base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
-candidate_commit: "be58060fd17edca54ed32da30e0c549bcdf0c48f"
+candidate_commit: "6da5494f8069dc2d5cc3d3d283f90367565ca521"
 branch: "codex/foundation-01"
 worktree_mode: "clean local bootstrap exception recorded by the packet; future producer packets require Codex worktrees"
 
@@ -15,6 +15,7 @@ changed_paths:
   - "docs/ai/master-plan.md"
   - "docs/ai/packets/FOUNDATION-01.yaml"
   - "docs/ai/review-procedure.md"
+  - "docs/ai/reviews/FOUNDATION-01-handoff.yaml"
 
 acceptance_evidence:
   - id: "F01-AC-01"
@@ -48,7 +49,7 @@ acceptance_evidence:
 checks:
   - command: "git diff --check"
     result: "pass"
-    evidence: "No whitespace errors before candidate commit."
+    evidence: "The full base-to-candidate gate found four blank EOF lines missed while files were untracked; correction commit 6da5494 removed them and the repeated full-range check passed."
   - command: "allowed-path PowerShell scope check"
     result: "pass"
     evidence: "OutsideAllowed was empty before candidate commit."
@@ -85,7 +86,7 @@ known_risks:
 review_target:
   packet_path: "docs/ai/packets/FOUNDATION-01.yaml"
   base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
-  candidate_commit: "be58060fd17edca54ed32da30e0c549bcdf0c48f"
-  diff: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..be58060fd17edca54ed32da30e0c549bcdf0c48f"
+  candidate_commit: "6da5494f8069dc2d5cc3d3d283f90367565ca521"
+  diff: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..6da5494f8069dc2d5cc3d3d283f90367565ca521"
   handoff_path: "docs/ai/reviews/FOUNDATION-01-handoff.yaml"
   next_task: "Open a new gpt-5.6-sol cold-review task; do not edit files; return PASS, FAIL, or BLOCKED."
