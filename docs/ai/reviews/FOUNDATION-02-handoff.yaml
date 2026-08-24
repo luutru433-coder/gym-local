@@ -1,0 +1,143 @@
+schema_version: 1
+packet_id: "FOUNDATION-02"
+status: "candidate"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence: "The coordinator successfully launched this producer with CLI model argument -m gpt-5.6-sol; that invocation is authoritative and was not replaced by model self-identification."
+subagents_used: false
+lineage_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+coordinator_packet_commit: "208d5c606c72d1d175dfa1d7552689186eec9ffe"
+producer_start_commit: "208d5c606c72d1d175dfa1d7552689186eec9ffe"
+candidate_commit: "21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+handoff_commit: "SELF: resolve to the commit containing this report; the exact SHA is returned to the coordinator after commit creation"
+branch: "codex/foundation-02-producer"
+
+changed_paths:
+  - "packages/contracts/src/animation-pack.ts"
+  - "packages/contracts/src/animation-pack.test.ts"
+  - "packages/contracts/src/index.ts"
+
+acceptance_evidence:
+  - id: "F02-AC-01"
+    result: "pass"
+    evidence:
+      - "The public entry point exports independent literal constants animationPackSchemaVersion, animationPlayerProtocolVersion, and animationCatalogVersion, each equal to 1."
+      - "The producer delta contains no package manifest, existing version owner, or path other than the three contract implementation paths."
+  - id: "F02-AC-02"
+    result: "pass"
+    evidence:
+      - "Public dependency-free parsers cover descriptor, manifest, entry, asset, source, license, review, installed pack, player request/state, and AnimationPackError values imported only from ./index."
+      - "Positive and negative table-driven tests reject missing or incorrectly typed values without coercion or defaults."
+  - id: "F02-AC-03"
+    result: "pass"
+    evidence:
+      - "The descriptor parser owns archiveByteSize, archiveSha256, manifestPath, manifestByteSize, and manifestSha256."
+      - "The manifest parser deterministically rejects each of those five fields with forbidden_manifest_field and the exact field path."
+  - id: "F02-AC-04"
+    result: "pass"
+    evidence:
+      - "Compatibility tests accept supported v1, SemVer equality and greater versions, and correct prerelease precedence."
+      - "Distinct stable codes and paths cover future schema, player protocol, and animation catalog versions, a lower current app, every bound identity field, and each bound review field."
+  - id: "F02-AC-05"
+    result: "pass"
+    evidence:
+      - "Malformed-input tests cover canonical IDs, strict SemVer, real dates, RFC 3339 timestamps, lowercase SHA-256, positive safe byte sizes, finite durations/camera/player values, loop bounds, and unsafe POSIX paths."
+      - "Manifest tests cover duplicate IDs and asset paths, duplicate mapping identity, duplicate exact-tuple primary mapping, source/license/review resolution, asset-entry path/duration/source/license agreement, and mapping catalog agreement."
+  - id: "F02-AC-06"
+    result: "pass"
+    evidence:
+      - "Repeated invalid parses are deeply equal, JSON round-trip without loss, expose ordered code/path issues, contain no partial data, and leave a structured-cloned input byte-for-byte equivalent."
+      - "Unknown object fields are traversed with deterministic code-unit sorting; declared fields and arrays use schema order and ascending indices."
+  - id: "F02-AC-07"
+    result: "pass"
+    evidence:
+      - "findPrimaryAnimationEntry compares exerciseVariantId and animationCatalogVersion exactly and returns missing_variant for case changes, equipment near-matches, and catalog-version mismatches."
+      - "Reduced motion remains a player-request boolean and never alters animation or variant identity."
+  - id: "F02-AC-08"
+    result: "pass"
+    evidence:
+      - "Positive matrices cover active, staged, and previous installed-pointer discriminants and idle, loading, ready, playing, paused, and failed serializable player states."
+      - "Negative matrices cover forbidden discriminant fields, canonical installed timestamps, verification state, playback bounds, position bounds, recoverability, stable errors, and mandatory text offline fallback for failures."
+  - id: "F02-AC-09"
+    result: "pass"
+    evidence:
+      - "A public-index test pins exact ordered equality for all 18 required AnimationPackError spellings."
+  - id: "F02-AC-10"
+    result: "pass"
+    evidence:
+      - "git diff --name-only 208d5c606c72d1d175dfa1d7552689186eec9ffe..21e88fe4d9c1426363a792d0cf351d3d665f9cc5 prints only the three changed_paths entries."
+      - "The producer delta is 1,379 inserted lines in those three paths and contains no dependency, configuration, storage, media, app, catalog, backup, content, builder, fixture, or asset change."
+  - id: "F02-AC-11"
+    result: "pass"
+    evidence:
+      - "The full review range f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5 contains the unchanged coordinator packet and the three implementation paths."
+      - "The coordinator packet blob ID is 11d34d6368f00e2b4855f992529c01450a2b74b2 at both producer start and candidate."
+      - "The candidate is immutable; candidate-to-handoff metadata is restricted to this report."
+
+checks:
+  - command: "pnpm install --offline --frozen-lockfile"
+    result: "pass"
+    evidence: "The missing worktree dependencies were linked from the offline store; git status and git ls-files --others --exclude-standard remained empty. No manifest or lockfile changed."
+  - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    result: "pass"
+    evidence: "Final candidate bytes: 1 test file passed; 95 tests passed; duration 955 ms."
+  - command: "pnpm run typecheck"
+    result: "pass"
+    evidence: "Final candidate bytes: tsc -b --pretty false exited 0 with no diagnostics."
+  - command: "pnpm exec eslint packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts packages/contracts/src/index.ts --max-warnings=0"
+    result: "pass"
+    evidence: "Final candidate bytes: exit 0 with no warnings or errors."
+  - command: "pnpm run verify"
+    result: "pass"
+    evidence: "At candidate 21e88fe4: architecture, repository lint, typecheck, content validation/audit, 19 test files with 244 tests, production build, PWA generation, and performance budgets passed in the authoritative completed run. An earlier launch was superseded because the command harness terminated it at its 5-second timeout before verification completed."
+  - command: "git diff --check f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+    result: "pass"
+    evidence: "Exit 0 with no output."
+  - command: "git diff --name-only 208d5c606c72d1d175dfa1d7552689186eec9ffe..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+    result: "pass"
+    evidence: "packages/contracts/src/animation-pack.test.ts; packages/contracts/src/animation-pack.ts; packages/contracts/src/index.ts."
+  - command: "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+    result: "pass"
+    evidence: "docs/ai/packets/FOUNDATION-02.yaml plus the three contract implementation paths; no other path."
+  - command: "parse docs/ai/packets/FOUNDATION-02.yaml and docs/ai/reviews/FOUNDATION-02-handoff.yaml with bundled Node and repository js-yaml"
+    result: "pass"
+    evidence: "Both YAML files parse as objects; packet ID, required handoff fields, exact candidate SHA, changed paths, and review ranges are asserted before the metadata commit."
+  - command: "manual review against docs/code-review.md"
+    result: "pass"
+    evidence: "The change stays in @gym/contracts, is pure and offline-safe, does not touch personal or historical data, keeps exact equipment variants isolated, includes explicit source/license/review contracts, preserves reduced motion, and changes no PWA behavior."
+  - command: "manual public-boundary and internal-import audit"
+    result: "pass"
+    evidence: "packages/contracts/src/index.ts exports the complete animation-pack surface; the test imports only ./index; no production consumer directly imports animation-pack.ts."
+  - command: "manual trust-boundary and compatibility trace"
+    result: "pass"
+    evidence: "Only the external descriptor owns archive/manifest selection integrity; manifests reject self-reference fields; future compatibility values fail closed; exact variant lookup performs no coercion, redirect, case fold, or fallback."
+
+licenses:
+  result: "pass"
+  bundled_assets: []
+  source_records_in_tests: "Synthetic example.test metadata only; no external media or redistributable payload is included."
+  notes:
+    - "No media, model, archive, fixture, image, generated binary, or third-party source content was downloaded or bundled."
+    - "The new TypeScript source and test carry the standard Apache-2.0 header required by the repository's license-header skill."
+    - "Runtime contracts require explicit author, source URL, license ID and terms URL, offline redistribution scope, attribution, modifications including explicit none, review date, review reference, and approved release review."
+
+stop_gates:
+  triggered: []
+  notes:
+    - "No dependency, package/configuration, storage, hashing, authentication, archive, renderer, UI, catalog-content, backup, PWA, builder, fixture, or asset implementation was required."
+    - "Descriptor authentication remains the caller/distribution-channel responsibility accepted by the packet; the manifest cannot authenticate itself."
+    - "No compatibility ambiguity, unknown-future acceptance, stable-ID reuse, or cross-equipment fallback was introduced."
+
+known_risks:
+  - "These are pure validation contracts only; archive I/O, hashing, authenticated descriptor delivery, storage activation/rollback, and rendering remain intentionally deferred to later packets."
+  - "URL validation proves canonical HTTPS syntax, not legal ownership or live availability; later content packets must supply and review real license evidence."
+  - "Installed pointer records express verification-safe states but do not implement persistence or atomic pointer changes; packages/storage remains the sole future owner."
+  - "The player protocol expresses reduced motion and text fallback but does not implement accessibility UI or playback behavior; later player and pilot packets must verify those behaviors physically."
+
+review_target:
+  packet_path: "docs/ai/packets/FOUNDATION-02.yaml"
+  candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+  full_review_range: "f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+  producer_delta: "208d5c606c72d1d175dfa1d7552689186eec9ffe..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+  handoff_metadata: "21e88fe4d9c1426363a792d0cf351d3d665f9cc5..handoff_commit; docs/ai/reviews/FOUNDATION-02-handoff.yaml only"
+  handoff_path: "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+  next_task: "Open a new independent gpt-5.6-sol cold-review task with no subagents; do not edit files; return PASS, FAIL, or BLOCKED."
