@@ -1,0 +1,93 @@
+schema_version: 1
+packet_id: "FOUNDATION-01-FIX-01"
+status: "candidate"
+producer_model: "gpt-5.6-sol"
+subagents_used: false
+lineage_base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+failed_candidate_commit: "e496e71d74b07c7b8cf3611927895116136666c2"
+failed_review_commit: "47cea0ca86a500029cd999286e8aa5550b871963"
+candidate_commit: "51d4b73c19d5699ba6090a2764eb590e19f421b0"
+branch: "codex/foundation-01-fix-01"
+
+changed_paths:
+  - "docs/adr/0016-offline-animation-pack-foundation.md"
+  - "docs/ai/master-plan.md"
+
+finding_resolution:
+  severity: "P1"
+  result: "resolved"
+  finding: "The complete ZIP SHA-256 was self-referential when specified inside the ZIP's manifest."
+  resolution:
+    - "AnimationPackReleaseDescriptor is a trusted authenticated release-index or sidecar record outside the archive bytes."
+    - "The descriptor binds immutable packId/version to archiveByteSize, archiveSha256, manifestPath, manifestByteSize, manifestSha256, schema/protocol/minimum-app compatibility, and release/review metadata."
+    - "The deterministic ZIP contains the manifest plus declared assets; the manifest contains neither the complete archive digest nor a digest of its own bytes."
+    - "The manifest retains per-asset byte sizes and SHA-256 values plus exact variant/source/license records."
+    - "Installation order is trusted descriptor; stage ZIP; verify archive size/SHA-256; verify and validate the descriptor-selected manifest identity/compatibility; verify per-asset hashes and exact variant/source/license records; atomic activate."
+
+acceptance_evidence:
+  - id: "F01-FIX-AC-01"
+    result: "pass"
+    evidence:
+      - "ADR 0016 and the master plan place archiveByteSize/archiveSha256 only in the external trusted AnimationPackReleaseDescriptor and bind them to immutable packId/version."
+      - "The descriptor also binds manifest identity, compatibility, and release/review metadata before archive activation."
+  - id: "F01-FIX-AC-02"
+    result: "pass"
+    evidence:
+      - "Both documents state that the in-archive manifest contains neither the complete archive digest nor a digest of its own bytes."
+      - "Both documents preserve deterministic per-asset byte sizes/SHA-256 and exact variant/source/license records."
+  - id: "F01-FIX-AC-03"
+    result: "pass"
+    evidence:
+      - "ADR 0016, Proposed public contracts, and Required release evidence use AnimationPackReleaseDescriptor, archiveByteSize, archiveSha256, manifestPath, manifestByteSize, and manifestSha256 with the same external trust boundary."
+      - "All three locations use the same ordered verification boundary ending in atomic activation."
+  - id: "F01-FIX-AC-04"
+    result: "pass"
+    evidence:
+      - "The fixer candidate commit changes only the two authorized documentation paths listed in changed_paths."
+      - "The complete lineage range 52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..51d4b73c19d5699ba6090a2764eb590e19f421b0 contains documentation and coordination YAML only; no source, dependency, binary, runtime, or asset file changed."
+
+checks:
+  - command: "git diff --check"
+    result: "pass"
+    evidence: "No output and exit code 0 on the clean immutable candidate; git diff --check 52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..51d4b73c19d5699ba6090a2764eb590e19f421b0 also returned no output and exit code 0."
+  - command: "git diff --name-only 52dd9b25bcd29d0c7ac058e459cd248ab2e970ae...HEAD"
+    result: "pass"
+    evidence: "At candidate HEAD 51d4b73c19d5699ba6090a2764eb590e19f421b0 the output was AGENTS.md; docs/adr/0016-offline-animation-pack-foundation.md; docs/ai/coordinate-packet-template.yaml; docs/ai/master-plan.md; docs/ai/packets/FOUNDATION-01-FIX-01.yaml; docs/ai/packets/FOUNDATION-01.yaml; docs/ai/review-procedure.md; docs/ai/reviews/FOUNDATION-01-cold-review.yaml; docs/ai/reviews/FOUNDATION-01-handoff.yaml. Every path is documentation or coordination metadata."
+  - command: "YAML parse check for the fixer packet and handoff"
+    result: "pass"
+    evidence: "The packet and handoff parsed with the repository-locked js-yaml 4.3.0; packet ID, handoff packet_id, required top-level fields, candidate SHA, changed paths, and review range were asserted."
+  - command: "pnpm run verify:affected"
+    result: "pass"
+    evidence: "Exit code 0: Architecture boundaries verified. No code or catalog changes detected; documentation-only verification complete. The bundled Node runtime directory was prepended to PATH because node was not initially exposed by this shell."
+  - command: "manual archive integrity trace"
+    result: "pass"
+    evidence: "Trusted external descriptor supplies expected archive size/SHA-256 before staging verification; only after archive verification is its selected manifest hash checked, identity/compatibility validated, assets verified, and activation performed atomically."
+  - command: "manual manifest self-reference review"
+    result: "pass"
+    evidence: "The manifest explicitly contains neither archiveSha256 nor a digest of its own bytes; per-asset sizes and hashes remain in the manifest."
+  - command: "manual scope review against docs/code-review.md"
+    result: "pass"
+    evidence: "No source, dependency, binary, runtime, storage, player, UI, PWA, personal-data, or bundled-asset behavior changed."
+
+licenses:
+  result: "not_applicable"
+  bundled_assets: []
+  notes:
+    - "No media or binary asset was downloaded, generated, or bundled."
+    - "Exact source/license records remain required for every future bundled asset."
+
+stop_gates:
+  triggered: []
+  notes:
+    - "The P1 finding was resolved entirely within the two authorized design documents."
+    - "No runtime contract, dependency, schema, asset, or out-of-scope edit was required."
+
+review_target:
+  packet_path: "docs/ai/packets/FOUNDATION-01-FIX-01.yaml"
+  lineage_base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+  candidate_commit: "51d4b73c19d5699ba6090a2764eb590e19f421b0"
+  complete_updated_range: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae..51d4b73c19d5699ba6090a2764eb590e19f421b0"
+  metadata_range: "51d4b73c19d5699ba6090a2764eb590e19f421b0..HEAD"
+  metadata_rule: "From candidate_commit to branch HEAD, only docs/ai/reviews/FOUNDATION-01-FIX-01-handoff.yaml may differ."
+  handoff_path: "docs/ai/reviews/FOUNDATION-01-FIX-01-handoff.yaml"
+  next_task: "Open a new gpt-5.6-sol cold-review task; review the complete updated range and metadata range; do not edit files; return PASS, FAIL, or BLOCKED."
