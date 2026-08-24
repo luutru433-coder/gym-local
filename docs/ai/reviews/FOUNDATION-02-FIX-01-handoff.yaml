@@ -1,0 +1,165 @@
+schema_version: 1
+packet_id: "FOUNDATION-02-FIX-01"
+status: "candidate"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence: "The coordinator launched this task with CLI model argument -m gpt-5.6-sol; that invocation metadata is authoritative."
+subagents_used: false
+completed_at: "2026-08-24T11:32:06+07:00"
+lineage_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+review_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+failed_candidate_commit: "21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+failed_metadata_commit: "e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f"
+coordinator_packet_commit: "db3c0b8f28936525572b0dd5de316679a2131544"
+producer_start_commit: "db3c0b8f28936525572b0dd5de316679a2131544"
+candidate_parent_commit: "db3c0b8f28936525572b0dd5de316679a2131544"
+candidate_commit: "3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+branch: "codex/foundation-02-fix-01"
+
+changed_paths:
+  - "docs/ai/packets/FOUNDATION-02.yaml"
+  - "packages/contracts/src/animation-pack.test.ts"
+  - "packages/contracts/src/animation-pack.ts"
+
+finding_resolution:
+  - finding: "Sparse array holes were accepted, lossy, or throwing."
+    result: "resolved"
+    evidence:
+      - "All parser-owned arrays use explicit own-index traversal and return missing_array_element at the exact hole path without dereferencing absent elements."
+      - "The regression matrix covers leading, interior, and trailing holes in reviews, licenses, sources, assets, entries, equipmentProps, camera position, and camera target; every case asserts no throw, deterministic equality, JSON round-trip equality, and no input mutation."
+  - finding: "All-or-nothing arrays created false missing references and suppressed safe diagnostics."
+    result: "resolved"
+    evidence:
+      - "Manifest arrays retain per-index parse state and separately inspect only independently valid identity and relation fields."
+      - "Review, license, source, asset, and entry regressions prove malformed declarations retain safe identities while independent missing review, license, source, and asset references are still reported."
+  - finding: "The bound release review could disagree with its declared review record."
+    result: "resolved"
+    evidence:
+      - "Manifest parsing now requires one unambiguous review ID match and equality across reviewer, reviewedAt, and status."
+      - "Tests cover equality, reviewer/reviewedAt/status disagreement, missing ID resolution, duplicate identity, and defensive compatibility rejection."
+  - finding: "Accepted negative zero was not JSON-lossless."
+    result: "resolved"
+    evidence:
+      - "The shared finite-number validator rejects Object.is(value, -0)."
+      - "Tests cover both loop bounds, all six camera vector components, and player position, with valid positive-zero controls."
+  - finding: "Valid years 0001 through 0099 were rejected."
+    result: "resolved"
+    evidence:
+      - "Date validation uses explicit proleptic-Gregorian month and leap-year arithmetic; timestamp validation no longer delegates validity to Date.parse."
+      - "Date and RFC 3339 tests cover valid years 0001, 0004, and 0099 plus leap, impossible-day, time, and year-zero boundaries."
+  - finding: "The governing handoff contract required circular metadata evidence."
+    result: "resolved"
+    evidence:
+      - "FOUNDATION-02 now requires exact coordinator, producer-start, candidate-parent, candidate, and candidate range evidence already available when a handoff is written."
+      - "The handoff schema prohibits a handoff_commit field and assigns the exact metadata commit and candidate-to-metadata range to later independent cold-review or coordinator attestation."
+      - "The historical failed FOUNDATION-02 handoff remains at blob 69f7760c0099ee7f8df4105eb9b03014c77777d2."
+  - finding: "Malformed HTTPS authorities, hosts, and ports were accepted."
+    result: "resolved"
+    evidence:
+      - "URL validation requires exact https syntax, no credentials, a lowercase ASCII DNS host or parser-valid bracketed IPv6 host, and an optional decimal port from 0 through 65535."
+      - "Both source and license parsers cover malformed brackets, authority, credentials, empty/invalid hosts, missing/malformed/out-of-range ports, non-HTTPS schemes, and valid host/port cases."
+
+acceptance_evidence:
+  - id: "F02-FIX-AC-01"
+    result: "pass"
+    evidence:
+      - "Twenty-four leading/interior/trailing sparse-array cases cover all eight array fields with exact paths, non-throwing results, deterministic repeats, JSON round trips, and input equality."
+  - id: "F02-FIX-AC-02"
+    result: "pass"
+    evidence:
+      - "Five malformed-declaration cases retain safe review/license/source/asset/entry identities and each pairs with an independently detectable missing reference."
+  - id: "F02-FIX-AC-03"
+    result: "pass"
+    evidence:
+      - "Exact bound-review equality passes; each bound field disagreement, missing resolution, duplicate binding, and compatibility bypass attempt fails at stable paths."
+  - id: "F02-FIX-AC-04"
+    result: "pass"
+    evidence:
+      - "Negative zero fails for loop start/end, all position/target camera components, and player position; valid positive-zero entry and player controls remain lossless."
+  - id: "F02-FIX-AC-05"
+    result: "pass"
+    evidence:
+      - "Explicit Gregorian arithmetic accepts 0001-01-01, 0004-02-29, and 0099-12-31 for dates and timestamps and rejects the bounded impossible-date/time matrix."
+  - id: "F02-FIX-AC-06"
+    result: "pass"
+    evidence:
+      - "Both URL-bearing record parsers pass three documented canonical cases and reject fourteen malformed HTTPS cases each."
+  - id: "F02-FIX-AC-07"
+    result: "pass"
+    evidence:
+      - "The corrected governing packet parses, has no self-SHA requirement, records exact candidate-parent/range fields, and delegates exact metadata SHA attestation until after the metadata commit exists."
+  - id: "F02-FIX-AC-08"
+    result: "pass"
+    evidence:
+      - "The focused suite passes 187 tests; full verification passes 19 files and 336 tests; public index, stable errors, version literals, exact variant lookup, and protected paths are unchanged."
+  - id: "F02-FIX-AC-09"
+    result: "pass"
+    evidence:
+      - "Candidate 3f4f7fd7fa5f142f13c01bfba24dc0fb577df924 has parent db3c0b8f28936525572b0dd5de316679a2131544 and changes only the three declared candidate paths."
+
+checks:
+  - command: "pnpm install --offline --frozen-lockfile"
+    result: "pass"
+    evidence: "Linked 594 packages from the local content-addressable store without manifest or lockfile changes."
+  - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    result: "pass"
+    evidence: "Final candidate bytes: 1 test file and 187 tests passed in 1.09 seconds."
+  - command: "pnpm exec eslint packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts --max-warnings=0"
+    result: "pass"
+    evidence: "Final candidate bytes: exit 0 with no warnings or errors."
+  - command: "pnpm run typecheck"
+    result: "pass"
+    evidence: "Final candidate bytes: tsc -b --pretty false exited 0 with no diagnostics."
+  - command: "pnpm run verify"
+    result: "pass"
+    evidence: "At candidate 3f4f7fd7: architecture, lint, typecheck, content validation/audit, 19 test files with 336 tests, production build, PWA generation, and performance budgets passed."
+  - command: "git diff --check f20bf05d3f640b94e7df178a4303d0105134c492..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+    result: "pass"
+    evidence: "Exit 0 with no whitespace errors."
+  - command: "git diff --name-only db3c0b8f28936525572b0dd5de316679a2131544..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+    result: "pass"
+    evidence: "Only docs/ai/packets/FOUNDATION-02.yaml, packages/contracts/src/animation-pack.test.ts, and packages/contracts/src/animation-pack.ts changed."
+  - command: "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+    result: "pass"
+    evidence: "The complete updated candidate range contains the two coordinator artifacts, historical failed handoff, governing packet, original public index export, and the two contract files; no other path."
+  - command: "git rev-parse 3f4f7fd7fa5f142f13c01bfba24dc0fb577df924^"
+    result: "pass"
+    evidence: "Returned exact candidate parent db3c0b8f28936525572b0dd5de316679a2131544."
+  - command: "Parse and assert the governing packet, fixer packet, failed cold review, and fixer handoff with bundled Node and repository js-yaml"
+    result: "pass"
+    evidence: "All YAML files parse; packet IDs, verdict, required exact SHA/range fields, prohibited circular field, and deferred exact metadata attestation rules are asserted."
+  - command: "manual review against docs/code-review.md"
+    result: "pass"
+    evidence: "The change remains pure @gym/contracts validation, keeps exact equipment variants isolated, changes no user data/storage/offline/PWA behavior, and includes no media or license-bearing payload."
+  - command: "manual public-boundary, version, protected-path, array, numeric, relation, calendar, and URL audit"
+    result: "pass"
+    evidence: "index.ts, exports, stable error spellings, version literals, dependencies, configuration, historical handoff, and coordinator artifacts are unchanged; every bounded input inventory item maps to regression coverage."
+
+licenses:
+  result: "pass"
+  bundled_assets: []
+  findings: []
+  evidence:
+    - "No media, model, archive, fixture, image, generated binary, or third-party content was added."
+    - "Tests use only synthetic example.test metadata already present in the failed candidate."
+
+stop_gates:
+  triggered: []
+  notes:
+    - "No dependency, package, lockfile, configuration, index, storage, media, app, catalog, backup, content, builder, fixture, archive, asset, hashing, authentication, renderer, or PWA change was required."
+    - "No stable ID, stable error spelling, public export, version, coercion, fallback, or cross-equipment substitution changed."
+
+known_risks:
+  - "Archive I/O, hashing, authenticated descriptor delivery, storage activation/rollback, rendering, and real license review remain deferred to later packets."
+  - "URL validation establishes deterministic canonical HTTPS syntax only; it does not establish ownership, availability, or redistribution rights."
+  - "Exact post-candidate metadata commit identity and its candidate-to-metadata range must be recorded by the independent cold review or coordinator attestation after the metadata-only commit exists."
+
+review_target:
+  packet_path: "docs/ai/packets/FOUNDATION-02-FIX-01.yaml"
+  governing_packet_path: "docs/ai/packets/FOUNDATION-02.yaml"
+  complete_updated_candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+  fixer_delta: "db3c0b8f28936525572b0dd5de316679a2131544..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+  coordinator_to_candidate: "db3c0b8f28936525572b0dd5de316679a2131544..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+  candidate_parent: "db3c0b8f28936525572b0dd5de316679a2131544"
+  handoff_metadata_rule: "After this report is committed alone, the independent cold review or coordinator attestation records the exact 3f4f7fd7fa5f142f13c01bfba24dc0fb577df924..metadata_commit range and confirms it contains only docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml."
+  handoff_path: "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+  next_task: "Launch a new independent gpt-5.6-sol cold review without subagents; do not edit files; return PASS, FAIL, or BLOCKED and attest the exact metadata commit."
