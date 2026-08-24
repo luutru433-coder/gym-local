@@ -1,0 +1,375 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-02"
+  title: "Implement executable animation-pack contracts"
+  type: "foundation"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  lineage_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+  review_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+  target_branch: "codex/foundation-02-producer"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-01"
+  producer_start_rule:
+    start_commit: "The committed coordinator packet HEAD supplied to the producer, not the lineage base itself."
+    required_parent_lineage: "The producer start commit must descend directly from f20bf05d3f640b94e7df178a4303d0105134c492."
+    required_coordinator_delta:
+      - "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..HEAD must print only docs/ai/packets/FOUNDATION-02.yaml before producer edits."
+      - "The producer must not amend, regenerate, or otherwise edit docs/ai/packets/FOUNDATION-02.yaml."
+    review_range_rule: "The complete candidate range is f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit, so the coordinator packet commit remains reviewable with the implementation."
+
+authority:
+  allowed_paths:
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/index.ts"
+    - "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+  candidate_implementation_paths:
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/index.ts"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+  coordinator_owned_review_path: "docs/ai/packets/FOUNDATION-02.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "packages/*/package.json"
+    - "apps/**"
+    - "packages/storage/**"
+    - "packages/media/**"
+    - "packages/backup/**"
+    - "packages/catalog/**"
+    - "packages/workouts/**"
+    - "packages/nutrition/**"
+    - "packages/progress/**"
+    - "packages/ui/**"
+    - "content/**"
+    - "public/**"
+    - "outputs/**"
+    - "scripts/**"
+    - "tests/**"
+    - "docs/** except docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  generated_binary_assets_allowed: false
+  fixture_pack_or_asset_changes_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/architecture.md"
+    - "docs/module-map.md"
+    - "docs/code-review.md"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "packages/contracts/package.json"
+    - "packages/contracts/src/index.ts"
+    - "package.json"
+    - "pnpm-workspace.yaml"
+    - "tsconfig.json"
+    - "tsconfig.app.json"
+    - "tsconfig.node.json"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "scripts/verify-affected.mjs"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+  assumptions:
+    - "The trusted external release descriptor is authenticated before these validation contracts are called; authentication and transport are not designed or implemented here."
+    - "The contract layer validates unknown JavaScript values without storage, network, archive extraction, hashing, rendering, or catalog lookup side effects."
+    - "Exact exercise variant IDs are opaque stable IDs; this packet validates identity and mapping consistency within the supplied pack but does not query catalog content."
+
+outcome:
+  objective: "Publish executable, dependency-free TypeScript contracts and deterministic runtime validation for animation-pack descriptors, manifests, installation metadata, and player messages, with compatibility and malformed-input tests and no storage or player implementation."
+  user_visible_result: "None yet; later builder, storage, and player packets can consume a reviewed @gym/contracts v1 boundary."
+  deliverables:
+    - "packages/contracts/src/animation-pack.ts defines the v1 public types, independent version constants, stable error codes, parsers/validators, and descriptor-to-manifest compatibility validation."
+    - "packages/contracts/src/animation-pack.test.ts proves supported v1 data, strict malformed-input rejection, trust-boundary rules, exact mapping semantics, compatibility failures, deterministic serializable issues, and valid reduced-motion/player states."
+    - "packages/contracts/src/index.ts publicly re-exports the animation-pack API; consumers need only @gym/contracts and no internal-path import."
+    - "A candidate commit containing only implementation paths, followed by a separate schema-valid docs/ai/reviews/FOUNDATION-02-handoff.yaml metadata commit."
+  non_goals:
+    - "No storage, OPFS, IndexedDB, database schema, migration, activation, rollback, quota, archive extraction, download, hashing, authentication, or backup implementation."
+    - "No media loader, renderer, playback controller, app UI, PWA, service-worker, catalog content, workout, nutrition, or progress behavior."
+    - "No deterministic pack builder, ZIP generation, fixture pack, GLB/glTF file, binary, image, animation, or other asset."
+    - "No dependency, package manifest, lockfile, test configuration, compiler configuration, or build configuration change; specifically do not use Zod or add a replacement dependency."
+    - "No app, database, backup, workout catalog, nutrition-pack, or other existing version bump."
+
+decisions:
+  contract_or_schema_change: "runtime_change"
+  version_decisions:
+    - "Export animationPackSchemaVersion = 1 as an independent literal constant."
+    - "Export animationPlayerProtocolVersion = 1 as an independent literal constant."
+    - "Export animationCatalogVersion = 1 as an independent literal constant."
+    - "Do not change APP_VERSIONS.app 0.7.0, APP_VERSIONS.database 5, APP_VERSIONS.catalog 3, APP_VERSIONS.backup 5, APP_VERSIONS.nutritionPackSchema 3, package.json version, or any workout/catalog/nutrition version."
+    - "A pack release uses its own strict SemVer 2.0 version without a leading v; minimumAppVersion is also strict SemVer 2.0."
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "metadata_only"
+
+contract_surface:
+  public_entry_point: "@gym/contracts"
+  implementation_file: "packages/contracts/src/animation-pack.ts"
+  export_rule: "Every new type, constant, stable error-code value, and runtime parser/validator is re-exported by packages/contracts/src/index.ts; tests may import only from ./index or @gym/contracts and no production consumer is added."
+  implementation_constraints:
+    - "Use repository-native TypeScript predicates/parsers over unknown input; no Zod and no new dependency."
+    - "Do not silently coerce strings, numbers, booleans, dates, arrays, enum values, paths, versions, or hashes, and do not fill missing required fields with defaults."
+    - "Runtime validation is pure and has no browser, storage, network, crypto, clock, locale, or random dependency."
+  required_public_types:
+    - "AnimationPackReleaseDescriptor"
+    - "AnimationPackManifest"
+    - "AnimationPackEntry"
+    - "AnimationAssetDescriptor"
+    - "AnimationSourceRecord"
+    - "AnimationLicenseRecord"
+    - "AnimationReviewRecord or an equivalently explicit typed review-metadata record"
+    - "InstalledAnimationPack"
+    - "AnimationPlayerRequest"
+    - "AnimationPlayerState"
+    - "AnimationPackError"
+    - "AnimationPackValidationIssue"
+    - "AnimationPackValidationResult<T>"
+  required_runtime_entry_points:
+    - "A public parser for each top-level trusted descriptor, manifest, installed-pack record, player request, and player state, each accepting unknown and returning AnimationPackValidationResult<T>."
+    - "A public descriptor/manifest compatibility validator accepting already parsed values plus the current app SemVer and returning a deterministic validation result without throwing for untrusted input."
+    - "Public type guards may be added, but must not replace path-addressable parser results."
+
+validation_contract:
+  result_shape:
+    - "Success and failure are discriminated, plain-data results that survive JSON.stringify/JSON.parse without loss."
+    - "Every issue contains a stable machine-readable code and a path represented as an ordered array of string or non-negative integer segments rooted at the supplied value; a concise message may be included but is not the identity of the error."
+    - "For the same input, issue order, codes, and paths are identical across runs. Traverse object fields in declared schema order and arrays in ascending index order; never depend on object insertion order, locale sorting, Set/Map serialization, Error instances, or thrown exception text."
+    - "Report all safely detectable structural and referential issues in deterministic order; do not return a partially accepted value or mutate the input."
+  primitive_rules:
+    stable_ids: "Required IDs are non-empty canonical strings from a documented conservative ASCII grammar, are compared byte-for-byte, and are unique in their declared namespace; no trimming or case folding."
+    semver: "Pack version and minimumAppVersion are strict valid SemVer 2.0 strings without a leading v; comparisons handle prerelease precedence deterministically and do not use parseFloat."
+    metadata_dates: "Release, creation, source-review, license-review, and approval-review dates use a documented canonical ISO-8601 form with real calendar validation; installed timestamps use a documented canonical RFC 3339 form. Malformed or impossible dates fail."
+    hashes: "Every SHA-256 is exactly 64 lowercase hexadecimal characters; uppercase, prefixes, whitespace, and non-hex characters fail."
+    byte_sizes: "Archive, manifest, and asset byte sizes are positive safe integers; zero, negative, fractional, non-finite, and unsafe integers fail."
+    durations: "Durations and time-window values are finite; asset/clip duration is positive and loop bounds satisfy 0 <= start < end <= duration."
+    player_numbers: "Playback speed and every loop/camera numeric component are finite and lie within explicitly documented safe v1 ranges; NaN and positive/negative Infinity fail."
+    relative_paths: "manifestPath and asset paths are non-empty normalized POSIX relative paths: no leading slash, drive/URL scheme, backslash, empty segment, dot or dot-dot segment, query, fragment, NUL/control character, or percent-encoded traversal; the parser never normalizes an unsafe input into acceptance."
+  trust_boundary:
+    descriptor_owns_exclusively:
+      - "archiveByteSize"
+      - "archiveSha256"
+      - "manifestPath"
+      - "manifestByteSize"
+      - "manifestSha256"
+    descriptor_binds:
+      - "immutable packId and pack SemVer version"
+      - "animationPackSchemaVersion"
+      - "animationPlayerProtocolVersion"
+      - "animationCatalogVersion"
+      - "minimumAppVersion"
+      - "release date"
+      - "reviewer identity or review-record reference"
+      - "review date"
+      - "explicit approval status"
+    manifest_forbidden_fields:
+      - "archiveByteSize"
+      - "archiveSha256"
+      - "manifestPath"
+      - "manifestByteSize"
+      - "manifestSha256"
+    rule: "The in-archive manifest rejects forbidden whole-archive, descriptor-selected manifest, and self-digest fields rather than ignoring them. Per-asset byteSize and sha256 remain required in asset descriptors."
+  manifest_integrity:
+    - "Pack IDs, animation IDs, asset IDs, source IDs, license IDs, review IDs when present, asset paths, and mapping identities are unique in their namespaces; duplicate asset paths fail even if IDs differ."
+    - "Every entry references one declared asset, source, and license through explicit IDs as applicable, and every asset/source licenseId resolves to exactly one declared license. Missing or ambiguous references fail."
+    - "Every bundled asset has explicit author/source, license ID and terms URL, offline redistribution scope, attribution, modifications record including explicit none, and reviewed date; draft, missing, or unapproved release/review metadata cannot validate as an approved installable release."
+    - "Each mapping binds one animationId to one exact exerciseVariantId and its declared animationCatalogVersion. No parser or compatibility function substitutes, redirects, case-folds, or falls back to a different variant."
+    - "The exact tuple of exerciseVariantId and animationCatalogVersion may have at most one primary mapping. Duplicate mapping tuples and a second primary for the same exact tuple fail deterministically."
+    - "Entry assetPath/assetId relationships, clip names, durations, loop windows, camera values, equipment props, accessibility fallback keys, source IDs, and license IDs must be structurally and referentially valid."
+  compatibility:
+    - "Supported v1 requires descriptor and manifest identity equality for packId, version, all three independent compatibility versions, and minimumAppVersion."
+    - "Unknown future animation pack schema, player protocol, or animation catalog versions fail closed with distinct stable incompatibility codes; they are never treated as v1."
+    - "A current app version lower than minimumAppVersion fails closed; equality and greater compatible SemVer values pass."
+    - "Descriptor/manifest disagreement fails with a stable identity-mismatch code and path(s) that identify the mismatched field."
+  installed_and_player_state:
+    - "InstalledAnimationPack represents active, staged, and previous verification-safe pointer metadata and installed bytes/time without database handles, archive bytes, or personal data. Its discriminants and required/forbidden fields are validated."
+    - "AnimationPlayerRequest requires exact exerciseVariantId plus animationId, finite positive bounded playback speed, an explicit camera preset, mirror mode, and reducedMotion boolean; reduced motion is preserved as requested and never changes variant identity."
+    - "AnimationPlayerState is a serializable discriminated union for idle, loading, ready, playing, paused, and failed. Status-specific required and forbidden fields, offline fallback, recoverability, and stable AnimationPackError values are validated."
+
+stable_error_codes:
+  requirement: "Export a readonly stable code set and an AnimationPackError representation whose code is one of these values; spelling is compatibility surface and tests assert it. Validation-issue codes may be more granular but must also be stable."
+  required_semantics:
+    - "incompatible_schema"
+    - "incompatible_player_protocol"
+    - "incompatible_animation_catalog"
+    - "incompatible_minimum_app"
+    - "descriptor_manifest_identity_mismatch"
+    - "archive_size_mismatch"
+    - "archive_checksum_mismatch"
+    - "manifest_size_mismatch"
+    - "manifest_checksum_mismatch"
+    - "asset_size_mismatch"
+    - "asset_checksum_mismatch"
+    - "corrupt_archive"
+    - "missing_asset"
+    - "missing_variant"
+    - "missing_source"
+    - "missing_license"
+    - "quota_exceeded"
+    - "activation_failed"
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "branch_and_start_commit"
+    - "lineage_base_ancestry"
+    - "coordinator_delta_from_lineage_base"
+    - "dirty_files"
+    - "allowed_paths"
+    - "applicable_stop_gates"
+    - "known_invariant_or_compatibility_conflicts"
+  required_conditions:
+    clean_worktree: true
+    head_is_coordinator_packet_commit: true
+    parent_lineage_contains_review_base: true
+    only_coordinator_delta_is_packet: true
+    instructions_read: true
+    required_inputs_present: true
+    model_is_gpt_5_6_sol: true
+    subagents_unused: true
+
+acceptance_tests:
+  - id: "F02-AC-01"
+    requirement: "The three animation version constants are independently exported as literal 1 values while every existing app/database/backup/catalog/nutrition/workout/package version remains byte-for-byte unchanged."
+    evidence: "Focused constant tests, packages/contracts/src/index.ts boundary inspection, and candidate diff."
+  - id: "F02-AC-02"
+    requirement: "Unknown values can be parsed into every required descriptor, manifest, entry/asset/source/license/review record, installed-pack, player request/state, and stable error contract without dependency use or silent coercion."
+    evidence: "Positive and negative table-driven tests in packages/contracts/src/animation-pack.test.ts plus package/typecheck evidence."
+  - id: "F02-AC-03"
+    requirement: "Only the external trusted descriptor accepts and owns archiveByteSize/archiveSha256 and descriptor-selected manifest path/size/hash; the in-archive manifest rejects whole-archive and self-reference fields."
+    evidence: "Valid descriptor test and forbidden-field manifest tests for every prohibited field."
+  - id: "F02-AC-04"
+    requirement: "Descriptor and manifest compatibility accepts supported v1 and fails closed for each unknown future schema/protocol/catalog version, minimum-app incompatibility, and every bound identity mismatch."
+    evidence: "Compatibility matrix tests with exact stable codes and issue paths."
+  - id: "F02-AC-05"
+    requirement: "Manifest validation enforces canonical IDs/hashes/dates/semver/paths, positive safe byte sizes, finite durations/camera/player values, valid loop windows, unique IDs and paths, source/license integrity, exact variant mapping, and at most one primary mapping per exact variant/catalog tuple."
+    evidence: "Table-driven malformed and referential-integrity tests, including duplicate IDs, paths, mappings, missing references, and loop boundaries."
+  - id: "F02-AC-06"
+    requirement: "Validation failures are deterministic, serializable, path-addressable, non-mutating, and do not return a partial accepted value."
+    evidence: "Tests repeat the same invalid parse, compare deep equality and JSON round-trip, assert issue codes/order/paths, and verify input equality."
+  - id: "F02-AC-07"
+    requirement: "No exact-variant lookup, parser, or compatibility function silently falls back or coerces across equipment variants."
+    evidence: "Near-match and missing exact-variant tests prove stable missing_variant or mapping validation failure without alternate result."
+  - id: "F02-AC-08"
+    requirement: "InstalledAnimationPack and all player-state discriminants validate, including valid reduced-motion requests and idle/loading/ready/playing/paused/failed serializable states with recoverable and offline-fallback semantics."
+    evidence: "Player/installed-state positive matrix and invalid discriminant/field-combination tests."
+  - id: "F02-AC-09"
+    requirement: "The complete stable AnimationPackError code set is exported through @gym/contracts and tests pin every required spelling."
+    evidence: "Exact array/object equality test importing from packages/contracts/src/index.ts."
+  - id: "F02-AC-10"
+    requirement: "The candidate contains only the three authorized contract implementation paths; no package, dependency, storage, media, UI, backup, content, PWA, builder, fixture, or asset change exists."
+    evidence: "git diff --name-only coordinator_packet_commit..candidate_commit and git diff --stat, recorded in handoff."
+  - id: "F02-AC-11"
+    requirement: "The complete review range starts at f20bf05d3f640b94e7df178a4303d0105134c492, includes the unchanged coordinator packet plus the implementation candidate, and the only post-candidate delta is the handoff report."
+    evidence: "Immutable candidate and metadata range commands recorded with exact SHAs in the handoff."
+
+required_checks:
+  commands:
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    - "pnpm run typecheck"
+    - "pnpm run verify"
+    - "git diff --check f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    - "git diff --name-only coordinator_packet_commit..candidate_commit"
+    - "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    - "git diff --name-only candidate_commit..handoff_commit"
+    - "Parse docs/ai/packets/FOUNDATION-02.yaml and docs/ai/reviews/FOUNDATION-02-handoff.yaml with the bundled Node runtime and repository js-yaml."
+  timing:
+    - "Run focused tests and typecheck during implementation and again at the final candidate bytes."
+    - "Create the candidate commit before writing the handoff, then run pnpm run verify and immutable diff checks against that candidate commit."
+    - "Write and commit only the handoff report after the candidate; do not amend the candidate."
+  manual_reviews:
+    - "Review against docs/code-review.md, emphasizing module scope, offline failure safety, exact equipment-variant semantics, and license/review metadata completeness."
+    - "Inspect packages/contracts/src/index.ts and repository imports to confirm all new public contracts are reachable only through @gym/contracts and no consumer imports animation-pack.ts directly."
+    - "Inspect the complete diff for any dependency, manifest, version, storage, media, app UI, backup, catalog content, PWA, builder, fixture, or asset change."
+    - "Trace descriptor-only archive/manifest integrity ownership and confirm the manifest rejects forbidden self-reference fields."
+    - "Trace every compatibility decision and confirm unknown or ambiguous values fail closed without cross-variant fallback."
+  evidence_paths:
+    - "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+
+stop_gates:
+  - id: "F02-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or the active producer/reviewer cannot verify the mandated model."
+    action: "Stop without substitution and write a BLOCKED handoff report at the authorized handoff path."
+  - id: "F02-STOP-02"
+    condition: "The producer start worktree is dirty, HEAD is not the supplied coordinator packet commit, f20bf05d3f640b94e7df178a4303d0105134c492 is absent from its parent lineage, or the pre-edit delta from that lineage base contains anything other than docs/ai/packets/FOUNDATION-02.yaml."
+    action: "Stop before editing and write a BLOCKED handoff with exact branch, HEAD, status, ancestry, and unexpected paths; do not clean or rebase the worktree."
+  - id: "F02-STOP-03"
+    condition: "A dependency, package manifest, lockfile, configuration, or path outside authority.allowed_paths must change to implement or test the contracts."
+    action: "Stop without widening scope and write a BLOCKED handoff naming the required change and why repository-native TypeScript is insufficient."
+  - id: "F02-STOP-04"
+    condition: "Correctness requires storage, archive, hashing, authentication, media, renderer, app UI, backup, catalog content, PWA, builder, fixture-pack, or asset implementation."
+    action: "Stop and write a BLOCKED handoff; defer implementation to the owning later packet."
+  - id: "F02-STOP-05"
+    condition: "The trust root, descriptor authentication responsibility, approval semantics, or ownership of archive/manifest digest fields cannot be represented without allowing the archive or manifest to authenticate itself."
+    action: "Stop and write a BLOCKED handoff describing the unresolved trust/authentication decision; never accept manifest-supplied archive expectations."
+  - id: "F02-STOP-06"
+    condition: "Any schema/protocol/catalog/minimum-app or descriptor/manifest compatibility ambiguity would require guessing, coercion, fallback, or acceptance of an unknown future or unsafe manifest."
+    action: "Stop and write a BLOCKED handoff with the ambiguous field and rejected unsafe behavior; fail closed rather than silently accepting it."
+  - id: "F02-STOP-07"
+    condition: "Any validation or mapping design would silently substitute a different exercise/equipment variant or reuse an immutable stable ID."
+    action: "Stop and write a BLOCKED handoff; do not implement cross-variant fallback or ID reuse."
+  - id: "F02-STOP-08"
+    condition: "A candidate or post-candidate diff contains an unexpected path, or the handoff cannot prove separate candidate and metadata commits."
+    action: "Stop, do not amend or add unrelated cleanup, and write a BLOCKED handoff if the authorized report path is still the sole safe metadata change."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After candidate_commit, only docs/ai/reviews/FOUNDATION-02-handoff.yaml may change before cold review, and it must be committed separately without amending candidate_commit."
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "lineage_base_commit"
+    - "coordinator_packet_commit"
+    - "producer_start_commit"
+    - "candidate_commit"
+    - "handoff_commit"
+    - "branch"
+    - "changed_paths"
+    - "acceptance_evidence"
+    - "checks"
+    - "licenses"
+    - "known_risks"
+    - "review_target"
+  required_review_target:
+    candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    producer_delta: "coordinator_packet_commit..candidate_commit"
+    handoff_metadata: "candidate_commit..handoff_commit; docs/ai/reviews/FOUNDATION-02-handoff.yaml only"
+
+cold_review:
+  required: true
+  new_independent_task_required: true
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  inherits_producer_explanation: false
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: "docs/ai/reviews/FOUNDATION-02-cold-review.yaml"
+  immutable_ranges:
+    candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    producer_implementation: "coordinator_packet_commit..candidate_commit"
+    handoff_metadata: "candidate_commit..handoff_commit; docs/ai/reviews/FOUNDATION-02-handoff.yaml only"
+  required_focus:
+    - "Re-run or independently verify focused tests, typecheck, and pnpm run verify at candidate_commit."
+    - "Review runtime validation strictness, deterministic issue ordering/paths, trust-boundary field ownership, compatibility failure behavior, exact-variant semantics, and public @gym/contracts exports."
+    - "Confirm the packet is the only coordinator delta, implementation is limited to three contract paths, and the handoff is the only post-candidate delta."
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"
+  squash_policy: "Keep coordinator packet, candidate, and handoff commits distinct through cold review; merge policy is decided only after a recorded PASS."
