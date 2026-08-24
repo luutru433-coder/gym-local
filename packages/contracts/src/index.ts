@@ -683,3 +683,5 @@ export function createId(prefix: string): Id {
   const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   return `${prefix}_${id}`;
 }
+
+export * from "./animation-pack";
