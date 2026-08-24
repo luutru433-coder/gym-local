@@ -24,6 +24,10 @@ External video and thumbnails remain online-only and are not downloaded, transco
 
 Use an independently versioned, deterministic animation-pack format. Version 1 is a ZIP container with a JSON manifest and glTF 2.0/GLB-compatible assets. This records an interchange and integrity boundary; it does not authorize a renderer dependency until a later benchmark packet selects one.
 
+The complete archive integrity record is an `AnimationPackReleaseDescriptor` published outside the archive bytes in a trusted, authenticated release index or sidecar. The descriptor binds immutable `packId` and semantic `version` to `archiveByteSize`, `archiveSha256`, `manifestPath`, `manifestByteSize`, `manifestSha256`, animation pack schema version, animation catalog version, player protocol version, `minimumAppVersion`, and release/review metadata. Release/review metadata includes release date, reviewer identity or review-record reference, review date, and approval status. The trusted distribution channel for the descriptor is the root of trust; neither the archive nor its manifest may supply or override its expected archive digest.
+
+The deterministic ZIP contains the manifest plus its declared assets. The manifest contains neither the complete archive digest nor a digest of its own bytes. Its bytes are authenticated by the external descriptor's `manifestSha256`; the complete ZIP bytes are authenticated independently by the descriptor's `archiveSha256`.
+
 The manifest must include:
 
 - immutable pack, animation, and exact exercise-variant IDs;
@@ -31,10 +35,9 @@ The manifest must include:
 - semantic pack version and minimum compatible app version;
 - every entry path, media type, clip name, duration, byte size, and SHA-256;
 - rig/model compatibility, camera and loop metadata needed for deterministic playback;
-- source, author, license/terms URL, explicit offline redistribution scope, attribution, modifications, and review date for every bundled byte;
-- whole-pack byte size and SHA-256.
+- source, author, license/terms URL, explicit offline redistribution scope, attribution, modifications, and review date for every bundled byte.
 
-An installed pack is reproducible public content, not personal data. It is excluded from backup. Installation follows stage -> verify -> activate, retains one previous verified pack for rollback, and cannot update workout history, routines, sessions, custom exercises, nutrition data, pantry, saved plans, or backups.
+An installed pack is reproducible public content, not personal data. It is excluded from backup. Installation order is explicit: obtain and trust the external release descriptor; stage the ZIP; verify the staged archive's byte size and SHA-256 against `archiveByteSize` and `archiveSha256`; read the descriptor-selected manifest and verify its byte size and SHA-256; validate manifest identity and compatibility against the descriptor; verify every declared asset's byte size and SHA-256 plus exact variant/source/license records; then atomically activate. Any failure retains the current verified pack. Activation retains one previous verified pack for rollback and cannot update workout history, routines, sessions, custom exercises, nutrition data, pantry, saved plans, or backups.
 
 ### Independent versions
 
@@ -51,7 +54,7 @@ FOUNDATION-01 does not change the runtime app `0.7.0`, database `5`, catalog `3`
 
 ### Contract boundary
 
-Later packets will add public contracts corresponding to `AnimationPackManifest`, `AnimationPackEntry`, `AnimationAssetDescriptor`, `AnimationSourceRecord`, `InstalledAnimationPack`, `AnimationPlayerRequest`, `AnimationPlayerState`, and `AnimationPackError` as proposed in `docs/ai/master-plan.md`.
+Later packets will add public contracts corresponding to `AnimationPackReleaseDescriptor`, `AnimationPackManifest`, `AnimationPackEntry`, `AnimationAssetDescriptor`, `AnimationSourceRecord`, `InstalledAnimationPack`, `AnimationPlayerRequest`, `AnimationPlayerState`, and `AnimationPackError` as proposed in `docs/ai/master-plan.md`.
 
 Mapping is exact-variant only. A missing animation must never silently display another equipment variant's motion. Stable IDs are immutable; corrections deprecate and redirect rather than reuse. Workout records do not depend on animation bytes or player versions.
 
@@ -61,7 +64,7 @@ Complete contract, builder, storage, and player foundation packets before a 10â€
 
 ## Acceptance criteria for later implementation
 
-1. A deterministic rebuild produces the same manifest and pack SHA-256.
+1. A deterministic rebuild produces identical manifest and archive bytes; the external trusted release descriptor records their respective `manifestSha256` and `archiveSha256` without either digest appearing in the manifest.
 2. Every bundled byte has explicit offline redistribution rights and complete attribution; unclear sources are excluded.
 3. The installed pilot resolves exactly 10â€“12 declared equipment variants, with no cross-variant fallback.
 4. Network-disabled relaunch plays installed animations and preserves bilingual text fallback.

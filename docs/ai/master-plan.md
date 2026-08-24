@@ -56,9 +56,9 @@ These decisions are accepted at the design level by ADR 0016. They do not change
 - Player boundary: `animationPlayerProtocolVersion = 1`.
 - Variant mapping catalog: `animationCatalogVersion = 1`.
 - Pack release version is independent from app, workout catalog, database, backup, and nutrition-pack versions.
-- A pack declares `minimumAppVersion`, immutable `packId`, semantic `version`, byte size, SHA-256, schema version, player protocol, assets, variant mappings, sources, licenses, and review metadata.
-- Version 1 uses a deterministic ZIP container with a JSON manifest and glTF 2.0/GLB-compatible assets. A later packet must benchmark the exact decoding/rendering choice before adding a renderer dependency.
-- Pack activation uses stage -> verify -> activate. Keep the current and one previous verified pack for rollback.
+- A trusted external `AnimationPackReleaseDescriptor`, published outside the archive bytes in an authenticated release index or sidecar, binds immutable `packId` and semantic `version` to `archiveByteSize`, `archiveSha256`, `manifestPath`, `manifestByteSize`, `manifestSha256`, schema/protocol/minimum-app compatibility, and release/review metadata.
+- Version 1 uses a deterministic ZIP container containing a JSON manifest plus glTF 2.0/GLB-compatible assets. The manifest contains neither the complete archive digest nor a digest of its own bytes; it retains deterministic per-asset byte sizes and SHA-256 values plus exact variant/source/license records. A later packet must benchmark the exact decoding/rendering choice before adding a renderer dependency.
+- Installation order is trusted descriptor -> stage ZIP -> verify archive size/SHA-256 -> verify the descriptor-selected manifest size/SHA-256 and validate identity/compatibility -> verify per-asset hashes and exact variant/source/license records -> atomic activate. Keep the current and one previous verified pack for rollback.
 - Pack binaries and reproducible public metadata are excluded from personal backup. Any future personal animation preference must be separately versioned and backup-reviewed.
 - FOUNDATION-01 does not bump app `0.7.0`, database `5`, backup `5`, or catalog `3`. The first runtime contract packet decides the next app/catalog versions; the storage packet decides whether DB6 is necessary.
 
@@ -66,7 +66,8 @@ These decisions are accepted at the design level by ADR 0016. They do not change
 
 The exact TypeScript is deferred to the contract packet. The proposal must preserve these semantic fields:
 
-- `AnimationPackManifest`: pack identity, schema/protocol versions, minimum app version, created/reviewed dates, byte size, checksum, entries, sources, and licenses.
+- `AnimationPackReleaseDescriptor`: trusted external release-index or sidecar record containing immutable pack identity/version, `archiveByteSize`, `archiveSha256`, `manifestPath`, `manifestByteSize`, `manifestSha256`, schema/protocol/minimum-app compatibility, release date, reviewer identity or review-record reference, review date, and approval status.
+- `AnimationPackManifest`: in-archive pack identity, schema/protocol versions, minimum app version, created/reviewed dates, entries, sources, and licenses; it contains neither the complete archive digest nor a digest of its own bytes.
 - `AnimationPackEntry`: immutable animation ID, exact exercise variant ID, asset path, clip name, duration, loop window, default camera, equipment props, and accessibility fallback key.
 - `AnimationAssetDescriptor`: path, media type, byte size, checksum, compression, rig/model compatibility ID, and source/license ID.
 - `AnimationSourceRecord`: author, source URL/path, license ID/URL, redistribution scope, attribution, modifications, and reviewed date.
@@ -85,7 +86,8 @@ Contract rules:
 
 ## Required release evidence
 
-- Deterministic manifest and pack generation with byte size and SHA-256.
+- Deterministic manifest and archive generation, with `manifestByteSize`/`manifestSha256` and `archiveByteSize`/`archiveSha256` recorded only in the trusted external `AnimationPackReleaseDescriptor`.
+- Install evidence follows the descriptor trust boundary in order: trust descriptor, stage ZIP, verify archive size/SHA-256, verify and validate the descriptor-selected manifest identity/compatibility, verify every asset's size/SHA-256 and exact variant/source/license records, then atomically activate.
 - Complete source/license/attribution review for every bundled byte.
 - Static mapping audit for exact exercise and equipment variant.
 - Corrupt, interrupted, incompatible, quota, and rollback tests.
