@@ -1,0 +1,24 @@
+schema_version: 1
+checkpoints:
+  - id: "FOUNDATION-01"
+    status: "merged"
+    recorded_at: "2026-08-24T10:20:55+07:00"
+    target_branch: "main"
+    merge_mode: "fast_forward"
+    lineage_base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+    candidate_commit: "51d4b73c19d5699ba6090a2764eb590e19f421b0"
+    handoff_commit: "e037f7b7ba0e817ce2f65f5ec6d4d9a6cee68796"
+    cold_review_report_commit: "421e5d9decb3e0f744961bb36332f7ad25a1fb3a"
+    merged_head: "421e5d9decb3e0f744961bb36332f7ad25a1fb3a"
+    verdict: "PASS"
+    merge_authorized: true
+    checkpoint_tag: "checkpoint/foundation-01-pass"
+    verification:
+      - command: "git diff --check origin/main..HEAD"
+        result: "pass"
+      - command: "pnpm run verify:affected"
+        result: "pass"
+        evidence: "Architecture boundaries verified; documentation-only verification complete."
+      - command: "parse all docs/ai packet, handoff, review, and template YAML with js-yaml 4.3.0"
+        result: "pass"
+    next_packet: "FOUNDATION-02"
