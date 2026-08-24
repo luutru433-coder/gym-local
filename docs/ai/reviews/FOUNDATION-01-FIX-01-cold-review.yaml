@@ -1,0 +1,63 @@
+schema_version: 1
+packet_id: "FOUNDATION-01-FIX-01"
+verdict: "PASS"
+reviewed_base_commit: "52dd9b25bcd29d0c7ac058e459cd248ab2e970ae"
+reviewed_head_commit: "51d4b73c19d5699ba6090a2764eb590e19f421b0"
+reviewed_metadata_commit: "e037f7b7ba0e817ce2f65f5ec6d4d9a6cee68796"
+reviewed_at: "2026-08-24T10:18:49+07:00"
+reviewer_model: "gpt-5.6-sol"
+reviewer_task_id: "01a031c4-f009-7f01-b7bb-759c53d91cb6"
+
+scope:
+  changed_paths_in_scope: true
+  unexpected_paths: []
+  worktree_clean: true
+  complete_range_documentation_only: true
+  fixer_paths:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/ai/master-plan.md"
+  metadata_only_path: "docs/ai/reviews/FOUNDATION-01-FIX-01-handoff.yaml"
+  metadata_rule_satisfied: true
+
+acceptance:
+  - id: "F01-FIX-AC-01"
+    result: "pass"
+    evidence:
+      - "The trusted external release descriptor owns archiveByteSize and archiveSha256 and binds them to immutable pack identity and version."
+  - id: "F01-FIX-AC-02"
+    result: "pass"
+    evidence:
+      - "The in-archive manifest contains neither a complete archive digest nor a digest of its own bytes and retains deterministic per-asset integrity records."
+  - id: "F01-FIX-AC-03"
+    result: "pass"
+    evidence:
+      - "ADR 0016 and the master-plan contracts, terminology, verification order, and trust boundaries align."
+  - id: "F01-FIX-AC-04"
+    result: "pass"
+    evidence:
+      - "The complete candidate range is documentation-only; the fixer commit changes only its two authorized design documents."
+
+checks:
+  - command: "git diff --check"
+    result: "pass"
+    evidence: "The complete candidate range and handoff metadata range have no whitespace errors."
+  - command: "git diff --name-only 52dd9b25bcd29d0c7ac058e459cd248ab2e970ae...HEAD"
+    result: "pass"
+    evidence: "Direct inspection found documentation and coordination metadata only."
+  - command: "YAML parse check for the fixer packet and handoff"
+    result: "pass"
+    evidence: "The packet and handoff are schema-readable and contain the required identifiers, fields, candidate SHA, and ranges."
+  - command: "pnpm run verify:affected"
+    result: "pass"
+    evidence: "Architecture boundaries verified; documentation-only verification completed with exit code 0."
+  - command: "independent archive integrity review"
+    result: "pass"
+    evidence: "External archive integrity, descriptor identity/compatibility/review binding, manifest non-self-reference, per-asset integrity, atomic activation, rollback, immutable exact-variant mapping, personal-data isolation, licensing gates, offline behavior, and optional external-video fallback all passed."
+
+licenses:
+  result: "not_applicable"
+  findings: []
+
+findings: []
+residual_risks: []
+merge_authorized: true
