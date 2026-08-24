@@ -1,0 +1,428 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-03-FIX-01"
+  title: "Close deterministic animation-pack builder trust-boundary defects"
+  type: "review-fix"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  lineage_base_commit: "538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+  review_base_commit: "538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+  failed_candidate_commit: "4f921af49cbd6efb564caaac70cb6ab0ed044be8"
+  failed_metadata_commit: "5433a32ccd81147eb2ac0b87f6758a8774a84979"
+  coordinator_parent_commit: "5433a32ccd81147eb2ac0b87f6758a8774a84979"
+  target_branch: "codex/foundation-03-fix-01"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-03"
+  producer_start_rule:
+    start_commit: "The committed FOUNDATION-03-FIX-01 coordinator packet HEAD supplied to the producer, not the failed metadata commit itself."
+    required_parent: "The producer start commit's first parent must be exactly 5433a32ccd81147eb2ac0b87f6758a8774a84979."
+    required_coordinator_delta:
+      - "git diff --name-only 5433a32ccd81147eb2ac0b87f6758a8774a84979..HEAD must print only docs/ai/packets/FOUNDATION-03-FIX-01.yaml and docs/ai/reviews/FOUNDATION-03-cold-review.yaml before producer edits."
+      - "The producer must not amend, regenerate, or edit either coordinator artifact."
+    single_candidate_commit_rule: "The fixer implementation is one commit whose first parent is the producer start commit."
+    review_range_rule: "The complete updated candidate range is 538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit; the finding-scoped fixer delta is producer_start_commit..candidate_commit."
+
+authority:
+  allowed_paths:
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml"
+  candidate_implementation_paths:
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  external_writes_allowed: true
+  external_writes_scope: "Only the coordinator-authorized, uniquely named OS temporary runtime test directory specified below; no persistent or product external write is authorized."
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  generated_binary_assets_allowed: false
+  committed_runtime_binary_allowed: false
+  candidate_tests_network_allowed: false
+  builder_network_allowed: false
+  temporary_test_outputs_allowed: true
+  coordinator_authorized_historical_runtime_setup:
+    external_writes_allowed: true
+    exact_scope: "One uniquely named OS temporary directory outside the repository for the official Node 22.13.0 archive, SHASUMS256, extraction, decoded synthetic source, output, and captured smoke evidence only."
+    network_reads_allowed:
+      - "https://nodejs.org/dist/v22.13.0/SHASUMS256.txt"
+      - "https://nodejs.org/dist/v22.13.0/node-v22.13.0-win-x64.zip"
+    constraints:
+      - "Match exactly one SHASUMS256 line for the downloaded archive and require Get-FileHash SHA-256 equality before extraction."
+      - "Do not install Node, alter PATH, mutate a system runtime, write into the repository, or retain/archive/commit the runtime binary."
+      - "Invoke the extracted node.exe by absolute path, create all smoke inputs/outputs below the unique temp directory, and remove the verified temp directory in finally after the smoke."
+      - "This authority is test setup only and must not appear in builder code, candidate tests, artifacts, fixtures, dependencies, or runtime product behavior."
+  forbidden_paths:
+    - "scripts/build-animation-pack-v1.mjs"
+    - "tests/fixtures/**"
+    - "docs/ai/packets/FOUNDATION-03.yaml"
+    - "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-03-cold-review.yaml"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "packages/*/package.json"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - "vite.config.ts"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "outputs/**"
+    - "work/**"
+    - "reports/**"
+    - "dist/**"
+    - "scripts/** except scripts/animation-pack-v1.mjs and scripts/animation-pack-v1.test.mjs"
+    - "docs/** except docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml"
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/code-review.md"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/ai/packets/FOUNDATION-03.yaml"
+    - "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-03-cold-review.yaml"
+    - "docs/ai/packets/FOUNDATION-03-FIX-01.yaml"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "tests/fixtures/animation-pack-v1/README.md"
+    - "tests/fixtures/animation-pack-v1/valid/pack-source.json"
+    - "tests/fixtures/animation-pack-v1/valid/assets/synthetic-minimal.glb.base64"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "packages/contracts/package.json"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/index.ts"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+  immutable_failed_evidence:
+    failed_packet_blob: "4d8ebb7ba9233a0eba5e760500dac6a00d5be4e3"
+    failed_handoff_blob: "6eeaccba5f2ac3284c7a80c04ef6ca14be86269d"
+    immutable_build_cli_blob: "d8f8ebcf66f0e210a46b25c47c075b8457ac133d"
+    fixture_readme_blob: "70e5e45fc53dbc9a32821edc557b3aa424f074f8"
+    fixture_source_blob: "f70d1ca5d430b6ce6e600dd6498b67282f61a091"
+    fixture_base64_blob: "232bf4b807bf358748971b1a63d756428a0555f2"
+  immutable_baseline_blobs:
+    package_json: "485bffca88295d9c458dc8706d84e46f75d92dcd"
+    pnpm_lock_yaml: "8af6caac77c93c58c5cfce23feb37303ee4c9620"
+    pnpm_workspace_yaml: "6bc432d83c0be318804535340aed4e27bfbeff2c"
+    eslint_config: "1b407167cc91482fe3471f2fd744c2affa7bdb17"
+    tsconfig_json: "1ffef600d959ec9e396d5a260bd3f5b927b2cef8"
+    vite_config: "04055943b776036d9f01d4db28b0acde725e96e0"
+    contracts_package_json: "e0d82e322799049ef8debbc1935ccee9633b1150"
+    animation_pack_contract: "8ccea0741e48b1e613c59dbc81c60f03902ed87d"
+    animation_pack_contract_tests: "659f20211ae7e024544dcfeb747fad32850d749a"
+    contracts_public_index: "6f48747874e7ff0964ad04e8bc87550a4de80de6"
+    license: "8c66f07c09f54f757007b3f5ea1e0a01bf6f5efc"
+    third_party_notices: "7dfab0eecc6cfde65a84a24d0ffe6dd6dc4eb03b"
+    gitattributes: "b0eb9a4782c0f93d50b344d382b77b855152d62b"
+    gitignore: "dc7e1c8beaa4268bfbb154cfe8be7cf33e71989f"
+  immutable_baseline_trees:
+    apps: "3ffc6e49306bc63231106791ffc270e6244fccde"
+    content: "f8a06b5df08802550acc88958894eff54d8f91d2"
+    public: "97bebe1b67d4c2fa7c04d46d7e302a25f5f2bc09"
+    contracts: "689904789935288582f93d525d11e69f065e88ee"
+    storage: "ee00e73028e22823a24ec823d4253d37a3fa5775"
+    media: "d15ebafcdbd7d48f6808011fa73e9696016dd23a"
+    catalog: "dfe0b2ad65b1135e89fc1bed951bf0a9b229043c"
+    backup: "4162e7601fb23158a8d7182b508a08c46cae7278"
+    workouts: "818daf4f4395b68648bb4bf00e7bd57395e9e251"
+    nutrition: "15abe8f81c1bee6b15431567026fd2a5e33da6e7"
+    progress: "781450a07fe6a309963fc6ea108a8f429f31675c"
+    ui: "7508a5796d6416f59b991a9b08616eb9c885cfa1"
+  assumptions:
+    - "The original FOUNDATION-03 architecture, descriptor trust boundary, deterministic STORE-only ZIP policy, public v1 contract meaning, exact equipment-variant mapping, and synthetic fixture provenance remain authoritative except where a finding requires a bounded correction."
+    - "After-rename fault injection is not automatically safe or meaningful: successful atomic rename may already constitute publication. Evidence must distinguish pre-commit failures from post-commit verification and must never delete a successfully published final directory as cleanup."
+
+outcome:
+  objective: "Resolve exactly the nine FOUNDATION-03 cold-review findings while preserving every original positive requirement, negative matrix, public contract, artifact byte policy, license boundary, and protected path."
+  user_visible_result: "None yet; the local release builder becomes race-safe, deterministic, Node 22.13-compatible, and accurately evidenced for later storage/player packets."
+  deliverables:
+    - "scripts/animation-pack-v1.mjs closes the nine bounded implementation defects without changing public contracts, dependencies, fixtures, wrapper CLI, output names, or artifact meaning."
+    - "scripts/animation-pack-v1.test.mjs contains deterministic Windows-aware regression coverage for every former defect and retains all original FOUNDATION-03 acceptance and negative probes."
+    - "One candidate commit changes only the two candidate implementation paths, followed by one direct-child metadata commit adding only docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml."
+  non_goals:
+    - "No new contract, schema, version, dependency, package, lockfile, configuration, wrapper CLI, fixture, output format, renderer, storage, app, catalog, media, content, backup, PWA, or production asset change."
+    - "No network path in the builder or test suite, no runtime download/install feature, and no committed historical runtime or generated binary."
+    - "No edit to the failed FOUNDATION-03 packet, failed handoff, new cold review, or any historical evidence."
+
+preflight:
+  report_before_editing:
+    - "authoritative_model_and_no_subagents"
+    - "branch_head_parent_cleanliness_and_exact_two-file_coordinator_delta"
+    - "failed_candidate_and_metadata_parentage_and_ranges"
+    - "all_required_reads_and_inputs"
+    - "two_candidate_paths_and_one_post_candidate_metadata_path"
+    - "Node_22_13_official_runtime_evidence_plan_and_authority"
+    - "applicable_stop_gates"
+    - "known_invariant_contract_dependency_license_or_platform_conflicts"
+  required_conditions:
+    model_is_gpt_5_6_sol: true
+    subagents_unused: true
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_coordinator_start_commit: true
+    coordinator_start_parent_is_exact_failed_metadata: true
+    only_coordinator_delta_is_cold_review_and_fix_packet: true
+    instructions_read: true
+    required_inputs_present: true
+
+decisions:
+  contract_or_schema_change: "none"
+  version_decisions:
+    - "Keep animationPackSchemaVersion 1, animationPlayerProtocolVersion 1, animationCatalogVersion 1, APP_VERSIONS.app 0.7.0, and repository Node engine >=22.13.0 unchanged."
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "none; retain the immutable project-authored MIT synthetic fixture"
+  public_contract_loading: "The builder must consume only the public @gym/contracts entry point and may use only direct dependencies plus Node built-ins; no packages/contracts/src path, generated bridge, copied contract, dependency/config change, or Node >=22.15-only API."
+
+finding_scope:
+  - id: "F03-FIX-01-F01"
+    severity: "P1"
+    requirement: "Prove real filesystem separation and stable identities for source, output parent, final output, and staging; reject Windows junction/symlink aliases and recheck immediately before rename."
+  - id: "F03-FIX-01-F02"
+    severity: "P1"
+    requirement: "Snapshot and recheck complete source inventory plus root, pack-source, directory, and file identities before artifact creation and publication; fail add/remove/replace and pack-source races."
+  - id: "F03-FIX-01-F03"
+    severity: "P1"
+    requirement: "Preserve staging on missing, unreadable, or mismatched owner proof, retain the created staging directory identity, and safely handle marker removal immediately before rename."
+  - id: "F03-FIX-01-F04"
+    severity: "P1"
+    requirement: "Remove registerHooks and load the public contracts on Node 22.13 using only authorized files, direct dependencies, and Node built-ins; prove validate and build with an official checksum-verified temporary Node 22.13.0 runtime."
+  - id: "F03-FIX-01-F05"
+    severity: "P2"
+    requirement: "Parse a structurally valid terminal EOCD and allow arbitrary EOCD-signature bytes inside stored GLB payloads."
+  - id: "F03-FIX-01-F06"
+    severity: "P2"
+    requirement: "Allow required GLB JSON space padding only and reject NUL padding."
+  - id: "F03-FIX-01-F07"
+    severity: "P2"
+    requirement: "Preflight stable sizes and cumulative budget, rejecting before read/store of the first exceeding asset with observable unread-excess evidence."
+  - id: "F03-FIX-01-F08"
+    severity: "P2"
+    requirement: "Leave the old handoff immutable and make the new handoff record only exact actual review IDs, archive paths/order, fault phases, SHAs, ranges, and meaningful publication coverage."
+  - id: "F03-FIX-01-F09"
+    severity: "P3"
+    requirement: "Make first-failure selection independent of filesystem readdir order using the raw comparator or deterministic sorted failure collection."
+
+acceptance_tests:
+  - id: "F03-FIX-01-AC-01"
+    requirement: "Realpath and filesystem-identity containment rejects lexical, symlink, and Windows junction aliases among source, output parent, final, and staging at initial checks and immediately before rename."
+    evidence: "Windows junction/symlink matrix plus identity-swap hooks proves no output or staging is created inside source and no alias escapes the expected parent."
+  - id: "F03-FIX-01-AC-02"
+    requirement: "The complete source snapshot is stable from validation through artifact creation and publication."
+    evidence: "Add/remove/replace assets, replace directories/files, mutate/replace pack-source, and root identity probes all fail before artifact creation/publication with no partial final output."
+  - id: "F03-FIX-01-AC-03"
+    requirement: "Cleanup deletes only the exact staging directory created and continuously owned by the invocation."
+    evidence: "Missing/unreadable/mismatched marker, marker removal before rename, staging identity replacement, and foreign sentinel probes preserve questionable staging and surface ownership failure."
+  - id: "F03-FIX-01-AC-04"
+    requirement: "The unchanged repository Node floor is real: both validate and build work under exact official Node 22.13.0 without internal contract imports, dependency/config changes, or Node 22.15-only APIs."
+    evidence: "Checksum-verified official temporary-runtime transcript records node --version, validate exit/output, build exit/output, exact artifact inventory, no repository mutation, and cleanup."
+  - id: "F03-FIX-01-AC-05"
+    requirement: "Raw ZIP verification finds the unique structurally valid terminal EOCD and ignores signature bytes in file payloads."
+    evidence: "A valid GLB BIN chunk containing PK 05 06 builds and verifies; malformed terminal EOCD, comments, trailing bytes, duplicate structural EOCD, and offset/count corruptions still fail."
+  - id: "F03-FIX-01-AC-06"
+    requirement: "GLB JSON accepts required ASCII-space padding and rejects NUL or other padding bytes."
+    evidence: "Positive space-padded fixtures and negative NUL/control padding mutations produce exact deterministic results."
+  - id: "F03-FIX-01-AC-07"
+    requirement: "The 64 MiB aggregate limit is enforced before the first asset that would exceed it is read or retained."
+    evidence: "Stable-size preflight and read hooks/counters prove the exceeding asset remains unread; boundary-equal totals pass and later identity/size changes fail."
+  - id: "F03-FIX-01-AC-08"
+    requirement: "Source traversal reports the same first error for equivalent trees regardless of creation or injected enumeration order."
+    evidence: "Raw-comparator tests perturb names, creation order, and enumeration order and assert byte-identical code/message/path."
+  - id: "F03-FIX-01-AC-09"
+    requirement: "The new handoff is exact and non-circular while the old packet, handoff, fixtures, and wrapper remain immutable failure/baseline evidence."
+    evidence: "Parsed YAML, literal fact assertions, historical blob checks, exact parents/ranges, archive inventory, and fault-hook inventory agree."
+  - id: "F03-FIX-01-AC-10"
+    requirement: "Every original FOUNDATION-03 F03-AC-01 through F03-AC-16 positive requirement remains passing across the complete updated candidate range."
+    evidence: "The handoff maps all 16 inherited IDs to fresh concrete evidence, and the cold reviewer independently reruns them."
+  - id: "F03-FIX-01-AC-11"
+    requirement: "Every original FOUNDATION-03 required negative test remains present and passing in addition to all nine fixer regressions."
+    evidence: "Focused test inventory and independent cold-review probes cover the complete inherited negative matrix without relaxing expected failures."
+  - id: "F03-FIX-01-AC-12"
+    requirement: "Public contract imports, exact variant isolation, canonical JSON, deterministic STORE ZIP bytes, descriptor-only digest ownership, fixture provenance, and license boundaries remain unchanged."
+    evidence: "Import audit, artifact-byte comparisons, public contract tests, exact fixture blobs, license assertions, and protected tree hashes."
+  - id: "F03-FIX-01-AC-13"
+    requirement: "Focused Node tests, scoped lint, typecheck, architecture/content gates, full pnpm run verify, and current-runtime plus Node 22.13 CLI smokes pass on final candidate bytes."
+    evidence: "Exact commands and candidate SHA are recorded in the handoff and independently repeated by cold review."
+  - id: "F03-FIX-01-AC-14"
+    requirement: "The candidate is one direct child of the coordinator start and changes exactly two scripts; its direct child adds exactly one non-circular FIX-01 handoff."
+    evidence: "Exact 40-character parent/range/name-only assertions and later cold-review metadata attestation."
+
+required_regression_tests:
+  former_findings:
+    - "Windows junction and available symlink aliases for source root, output parent, final output, and staging, including aliases introduced or identities swapped after initial validation and immediately before rename."
+    - "Complete source inventory add/remove/replace; pack-source mutate/replace; asset/directory/root identity replacement after read, before artifact creation, after artifact creation, and before publication."
+    - "Ownership marker missing, unreadable, mismatched, or removed before rename; created staging directory replaced; foreign sentinel preserved; ownership failure surfaced; successful final output never treated as failed staging cleanup."
+    - "Node 22.13-compatible public @gym/contracts loading in focused/current tests and real exact Node 22.13.0 validate/build CLI smoke; candidate tests remain offline and deterministic."
+    - "Valid GLB JSON plus BIN payload containing PK 05 06; structurally valid terminal EOCD selection; prior EOCD/central/local corruption matrix remains failing."
+    - "Valid ASCII-space GLB JSON padding and invalid NUL/control padding."
+    - "Aggregate asset sizes below, exactly at, and one byte above 64 MiB; per-asset boundary; counter proves the first exceeding asset is not read/stored; identity changes after size preflight fail."
+    - "New handoff literals match actual review IDs, manifest archive path, raw entry order, output filenames, hooks/phases, checks, SHAs, and ranges; no after-rename claim without safe semantic evidence."
+    - "Readdir creation/enumeration perturbations with multiple failures produce identical deterministic code, message, and path."
+  inherited_foundation_03_negative_matrix:
+    - "Missing, unreadable, malformed, BOM-prefixed, duplicate-key, non-object, unknown-field, schema-invalid, unsupported-version, or oversized pack-source.json."
+    - "Missing, empty, duplicate, case-colliding, normalization-colliding, traversal, reserved, overlong, undeclared, non-regular, symlink/junction, special, or source-root-escaping assets."
+    - "Missing/ambiguous review, source, license, or asset IDs; draft/unapproved review; non-offline redistribution; missing authorship/attribution/modifications/terms/source URL/review date; mismatched relations."
+    - "Duplicate animation ID or exact variant/catalog primary tuple; case-changed and equipment-near variants remain distinct without fallback."
+    - "Corrupt GLB magic/version/length/alignment/chunk order/chunk length/UTF-8/JSON/asset.version and glTF external URI."
+    - "Corrupt canonical manifest/archive/descriptor bytes, CRC, sizes, hashes, offsets, order, flags, method, time, attributes, extras, comments, duplicate/extra entries, trailing bytes, identity, versions, review, and compatibility."
+    - "Existing final output, stale or foreign staging, concurrent collision, and every meaningful injected write/verify/pre-publication failure preserve source/unrelated bytes and publish no partial final directory."
+    - "No network, clock, locale, timezone, random, path spelling, source mtime, process identity, or filesystem order influences artifact bytes."
+
+required_checks:
+  commands:
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+    - "node --test scripts/animation-pack-v1.test.mjs"
+    - "node scripts/build-animation-pack-v1.mjs validate --source <fresh decoded valid fixture source>"
+    - "node scripts/build-animation-pack-v1.mjs build --source <fresh decoded valid fixture source> --output <fresh absent temp output>"
+    - "<verified official Node 22.13.0 absolute node.exe> --version must print v22.13.0"
+    - "<verified official Node 22.13.0 absolute node.exe> scripts/build-animation-pack-v1.mjs validate --source <temp decoded valid fixture source>"
+    - "<verified official Node 22.13.0 absolute node.exe> scripts/build-animation-pack-v1.mjs build --source <separate temp decoded valid fixture source> --output <fresh absent temp output>"
+    - "pnpm exec eslint scripts/animation-pack-v1.mjs scripts/animation-pack-v1.test.mjs --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run content:validate"
+    - "pnpm run content:audit"
+    - "pnpm run verify"
+    - "git diff --check 538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit"
+    - "git rev-parse producer_start_commit^ must equal 5433a32ccd81147eb2ac0b87f6758a8774a84979"
+    - "git diff --name-only 5433a32ccd81147eb2ac0b87f6758a8774a84979..producer_start_commit must print only docs/ai/packets/FOUNDATION-03-FIX-01.yaml and docs/ai/reviews/FOUNDATION-03-cold-review.yaml"
+    - "git rev-parse candidate_commit^ must equal producer_start_commit"
+    - "git diff --name-only producer_start_commit..candidate_commit must print only scripts/animation-pack-v1.mjs and scripts/animation-pack-v1.test.mjs"
+    - "git diff --name-only 538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit must match the inherited FOUNDATION-03 range plus only the two authorized fixer paths"
+    - "After metadata commit: git rev-parse metadata_commit^ must equal candidate_commit and git diff --name-only candidate_commit..metadata_commit must print only docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml"
+    - "Parse FOUNDATION-03 packet/handoff/cold review and FOUNDATION-03-FIX-01 packet/handoff with repository js-yaml; assert IDs, required fields, exact immutable SHAs/ranges, all 16 inherited acceptance IDs, all nine finding IDs, and absence of SELF/self-SHA metadata"
+    - "Assert every context.immutable_failed_evidence and context.immutable_baseline_blobs hash plus every context.immutable_baseline_trees tree at candidate_commit"
+    - "Assert LICENSE remains MIT for Gym Local contributors; all authorized source prefixes remain SPDX MIT; jszip remains direct 3.10.1 with selected MIT option and the pinned lock integrity; no new notice is required"
+    - "Assert imports use public @gym/contracts, direct jszip, and Node built-ins only; reject internal contracts paths, transitive package imports, network APIs, registerHooks, and other Node >22.13-only loading dependencies"
+  timing:
+    - "Run focused regressions repeatedly during implementation and again on immutable final candidate bytes."
+    - "Perform current-runtime and exact official Node 22.13.0 CLI smokes on final candidate bytes; the historical runtime setup must be checksum-verified, outside the repository, and cleaned afterward."
+    - "Create one candidate commit containing only the two authorized scripts, then run full verification and exact git/YAML/blob/tree/license assertions against that immutable commit."
+    - "Create one direct-child metadata commit adding only FOUNDATION-03-FIX-01-handoff.yaml; do not amend the candidate and do not put the handoff's own commit SHA in the handoff."
+    - "Launch a fresh independent gpt-5.6-sol cold review without subagents only after the exact metadata commit exists."
+  manual_reviews:
+    - "Review against docs/code-review.md, emphasizing real filesystem containment, identity/race safety, ownership-preserving cleanup, deterministic errors, public module boundaries, exact variants, offline purity, and license completeness."
+    - "Trace source root, pack-source, every directory/file, output parent/final/staging, marker, and rename from initial lstat/realpath identity through final publication or preservation."
+    - "Independently parse terminal EOCD/local/central records and validate the GLB BIN signature regression without relying only on producer verification code."
+    - "Prove size budgeting occurs before read/store while later stable-identity checks close preflight-to-read races."
+    - "Compare the new handoff line by line with actual fixture records, archive entries, hooks, commands, SHAs, and ranges; keep old evidence immutable."
+    - "Confirm build wrapper, fixtures, package/lock/config/contracts/apps/content/public/storage/media/catalog/backup/PWA/license/notices, stable IDs, versions, and every other unlisted path remain unchanged."
+  evidence_paths:
+    - "docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-03-FIX-01-cold-review.yaml"
+
+stop_gates:
+  - id: "F03-FIX-01-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or authoritative invocation metadata cannot be verified."
+    action: "Stop without substitution and write a BLOCKED handoff at the authorized metadata path."
+  - id: "F03-FIX-01-STOP-02"
+    condition: "Branch, clean state, producer start HEAD, exact parent 5433a32ccd81147eb2ac0b87f6758a8774a84979, ancestry, or exact two-file coordinator delta does not match execution.producer_start_rule."
+    action: "Stop before implementation and write a BLOCKED handoff with exact branch, HEAD, parent, status, ancestry, and unexpected paths; do not clean, rebase, amend, or guess."
+  - id: "F03-FIX-01-STOP-03"
+    condition: "Any correction requires scripts/build-animation-pack-v1.mjs, a fixture, contract, dependency, package/lock/config, license/notice, app/package/content/public module, or any path outside the two candidate files."
+    action: "Stop without widening scope and write a BLOCKED handoff naming the required owning path or packet."
+  - id: "F03-FIX-01-STOP-04"
+    condition: "Real containment, stable source/output identities, or ownership-safe cleanup cannot be proved on Windows without deleting, overwriting, following an untrusted alias, or weakening atomic publication."
+    action: "Stop and write a BLOCKED handoff with the exact filesystem case; preserve questionable staging and unrelated state."
+  - id: "F03-FIX-01-STOP-05"
+    condition: "Node 22.13 compatibility requires an internal contract import, copied/generated contract bridge, new dependency/configuration, package engine change, or API unavailable at the repository floor."
+    action: "Stop and write a BLOCKED handoff; do not change contracts, dependency metadata, configuration, or the engine floor."
+  - id: "F03-FIX-01-STOP-06"
+    condition: "The official Node 22.13.0 archive and SHASUMS256 cannot be obtained and verified under the exact temporary test-setup authority, or exact validate and build smoke evidence cannot be produced safely."
+    action: "Stop and write a BLOCKED handoff; do not claim Node 22.13 compatibility from a newer runtime, mocks, types, documentation, or unverified binary."
+  - id: "F03-FIX-01-STOP-07"
+    condition: "Any of the nine former defects remains reproducible, any of the original 16 acceptance criteria or inherited negative matrices regress, or artifact bytes/meaning, stable IDs, versions, public contracts, exact-variant behavior, or license boundaries change."
+    action: "Stop before candidate handoff and write a BLOCKED report with exact reproduction; do not weaken tests or redefine the format."
+  - id: "F03-FIX-01-STOP-08"
+    condition: "The candidate contains anything beyond the two authorized scripts, its parent is not exact, or the post-candidate commit contains anything beyond the new FIX-01 handoff."
+    action: "Stop without amending, rebasing, cleanup commits, or additional implementation commits; record the exact boundary failure if the authorized handoff remains the sole safe metadata change."
+  - id: "F03-FIX-01-STOP-09"
+    condition: "Exact candidate, handoff, metadata, or cold-review attestation would require circular SELF/self-SHA evidence or leave an immutable range endpoint unresolved."
+    action: "Stop and write a BLOCKED handoff describing the evidence gap; do not use placeholders, inferred SHAs, or circular metadata."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After candidate_commit, add and commit only docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml as the direct child without amending the candidate. The handoff cannot name its own metadata commit."
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "lineage_base_commit"
+    - "review_base_commit"
+    - "failed_candidate_commit"
+    - "failed_metadata_commit"
+    - "coordinator_parent_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "finding_resolution"
+    - "inherited_acceptance_evidence"
+    - "inherited_negative_matrix_evidence"
+    - "node_22_13_runtime_evidence"
+    - "checks"
+    - "licenses"
+    - "source_and_unrelated_mutation_audit"
+    - "known_risks"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  exact_fact_requirements:
+    - "Use review.foundation-03-fixture for the actual fixture and release review unless the immutable fixture itself says otherwise; do not repeat nonexistent review IDs."
+    - "Distinguish the output file animation-pack-manifest.json from its ZIP path manifest/animation-pack.json and record raw archive order exactly as produced."
+    - "List only implemented fault phases and semantically valid verification points; do not claim after-rename failure cleanup coverage unless such behavior is explicitly safe and tested."
+
+cold_review:
+  required: true
+  new_independent_task_required: true
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  inherits_producer_explanation: false
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: "docs/ai/reviews/FOUNDATION-03-FIX-01-cold-review.yaml"
+  exact_metadata_attestation_required: true
+  immutable_ranges:
+    complete_updated_candidate: "538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit"
+    fixer_implementation: "producer_start_commit..candidate_commit; exactly two authorized scripts"
+    handoff_metadata: "candidate_commit..metadata_commit; FIX-01 handoff only; metadata_commit recorded by cold review after it exists"
+  required_independent_actions:
+    - "Independently reproduce all nine former defects against the failed candidate and prove each no longer reproduces against the fixer candidate."
+    - "Independently rerun every original FOUNDATION-03 F03-AC-01 through F03-AC-16 requirement and the complete inherited negative matrix, not merely producer-added tests or handoff claims."
+    - "Exercise Windows realpath/identity/junction/symlink races, complete inventory and pack-source races, ownership-marker and staging-identity failures, deterministic readdir failures, structured terminal EOCD, strict GLB padding, and pre-read cumulative budgets."
+    - "Use the safe official temporary-runtime procedure to independently run exact Node 22.13.0 validate/build smokes; verify SHASUMS256, avoid install/system/repository mutation, and clean the unique temp directory."
+    - "Run focused Node tests, scoped lint, typecheck, architecture/content gates, full pnpm run verify, current CLI smokes, exact git/YAML/blob/tree/license/import assertions, and review the new handoff facts against actual bytes and hooks."
+    - "Attest the exact metadata SHA and all parent/ranges; return only PASS, FAIL, or BLOCKED, with merge_authorized true only for PASS."
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"
+  squash_policy: "Keep the coordinator FAIL review/fixer packet, fixer candidate, FIX-01 handoff metadata, and fresh cold-review commit distinct through review; merge policy is decided only after recorded PASS."

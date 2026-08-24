@@ -1,0 +1,236 @@
+schema_version: 1
+packet_id: "FOUNDATION-03"
+verdict: "FAIL"
+review_attempt: "independent_retry"
+reviewed_base_commit: "538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+reviewed_head_commit: "4f921af49cbd6efb564caaac70cb6ab0ed044be8"
+reviewed_metadata_commit: "5433a32ccd81147eb2ac0b87f6758a8774a84979"
+reviewed_candidate_range: "538eb0f701e1a31ecf17740c075f9d18c650a7e8..4f921af49cbd6efb564caaac70cb6ab0ed044be8"
+reviewed_producer_range: "7c46cfe41b641891d05ca4b1a8d483f1be8487e1..4f921af49cbd6efb564caaac70cb6ab0ed044be8"
+reviewed_metadata_range: "4f921af49cbd6efb564caaac70cb6ab0ed044be8..5433a32ccd81147eb2ac0b87f6758a8774a84979"
+reviewed_at: "2026-08-24T14:10:21+07:00"
+reviewer_model: "gpt-5.6-sol"
+model_gate_evidence: "The coordinator launched this exact independent retry cold-review process with CLI -m gpt-5.6-sol; invocation metadata is authoritative."
+
+scope:
+  changed_paths_in_scope: true
+  unexpected_paths: []
+  coordinator_packet_commit: "7c46cfe41b641891d05ca4b1a8d483f1be8487e1"
+  candidate_parent_verified: "7c46cfe41b641891d05ca4b1a8d483f1be8487e1"
+  metadata_parent_verified: "4f921af49cbd6efb564caaac70cb6ab0ed044be8"
+  metadata_only_handoff: true
+  metadata_path: "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+  metadata_head_verified: "5433a32ccd81147eb2ac0b87f6758a8774a84979"
+  worktree_clean_before_review: true
+  model_gate_satisfied: true
+  subagents_used: false
+  candidate_paths:
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "tests/fixtures/animation-pack-v1/README.md"
+    - "tests/fixtures/animation-pack-v1/valid/pack-source.json"
+    - "tests/fixtures/animation-pack-v1/valid/assets/synthetic-minimal.glb.base64"
+
+acceptance:
+  - id: "F03-AC-01"
+    result: "pass"
+    evidence: "Independent fresh builds and the focused suite reproduce the same complete three-file artifact bytes."
+  - id: "F03-AC-02"
+    result: "pass"
+    evidence: "The process, timezone, locale, source-order, creation-order, and elapsed-time determinism matrix passes."
+  - id: "F03-AC-03"
+    result: "pass"
+    evidence: "Canonical JSON ordering, UTF-8/LF policy, number guards, and byte-identical round trips pass."
+  - id: "F03-AC-04"
+    result: "fail"
+    evidence: "The raw verifier rejects a structurally valid generated ZIP when a valid GLB BIN payload contains PK 05 06 because it treats the first raw signature as EOCD."
+  - id: "F03-AC-05"
+    result: "pass"
+    evidence: "Descriptor-only manifest/archive size and SHA-256 ownership, identity, compatibility, and digest absence pass."
+  - id: "F03-AC-06"
+    result: "fail"
+    evidence: "Adding an undeclared asset after the declared asset read still returns a successful validated source and can proceed to artifact creation."
+  - id: "F03-AC-07"
+    result: "pass"
+    evidence: "The declared source, license, attribution, modification, review, and offline-redistribution negative matrix passes."
+  - id: "F03-AC-08"
+    result: "fail"
+    evidence: "A Windows junction output-parent alias bypasses lexical containment and publishes the output directory physically inside the source tree."
+  - id: "F03-AC-09"
+    result: "fail"
+    evidence: "NUL-padded GLB JSON is accepted, a valid GLB payload can trigger false EOCD rejection, and the CLI cannot load on the permitted Node 22.13.0 floor."
+  - id: "F03-AC-10"
+    result: "pass"
+    evidence: "Exact exerciseVariantId values remain distinct with no catalog lookup, case folding, redirect, or equipment fallback."
+  - id: "F03-AC-11"
+    result: "fail"
+    evidence: "Removing the ownership marker immediately before rename makes cleanup treat missing proof as ownership and recursively delete a foreign sentinel and staging directory."
+  - id: "F03-AC-12"
+    result: "pass"
+    evidence: "Direct jszip 3.10.1 resolution, selected MIT license, lock integrity, import boundary, and immutable dependency metadata pass."
+  - id: "F03-AC-13"
+    result: "pass"
+    evidence: "Only the three reviewed project-authored MIT textual fixture files are committed; the Base64 payload decodes to the documented 48-byte structural GLB."
+  - id: "F03-AC-14"
+    result: "pass"
+    evidence: "The exact candidate diff touches only six authorized paths and all protected blobs and trees remain immutable."
+  - id: "F03-AC-15"
+    result: "pass"
+    evidence: "Focused tests, scoped lint, typecheck, architecture/content gates, and full pnpm run verify all pass on the exact candidate bytes."
+  - id: "F03-AC-16"
+    result: "fail"
+    evidence: "Parentage and metadata-only scope are exact, but the handoff records nonexistent review IDs, incorrect ZIP entry names/order, and unsupported before/after rename coverage."
+
+checks:
+  - command: "pnpm install --offline --frozen-lockfile"
+    result: "pass"
+    evidence: "Reused 594 packages with zero downloads; the worktree remained clean."
+  - command: "node --test scripts/animation-pack-v1.test.mjs"
+    result: "pass"
+    evidence: "Independent retry on candidate 4f921af49cbd6efb564caaac70cb6ab0ed044be8: 23 tests passed and 0 failed."
+  - command: "node scripts/build-animation-pack-v1.mjs validate --source <fresh decoded fixture source>"
+    result: "pass"
+    evidence: "The supported current runtime returned VALID for the fresh reviewed source."
+  - command: "node scripts/build-animation-pack-v1.mjs build --source <fresh decoded fixture source> --output <fresh absent output>"
+    result: "pass"
+    evidence: "The supported current runtime produced exactly the three expected output files."
+  - command: "pnpm exec eslint scripts/animation-pack-v1.mjs scripts/build-animation-pack-v1.mjs scripts/animation-pack-v1.test.mjs --max-warnings=0"
+    result: "pass"
+    evidence: "Scoped lint exited 0 without diagnostics."
+  - command: "pnpm run typecheck"
+    result: "pass"
+    evidence: "TypeScript project checking exited 0 without diagnostics."
+  - command: "pnpm run architecture:audit"
+    result: "pass"
+    evidence: "Architecture boundaries verified."
+  - command: "pnpm run content:validate"
+    result: "pass"
+    evidence: "One content test file and 7 tests passed."
+  - command: "pnpm run content:audit"
+    result: "pass"
+    evidence: "All media, language, ingredient, recipe, redirect, source, license, pack, checksum, coverage, and placeholder gates passed."
+  - command: "pnpm run verify"
+    result: "pass"
+    evidence: "Architecture, lint, typecheck, content gates, 19 Vitest files with 358 tests, production/PWA build, and performance budgets passed."
+  - command: "Exact parent, range, name-only, git diff --check, YAML, blob, tree, and license assertions"
+    result: "pass"
+    evidence: "Candidate and metadata parentage/ranges are exact; the candidate has six authorized paths; metadata has only the handoff; pinned protected blobs/trees and MIT/jszip license evidence match."
+  - command: "Manual review against docs/code-review.md"
+    result: "pass"
+    evidence: "The checklist was completed across public boundaries, offline behavior, exact variants, personal-data/PWA isolation, deterministic failures, and licensing; the actionable defects are recorded below."
+
+independent_retry_defect_reproduction:
+  - finding: "Real output containment"
+    result: "reproduced"
+    evidence: "On Windows, a junction outside the lexical source path targeting the source root allowed build success and created built-through-alias physically inside the source."
+  - finding: "Source inventory and identity race"
+    result: "reproduced"
+    evidence: "An afterAssetRead hook added assets/undeclared.glb; validation still succeeded and returned the stale inventory result."
+  - finding: "Staging ownership cleanup"
+    result: "reproduced"
+    evidence: "A beforeRename hook removed .foundation-03-owner and wrote a foreign sentinel; the following ENOENT path recursively deleted both sentinel and staging."
+  - finding: "Node 22.13 compatibility"
+    result: "reproduced"
+    evidence: "An official Node v22.13.0 Windows x64 archive was downloaded outside the repository, matched its unique official SHASUMS256 entry, and failed the CLI at the line-20 registerHooks named import; the temporary runtime was then removed."
+  - finding: "EOCD payload signature"
+    result: "reproduced"
+    evidence: "A valid GLB with a four-byte BIN chunk containing 50 4b 05 06 passed GLB validation but buildDeterministicZip failed with zip_eocd."
+  - finding: "GLB JSON NUL padding"
+    result: "reproduced"
+    evidence: "Replacing the valid fixture JSON chunk's final space byte with NUL still passed validateGlbEnvelope."
+  - finding: "Aggregate byte budget"
+    result: "reproduced"
+    evidence: "Five 16 MiB valid glTF assets all completed afterAssetRead before total_asset_bytes_limit rejected 80 MiB against the 64 MiB aggregate limit."
+  - finding: "Handoff fact accuracy"
+    result: "reproduced"
+    evidence: "The immutable handoff lines 41-42, 72-74, and 96 disagree with pack-source.json, the raw ZIP/test evidence, and the sole beforeRename hook."
+  - finding: "Filesystem-order failure"
+    result: "reproduced"
+    evidence: "walkSource consumes unsorted readdir results and throws while iterating, so the first path-specific failure is selected by filesystem enumeration order rather than the required raw comparator."
+
+licenses:
+  result: "pass"
+  bundled_assets:
+    - "One project-authored 48-byte synthetic GLB structural payload represented as reviewed Base64 text under repository MIT terms."
+  dependency: "jszip 3.10.1 under the selected MIT option from (MIT OR GPL-3.0-or-later)."
+  findings: []
+  evidence:
+    - "LICENSE is MIT for Gym Local contributors and all three new source files carry the matching SPDX MIT header."
+    - "Fixture author, source, terms, attribution, modifications, approved review, and offline redistribution evidence are complete."
+    - "No scraped, downloaded, real exercise, production, or unclear media was committed."
+
+findings:
+  - severity: "P1"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 789
+    issue: "Lexical output containment allows a Windows junction output-parent alias into the source, and build creates its output inside the source tree."
+    reproduction_or_evidence: "A junction path outside the lexical source resolved to the source root; publication succeeded and the physical output appeared below the source."
+    required_fix: "Use realpath and filesystem-identity checks for the source, output parent, final path, and staging path, retain their identities, and recheck immediately before rename. Add Windows junction and symlink alias tests for source/output parent/final/staging paths."
+
+  - severity: "P1"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 511
+    related_line: 584
+    issue: "The source inventory is captured once, so an undeclared asset added after an asset read still succeeds."
+    reproduction_or_evidence: "afterAssetRead created an undeclared regular asset and validateAnimationPackSource returned success using the earlier inventory."
+    required_fix: "Snapshot the complete inventory plus pack-source and directory/file identities, then recheck them before artifact creation and again before publication. Test add, remove, replace, directory identity, file identity, and pack-source changes."
+
+  - severity: "P1"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 822
+    issue: "Cleanup treats a missing or unreadable ownership marker as owned and deletes foreign staging content after marker removal."
+    reproduction_or_evidence: "Removing the marker and adding a foreign sentinel at beforeRename caused ENOENT and recursive deletion of the sentinel and staging directory."
+    required_fix: "Missing, unreadable, or mismatched ownership proof must preserve staging and surface an ownership failure. Retain and verify the created directory identity, and handle deliberate marker removal immediately before rename without deleting foreign state."
+
+  - severity: "P1"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 20
+    issue: "node:module registerHooks requires Node 22.15, while repository engines permit Node >=22.13.0."
+    reproduction_or_evidence: "The checksum-verified official Node 22.13.0 CLI failed at the registerHooks named import before validate or build could start; official Node API history adds registerHooks in v22.15.0."
+    required_fix: "Replace the hook with a Node 22.13-compatible public-contract loading path using only the two authorized files, public @gym/contracts, direct dependencies, and Node built-ins. Require a real Node 22.13 validate/build CLI smoke from a verified official temporary runtime, keep candidate tests offline and deterministic, commit no runtime binary, and stop rather than claim compatibility if exact runtime evidence cannot be obtained safely."
+
+  - severity: "P2"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 633
+    issue: "A raw EOCD signature search rejects a valid GLB whose payload contains PK 05 06."
+    reproduction_or_evidence: "A valid GLB BIN payload containing the signature passed GLB validation, but ZIP generation self-verification failed with zip_eocd."
+    required_fix: "Locate and validate the structurally valid terminal EOCD instead of rejecting an arbitrary payload signature; add a valid GLB BIN-payload regression."
+
+  - severity: "P2"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 455
+    issue: "NUL-padded GLB JSON is accepted because the validator strips NUL bytes."
+    reproduction_or_evidence: "A fixture whose required JSON padding byte was changed from space to NUL still validated."
+    required_fix: "Permit only the JSON/GLB-required space padding and reject NUL; add explicit positive space-padding and negative NUL-padding probes."
+
+  - severity: "P2"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 546
+    issue: "The aggregate 64 MiB limit is enforced only after all asset bytes are loaded, allowing maximum counts to retain roughly 1 GiB."
+    reproduction_or_evidence: "All five 16 MiB assets were read and retained before 80 MiB was rejected against the 64 MiB limit."
+    required_fix: "Preflight stable asset sizes and cumulative budget, reject before reading or storing the exceeding asset, and add hooks/counters proving unread excess while retaining race-safe identity checks."
+
+  - severity: "P2"
+    path: "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+    line: 41
+    related_lines:
+      - 72
+      - 96
+    issue: "The handoff claims nonexistent review IDs, incorrect ZIP names/order, and before/after rename coverage although only beforeRename exists."
+    reproduction_or_evidence: "pack-source.json declares only review.foundation-03-fixture; the ZIP contains assets/synthetic-minimal.glb then manifest/animation-pack.json; the test phase list ends at beforeRename."
+    required_fix: "Keep the old handoff immutable as failure evidence. The FIX-01 handoff must record exact actual IDs, order, paths, and only coverage truly present; add after-rename verification only if it is safely meaningful under atomic publication semantics."
+
+  - severity: "P3"
+    path: "scripts/animation-pack-v1.mjs"
+    line: 399
+    issue: "Unsorted readdir makes the first reported source-tree failure depend on filesystem enumeration order."
+    reproduction_or_evidence: "walkSource iterates raw readdir results and throws on the first classified invalid entry without sorting or deterministic failure collection."
+    required_fix: "Sort entries with the raw comparator before processing, or deterministically collect and sort failures. Perturb creation and enumeration order and assert an identical error."
+
+residual_risks:
+  - "Authenticated descriptor distribution, release-index signing/trust, network download, runtime archive verification, storage activation/rollback/quota, and backup exclusion enforcement remain FOUNDATION-04 or later work."
+  - "GLB/glTF envelope validation does not prove clip presence, renderer compatibility, animation quality, accessibility, biomechanics, or iPhone performance."
+  - "Only synthetic MIT fixture rights are exercised; production sourcing, legal review, catalog mapping, and performance remain later release gates."
+  - "Atomic directory publication here is a build-tool boundary, not a durable storage transaction or runtime activation guarantee."
+merge_authorized: false
