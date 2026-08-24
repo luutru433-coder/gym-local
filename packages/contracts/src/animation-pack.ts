@@ -1,17 +1,6 @@
 /*
- * Copyright (c) 2026 MyCompany LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2026 Gym Local contributors
+ * SPDX-License-Identifier: MIT
  */
 
 /**
@@ -218,6 +207,9 @@ const SEMVER_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]
 const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const RFC3339_PATTERN = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?(Z|[+-]\d{2}:\d{2})$/;
 const RELATIVE_PATH_BAD_PERCENT = /%(?:2e|2f|5c)/i;
+const HTTPS_PATH_BAD_PERCENT_DELIMITER = /%(?:2f|5c)/i;
+const HTTPS_PATH_ENCODED_DOT = /%2e/i;
+const HTTPS_PATH_DOT_SEGMENT = /^(?:(?:%2e)|\.){1,2}$/i;
 const ERROR_CODE_SET = new Set<string>(ANIMATION_PACK_ERROR_CODES);
 
 function isRecord(value: unknown): value is UnknownRecord {
@@ -261,6 +253,24 @@ function hasControlCharacter(value: string): boolean {
     const code = character.charCodeAt(0);
     return code <= 0x1f || code === 0x7f;
   });
+}
+
+function hasUrlControlCharacter(value: string): boolean {
+  return [...value].some((character) => {
+    const code = character.charCodeAt(0);
+    return code <= 0x1f || (code >= 0x7f && code <= 0x9f);
+  });
+}
+
+function hasNormalizationSensitivePathEncoding(value: string): boolean {
+  const authorityEnd = value.slice("https://".length).search(/[/?#]/);
+  if (authorityEnd < 0) return false;
+  const pathStart = "https://".length + authorityEnd;
+  if (value[pathStart] !== "/") return false;
+  const pathEndOffset = value.slice(pathStart).search(/[?#]/);
+  const rawPath = pathEndOffset < 0 ? value.slice(pathStart) : value.slice(pathStart, pathStart + pathEndOffset);
+  if (HTTPS_PATH_BAD_PERCENT_DELIMITER.test(rawPath)) return true;
+  return rawPath.split("/").some((segment) => HTTPS_PATH_ENCODED_DOT.test(segment) && HTTPS_PATH_DOT_SEGMENT.test(segment));
 }
 
 function plainText(value: unknown, path: Path, context: ValidationContext): string | undefined {
@@ -369,7 +379,7 @@ function sha256(value: unknown, path: Path, context: ValidationContext): string 
 }
 
 function httpsUrl(value: unknown, path: Path, context: ValidationContext): string | undefined {
-  if (typeof value !== "string" || !value.startsWith("https://") || /[\s\\]/.test(value)) {
+  if (typeof value !== "string" || !value.startsWith("https://") || /[\s\\]/.test(value) || hasUrlControlCharacter(value) || hasNormalizationSensitivePathEncoding(value)) {
     context.issue("invalid_url", path);
     return undefined;
   }
@@ -415,7 +425,7 @@ function httpsUrl(value: unknown, path: Path, context: ValidationContext): strin
   }
   try {
     const parsed = new URL(value);
-    if (parsed.protocol !== "https:" || parsed.username !== "" || parsed.password !== "" || parsed.hostname === "") {
+    if (parsed.protocol !== "https:" || parsed.username !== "" || parsed.password !== "" || parsed.hostname === "" || parsed.href !== value) {
       context.issue("invalid_url", path);
       return undefined;
     }
@@ -999,7 +1009,8 @@ interface ParsedSemver {
   prerelease: string[];
 }
 
-function parseSemverForComparison(value: string): ParsedSemver | undefined {
+function parseSemverForComparison(value: unknown): ParsedSemver | undefined {
+  if (typeof value !== "string") return undefined;
   const match = SEMVER_PATTERN.exec(value);
   if (match === null) return undefined;
   return { major: BigInt(match[1]), minor: BigInt(match[2]), patch: BigInt(match[3]), prerelease: match[4]?.split(".") ?? [] };
@@ -1047,6 +1058,8 @@ export function validateAnimationPackCompatibility(
   }
   const current = parseSemverForComparison(currentAppVersion);
   if (current === undefined) context.issue("invalid_semver", ["currentAppVersion"]);
+  const minimum = parseSemverForComparison(descriptor.minimumAppVersion);
+  if (minimum === undefined) context.issue("invalid_semver", ["descriptor", "minimumAppVersion"]);
   const versionChecks: Array<[keyof Pick<AnimationPackReleaseDescriptor, "animationPackSchemaVersion" | "animationPlayerProtocolVersion" | "animationCatalogVersion">, number, string]> = [
     ["animationPackSchemaVersion", animationPackSchemaVersion, "incompatible_schema"],
     ["animationPlayerProtocolVersion", animationPlayerProtocolVersion, "incompatible_player_protocol"],
@@ -1064,7 +1077,6 @@ export function validateAnimationPackCompatibility(
   reviewFields.forEach((field) => {
     if (descriptor.review[field] !== manifest.review[field]) context.issue("descriptor_manifest_identity_mismatch", ["manifest", "review", field]);
   });
-  const minimum = parseSemverForComparison(descriptor.minimumAppVersion);
   if (current !== undefined && minimum !== undefined && compareSemver(current, minimum) < 0) context.issue("incompatible_minimum_app", ["currentAppVersion"]);
   return finish(context, context.issues.length === 0 ? { descriptor, manifest } : undefined);
 }

@@ -1,19 +1,10 @@
 /*
- * Copyright (c) 2026 MyCompany LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2026 Gym Local contributors
+ * SPDX-License-Identifier: MIT
  */
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   ANIMATION_PACK_ERROR_CODES,
@@ -145,6 +136,21 @@ function expectIssue<T>(result: AnimationPackValidationResult<T>, code: string, 
   expect("data" in result).toBe(false);
 }
 
+function expectDeterministicFailure(
+  parser: (value: unknown) => AnimationPackValidationResult<unknown>,
+  input: Record<string, unknown>,
+  code: string,
+  path: Array<string | number>
+): void {
+  const before = structuredClone(input);
+  let first: AnimationPackValidationResult<unknown> | undefined;
+  expect(() => { first = parser(input); }).not.toThrow();
+  expect(first).toEqual({ success: false, issues: [{ code, path }] });
+  expect(parser(input)).toEqual(first);
+  expect(JSON.parse(JSON.stringify(first))).toEqual(first);
+  expect(input).toEqual(before);
+}
+
 function setAtPath(root: Record<string, any>, path: Array<string | number>, value: unknown): void {
   let cursor: any = root;
   for (let index = 0; index < path.length - 1; index += 1) cursor = cursor[path[index]];
@@ -169,6 +175,31 @@ const request = {
 };
 
 describe("animation-pack public contract", () => {
+  it("uses the exact repository MIT header in both authorized files", () => {
+    const expectedHeader = [
+      "/*",
+      " * Copyright (c) 2026 Gym Local contributors",
+      " * SPDX-License-Identifier: MIT",
+      " */"
+    ].join("\n");
+    const forbidden = [
+      ["MyCompany", " LLC"].join(""),
+      ["Apache", " License"].join(""),
+      ["Apache", "-2.0"].join(""),
+      ["apache.org", "/licenses/LICENSE-2.0"].join("")
+    ];
+    const files = [
+      readFileSync(resolve(process.cwd(), "packages/contracts/src/animation-pack.ts"), "utf8"),
+      readFileSync(resolve(process.cwd(), "packages/contracts/src/animation-pack.test.ts"), "utf8")
+    ];
+    for (const contents of files) {
+      expect(contents.startsWith(`${expectedHeader}\n`)).toBe(true);
+      for (const placeholder of forbidden) expect(contents).not.toContain(placeholder);
+    }
+    const repositoryLicense = readFileSync(resolve(process.cwd(), "LICENSE"), "utf8");
+    expect(repositoryLicense.startsWith("MIT License\n\nCopyright (c) 2026 Gym Local contributors\n")).toBe(true);
+  });
+
   it("exports three independent literal v1 boundaries and every stable error spelling", () => {
     expect([animationPackSchemaVersion, animationPlayerProtocolVersion, animationCatalogVersion]).toEqual([1, 1, 1]);
     expect(ANIMATION_PACK_ERROR_CODES).toEqual([
@@ -582,6 +613,24 @@ describe("strict lossless regression matrix", () => {
     "http://example.test/path"
   ];
 
+  const nonCanonicalHttpsUrls = [
+    "https://example.test/path\u0000",
+    "https://example.test/%2e/license",
+    "https://example.test/%2E/license",
+    "https://example.test/%2e%2e/license",
+    "https://example.test/%2E%2E/license",
+    "https://example.test/.%2e/license",
+    "https://example.test/%2e./license",
+    "https://example.test/folder%2Flicense",
+    "https://example.test/folder%2flicense",
+    "https://example.test/folder%5Clicense",
+    "https://example.test/folder%5clicense",
+    "https://[2001:DB8::1]/",
+    "https://[2001:0db8:0:0:0:0:0:1]/",
+    "https://example.test:443/path",
+    "https://example.test"
+  ];
+
   it.each(invalidHttpsUrls)("rejects malformed source HTTPS URL %s", (sourceUrl) => {
     expectIssue(parseAnimationSourceRecord({ ...source, sourceUrl }), "invalid_url", ["sourceUrl"]);
   });
@@ -590,13 +639,30 @@ describe("strict lossless regression matrix", () => {
     expectIssue(parseAnimationLicenseRecord({ ...license, termsUrl }), "invalid_url", ["termsUrl"]);
   });
 
+  it.each(nonCanonicalHttpsUrls)("rejects noncanonical HTTPS URL %s symmetrically and losslessly", (url) => {
+    expectDeterministicFailure(parseAnimationSourceRecord, { ...source, sourceUrl: url }, "invalid_url", ["sourceUrl"]);
+    expectDeterministicFailure(parseAnimationLicenseRecord, { ...license, termsUrl: url }, "invalid_url", ["termsUrl"]);
+  });
+
   it.each([
     "https://example.test/path",
     "https://example.test:8443/path?query=value#section",
     "https://[2001:db8::1]:8443/path"
   ])("accepts documented canonical HTTPS URL %s in both source and license records", (url) => {
-    expect(parseAnimationSourceRecord({ ...source, sourceUrl: url }).success).toBe(true);
-    expect(parseAnimationLicenseRecord({ ...license, termsUrl: url }).success).toBe(true);
+    const sourceInput = { ...source, sourceUrl: url };
+    const licenseInput = { ...license, termsUrl: url };
+    const sourceBefore = structuredClone(sourceInput);
+    const licenseBefore = structuredClone(licenseInput);
+    const sourceResult = parseAnimationSourceRecord(sourceInput);
+    const licenseResult = parseAnimationLicenseRecord(licenseInput);
+    expect(sourceResult.success).toBe(true);
+    expect(licenseResult.success).toBe(true);
+    expect(parseAnimationSourceRecord(sourceInput)).toEqual(sourceResult);
+    expect(parseAnimationLicenseRecord(licenseInput)).toEqual(licenseResult);
+    expect(JSON.parse(JSON.stringify(sourceResult))).toEqual(sourceResult);
+    expect(JSON.parse(JSON.stringify(licenseResult))).toEqual(licenseResult);
+    expect(sourceInput).toEqual(sourceBefore);
+    expect(licenseInput).toEqual(licenseBefore);
   });
 });
 
@@ -623,6 +689,52 @@ describe("compatibility and exact variant identity", () => {
   it("returns plain validation failures instead of throwing on non-parsed runtime arguments", () => {
     const result = validateAnimationPackCompatibility(null as unknown as AnimationPackReleaseDescriptor, manifest(), "0.7.0");
     expectIssue(result, "invalid_type", ["descriptor"]);
+  });
+
+  it.each([
+    { label: "Symbol", value: Symbol("invalid-current-version") },
+    { label: "object", value: { version: "0.7.0" } },
+    { label: "null", value: null }
+  ])("returns deterministic invalid_semver for $label currentAppVersion without coercion", ({ value }) => {
+    const release = descriptor();
+    const pack = manifest();
+    const releaseBefore = structuredClone(release);
+    const packBefore = structuredClone(pack);
+    const valueBefore = typeof value === "object" && value !== null ? structuredClone(value) : value;
+    let first: ReturnType<typeof validateAnimationPackCompatibility> | undefined;
+    expect(() => { first = validateAnimationPackCompatibility(release, pack, value as unknown as string); }).not.toThrow();
+    expect(first).toEqual({ success: false, issues: [{ code: "invalid_semver", path: ["currentAppVersion"] }] });
+    expect(validateAnimationPackCompatibility(release, pack, value as unknown as string)).toEqual(first);
+    expect(JSON.parse(JSON.stringify(first))).toEqual(first);
+    expect(release).toEqual(releaseBefore);
+    expect(pack).toEqual(packBefore);
+    expect(value).toEqual(valueBefore);
+  });
+
+  it.each([
+    { label: "Symbol", value: Symbol("invalid-minimum-version") },
+    { label: "object", value: { version: "0.7.0" } },
+    { label: "null", value: null }
+  ])("returns deterministic invalid_semver for $label descriptor.minimumAppVersion without coercion", ({ value }) => {
+    const release = descriptor();
+    const pack = manifest();
+    (release as unknown as { minimumAppVersion: unknown }).minimumAppVersion = value;
+    const releaseBefore = { ...release, review: structuredClone(release.review) };
+    const packBefore = structuredClone(pack);
+    const valueBefore = typeof value === "object" && value !== null ? structuredClone(value) : value;
+    let first: ReturnType<typeof validateAnimationPackCompatibility> | undefined;
+    expect(() => { first = validateAnimationPackCompatibility(release, pack, "9.0.0"); }).not.toThrow();
+    if (first === undefined) throw new Error("Compatibility validator did not return a result");
+    expectIssue(first, "invalid_semver", ["descriptor", "minimumAppVersion"]);
+    if (first.success) throw new Error("Expected validation failure");
+    expect(first.issues.filter((issue) => issue.code === "invalid_semver")).toEqual([
+      { code: "invalid_semver", path: ["descriptor", "minimumAppVersion"] }
+    ]);
+    expect(validateAnimationPackCompatibility(release, pack, "9.0.0")).toEqual(first);
+    expect(JSON.parse(JSON.stringify(first))).toEqual(first);
+    expect(release).toEqual(releaseBefore);
+    expect(pack).toEqual(packBefore);
+    expect(value).toEqual(valueBefore);
   });
 
   it.each([
