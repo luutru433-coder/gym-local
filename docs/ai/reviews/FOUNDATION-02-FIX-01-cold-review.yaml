@@ -1,0 +1,184 @@
+schema_version: 1
+packet_id: "FOUNDATION-02-FIX-01"
+verdict: "FAIL"
+reviewed_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+reviewed_head_commit: "3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+reviewed_metadata_commit: "9177484dbf67aec669747be8e0ea49e34173c6a4"
+reviewed_candidate_range: "f20bf05d3f640b94e7df178a4303d0105134c492..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+reviewed_fixer_range: "db3c0b8f28936525572b0dd5de316679a2131544..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+reviewed_metadata_range: "3f4f7fd7fa5f142f13c01bfba24dc0fb577df924..9177484dbf67aec669747be8e0ea49e34173c6a4"
+reviewed_at: "2026-08-24T11:52:13+07:00"
+reviewer_model: "gpt-5.6-sol"
+model_gate_evidence: "The coordinator launched this exact cold-review process with CLI model argument -m gpt-5.6-sol; invocation metadata is authoritative."
+
+scope:
+  changed_paths_in_scope: true
+  unexpected_paths: []
+  fixer_candidate_paths:
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/animation-pack.ts"
+  metadata_only_handoff: true
+  metadata_path: "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+  candidate_parent_verified: "db3c0b8f28936525572b0dd5de316679a2131544"
+  metadata_parent_verified: "3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+  historical_failed_handoff_blob_verified: "69f7760c0099ee7f8df4105eb9b03014c77777d2"
+  model_gate_satisfied: true
+  subagents_used: false
+
+prior_finding_reverification:
+  - finding: "Sparse array holes were accepted, lossy, or throwing."
+    result: "pass"
+    evidence: "Leading, interior, and trailing holes across every parser-owned array return deterministic missing_array_element issues, never throw, and remain JSON-lossless."
+  - finding: "All-or-nothing array parsing created false references and suppressed safe diagnostics."
+    result: "pass"
+    evidence: "Malformed declarations retain safe identities without false missing-reference issues, while independent missing relations are still reported."
+  - finding: "The bound release review could disagree with its declared review record."
+    result: "pass"
+    evidence: "Review binding now requires a unique record and exact id, reviewer, reviewedAt, and status equality, including compatibility-path probes."
+  - finding: "Accepted negative zero was not JSON-lossless."
+    result: "pass"
+    evidence: "Every zero-permitting animation-pack numeric field rejects negative zero and retains positive-zero controls."
+  - finding: "Valid Gregorian years 0001 through 0099 were rejected."
+    result: "pass"
+    evidence: "Date and timestamp probes pass for valid years 0001, 0004, and 0099 and reject the required leap, impossible-date, time, and year-zero boundaries."
+  - finding: "The governing handoff contract required circular metadata evidence."
+    result: "pass"
+    evidence: "The governing packet is non-circular, the handoff has no SELF or self-SHA field, and this review attests the exact metadata SHA and range after it exists."
+  - finding: "Malformed HTTPS authorities, hosts, and ports were accepted."
+    result: "pass"
+    evidence: "The earlier malformed bracket, authority, credential, DNS-host, empty or malformed port, out-of-range port, and scheme regression matrix passes for source and license records."
+
+acceptance:
+  - id: "F02-FIX-AC-01"
+    result: "pass"
+    evidence:
+      - "All required sparse-hole locations return exact deterministic issues without throw, mutation, partial success, or JSON loss."
+  - id: "F02-FIX-AC-02"
+    result: "pass"
+    evidence:
+      - "Safe identity retention and independent relation diagnostics pass for review, license, source, asset, and entry relations."
+  - id: "F02-FIX-AC-03"
+    result: "pass"
+    evidence:
+      - "Exact bound-review equality, mismatch, missing-resolution, duplicate-binding, and defensive compatibility probes pass."
+  - id: "F02-FIX-AC-04"
+    result: "pass"
+    evidence:
+      - "Negative-zero rejection and positive-zero JSON-lossless controls pass across the audited numeric inventory."
+  - id: "F02-FIX-AC-05"
+    result: "pass"
+    evidence:
+      - "Explicit Gregorian date and RFC 3339 boundary probes pass, including years 0001, 0004, and 0099."
+  - id: "F02-FIX-AC-06"
+    result: "fail"
+    evidence:
+      - "The earlier malformed HTTPS matrix passes, but canonical HTTPS validation still accepts a literal U+0000 suffix, URL-normalized encoded dot traversal, and uppercase/noncanonical IPv6."
+  - id: "F02-FIX-AC-07"
+    result: "pass"
+    evidence:
+      - "The governing packet and handoff are non-circular; exact candidate parent, candidate ranges, metadata SHA, metadata range, and historical failed-handoff blob are independently verified."
+  - id: "F02-FIX-AC-08"
+    result: "fail"
+    evidence:
+      - "All prior FOUNDATION-02 tests and seven prior probes pass, but compatibility can throw TypeError for Symbol-valued comparison inputs, violating the untrusted-input no-throw contract."
+  - id: "F02-FIX-AC-09"
+    result: "pass"
+    evidence:
+      - "The fixer candidate and following metadata commit contain only their authorized paths with exact verified parentage."
+
+checks:
+  - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    result: "pass"
+    evidence: "Independent run at candidate 3f4f7fd7fa5f142f13c01bfba24dc0fb577df924: 1 focused test file and 187 tests passed."
+  - command: "pnpm exec eslint packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts --max-warnings=0"
+    result: "pass"
+    evidence: "Independent scoped lint exited 0 without warnings or errors."
+  - command: "pnpm run typecheck"
+    result: "pass"
+    evidence: "Independent typecheck exited 0 without diagnostics."
+  - command: "pnpm run verify"
+    result: "pass"
+    evidence: "Independent full verification passed architecture, lint, typecheck, content checks, 19 test files with 336 tests, production build, PWA generation, and performance budgets."
+  - command: "git diff --check f20bf05d3f640b94e7df178a4303d0105134c492..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+    result: "pass"
+    evidence: "Exit 0 with no whitespace errors."
+  - command: "git diff --name-only db3c0b8f28936525572b0dd5de316679a2131544..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+    result: "pass"
+    evidence: "Only docs/ai/packets/FOUNDATION-02.yaml and the two animation-pack contract files changed."
+  - command: "git rev-parse 3f4f7fd7fa5f142f13c01bfba24dc0fb577df924^"
+    result: "pass"
+    evidence: "Returned exact candidate parent db3c0b8f28936525572b0dd5de316679a2131544."
+  - command: "git rev-parse 9177484dbf67aec669747be8e0ea49e34173c6a4^"
+    result: "pass"
+    evidence: "Returned exact metadata parent 3f4f7fd7fa5f142f13c01bfba24dc0fb577df924."
+  - command: "git diff --name-only 3f4f7fd7fa5f142f13c01bfba24dc0fb577df924..9177484dbf67aec669747be8e0ea49e34173c6a4"
+    result: "pass"
+    evidence: "Only docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml changed after the candidate."
+  - command: "Parse and assert FOUNDATION-02, FOUNDATION-02-FIX-01, both prior cold-review/handoff records, and immutable SHA/range fields with bundled Node and repository js-yaml"
+    result: "pass"
+    evidence: "All reviewed YAML parses; packet identities, exact lineage, required fields, non-circular metadata rules, and absence of SELF evidence are valid."
+  - command: "git hash-object docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+    result: "pass"
+    evidence: "The immutable historical failed handoff remains blob 69f7760c0099ee7f8df4105eb9b03014c77777d2."
+  - command: "manual review against docs/code-review.md and LICENSE"
+    result: "fail"
+    evidence: "Module scope, exact-variant isolation, offline/product boundaries, and absence of bundled media pass; the two changed contract files carry Apache/MyCompany placeholder headers that contradict the repository MIT/Gym Local license."
+  - command: "independent prior and new malformed-input probes"
+    result: "fail"
+    evidence: "All seven earlier defects are resolved, but the three bounded findings below were independently reproduced."
+
+licenses:
+  result: "fail"
+  bundled_assets: []
+  evidence:
+    - "No media, model, archive, fixture, image, generated binary, or third-party content was added."
+    - "The repository LICENSE is MIT and names Gym Local contributors."
+  findings:
+    - "packages/contracts/src/animation-pack.ts and packages/contracts/src/animation-pack.test.ts say MyCompany LLC and Apache-2.0, while the repository has no Apache notice."
+
+findings:
+  - severity: "P1"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 371
+    issue: "Canonical HTTPS validation accepts normalization-sensitive or noncanonical URL spellings."
+    reproduction_or_evidence: >-
+      Both sourceUrl and termsUrl accept a URL containing a literal U+0000 after the path,
+      accept /%2e%2e/license even though URL parsing normalizes it to /license, and accept
+      uppercase/noncanonical IPv6 such as [2001:DB8::1] even though serialization lowercases it.
+    required_fix: >-
+      Reject literal control characters and require exact canonical URL serialization without
+      normalization-sensitive encoded delimiters or dot segments. Add the complete bypass
+      regression matrix to both source and license record parsers while preserving the existing
+      strict HTTPS meaning.
+
+  - severity: "P2"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 1002
+    issue: "Compatibility validation can throw TypeError while parsing untrusted SemVer comparison values."
+    reproduction_or_evidence: >-
+      validateAnimationPackCompatibility throws for currentAppVersion = Symbol("x") and for a
+      Symbol-valued descriptor.minimumAppVersion instead of returning plain deterministic issues.
+    required_fix: >-
+      Parse every comparison input from unknown, return deterministic invalid_semver issues at
+      the runtime or descriptor field path, and never throw. Add Symbol, object, and null matrices
+      for currentAppVersion and descriptor.minimumAppVersion.
+
+  - severity: "P2"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 2
+    related_path: "packages/contracts/src/animation-pack.test.ts"
+    related_line: 2
+    issue: "Placeholder Apache/MyCompany source headers contradict the repository license."
+    reproduction_or_evidence: >-
+      Both files identify MyCompany LLC and Apache-2.0, while LICENSE is MIT for Gym Local
+      contributors and the repository contains no Apache notice.
+    required_fix: >-
+      Replace both headers with the repository-standard Gym Local contributors and
+      SPDX-License-Identifier: MIT header. Assert that MyCompany LLC and the Apache contradiction
+      are absent from both files.
+
+residual_risks:
+  - "Archive I/O, hashing, authenticated descriptor delivery, storage activation/rollback, rendering, and real asset license review remain deferred exactly as in FOUNDATION-02."
+  - "The next fixer must not redefine accepted canonical HTTPS meaning beyond strict rejection of the reproduced bypasses, normalization-sensitive spellings, and literal controls."
+merge_authorized: false

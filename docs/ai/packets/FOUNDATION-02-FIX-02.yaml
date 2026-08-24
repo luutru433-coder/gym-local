@@ -1,0 +1,358 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-02-FIX-02"
+  title: "Close canonical URL, compatibility no-throw, and license-header gaps"
+  type: "review-fix"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  lineage_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+  review_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+  failed_fixer_candidate_commit: "3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+  failed_fixer_metadata_commit: "9177484dbf67aec669747be8e0ea49e34173c6a4"
+  target_branch: "codex/foundation-02-fix-02"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-02-FIX-01"
+  producer_start_rule:
+    start_commit: "Start from the new coordinator commit that adds only docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml and docs/ai/packets/FOUNDATION-02-FIX-02.yaml on top of 9177484dbf67aec669747be8e0ea49e34173c6a4."
+    required_parent: "The producer start commit's first parent must be exactly 9177484dbf67aec669747be8e0ea49e34173c6a4."
+    required_coordinator_delta:
+      - "git diff --name-only 9177484dbf67aec669747be8e0ea49e34173c6a4..HEAD must print exactly docs/ai/packets/FOUNDATION-02-FIX-02.yaml and docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml before producer edits."
+      - "The producer must not amend, regenerate, or edit either coordinator artifact."
+    single_candidate_commit_rule: "The implementation candidate is one new commit whose first parent is the producer start commit."
+    review_range_rule: "The complete updated candidate range remains f20bf05d3f640b94e7df178a4303d0105134c492..fixer_candidate_commit; the finding-scoped FIX-02 producer delta is producer_start_commit..fixer_candidate_commit."
+
+authority:
+  allowed_paths:
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+  candidate_implementation_paths:
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+  coordinator_owned_paths:
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-02.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-01.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-02.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-cold-review.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml"
+    - "packages/contracts/src/index.ts"
+    - "LICENSE"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "packages/*/package.json"
+    - "tsconfig*.json"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "apps/**"
+    - "packages/storage/**"
+    - "packages/media/**"
+    - "packages/backup/**"
+    - "packages/catalog/**"
+    - "packages/workouts/**"
+    - "packages/nutrition/**"
+    - "packages/progress/**"
+    - "packages/ui/**"
+    - "content/**"
+    - "public/**"
+    - "outputs/**"
+    - "scripts/**"
+    - "tests/**"
+    - "docs/** except docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  generated_binary_assets_allowed: false
+  storage_media_app_catalog_backup_content_builder_asset_changes_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/code-review.md"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-01.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-02.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-cold-review.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "packages/contracts/package.json"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/index.ts"
+    - "LICENSE"
+    - "package.json"
+  assumptions:
+    - "The exact failed FIX-01 candidate and metadata commits are immutable review evidence and remain unchanged."
+    - "The public contract surface, stable IDs, stable issue/error spellings, version literals, and existing accepted canonical contract meaning remain unchanged."
+    - "The fix remains dependency-free, pure validation with no storage, network, crypto, clock, locale, random, or normalization side effects."
+  review_findings:
+    - "P1 animation-pack.ts around line 371: canonical HTTPS accepts literal controls, normalized encoded dot traversal, and noncanonical uppercase IPv6."
+    - "P2 animation-pack.ts around line 1002: compatibility SemVer comparison throws TypeError for Symbol runtime and descriptor values."
+    - "P2 animation-pack.ts and animation-pack.test.ts line 2: Apache/MyCompany placeholder headers contradict the repository MIT/Gym Local license."
+
+outcome:
+  objective: "Resolve exactly the three FOUNDATION-02-FIX-01 cold-review findings by making HTTPS inputs literally canonical, compatibility comparison total over untrusted runtime values, and both touched-file headers license-correct."
+  user_visible_result: "None yet; later animation-pack packets receive a strict, non-throwing, repository-licensed @gym/contracts v1 boundary."
+  deliverables:
+    - "A bounded canonical HTTPS validation correction in packages/contracts/src/animation-pack.ts."
+    - "A bounded unknown-input SemVer comparison correction in packages/contracts/src/animation-pack.ts."
+    - "Source and license URL, compatibility no-throw, and exact header regression coverage in packages/contracts/src/animation-pack.test.ts."
+    - "One candidate commit containing only the two contract files, followed by a separate metadata-only docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml commit."
+  non_goals:
+    - "No new public contract, export, stable ID, issue/error spelling, field, accepted URL capability, version, dependency, package, lockfile, or configuration change."
+    - "No edit to index.ts, LICENSE, coordinator artifacts, governing or earlier packets, historical reviews/handoffs, or any other module."
+    - "No storage, media, app, catalog, backup, content, builder, fixture, archive, asset, PWA, hashing, authentication, renderer, or real-network work."
+    - "No URL ownership, availability, trust, redistribution-right, or online reachability check."
+    - "No unrelated cleanup, reformatting, or validator redesign beyond the three findings."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "branch_and_start_commit"
+    - "start_commit_parent_is_exact_failed_metadata_commit"
+    - "exact_two_file_coordinator_delta"
+    - "lineage_base_failed_candidate_and_failed_metadata_ancestry"
+    - "dirty_files"
+    - "allowed_candidate_and_metadata_paths"
+    - "applicable_stop_gates"
+    - "known_invariant_contract_or_license_conflicts"
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_coordinator_start_commit: true
+    coordinator_start_parent_is_exact_failed_metadata_commit: true
+    only_coordinator_delta_is_new_cold_review_and_fixer_packet: true
+    lineage_and_failed_commits_resolve: true
+    instructions_read: true
+    required_inputs_present: true
+    model_is_gpt_5_6_sol: true
+    subagents_unused: true
+
+decisions:
+  contract_or_schema_change: "runtime_change"
+  version_decisions:
+    - "Keep animationPackSchemaVersion, animationPlayerProtocolVersion, and animationCatalogVersion at literal 1."
+    - "Do not change app, database, backup, catalog, nutrition, workout, package, or any other version."
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "metadata_only"
+
+implementation_requirements:
+  canonical_https:
+    - "Treat sourceUrl and termsUrl as untrusted unknown input and continue to accept only absolute HTTPS URLs under the existing canonical v1 policy."
+    - "Reject every literal control character before URL parsing or serialization checks; the regression must include a literal U+0000 appended after an otherwise valid path."
+    - "Require the platform parser's exact canonical serialized URL to equal the supplied string byte-for-byte; do not accept a spelling that the URL parser changes, removes, inserts, case-normalizes, or resolves."
+    - "Reject normalization-sensitive percent-encoded path delimiters and dot segments, case-insensitively, before they can be resolved or interpreted differently downstream; /%2e%2e/license must fail rather than normalize to /license."
+    - "Reject uppercase or otherwise noncanonical bracketed IPv6 spellings such as https://[2001:DB8::1]/ even when URL parsing would lowercase or compress them."
+    - "Apply one shared policy to source and license records and retain deterministic invalid_url codes and exact field paths."
+    - "Preserve the already documented accepted lowercase DNS, non-default decimal port, query/fragment, and canonical lowercase bracketed IPv6 controls when their input already equals canonical serialization."
+  compatibility_no_throw:
+    - "Parse currentAppVersion and every minimumAppVersion used for comparison from unknown rather than assuming a JavaScript string at runtime."
+    - "For Symbol, object, or null currentAppVersion, return a deterministic invalid_semver issue at [currentAppVersion] and never throw."
+    - "For Symbol, object, or null descriptor.minimumAppVersion, return a deterministic invalid_semver issue at [descriptor, minimumAppVersion] and never throw."
+    - "Do not stringify, coerce, trim, case-fold, or otherwise convert invalid comparison inputs."
+    - "Preserve strict SemVer 2.0 precedence, arbitrarily large numeric components, existing descriptor/manifest identity diagnostics, deterministic issue order, plain-data JSON-lossless results, and valid-input success."
+  license_headers:
+    - "Replace the first comment block in both authorized files with the repository-standard four-line block naming Copyright (c) 2026 Gym Local contributors and SPDX-License-Identifier: MIT."
+    - "Remove every MyCompany LLC, Apache License, Apache-2.0, and apache.org/licenses/LICENSE-2.0 reference from both authorized files."
+    - "Do not edit LICENSE; the header correction must align to its existing MIT/Gym Local contributors text."
+
+prior_seven_defect_probes:
+  - "Sparse array holes at leading, interior, and trailing positions across all parser-owned arrays: exact issues, no throw, no mutation, deterministic and JSON-lossless results."
+  - "Malformed declarations retain safe identities without false missing-reference issues while independent missing review/license/source/asset relations remain detectable."
+  - "Manifest bound review uniquely resolves and equals the declared record across id, reviewer, reviewedAt, and status, including compatibility bypass probes."
+  - "Negative zero fails across every zero-permitting numeric field while positive-zero controls remain JSON-lossless."
+  - "Dates and RFC 3339 timestamps accept valid years 0001, 0004, and 0099 and reject leap, impossible-date, time, and year-zero boundaries."
+  - "The governing packet/handoff contract remains non-circular, the historical failed handoff remains unchanged, and exact metadata SHA attestation remains assigned to the later cold review."
+  - "The earlier malformed HTTPS bracket, authority, credential, hostname, empty/malformed/out-of-range port, and scheme matrix continues to fail for both source and license records while canonical controls pass."
+
+acceptance_tests:
+  - id: "F02-FIX-02-AC-01"
+    requirement: "Both sourceUrl and termsUrl reject literal controls, normalization-sensitive encoded delimiters or dot segments, and any URL whose exact canonical serialization differs from its input."
+    evidence: "Source-plus-license table tests include a literal U+0000 suffix, /%2e%2e/license and case variants, encoded delimiter cases, uppercase/noncanonical IPv6, and exact invalid_url paths with no throw."
+  - id: "F02-FIX-02-AC-02"
+    requirement: "The HTTPS correction preserves the existing accepted canonical contract and does not add normalization, coercion, network access, or a broader URL capability."
+    evidence: "Positive source-plus-license controls cover lowercase DNS, a non-default canonical port, query/fragment, and canonical lowercase IPv6; repeated results are deterministic and input remains unchanged."
+  - id: "F02-FIX-02-AC-03"
+    requirement: "validateAnimationPackCompatibility returns deterministic plain invalid_semver results and never throws for Symbol, object, and null currentAppVersion values."
+    evidence: "Unknown runtime-value matrix asserts no throw, exact [currentAppVersion] path, stable repeated equality, JSON round trip, and no input mutation."
+  - id: "F02-FIX-02-AC-04"
+    requirement: "validateAnimationPackCompatibility returns deterministic plain invalid_semver results and never throws for Symbol, object, and null descriptor.minimumAppVersion values."
+    evidence: "Descriptor-value matrix asserts no throw, exact [descriptor, minimumAppVersion] path, stable repeated equality, JSON round trip, and no descriptor mutation."
+  - id: "F02-FIX-02-AC-05"
+    requirement: "Valid compatibility behavior remains strict SemVer 2.0, lossless for arbitrarily large components, fail-closed for unsupported versions, and exact for descriptor/manifest identity."
+    evidence: "Existing valid, prerelease, large-number, incompatibility, mismatch, and exact-variant tests remain byte-for-byte meaningful and pass."
+  - id: "F02-FIX-02-AC-06"
+    requirement: "Both authorized files carry the exact repository-standard Gym Local contributors / SPDX MIT header and contain no MyCompany or Apache contradiction."
+    evidence: "Header text assertions inspect both file prefixes, repository LICENSE, and absence of MyCompany LLC, Apache License, Apache-2.0, and apache.org license text."
+  - id: "F02-FIX-02-AC-07"
+    requirement: "All seven findings from the earlier FOUNDATION-02 cold review remain resolved under their full prior probe matrices."
+    evidence: "The focused suite and explicit prior-seven cold-review probes all pass with deterministic, no-throw, no-mutation, JSON-lossless results."
+  - id: "F02-FIX-02-AC-08"
+    requirement: "All earlier FOUNDATION-02 and FOUNDATION-02-FIX-01 positive and negative behavior remains passing with no public export, stable code, version, cross-variant, or contract-meaning change."
+    evidence: "Focused tests, scoped lint, typecheck, full pnpm run verify, index/public-boundary inspection, and exact candidate diff."
+  - id: "F02-FIX-02-AC-09"
+    requirement: "The candidate commit has the coordinator start commit as its exact parent and changes only animation-pack.ts and animation-pack.test.ts."
+    evidence: "Exact git parent, name-only, stat, and diff-check assertions recorded in the handoff."
+  - id: "F02-FIX-02-AC-10"
+    requirement: "A separate direct-child metadata commit changes only FOUNDATION-02-FIX-02-handoff.yaml, which remains non-circular; the later independent cold review attests its exact SHA and range."
+    evidence: "Candidate-to-metadata parent/name-only checks, parsed handoff with no self-SHA field, and later cold-review exact metadata attestation."
+
+required_regression_tests:
+  - "Source and license URL matrices both cover literal U+0000 after a valid path, /%2e%2e/license with percent-encoding case variants, normalization-sensitive encoded path delimiters, uppercase IPv6, and any other spelling the implementation specifically guards."
+  - "URL failure results assert invalid_url at sourceUrl or termsUrl, no throw, deterministic repeat equality, JSON round-trip equality, and no mutation."
+  - "Canonical URL success controls remain accepted only when the parser's serialized href equals the input exactly."
+  - "Compatibility matrices cover Symbol, object, and null independently for currentAppVersion and descriptor.minimumAppVersion with exact invalid_semver paths, deterministic issue order, no throw, JSON round trip, and no mutation."
+  - "Existing strict SemVer, prerelease precedence, arbitrarily large component, future-version, identity mismatch, review binding, and exact-variant probes continue to pass."
+  - "All prior seven-defect regression matrices run again, not merely the three new tests."
+  - "Both file prefixes match the exact repository-standard MIT SPDX header and forbidden placeholder/Apache strings are absent."
+
+required_checks:
+  commands:
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    - "pnpm exec eslint packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run verify"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "git rev-parse producer_start_commit^ must equal 9177484dbf67aec669747be8e0ea49e34173c6a4"
+    - "git diff --name-only 9177484dbf67aec669747be8e0ea49e34173c6a4..producer_start_commit must print only docs/ai/packets/FOUNDATION-02-FIX-02.yaml and docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml"
+    - "git rev-parse candidate_commit^ must equal producer_start_commit"
+    - "git diff --name-only producer_start_commit..candidate_commit must print only packages/contracts/src/animation-pack.test.ts and packages/contracts/src/animation-pack.ts"
+    - "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit must match the inherited complete review lineage plus only the authorized FIX-02 candidate paths"
+    - "After the metadata commit exists, git rev-parse metadata_commit^ must equal candidate_commit"
+    - "After the metadata commit exists, git diff --name-only candidate_commit..metadata_commit must print only docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+    - "Parse FOUNDATION-02, FOUNDATION-02-FIX-01, FOUNDATION-02-FIX-02, both prior cold reviews, FIX-01 handoff, and FIX-02 handoff with bundled Node and repository js-yaml; assert packet IDs, exact immutable SHAs/ranges, required keys, and absence of SELF/self-SHA evidence"
+    - "Assert LICENSE is MIT for Gym Local contributors; assert both authorized file prefixes equal the repository-standard Gym Local contributors / SPDX-License-Identifier: MIT block; assert both files contain no MyCompany LLC or Apache license text"
+    - "git hash-object docs/ai/reviews/FOUNDATION-02-handoff.yaml must remain 69f7760c0099ee7f8df4105eb9b03014c77777d2"
+  timing:
+    - "Run focused tests, scoped lint, and typecheck during implementation and again on the final candidate bytes."
+    - "Create one candidate commit containing only animation-pack.ts and animation-pack.test.ts before creating the handoff."
+    - "Run pnpm run verify and all candidate diff, parent, YAML, historical-blob, and license assertions against the exact candidate commit."
+    - "Write and commit only docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml in a separate direct-child metadata commit; do not amend the candidate."
+    - "Launch a new independent gpt-5.6-sol cold review after the exact metadata commit exists."
+  manual_reviews:
+    - "Review against docs/code-review.md, emphasizing untrusted-input no-throw behavior, deterministic JSON-lossless issues, exact variant isolation, offline purity, and repository license consistency."
+    - "Trace canonical URL validation before and after the platform parser: literal controls, authority, host/IPv6 spelling, ports, path dot segments, percent-encoded structural bytes, and exact href equality."
+    - "Inventory every runtime value sent to SemVer comparison and prove each is type-checked from unknown before regex, BigInt, or comparison operations."
+    - "Confirm source/license invalid matrices are symmetric and positive canonical cases preserve existing meaning."
+    - "Independently re-run every prior seven-defect probe plus the three new finding probes."
+    - "Confirm index.ts, public exports, stable errors/issues, version literals, dependencies, configurations, LICENSE, coordinator artifacts, governing packet, historical evidence, and every forbidden module/path remain unchanged."
+    - "Verify the handoff remains non-circular and reserves exact metadata SHA/range attestation for the later independent cold review."
+  evidence_paths:
+    - "docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-02-cold-review.yaml"
+
+stop_gates:
+  - id: "F02-FIX-02-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or the producer cannot verify the mandated invocation metadata."
+    action: "Stop without substitution and write a BLOCKED FIX-02 handoff at the authorized handoff path."
+  - id: "F02-FIX-02-STOP-02"
+    condition: "The target branch, clean state, producer start HEAD, exact parent 9177484dbf67aec669747be8e0ea49e34173c6a4, ancestry, or exact two-file coordinator delta does not match execution.producer_start_rule."
+    action: "Stop before implementation and write a BLOCKED handoff with exact branch, HEAD, parent, status, ancestry, and unexpected paths; do not clean, rebase, or amend."
+  - id: "F02-FIX-02-STOP-03"
+    condition: "Any dependency, package, lockfile, configuration, LICENSE, index.ts, documentation other than the new handoff, or other path outside authority.allowed_paths must change."
+    action: "Stop without widening scope and write a BLOCKED handoff naming the required change."
+  - id: "F02-FIX-02-STOP-04"
+    condition: "Correctness requires storage, network lookup, media, app, catalog, backup, content, builder, fixture, archive, asset, PWA, hashing, authentication, renderer, or another owning module."
+    action: "Stop and write a BLOCKED handoff; defer the change to its owning packet."
+  - id: "F02-FIX-02-STOP-05"
+    condition: "A URL fix would normalize an input into acceptance, add a new accepted URL form, redefine the existing canonical HTTPS contract, or require an ambiguous policy beyond strict control/serialization/encoded-structure rejection."
+    action: "Stop and write a BLOCKED handoff describing the ambiguity; do not widen or reinterpret the contract."
+  - id: "F02-FIX-02-STOP-06"
+    condition: "Compatibility cannot handle the specified unknown comparison values without coercion, thrown exceptions, nondeterministic issue order, a public surface change, or weakening strict SemVer."
+    action: "Stop and write a BLOCKED handoff with the exact unsafe runtime case; do not coerce or weaken validation."
+  - id: "F02-FIX-02-STOP-07"
+    condition: "The exact repository-standard MIT header cannot be applied to both authorized files without changing LICENSE or introducing a conflicting notice."
+    action: "Stop and write a BLOCKED handoff with the conflicting policy evidence; do not invent or alter license terms."
+  - id: "F02-FIX-02-STOP-08"
+    condition: "Any prior seven-defect probe regresses, any new finding probe remains reproducible, or a stable ID/error/issue/version/public export/exact-variant invariant would change."
+    action: "Stop and write a BLOCKED handoff; do not weaken prior behavior or widen scope to make checks pass."
+  - id: "F02-FIX-02-STOP-09"
+    condition: "The candidate contains anything beyond the two contract files, candidate parentage is not exact, or the post-candidate commit contains anything beyond the new FIX-02 handoff."
+    action: "Stop without amending, cleanup, or additional commits and write a BLOCKED handoff if the authorized report remains the sole safe metadata change."
+  - id: "F02-FIX-02-STOP-10"
+    condition: "A non-circular candidate, handoff, metadata, or later cold-review attestation boundary would require the handoff to contain its own commit SHA or would leave an immutable endpoint unresolved."
+    action: "Stop and write a BLOCKED handoff describing the evidence gap; do not use SELF, placeholders, or inferred commit identity."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After candidate_commit, only docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml may change, and it must be committed separately as the direct child of candidate_commit without amending the candidate. The handoff does not and cannot name its own metadata commit."
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "lineage_base_commit"
+    - "review_base_commit"
+    - "failed_fixer_candidate_commit"
+    - "failed_fixer_metadata_commit"
+    - "coordinator_packet_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "finding_resolution"
+    - "prior_seven_probe_evidence"
+    - "acceptance_evidence"
+    - "checks"
+    - "licenses"
+    - "known_risks"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+  required_review_target:
+    inherited_failed_candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..3f4f7fd7fa5f142f13c01bfba24dc0fb577df924"
+    inherited_failed_metadata: "3f4f7fd7fa5f142f13c01bfba24dc0fb577df924..9177484dbf67aec669747be8e0ea49e34173c6a4; docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml only"
+    coordinator_delta: "9177484dbf67aec669747be8e0ea49e34173c6a4..producer_start_commit; exactly the new FIX-01 cold review and FIX-02 packet"
+    complete_updated_candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    fixer_delta: "producer_start_commit..candidate_commit; exactly packages/contracts/src/animation-pack.ts and packages/contracts/src/animation-pack.test.ts"
+    candidate_parent: "candidate_parent_commit must equal producer_start_commit and candidate_commit^ as exact 40-character SHAs."
+    handoff_metadata_rule: "The later independent cold review records exact candidate_commit..metadata_commit after metadata_commit exists; metadata_commit^ must equal candidate_commit and the range must contain only docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml."
+
+cold_review:
+  required: true
+  new_independent_task_required: true
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  inherits_producer_explanation: false
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: "docs/ai/reviews/FOUNDATION-02-FIX-02-cold-review.yaml"
+  exact_metadata_attestation_required: true
+  immutable_ranges:
+    complete_updated_candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    fixer_implementation: "producer_start_commit..candidate_commit; two contract files only"
+    handoff_metadata: "candidate_commit..metadata_commit; FIX-02 handoff only; metadata_commit recorded by the cold review after it exists"
+  required_focus:
+    - "Independently reproduce and re-run all seven findings from FOUNDATION-02-cold-review.yaml, not merely rely on producer tests or handoff claims."
+    - "Independently reproduce the three FOUNDATION-02-FIX-01 findings: canonical HTTPS bypasses in both URL fields, Symbol/object/null compatibility values, and exact MIT/Gym Local header assertions."
+    - "Re-run focused tests, scoped lint, typecheck, full pnpm run verify, YAML assertions, git diff/parent/range checks, historical blob check, and license/header assertions at immutable exact commits."
+    - "Review literal-control rejection, exact URL serialization equality, encoded delimiter/dot-segment handling, canonical IPv6, deterministic invalid_semver issue paths, and comparison no-throw behavior."
+    - "Confirm the prior seven fixes remain intact, accepted canonical contract meaning did not widen or change, and no public export, stable code, version, cross-variant, dependency, config, LICENSE, or other-module change exists."
+    - "Confirm the coordinator delta has exactly two artifacts, candidate exactly two contract files, and direct-child metadata commit exactly the FIX-02 handoff."
+    - "Record the exact metadata commit and candidate-to-metadata range in the cold-review report; do not infer it from chat or require the handoff to self-identify."
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"
+  squash_policy: "Keep coordinator cold-review/fixer packet, FIX-02 candidate, FIX-02 handoff, and new cold-review commits distinct through review; merge policy is decided only after a recorded PASS."
