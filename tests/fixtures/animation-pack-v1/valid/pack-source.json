@@ -1,0 +1,80 @@
+{
+  "packId": "gym-local.animations-foundation-fixture",
+  "version": "1.0.0",
+  "animationPackSchemaVersion": 1,
+  "animationPlayerProtocolVersion": 1,
+  "animationCatalogVersion": 1,
+  "minimumAppVersion": "0.7.0",
+  "releaseDate": "2026-08-24",
+  "createdAt": "2026-08-24",
+  "releaseReviewId": "review.foundation-03-fixture",
+  "reviews": [
+    {
+      "id": "review.foundation-03-fixture",
+      "reviewer": "Gym Local FOUNDATION-03 fixture review",
+      "reviewedAt": "2026-08-24",
+      "status": "approved"
+    }
+  ],
+  "licenses": [
+    {
+      "id": "license.mit-gym-local",
+      "name": "MIT License",
+      "termsUrl": "https://github.com/luutru433-coder/gym-local/blob/main/LICENSE",
+      "redistributionScope": "offline",
+      "attribution": "Copyright (c) 2026 Gym Local contributors",
+      "reviewedAt": "2026-08-24",
+      "reviewId": "review.foundation-03-fixture"
+    }
+  ],
+  "sources": [
+    {
+      "id": "source.foundation-03-synthetic-glb",
+      "author": "Gym Local contributors",
+      "sourceUrl": "https://github.com/luutru433-coder/gym-local/blob/main/tests/fixtures/animation-pack-v1/README.md",
+      "licenseId": "license.mit-gym-local",
+      "attribution": "Copyright (c) 2026 Gym Local contributors",
+      "modifications": "None",
+      "reviewedAt": "2026-08-24",
+      "reviewId": "review.foundation-03-fixture"
+    }
+  ],
+  "assets": [
+    {
+      "id": "asset.foundation-03-minimal-glb",
+      "path": "assets/synthetic-minimal.glb",
+      "mediaType": "model/gltf-binary",
+      "compression": "none",
+      "rigId": "rig.synthetic-v1",
+      "sourceId": "source.foundation-03-synthetic-glb",
+      "licenseId": "license.mit-gym-local",
+      "durationSeconds": 1
+    }
+  ],
+  "entries": [
+    {
+      "animationId": "animation.foundation-03-synthetic",
+      "exerciseVariantId": "fixture_movement__bodyweight",
+      "animationCatalogVersion": 1,
+      "primary": true,
+      "assetId": "asset.foundation-03-minimal-glb",
+      "assetPath": "assets/synthetic-minimal.glb",
+      "clipName": "SyntheticFixture",
+      "durationSeconds": 1,
+      "loop": {
+        "startSeconds": 0,
+        "endSeconds": 1
+      },
+      "defaultCamera": {
+        "preset": "front",
+        "position": [0, 1, 3],
+        "target": [0, 1, 0],
+        "fovDegrees": 45
+      },
+      "equipmentProps": [],
+      "accessibilityFallbackKey": "fixture.foundation-03.text-fallback",
+      "sourceId": "source.foundation-03-synthetic-glb",
+      "licenseId": "license.mit-gym-local"
+    }
+  ]
+}
