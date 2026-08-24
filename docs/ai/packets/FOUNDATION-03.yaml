@@ -1,0 +1,528 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-03"
+  title: "Build deterministic reviewed animation-pack v1 artifacts"
+  type: "foundation"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  lineage_base_commit: "538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+  review_base_commit: "538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+  target_branch: "codex/foundation-03-producer"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-02"
+  producer_start_rule:
+    start_commit: "The committed FOUNDATION-03 coordinator packet HEAD supplied to the producer, not the lineage base itself."
+    required_parent: "The producer start commit's first parent must be exactly 538eb0f701e1a31ecf17740c075f9d18c650a7e8."
+    required_coordinator_delta:
+      - "git diff --name-only 538eb0f701e1a31ecf17740c075f9d18c650a7e8..HEAD must print only docs/ai/packets/FOUNDATION-03.yaml before producer edits."
+      - "The producer must not amend, regenerate, or edit docs/ai/packets/FOUNDATION-03.yaml."
+    single_candidate_commit_rule: "The implementation candidate is one new commit whose first parent is the producer start commit."
+    review_range_rule: "The complete candidate range is 538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit so the coordinator packet and implementation remain reviewable together."
+
+authority:
+  allowed_paths:
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "tests/fixtures/animation-pack-v1/README.md"
+    - "tests/fixtures/animation-pack-v1/valid/pack-source.json"
+    - "tests/fixtures/animation-pack-v1/valid/assets/synthetic-minimal.glb.base64"
+    - "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+  candidate_implementation_paths:
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "tests/fixtures/animation-pack-v1/README.md"
+    - "tests/fixtures/animation-pack-v1/valid/pack-source.json"
+    - "tests/fixtures/animation-pack-v1/valid/assets/synthetic-minimal.glb.base64"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+  coordinator_owned_packet_path: "docs/ai/packets/FOUNDATION-03.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "packages/*/package.json"
+    - "tsconfig*.json"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "outputs/**"
+    - "work/**"
+    - "dist/**"
+    - "reports/**"
+    - "scripts/** except the three exact candidate script paths"
+    - "tests/** except tests/fixtures/animation-pack-v1/README.md, tests/fixtures/animation-pack-v1/valid/pack-source.json, and tests/fixtures/animation-pack-v1/valid/assets/synthetic-minimal.glb.base64"
+    - "docs/** except docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  generated_production_assets_allowed: false
+  committed_generated_archives_manifests_descriptors_allowed: false
+  temporary_test_outputs_allowed: true
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/code-review.md"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-01.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-02.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-cold-review.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-02-cold-review.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/architecture.md"
+    - "docs/module-map.md"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "packages/contracts/package.json"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/index.ts"
+    - "scripts/verify-affected.mjs"
+    - "scripts/build-video-manifest.mjs"
+    - "scripts/build-nutrition-pack.py"
+    - "scripts/verify-nutrition-pack.py"
+    - "packages/backup/src/index.ts"
+    - "packages/backup/src/backup.test.ts"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+    - ".gitattributes"
+    - ".gitignore"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+  accepted_checkpoint:
+    commit: "538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+    tag: "checkpoint/foundation-02-pass"
+    prior_verdict: "PASS"
+    prior_review_commit: "7c65acb0f221d5b3ead74a377476fb87f3971a31"
+  immutable_baseline_blobs:
+    package_json: "485bffca88295d9c458dc8706d84e46f75d92dcd"
+    pnpm_lock_yaml: "8af6caac77c93c58c5cfce23feb37303ee4c9620"
+    pnpm_workspace_yaml: "6bc432d83c0be318804535340aed4e27bfbeff2c"
+    animation_pack_contract: "8ccea0741e48b1e613c59dbc81c60f03902ed87d"
+    animation_pack_contract_tests: "659f20211ae7e024544dcfeb747fad32850d749a"
+    contracts_public_index: "6f48747874e7ff0964ad04e8bc87550a4de80de6"
+    third_party_notices: "7dfab0eecc6cfde65a84a24d0ffe6dd6dc4eb03b"
+    public_tree: "97bebe1b67d4c2fa7c04d46d7e302a25f5f2bc09"
+    apps_tree: "3ffc6e49306bc63231106791ffc270e6244fccde"
+    content_tree: "f8a06b5df08802550acc88958894eff54d8f91d2"
+  assumptions:
+    - "The builder produces release artifacts; it does not authenticate, publish, download, install, extract at runtime, or activate the external release descriptor or archive."
+    - "The trusted distribution channel for the external descriptor remains deferred; this packet only creates a descriptor suitable for later authenticated publication."
+    - "The v1 source tree is reviewed release input, not app content and not a personal-data source."
+    - "GLB/glTF checks in this packet establish a safe self-contained interchange envelope, not renderer correctness, clip existence, visual quality, biomechanics, or device performance."
+
+outcome:
+  objective: "Implement a dependency-reviewed, deterministic animation-pack v1 source validator and builder that turns one reviewed source tree into byte-identical canonical manifest JSON, a deterministic ZIP archive, and a separate external release descriptor, with only tiny project-authored synthetic fixture evidence."
+  user_visible_result: "None yet; later storage and player packets receive reproducible, integrity-bound test release artifacts without any install, renderer, UI, or production animation behavior."
+  deliverables:
+    - "scripts/animation-pack-v1.mjs exports pure bounded validation, canonicalization, build, and built-artifact verification functions for reviewed v1 source trees."
+    - "scripts/build-animation-pack-v1.mjs exposes explicit validate-only and build CLI modes, has no network path, and exits nonzero without partial success on any failure."
+    - "scripts/animation-pack-v1.test.mjs uses the Node test runner and fresh temporary directories to prove determinism and trust-boundary failures."
+    - "A tiny textual fixture set represents one project-authored MIT/Gym Local GLB-compatible asset as reviewable Base64 plus reviewed source/license/release metadata; tests decode it only into fresh temporary source trees."
+    - "One candidate commit contains only candidate_implementation_paths, followed by a separate direct-child metadata commit containing only docs/ai/reviews/FOUNDATION-03-handoff.yaml."
+  non_goals:
+    - "No storage, OPFS, IndexedDB, database, migration, install, staging-at-runtime, activation, rollback, quota, or personal backup implementation."
+    - "No renderer, player, decoder dependency, playback controller, app UI, accessibility shell, exercise page, or media integration."
+    - "No real exercise animation, production asset wave, catalog mapping, catalog lookup, content pack, user routine, workout, nutrition, progress, or historical-data change."
+    - "No network download, authenticated descriptor delivery, release publishing, PWA/service-worker cache, public payload, or external-video change."
+    - "No dependency addition, update, transitive import assumption, package script, package manifest, lockfile, compiler, test configuration, lint configuration, or version change."
+    - "No committed ZIP, generated manifest, generated release descriptor, golden binary, golden checksum, output directory, unclear binary, scraped media, or third-party asset."
+
+preflight:
+  report_before_editing:
+    - "authoritative_model_and_no_subagents"
+    - "branch_head_parent_and_cleanliness"
+    - "exact_coordinator_delta_from_538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+    - "foundation_02_pass_checkpoint_tag_ledger_and_ancestry"
+    - "all_required_reads_and_inputs"
+    - "allowed_candidate_and_metadata_paths"
+    - "direct_dependency_and_license_decision"
+    - "applicable_stop_gates"
+    - "known_invariant_contract_dependency_or_license_conflicts"
+  required_conditions:
+    model_is_gpt_5_6_sol: true
+    subagents_unused: true
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_coordinator_start_commit: true
+    coordinator_start_parent_is_exact_lineage_base: true
+    only_coordinator_delta_is_foundation_03_packet: true
+    foundation_02_checkpoint_is_passed: true
+    instructions_read: true
+    required_inputs_present: true
+    direct_jszip_3_10_1_available_offline: true
+
+decisions:
+  contract_or_schema_change: "none"
+  version_decisions:
+    - "Consume animationPackSchemaVersion = 1, animationPlayerProtocolVersion = 1, animationCatalogVersion = 1, APP_VERSIONS.app, and existing public validators from @gym/contracts without changing them."
+    - "Do not change app, database, backup, workout catalog, nutrition pack, package, or any other version."
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "synthetic_fixture_only"
+  golden_output_policy: "Do not commit generated artifacts or fixed archive/manifest/descriptor checksums; independently build into separate fresh temp directories, compare bytes, and recompute all hashes and sizes."
+
+dependency_review:
+  selected_zip_implementation:
+    package: "jszip"
+    exact_version: "3.10.1"
+    dependency_status: "direct root dependency in package.json and the root pnpm-lock.yaml importer"
+    lock_integrity: "sha512-xXDvecyTpGLrqFrvkrUSoxxfJI5AH7U8zxxtVclpsUtMCq4JQ290LY8AW5c7Ggnr/Y/oK+bQMbqK2qmtk3pN4g=="
+    selected_license: "MIT option from (MIT OR GPL-3.0-or-later)"
+    review_basis:
+      - "The installed 3.10.1 implementation exposes explicit entry date, compression, folder creation, UNIX permissions, streamFiles, platform, comment, output type, and filename encoding controls."
+      - "Its ZIP worker uses UTC date fields and preserves insertion order; tests must pin the resulting local headers, central directory, EOCD, attributes, ordering, and bytes rather than trusting defaults."
+      - "STORE-only generation avoids pako/DEFLATE variation and makes every archived byte directly inspectable."
+    constraints:
+      - "Import jszip only by its direct package name; do not import pako, lie, readable-stream, setimmediate, or any transitive package."
+      - "Do not add, update, replace, patch, or vendor a ZIP dependency and do not change any package or lockfile."
+      - "If jszip is not exactly the pinned direct dependency, its MIT license cannot be verified, or required record bytes are not deterministic under the mandated policy, trigger the dependency stop gate."
+  hashing_implementation:
+    selection: "Use node:crypto createHash('sha256'); no hashing dependency or Web Crypto environment variation."
+  public_contract_dependency:
+    selection: "Import only @gym/contracts and use its public parsers, version constants, APP_VERSIONS.app, and validateAnimationPackCompatibility."
+    forbidden: "No packages/contracts/src/* or relative internal contract import."
+
+source_tree_contract:
+  root_shape:
+    - "A live reviewed source root contains exactly pack-source.json plus assets/ and its declared regular asset files; no README, generated output, sidecar, hidden file, or undeclared byte is allowed in the live root."
+    - "The committed Base64 fixture is not a live builder input. The test helper decodes it into assets/synthetic-minimal.glb in a new temporary live source root and copies only pack-source.json."
+  pack_source_json:
+    encoding: "Strict UTF-8 without BOM; JSON object only; duplicate JSON member names must be rejected before ordinary JSON.parse acceptance."
+    fields:
+      - "packId, version, the three public v1 version fields, minimumAppVersion, releaseDate, createdAt, and releaseReviewId"
+      - "reviews, licenses, sources, assets, and entries using the existing public contract record meanings"
+      - "Source asset declarations omit only computed byteSize and sha256; every other public AnimationAssetDescriptor field is required."
+    unknown_or_duplicate_fields: "Reject at every source-schema object level; never ignore or normalize an unknown declaration."
+    release_review_binding: "releaseReviewId must resolve to exactly one approved reviews record; derive manifest.review and descriptor.review from that exact record rather than accepting duplicate bound-review input."
+  inventory_and_path_policy:
+    - "Walk with lstat/Dirent semantics without following links. Allow directories and regular files only; reject symlinks, Windows junctions/reparse links, sockets, FIFOs, devices, and other special files before reading bytes."
+    - "Convert separators to neither acceptance nor output: declarations must already use normalized POSIX relative paths beginning assets/ with no slash prefix, drive/scheme, backslash, empty/dot/dot-dot segment, query, fragment, percent-encoded delimiter/traversal, control, or NUL."
+    - "For v1 portability, every archive path segment is lowercase ASCII and matches a documented [a-z0-9][a-z0-9._-]* subset, is not a Windows reserved device name, has no trailing dot/space, and the full UTF-8 path is bounded to 240 bytes."
+    - "Before portability rejection, detect and fail exact duplicates, ASCII-case collisions, and NFC/NFD Unicode-normalization collisions across declarations, inventory paths, and the reserved manifest/animation-pack.json path. Never case-fold or normalize a path into acceptance."
+    - "Resolve every declared file against the source root and prove the resolved path remains inside it, then lstat again immediately before reading."
+    - "Every regular file below assets/ is declared by exactly one asset and every asset declaration resolves to exactly one regular file. Missing, duplicate, colliding, or undeclared files fail."
+  source_license_review_policy:
+    - "Pass the computed manifest through parseAnimationPackManifest and reject every structural, uniqueness, relation, review-binding, source, license, URL, date, exact-mapping, or approval issue."
+    - "Each asset and entry resolves to exactly one source and one license; the entry tuple must equal its asset's path, source, license, and duration, and the source's license must equal the asset license."
+    - "Every source has explicit author, canonical HTTPS sourceUrl, licenseId, attribution, explicit nonempty modifications including the literal none case, reviewedAt, and reviewId."
+    - "Every license has a canonical HTTPS termsUrl, redistributionScope exactly offline, nonempty attribution, reviewedAt, and reviewId resolving to an approved record. Missing, draft, conflicting, or ambiguous evidence fails closed."
+    - "Review dates are static source data and must not be derived from the clock; source/license/release review dates later than releaseDate fail deterministically."
+    - "The builder never queries a catalog and never substitutes, redirects, case-folds, or falls back from exerciseVariantId. Mapping and sorting use the exact stable string from the source declaration."
+  asset_envelope_policy:
+    - "model/gltf-binary paths end .glb and pass a bounded GLB 2.0 envelope check: magic, version 2, declared total length, 4-byte chunk alignment, first JSON chunk, valid UTF-8 JSON, and asset.version exactly 2.0, with no overrun or trailing bytes."
+    - "model/gltf+json paths end .gltf, are strict UTF-8 JSON with asset.version exactly 2.0, and contain no external, absolute, file, or network buffer/image URI; only embedded data URIs are allowed in this packet."
+    - "Envelope checks do not assert animation clip existence, rendering, biomechanics, compression-extension support, or performance; those remain deferred."
+    - "Apply explicit conservative source-count and byte limits documented in code so JSZip never approaches ZIP64 or unbounded-memory behavior; tests cover rejection at the boundary without allocating huge fixtures."
+
+canonical_manifest_policy:
+  identity:
+    - "Build AnimationPackManifest only from validated source data plus computed asset byteSize and lowercase SHA-256; derive the bound review from releaseReviewId."
+    - "The manifest contains no archiveByteSize, archiveSha256, manifestPath, manifestByteSize, manifestSha256, descriptor object, output filename, build host, tool path, timestamp, or source-root path."
+  ordering:
+    - "Sort reviews, licenses, and sources by exact id; assets by exact path then id; entries by exact exerciseVariantId, numeric animationCatalogVersion, animationId, then assetPath; equipmentProps by raw code-unit order."
+    - "Use an explicit comparator based on < and > over unmodified strings; never localeCompare, Intl, filesystem enumeration order, object insertion order from source JSON, or platform collation."
+    - "Canonicalize every object recursively by lexicographically sorted UTF-16 code units after the schema-specific array ordering; reject integer-like or duplicate keys that would undermine the stated order."
+  serialization:
+    - "Serialize the validated canonical object with the ECMAScript JSON number/string rules: finite contract-bounded numbers only, no negative zero, NaN, Infinity, implicit rounding, BigInt, undefined, holes, replacer, or toJSON side effect."
+    - "Preserve string code points exactly without Unicode normalization; use UTF-8 without BOM and exactly one trailing LF, with no indentation or CR bytes."
+    - "Parse the emitted bytes, validate again through parseAnimationPackManifest, re-canonicalize, and require byte-identical round-trip before archive generation."
+
+deterministic_zip_policy:
+  archive_entries:
+    - "Contain exactly descriptor.manifestPath fixed to manifest/animation-pack.json once plus every canonical manifest asset path once; contain no descriptor, source JSON, Base64 fixture, license sidecar, hidden file, directory entry, extra file, or duplicate name."
+    - "Sort entry names by exact UTF-8 bytes. Because accepted paths are lowercase ASCII, byte order and raw code-unit order coincide. Add to JSZip only in that order."
+  jszip_entry_options:
+    date: "Use one explicit new Date('1980-01-01T00:00:00.000Z') for every entry; never source mtime, current time, local time, or filesystem birth/change time."
+    compression: "STORE on every entry and at archive generation; ZIP method 0 only."
+    permissions: "platform UNIX and explicit regular-file unixPermissions 0o100644; no executable, symlink, directory, DOS-host, or inherited attribute."
+    folders: "createFolders false and dir false; no implicit directory records."
+    generation: "type nodebuffer, streamFiles false, comment empty, default UTF-8 encoder, no custom extra field, no data descriptor, no encryption, and no ZIP64."
+  post_generation_verification:
+    - "Before publishing output, scan local headers, central records, and EOCD from raw bytes and reject prefixes/trailing data, multiple EOCDs, comments, extras, encryption, data descriptors, ZIP64, non-STORE methods, non-fixed timestamps/attributes, count/order/name/offset mismatch, CRC/size mismatch, duplicate paths, or any record outside the policy."
+    - "Extract each entry into memory through JSZip with CRC checking and compare exact bytes to the canonical manifest or source asset; reject any missing or extra entry. Do not extract to the filesystem."
+    - "A cold reviewer must repeat record-level inspection independently; producer verification code is not sufficient evidence by itself."
+
+release_descriptor_policy:
+  output: "Create a separate canonical animation-pack-release.json after manifest and archive bytes are final; never place it inside the archive."
+  ownership:
+    - "The descriptor alone owns manifestPath, manifestByteSize, manifestSha256, archiveByteSize, and archiveSha256."
+    - "Compute both byte sizes from final byte buffers and both lowercase SHA-256 values from final byte buffers; never trust source declarations or JS object character counts."
+    - "Copy bound pack identity, all compatibility fields, release date, and the derived exact approved review from the manifest."
+  validation:
+    - "Validate the descriptor through parseAnimationPackReleaseDescriptor and validate descriptor/manifest identity and compatibility through validateAnimationPackCompatibility using APP_VERSIONS.app."
+    - "Canonicalize the descriptor with the same JSON policy and require a byte-identical parse/validate/re-canonicalize round-trip."
+    - "Assert neither descriptor digest field nor either computed digest string appears in the manifest object or serialized manifest bytes; per-asset byteSize and sha256 remain required."
+    - "Recompute all sizes and SHA-256 values during final self-verification and require exact equality before output publication."
+
+output_and_side_effect_policy:
+  output_names:
+    - "animation-pack-manifest.json: exact canonical manifest bytes also stored at manifest/animation-pack.json in the ZIP"
+    - "animation-pack.zip: exact deterministic ZIP bytes"
+    - "animation-pack-release.json: exact external canonical descriptor bytes"
+  atomicity:
+    - "The requested output directory and deterministic same-parent staging sibling must both be absent. Refuse existing or stale output/staging rather than deleting or merging it."
+    - "Create the staging directory exclusively in the output parent, write each exact output with exclusive creation, verify the complete staged trio, then rename the whole staging directory to the absent final output directory."
+    - "On failure, remove only the staging directory created by the current process after proving its exact resolved path and ownership marker; leave source, output target, pre-existing stale paths, and unrelated files untouched."
+    - "Never publish one or two files as partial success, overwrite an existing output, mutate source files, write inside the repository except when the caller explicitly chooses a temporary ignored output, or clean unrelated state."
+  influence_prohibitions:
+    - "No network, fetch, DNS, clock-derived metadata, locale, Intl, timezone, random, UUID, process ID, source mtime, current directory spelling, absolute source/output path, filesystem order, environment-specific newline, or user identity may influence artifact bytes."
+    - "A staging pathname may not be serialized or hashed into any artifact."
+
+fixture_policy:
+  provenance:
+    author: "Gym Local contributors"
+    license: "MIT under the repository LICENSE"
+    source_kind: "Project-authored synthetic test data; zero scraped, generated-from-third-party, or external media bytes"
+    required_metadata: "The fixture README and pack-source.json explicitly record author, canonical repository source URL, MIT terms URL, attribution, modifications, approved review record, review dates, and offline redistribution scope."
+  exact_fixture_identity:
+    pack: "packId gym-local.animations-foundation-fixture, version 1.0.0, minimumAppVersion 0.7.0, all three animation compatibility versions 1, createdAt/releaseDate 2026-08-24"
+    review: "review.foundation-03-fixture; reviewer Gym Local FOUNDATION-03 fixture review; reviewedAt 2026-08-24; status approved"
+    license: "license.mit-gym-local; MIT License; termsUrl https://github.com/luutru433-coder/gym-local/blob/main/LICENSE; redistributionScope offline; attribution Copyright (c) 2026 Gym Local contributors; the exact approved review ID/date"
+    source: "source.foundation-03-synthetic-glb; author Gym Local contributors; sourceUrl https://github.com/luutru433-coder/gym-local/blob/main/tests/fixtures/animation-pack-v1/README.md; the exact MIT license/review IDs; explicit attribution; modifications None; project-authored synthetic bytes."
+    asset: "asset.foundation-03-minimal-glb at assets/synthetic-minimal.glb; model/gltf-binary; compression none; rig.synthetic-v1; source/license IDs above; 1 second structural fixture duration"
+    entry: "animation.foundation-03-synthetic mapped primary only to exact fixture_movement__bodyweight at animationCatalogVersion 1, with the same asset/path/source/license/duration, SyntheticFixture clip label, loop 0..1, fixed camera, empty equipment props, and fixture.foundation-03.text-fallback"
+    glb_payload: "Exactly 48 decoded bytes: a GLB v2 header plus one 28-byte padded JSON chunk for {\"asset\":{\"version\":\"2.0\"}}; README must state that it intentionally contains no playable exercise animation or claimed clip."
+  representation:
+    - "Commit the one valid GLB-compatible payload only as small reviewable Base64 text. Tests decode it programmatically into a fresh temp source tree and prove the decoded length/header/JSON chunk."
+    - "Do not commit malformed binary fixtures. Generate corrupt GLB, corrupt ZIP, traversal, collision, duplicate, undeclared-file, missing-right, and special-file metadata cases programmatically in temp directories."
+    - "Do not copy the synthetic fixture into content/, public/, outputs/, a PWA cache, a catalog mapping, or any production release path."
+  semantic_limit: "The synthetic GLB is only an interchange-envelope fixture and is not a real exercise animation, renderer fixture, biomechanical demonstration, production catalog entry, or claim of clip playback."
+
+acceptance_tests:
+  - id: "F03-AC-01"
+    requirement: "Two independent builds from equivalent reviewed source trees in separate fresh temporary directories produce byte-identical manifest, ZIP, and descriptor files."
+    evidence: "Focused tests compare each output Buffer and complete output directory inventory byte-for-byte."
+  - id: "F03-AC-02"
+    requirement: "Determinism survives separate Node processes, different TZ/LANG/LC_ALL settings, reversed source-array order, different file creation/enumeration order, and elapsed wall-clock time."
+    evidence: "Spawned CLI matrix produces one identical three-artifact hash tuple without source or environment normalization."
+  - id: "F03-AC-03"
+    requirement: "Manifest JSON is canonical UTF-8 with one LF, schema-specific array ordering, recursive key ordering, stable number spelling, and a byte-identical parse/validate/re-canonicalize round trip."
+    evidence: "Canonical round-trip tests include reordered input objects/arrays, Unicode metadata, finite decimal/integer fields, positive zero, and forbidden negative/non-finite programmatic values."
+  - id: "F03-AC-04"
+    requirement: "The ZIP contains exactly the manifest and each declared asset once, in mandated order and record policy, and extracting in memory reproduces every expected byte with no extra or duplicate entry."
+    evidence: "Raw local/central/EOCD scanner assertions plus JSZip CRC-checked extraction and independent cold-review inspection."
+  - id: "F03-AC-05"
+    requirement: "The external descriptor alone binds exact final manifest/archive byte sizes and SHA-256 values, matches manifest identity/compatibility through @gym/contracts, and is not archived."
+    evidence: "Recomputation from final Buffers, public parser/compatibility results, archive enumeration, and recursive forbidden-field/digest-absence assertions."
+  - id: "F03-AC-06"
+    requirement: "Every non-manifest archive byte is represented by exactly one asset declaration and every source-tree asset is bundled exactly once; no undeclared, missing, duplicate, or colliding file can build."
+    evidence: "Positive inventory equality plus undeclared file, missing file, duplicate declaration, manifest-path collision, exact/case/Unicode collision negative tests."
+  - id: "F03-AC-07"
+    requirement: "Source/license/attribution/modification/review/offline-redistribution evidence fails closed when missing, draft, conflicting, ambiguous, unapproved, or unrelated to an asset/entry."
+    evidence: "Table-driven negative tests mutate each required evidence field and relation and assert nonzero CLI/no output."
+  - id: "F03-AC-08"
+    requirement: "Unsafe filesystem and path inputs fail without traversal or source mutation."
+    evidence: "Absolute, drive, scheme, slash, backslash, dot/dot-dot, percent-encoded traversal, control, reserved-name, overlong, symlink/junction, reparse-link, and special-file classification tests."
+  - id: "F03-AC-09"
+    requirement: "Corrupt or incompatible asset/archive/JSON input fails closed with no partial success."
+    evidence: "Programmatic bad GLB magic/version/length/chunk/UTF-8/asset.version, external glTF URI, malformed/duplicate-key source JSON, corrupt ZIP byte/CRC/record, unsupported version, and lower-current-app compatibility cases."
+  - id: "F03-AC-10"
+    requirement: "Mappings retain stable exact exerciseVariantId identity and never case-fold, redirect, query catalog, or fall back across equipment variants."
+    evidence: "Exact and near-match variant tests plus public-boundary/code audit show output contains only declared exact IDs."
+  - id: "F03-AC-11"
+    requirement: "Output publication is atomic, refuses pre-existing final/staging paths, cleans only current-process staging after injected failure, and never mutates source or unrelated repository files."
+    evidence: "Fault-injection tests at each write/verify/rename phase, before/after source hashes and mtimes, sentinel files, output inventory, and clean candidate worktree evidence."
+  - id: "F03-AC-12"
+    requirement: "The selected direct jszip 3.10.1 dependency and MIT license are verified, no transitive package is imported, and no manifest/lock/config change occurs."
+    evidence: "Root package/lock inspection, resolved package metadata/license, import audit, immutable baseline blob checks, and exact diff."
+  - id: "F03-AC-13"
+    requirement: "The only committed asset evidence is tiny project-authored MIT/Gym Local Base64 text whose decoded bytes pass the bounded GLB 2.0 envelope check; malformed bytes exist only in temp tests."
+    evidence: "Fixture README/source records, decoded byte inspection, license audit, file-size inventory, and absence of other binary/media files."
+  - id: "F03-AC-14"
+    requirement: "No production asset, app, package, contract, storage, media, catalog, workout, nutrition, backup, PWA, public, content, version, or personal-data path changes."
+    evidence: "Exact candidate name-only/stat diff, immutable baseline blobs/trees, architecture audit, and manual docs/code-review.md review."
+  - id: "F03-AC-15"
+    requirement: "Focused tests, lint, typecheck, content validation/audit, architecture audit, and the complete pnpm run verify pass on exact candidate bytes."
+    evidence: "Command output and exact candidate SHA recorded in the handoff, then independently rerun by cold review."
+  - id: "F03-AC-16"
+    requirement: "Candidate and handoff evidence is exact, non-circular, and restricted to one implementation commit followed by one direct-child handoff-only commit."
+    evidence: "Exact 40-character parent/range/name-only SHAs in the handoff and later cold-review attestation of the metadata commit after it exists; the handoff contains no own-commit field."
+
+required_negative_tests:
+  - "Missing, unreadable, malformed, BOM-prefixed, duplicate-key, non-object, unknown-field, or schema-invalid pack-source.json."
+  - "Missing, empty, duplicate, case-colliding, normalization-colliding, traversal, reserved, overlong, undeclared, non-regular, symlink/junction, or source-root-escaping asset."
+  - "Missing or ambiguous review/source/license IDs; draft/unapproved review; non-offline redistribution; missing author/attribution/modifications/terms/source URL/review date; source/asset/entry license or path mismatch."
+  - "Duplicate animation ID or exact variant/catalog primary tuple; case-changed and equipment-near-match variants remain distinct with no fallback."
+  - "Corrupt GLB headers/chunks/UTF-8/JSON/version; glTF external URI; asset size/hash changes between validation and read must fail or be detected by immediate re-stat/final verification."
+  - "Corrupt manifest/archive/descriptor bytes, CRC, sizes, hashes, record offsets/order/flags/method/time/attributes, duplicate or extra archive records, and descriptor/manifest identity or compatibility disagreement."
+  - "Existing output, stale staging path, injected write/verification/rename failure, and concurrent exclusive-staging collision produce nonzero exit with no partial final directory and no unrelated deletion."
+  - "No negative test may add a real or unclear binary to the repository; construct malformed values and filesystem objects in test-owned temporary directories."
+
+required_checks:
+  commands:
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+    - "node --test scripts/animation-pack-v1.test.mjs"
+    - "node scripts/build-animation-pack-v1.mjs validate --source <fresh decoded valid fixture source>"
+    - "node scripts/build-animation-pack-v1.mjs build --source <fresh decoded valid fixture source> --output <fresh absent temp output>"
+    - "pnpm exec eslint scripts/animation-pack-v1.mjs scripts/build-animation-pack-v1.mjs scripts/animation-pack-v1.test.mjs --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run content:validate"
+    - "pnpm run content:audit"
+    - "pnpm run verify"
+    - "git diff --check 538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit"
+    - "git rev-parse producer_start_commit^ must equal 538eb0f701e1a31ecf17740c075f9d18c650a7e8"
+    - "git diff --name-only 538eb0f701e1a31ecf17740c075f9d18c650a7e8..producer_start_commit must print only docs/ai/packets/FOUNDATION-03.yaml"
+    - "git rev-parse candidate_commit^ must equal producer_start_commit"
+    - "git diff --name-only producer_start_commit..candidate_commit must print exactly authority.candidate_implementation_paths and no other path"
+    - "git diff --name-only 538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit must print the coordinator packet plus exactly authority.candidate_implementation_paths"
+    - "After the handoff commit exists, git rev-parse metadata_commit^ must equal candidate_commit and git diff --name-only candidate_commit..metadata_commit must print only docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+    - "Parse docs/ai/packets/FOUNDATION-03.yaml and docs/ai/reviews/FOUNDATION-03-handoff.yaml with the bundled Node runtime and the repository-resolved js-yaml check tool; assert packet ID, required fields, exact SHAs/ranges, and absence of SELF or handoff own-commit metadata"
+    - "git hash-object package.json pnpm-lock.yaml pnpm-workspace.yaml packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts packages/contracts/src/index.ts THIRD_PARTY_NOTICES.md must equal context.immutable_baseline_blobs"
+    - "git rev-parse candidate_commit:public candidate_commit:apps candidate_commit:content must equal context.immutable_baseline_blobs public_tree/apps_tree/content_tree"
+  timing:
+    - "Run focused tests and scoped lint repeatedly during implementation, then again on final candidate bytes."
+    - "Run cross-process determinism and all negative trust-boundary tests against fresh temporary directories on final candidate bytes."
+    - "Create the single candidate commit before writing the handoff; then run full verification and all exact candidate parent/range/path/blob/tree assertions against that immutable commit."
+    - "Write and commit only docs/ai/reviews/FOUNDATION-03-handoff.yaml as the candidate's direct child; never amend the candidate and never put the handoff's own commit SHA in the handoff."
+    - "Launch a new independent gpt-5.6-sol cold review without subagents only after the exact handoff metadata commit exists."
+  manual_reviews:
+    - "Review against docs/code-review.md with emphasis on public module boundaries, offline/no-network behavior, exact equipment variants, license completeness, deterministic failures, and no personal-data or PWA effect."
+    - "Inventory every source-root path, archive entry, manifest asset, source, license, review, entry, output file, and generated hash to prove one-to-one declarations and descriptor-only digest ownership."
+    - "Trace canonical JSON bytes, fixed ZIP entry options, raw ZIP records, CRC/size/hash computations, and atomic directory publication without relying on JSZip defaults."
+    - "Audit imports for @gym/contracts public entry only, direct jszip only, Node built-ins only otherwise, and zero transitive/internal/network/browser/storage imports."
+    - "Inspect the Base64 fixture and decoded GLB header/JSON chunk; verify Gym Local contributors/MIT provenance and that no real exercise media or unclear binary is present."
+    - "Confirm package/lock/config/contracts/LICENSE/notices/apps/packages/content/public/PWA/output/version and every forbidden path remain unchanged."
+    - "Document residual risks without treating deferred authentication, storage, renderer, production licensing, or device performance as implemented."
+  evidence_paths:
+    - "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-03-cold-review.yaml"
+
+stop_gates:
+  - id: "F03-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or authoritative invocation metadata cannot be verified."
+    action: "Stop without substitution and write a BLOCKED FOUNDATION-03 handoff at the authorized report path."
+  - id: "F03-STOP-02"
+    condition: "The target branch, clean state, producer start HEAD, exact parent 538eb0f701e1a31ecf17740c075f9d18c650a7e8, checkpoint ancestry, or packet-only coordinator delta does not match execution.producer_start_rule."
+    action: "Stop before implementation and write a BLOCKED handoff with exact branch, HEAD, parent, status, ancestry, and unexpected paths; do not clean, rebase, amend, or guess."
+  - id: "F03-STOP-03"
+    condition: "FOUNDATION-02 PASS evidence, the public v1 animation-pack contract, version constants, APP_VERSIONS.app, or required public validators are missing, changed, ambiguous, or insufficient for this builder."
+    action: "Stop and write a BLOCKED handoff; do not change @gym/contracts, an ADR, a version, or compatibility meaning in this packet."
+  - id: "F03-STOP-04"
+    condition: "jszip is not an exact direct 3.10.1 dependency, its MIT option or lock integrity cannot be verified, a transitive ZIP import would be needed, or mandated ZIP bytes/records are not deterministic under the fixed STORE policy."
+    action: "Stop and write a BLOCKED handoff with dependency/license/byte evidence; do not add, update, replace, patch, or vendor a dependency or edit package/lock files."
+  - id: "F03-STOP-05"
+    condition: "Correctness requires a new contract/schema field, public export, catalog lookup, storage/install behavior, renderer/decoder, network/authentication, production asset, package/configuration, or path outside authority.allowed_paths."
+    action: "Stop without widening scope and write a BLOCKED handoff naming the owning later packet."
+  - id: "F03-STOP-06"
+    condition: "Any fixture byte has unclear authorship, source, license, attribution, modification, review, or offline redistribution evidence, or is derived from scraped/external media."
+    action: "Exclude it and stop with a BLOCKED handoff if the project-authored MIT synthetic fixture cannot satisfy the packet; never substitute unclear bytes."
+  - id: "F03-STOP-07"
+    condition: "A source path, symlink/junction, special file, collision, inventory mismatch, GLB/glTF envelope, duplicate JSON key, or license/review ambiguity cannot be rejected deterministically without normalization, following links, network access, or unsafe coercion."
+    action: "Stop and write a BLOCKED handoff with the exact unsafe case; fail closed and do not weaken the validator."
+  - id: "F03-STOP-08"
+    condition: "Atomic all-or-nothing output cannot be achieved with absent destination plus same-parent staging/rename, or failure cleanup could overwrite/delete pre-existing or unrelated state."
+    action: "Stop and write a BLOCKED handoff; do not publish partial files, overwrite output, or broaden into storage/transaction work."
+  - id: "F03-STOP-09"
+    condition: "Any independent build, cross-process/environment/order perturbation, canonical round trip, hash/size recomputation, raw ZIP inspection, extraction comparison, or required negative test fails or flakes."
+    action: "Stop before candidate handoff and write a BLOCKED report with exact reproduction; do not commit golden outputs, relax checks, or claim determinism."
+  - id: "F03-STOP-10"
+    condition: "Any app, package, contract, content, public/PWA, production asset, personal-data, dependency, configuration, baseline blob/tree, or other forbidden path changes."
+    action: "Stop without cleanup/amendment and write a BLOCKED handoff if the authorized report remains the sole safe change."
+  - id: "F03-STOP-11"
+    condition: "The candidate is not the exact single direct child of producer_start_commit, contains a path outside candidate_implementation_paths, or the post-candidate direct child contains anything beyond the new handoff."
+    action: "Stop; do not amend, rebase, add cleanup, or create another implementation commit. Record the exact boundary failure in the authorized handoff."
+  - id: "F03-STOP-12"
+    condition: "A non-circular candidate/handoff/cold-review evidence boundary would require the handoff to name its own metadata commit or leave a required immutable endpoint unresolved."
+    action: "Stop and write a BLOCKED handoff describing the evidence gap; do not use SELF, placeholders, inferred SHAs, or circular metadata."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-03-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After candidate_commit, only docs/ai/reviews/FOUNDATION-03-handoff.yaml may change, and it must be committed alone as the direct child of candidate_commit without amending the candidate. The handoff cannot and must not name its own metadata commit."
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "lineage_base_commit"
+    - "review_base_commit"
+    - "coordinator_packet_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "dependency_review"
+    - "fixture_provenance"
+    - "artifact_reproduction"
+    - "zip_record_evidence"
+    - "negative_test_evidence"
+    - "acceptance_evidence"
+    - "checks"
+    - "licenses"
+    - "source_and_unrelated_mutation_audit"
+    - "stop_gates"
+    - "known_risks"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  required_review_target:
+    complete_candidate: "538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit"
+    producer_delta: "producer_start_commit..candidate_commit; exactly authority.candidate_implementation_paths"
+    candidate_parent: "candidate_parent_commit must equal producer_start_commit and candidate_commit^ as exact 40-character SHAs."
+    handoff_metadata_rule: "The later independent cold review records exact candidate_commit..metadata_commit after metadata_commit exists; metadata_commit^ must equal candidate_commit and that range must contain only docs/ai/reviews/FOUNDATION-03-handoff.yaml."
+
+cold_review:
+  required: true
+  new_independent_task_required: true
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  inherits_producer_explanation: false
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: "docs/ai/reviews/FOUNDATION-03-cold-review.yaml"
+  exact_metadata_attestation_required: true
+  immutable_ranges:
+    complete_candidate: "538eb0f701e1a31ecf17740c075f9d18c650a7e8..candidate_commit"
+    producer_implementation: "producer_start_commit..candidate_commit; candidate implementation paths only"
+    handoff_metadata: "candidate_commit..metadata_commit; FOUNDATION-03 handoff only; metadata_commit recorded by cold review after it exists"
+  required_independent_actions:
+    - "Verify authoritative model/no-subagent evidence, detached exact metadata HEAD, clean worktree, packet identity, checkpoint ancestry, candidate parent, metadata parent, all three exact ranges, and name-only/path/blob/tree boundaries before reviewing behavior."
+    - "Run the builder at least twice in separate newly created source/output temp directory pairs and compare the complete three-file outputs byte-for-byte; add independent cross-process TZ/locale/order perturbations and record exact SHA-256/byte sizes."
+    - "Recompute manifest/archive SHA-256 and byte sizes independently from descriptor values, parse both JSON files independently, require canonical round trips, prove descriptor/manifest identity through @gym/contracts, and prove neither descriptor digest is in the manifest."
+    - "Inspect ZIP bytes independently of the producer helper and not only through JSZip: parse local headers, central directory, and EOCD or use Python struct plus zipfile; verify signatures, offsets, record count/order, names, CRC, STORE method, fixed time/date, flags, attributes, extras/comments, no descriptor/ZIP64/prefix/trailing bytes, and exact extraction bytes."
+    - "Reproduce representative corrupt GLB/glTF, duplicate-key JSON, traversal, exact/case/Unicode collision, undeclared/missing file, symlink or junction, special-file classification, license/right/review ambiguity, descriptor/hash corruption, existing-output/stale-stage, and injected-failure cases; confirm nonzero/no partial output/no mutation."
+    - "Trace every fixture byte to Gym Local contributors, repository source URL, MIT terms, attribution, modification statement, approved review, offline redistribution, and Base64-to-GLB decoding; reject any unclear or real exercise media."
+    - "Audit code imports and the resolved dependency/lock/license directly; prove no transitive import, network, clock/locale/random artifact influence, source mutation, internal contract import, catalog lookup, or forbidden module/path."
+    - "Run focused tests, scoped lint, typecheck, architecture audit, content validation/audit, full pnpm run verify, YAML assertions, exact git assertions, and immutable baseline blob/tree checks at the reviewed commits."
+    - "Return exactly PASS, FAIL, or BLOCKED with acceptance results, findings, license result, residual deferred risks, exact reviewed SHAs/ranges, and merge_authorized true only for PASS."
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"
+  squash_policy: "Keep coordinator packet, single candidate, handoff metadata, and new cold-review commits distinct through review; merge policy is decided only after a recorded PASS."
+  deferred_risks_required_in_handoff_and_review:
+    - "Authenticated descriptor distribution, release-index signing/trust, network download, runtime archive validation, storage staging, OPFS, activation, rollback, quota, and personal-backup exclusion enforcement remain FOUNDATION-04 or later work."
+    - "GLB/glTF envelope validation does not prove clip presence, renderer compatibility, animation quality, accessibility, biomechanics, or iPhone performance; renderer/pilot packets own those gates."
+    - "Only synthetic MIT fixture rights are exercised here; production asset sourcing, attribution scale, legal review, catalog mapping, and asset-wave performance remain blocked until later reviewed packets."
+    - "Reproducibility is pinned to the reviewed jszip 3.10.1 and Node ZIP-generation behavior under explicit STORE policy; any dependency/runtime policy change requires fresh deterministic byte and license review."
+    - "Atomic same-filesystem directory rename prevents partial publication for this build tool but is not a durable storage transaction or runtime activation guarantee."
