@@ -1,0 +1,323 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-02-FIX-01"
+  title: "Make animation-pack validation strict, lossless, and reviewable"
+  type: "review-fix"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  lineage_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+  review_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+  failed_candidate_commit: "21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+  failed_metadata_commit: "e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f"
+  target_branch: "codex/foundation-02-fix-01"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-02"
+  producer_start_rule:
+    start_commit: "Start from the coordinator commit that adds only docs/ai/reviews/FOUNDATION-02-cold-review.yaml and docs/ai/packets/FOUNDATION-02-FIX-01.yaml on top of e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f."
+    required_parent: "The producer start commit's first parent must be e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f."
+    required_coordinator_delta:
+      - "git diff --name-only e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f..HEAD must print exactly docs/ai/packets/FOUNDATION-02-FIX-01.yaml and docs/ai/reviews/FOUNDATION-02-cold-review.yaml before producer edits."
+      - "The producer must not amend or edit either coordinator artifact."
+    review_range_rule: "The complete updated candidate range remains f20bf05d3f640b94e7df178a4303d0105134c492..fixer_candidate_commit; the finding-scoped producer delta starts at the coordinator start commit."
+
+authority:
+  allowed_paths:
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+  candidate_implementation_paths:
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "packages/contracts/src/index.ts"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "packages/*/package.json"
+    - "apps/**"
+    - "packages/storage/**"
+    - "packages/media/**"
+    - "packages/backup/**"
+    - "packages/catalog/**"
+    - "packages/workouts/**"
+    - "packages/nutrition/**"
+    - "packages/progress/**"
+    - "packages/ui/**"
+    - "content/**"
+    - "public/**"
+    - "outputs/**"
+    - "scripts/**"
+    - "tests/**"
+    - "docs/** except docs/ai/packets/FOUNDATION-02.yaml and docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  generated_binary_assets_allowed: false
+  storage_media_app_catalog_backup_content_builder_asset_changes_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/packets/FOUNDATION-02-FIX-01.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-cold-review.yaml"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/code-review.md"
+    - "packages/contracts/package.json"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/index.ts"
+    - "package.json"
+  assumptions:
+    - "The historical failed FOUNDATION-02 handoff is immutable evidence and must remain unchanged."
+    - "The existing public export surface and all stable IDs and error spellings remain unchanged."
+    - "The fixes remain pure, dependency-free validation with no storage, network, clock, locale, or random behavior."
+  review_findings:
+    - "P1 sparse array holes accepted, lossy, or throwing near animation-pack.ts line 598."
+    - "P2 all-or-nothing array parsing creates false referential issues and suppresses safe issues near line 599."
+    - "P1 bound release review can disagree with its declared review record near line 663."
+    - "P2 negative zero violates lossless JSON serialization near line 288."
+    - "P2 valid ISO/RFC 3339 years 0001-0099 are rejected near line 322."
+    - "P2 FOUNDATION-02-handoff.yaml line 11 uses circular SELF evidence."
+    - "P1 malformed HTTPS authorities, hosts, and ports are accepted near line 368."
+
+outcome:
+  objective: "Resolve all seven FOUNDATION-02 cold-review findings with deterministic, non-throwing, lossless runtime validation and a non-circular handoff evidence contract."
+  user_visible_result: "None yet; later animation-pack work receives a stricter reviewed @gym/contracts v1 boundary."
+  deliverables:
+    - "Finding-scoped fixes in packages/contracts/src/animation-pack.ts."
+    - "Regression coverage for every finding in packages/contracts/src/animation-pack.test.ts."
+    - "A governing FOUNDATION-02 packet correction that defines non-circular candidate and metadata evidence without changing the historical failed handoff."
+    - "One candidate commit containing only code, tests, and the governing packet correction, followed by a separate new docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml commit."
+  non_goals:
+    - "No new public export, stable ID, stable error spelling, contract family, version, dependency, package, lockfile, or configuration change."
+    - "No storage, media, app, catalog, backup, content, builder, fixture, archive, asset, PWA, hashing, authentication, or renderer work."
+    - "No edit to docs/ai/reviews/FOUNDATION-02-handoff.yaml or either coordinator-owned FOUNDATION-02-FIX-01 artifact."
+    - "No unrelated cleanup or broad validator redesign beyond what the seven findings require."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "branch_and_start_commit"
+    - "start_commit_parent_and_exact_coordinator_delta"
+    - "lineage_base_and_failed_candidate_ancestry"
+    - "dirty_files"
+    - "allowed_paths"
+    - "applicable_stop_gates"
+    - "known_invariant_or_compatibility_conflicts"
+  required_conditions:
+    clean_worktree: true
+    head_is_coordinator_start_commit: true
+    coordinator_start_parent_is_failed_metadata_commit: true
+    only_coordinator_delta_is_cold_review_and_fixer_packet: true
+    lineage_and_failed_candidate_resolve: true
+    instructions_read: true
+    required_inputs_present: true
+    model_is_gpt_5_6_sol: true
+    subagents_unused: true
+
+decisions:
+  contract_or_schema_change: "runtime_change"
+  version_decisions:
+    - "Keep animationPackSchemaVersion, animationPlayerProtocolVersion, and animationCatalogVersion at literal 1."
+    - "Do not change app, database, backup, catalog, nutrition, workout, or package versions."
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "none"
+
+implementation_requirements:
+  arrays:
+    - "Reject every missing own numeric index in every array accepted by an animation-pack parser before mapping or dereferencing it, including manifest reviews, licenses, sources, assets, entries, and entry equipmentProps."
+    - "Return stable path-addressed validation issues for sparse holes; never throw and never return success data whose JSON round-trip replaces a hole with null."
+    - "Do not construct referential maps or access record fields until the relevant element is known to be present."
+  issue_collection:
+    - "Preserve per-element structural parse state and every independently validated identity needed for safe diagnostics."
+    - "Do not report missing_source, missing_license, missing_asset, or analogous missing-reference issues merely because an existing declaration with that identity has another structural defect."
+    - "Continue checking every safely inspectable record so one malformed element does not suppress an independent missing reference in another element."
+    - "Preserve deterministic schema-order and ascending-index issue collection, no partial success data, no mutation, and no throws."
+  release_review_binding:
+    - "Require manifest.review to match exactly one manifest.reviews record and to equal that unique record across id, reviewer, reviewedAt, and status."
+    - "Reject duplicate or disagreeing bindings with stable deterministic paths; descriptor compatibility may not pass a manifest whose bound review is inconsistent."
+  numeric_serialization:
+    - "Reject Object.is(value, -0) everywhere a numeric zero can otherwise be accepted, including loop bounds, every camera component, player position, and any other zero-permitting numeric field."
+    - "Keep positive zero valid where the existing contract permits zero."
+  calendar_and_timestamp_validation:
+    - "Validate canonical Gregorian calendar parts without Date.UTC year-0-to-99 remapping and without using Date.parse as the validity authority."
+    - "Support valid canonical years 0001, 0004, and 0099 for dates and RFC 3339 timestamps, including correct Gregorian leap boundaries, while continuing to reject impossible dates and timestamps."
+  https_validation:
+    - "Use deterministic syntactic HTTPS validation through a pure standard parser or an equivalent dependency-free implementation."
+    - "Require scheme https, no credentials, a nonempty syntactically valid hostname, and a syntactically and numerically valid port when present."
+    - "Document and test the accepted canonical form; reject malformed authority, bracket/host syntax, empty or invalid hostnames, credentials, and out-of-range or malformed ports."
+  handoff_evidence_schema:
+    - "Edit the governing docs/ai/packets/FOUNDATION-02.yaml non-circularly: remove handoff_commit as a required field and remove every requirement that the handoff report contain its own commit SHA."
+    - "Require handoff fields for coordinator_packet_commit, producer_start_commit, candidate_parent_commit, candidate_commit, and exact candidate ranges whose endpoints exist before the handoff is written."
+    - "Require candidate_parent_commit to be the actual first parent of candidate_commit and require the handoff to record coordinator-to-candidate and lineage-base-to-candidate ranges with exact SHAs."
+    - "Define the post-candidate rule as candidate_commit..metadata_commit containing only the handoff path, with the exact metadata_commit and range recorded later by the independent cold-review report or coordinator attestation after that commit exists."
+    - "Do not edit the historical failed docs/ai/reviews/FOUNDATION-02-handoff.yaml; its SELF value remains failure evidence."
+
+acceptance_tests:
+  - id: "F02-FIX-AC-01"
+    requirement: "Every array-bearing parser rejects sparse holes at their exact index with stable issues, never throws, and produces only JSON-lossless success or failure data."
+    evidence: "Table-driven sparse-hole tests for manifest reviews, licenses, sources, assets, entries, and entry equipmentProps; each asserts no throw, failure path, repeated-result equality, and JSON round-trip equality."
+  - id: "F02-FIX-AC-02"
+    requirement: "Diagnostics retain safe identities, avoid false missing-reference issues for malformed existing declarations, and still find independent missing references in other safely inspectable records."
+    evidence: "Regression tests reproduce malformed source.one without false missing_source and a separate valid entry referencing asset.missing-too with missing_asset still reported; extend the matrix to source, license, asset, review, and entry relations where safely inspectable."
+  - id: "F02-FIX-AC-03"
+    requirement: "The manifest's bound release review exactly matches its unique reviews record across id, reviewer, reviewedAt, and status."
+    evidence: "One passing equality test plus separate mismatch and duplicate-binding tests with stable codes, paths, and deterministic order; compatibility cannot pass an inconsistent parsed manifest."
+  - id: "F02-FIX-AC-04"
+    requirement: "Object.is(value, -0) is rejected anywhere numeric zero can be accepted while positive zero remains accepted according to existing bounds."
+    evidence: "Negative-zero regression matrix covers loop start, all camera components, player position, and every other zero-permitting numeric field; results and valid +0 controls survive JSON round-trip exactly."
+  - id: "F02-FIX-AC-05"
+    requirement: "Canonical dates and RFC 3339 timestamps validate real Gregorian years 0001, 0004, and 0099, including leap boundaries, without Date.UTC 0-99 behavior or Date.parse authority."
+    evidence: "Date and timestamp tests cover 0001-01-01, 0004-02-29, 0099-12-31, non-leap 0001/0099 February 29 rejection, and adjacent valid/invalid day and timestamp boundaries."
+  - id: "F02-FIX-AC-06"
+    requirement: "Source and license URL fields use deterministic syntactic HTTPS validation requiring https, no credentials, nonempty valid hostname, and a valid optional port."
+    evidence: "Both record parsers reject https://[, https://example.test:99999/path, https://user@:443/path, credentials, empty/malformed hosts, and malformed/out-of-range ports, while documented canonical HTTPS cases pass."
+  - id: "F02-FIX-AC-07"
+    requirement: "FOUNDATION-02's governing handoff schema is non-circular and requires exact candidate-parent/range evidence, while exact post-candidate metadata commit evidence is attested only after that commit exists."
+    evidence: "Packet diff, YAML assertions, git parent/range commands, a schema-valid new fixer handoff with no SELF placeholder, and later cold-review/coordinator attestation of the exact metadata commit; the historical failed handoff is byte-for-byte unchanged."
+  - id: "F02-FIX-AC-08"
+    requirement: "All prior FOUNDATION-02 positive and negative tests continue to pass with deterministic all-safe issue collection, no mutation, no cross-variant fallback, and no public export or stable error-code change."
+    evidence: "Focused suite, typecheck, public-boundary inspection, repeated invalid parses, structured-clone/input equality, and complete pnpm run verify."
+  - id: "F02-FIX-AC-09"
+    requirement: "The fixer candidate contains only animation-pack.ts, animation-pack.test.ts, and the governing FOUNDATION-02 packet correction; a separate following commit adds only the new fixer handoff."
+    evidence: "Exact SHA parent and diff-name checks recorded in the new handoff and independently confirmed by cold review."
+
+required_regression_tests:
+  - "Sparse holes at leading, interior, and trailing positions for every array field, with explicit own-index rejection, no throw, deterministic paths, and JSON round-trip checks."
+  - "Malformed existing source, license, asset, review, and entry declarations retain safe IDs without false missing-reference issues; independent valid records with missing references still report them."
+  - "Bound review disagreement separately covers reviewer, reviewedAt, status, ID resolution, and duplicate record identity."
+  - "Negative zero covers loop, camera, player position, and an audited inventory of all other zero-accepting numeric fields; positive-zero controls pass."
+  - "Dates and timestamps cover years 0001, 0004, and 0099, Gregorian leap/non-leap boundaries, impossible days, and canonical formatting."
+  - "HTTPS tests cover malformed bracket hosts, authorities, credentials, empty/invalid hostnames, missing and malformed ports, ports above 65535, non-HTTPS schemes, and documented valid canonical host/port cases in both source and license records."
+  - "Packet/handoff schema tests or assertions reject SELF/self-SHA requirements, verify candidate parent/ranges exactly, and leave exact metadata SHA attestation to the later cold-review/coordinator record."
+
+required_checks:
+  commands:
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    - "pnpm exec eslint packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run verify"
+    - "git diff --check"
+    - "git diff --name-only producer_start_commit..candidate_commit"
+    - "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    - "git rev-parse candidate_commit^"
+    - "git diff --name-only candidate_commit..metadata_commit"
+    - "Parse docs/ai/packets/FOUNDATION-02.yaml, docs/ai/packets/FOUNDATION-02-FIX-01.yaml, docs/ai/reviews/FOUNDATION-02-cold-review.yaml, and docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml with bundled Node and repository js-yaml; assert required keys, exact SHA/range fields, and absence of SELF metadata evidence requirements."
+  timing:
+    - "Run focused tests, scoped lint, and typecheck during implementation and again on final candidate bytes."
+    - "Create the candidate commit containing only code, tests, and docs/ai/packets/FOUNDATION-02.yaml before writing the fixer handoff."
+    - "After candidate creation, run pnpm run verify and candidate diff/parent checks against exact SHAs."
+    - "Write and commit only docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml in a separate new metadata commit; do not amend the candidate."
+    - "Launch a new independent gpt-5.6-sol cold review after the exact metadata commit exists."
+  manual_reviews:
+    - "Review against docs/code-review.md, emphasizing untrusted-input no-throw behavior, deterministic all-safe diagnostics, JSON losslessness, and exact variant isolation."
+    - "Inventory every array input and every numeric field where zero can be accepted; match each to an explicit regression test."
+    - "Trace each referential relation through malformed declarations and independent records to exclude both false and suppressed missing-reference issues."
+    - "Trace manifest.review to exactly one equal reviews record and then through descriptor compatibility."
+    - "Inspect calendar arithmetic and HTTPS parsing for determinism, purity, canonical syntax, and no locale/network dependency."
+    - "Confirm index.ts, public exports, stable error codes, versions, dependencies, configurations, historical handoff, and every forbidden module/path remain unchanged."
+    - "Verify the corrected governing handoff schema has no self-SHA requirement and that the later independent review/coordinator attestation records the exact metadata commit and candidate-to-metadata range."
+  evidence_paths:
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml"
+
+stop_gates:
+  - id: "F02-FIX-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or the producer cannot verify the mandated invocation metadata."
+    action: "Stop without substitution and write a BLOCKED fixer handoff at the authorized handoff path."
+  - id: "F02-FIX-STOP-02"
+    condition: "The producer start branch, HEAD, parent, cleanliness, lineage, or exact two-file coordinator delta does not match execution.producer_start_rule."
+    action: "Stop before implementation and write a BLOCKED handoff with exact branch, HEAD, parent, status, ancestry, and unexpected paths; do not clean, rebase, or amend."
+  - id: "F02-FIX-STOP-03"
+    condition: "Any new dependency, package/lockfile/configuration change, or edit outside authority.allowed_paths is required."
+    action: "Stop without widening scope and write a BLOCKED handoff naming the required change."
+  - id: "F02-FIX-STOP-04"
+    condition: "Correctness requires any storage, media, app, catalog, backup, content, builder, fixture, archive, asset, PWA, hashing, authentication, renderer, or index.ts change."
+    action: "Stop and write a BLOCKED handoff; defer the change to its owning packet."
+  - id: "F02-FIX-STOP-05"
+    condition: "The implementation cannot preserve deterministic collection of every safely detectable issue without false missing-reference diagnostics, partial accepted data, mutation, or throws."
+    action: "Stop and write a BLOCKED handoff with the ambiguous identity/referential case; do not weaken all-safe issue collection."
+  - id: "F02-FIX-STOP-06"
+    condition: "A non-circular candidate, handoff, metadata-commit, or review attestation boundary remains ambiguous or would require a report to contain its own commit SHA."
+    action: "Stop and write a BLOCKED handoff describing the unresolved evidence boundary; do not use SELF, placeholders, or inferred commit identity."
+  - id: "F02-FIX-STOP-07"
+    condition: "Any fix would change a stable ID/error spelling/version, accept an unknown unsafe value, or introduce cross-equipment fallback or coercion."
+    action: "Stop and write a BLOCKED handoff; preserve compatibility and fail closed."
+  - id: "F02-FIX-STOP-08"
+    condition: "The candidate contains anything beyond the two contract files and governing FOUNDATION-02 packet correction, or the post-candidate commit contains anything beyond the new fixer handoff."
+    action: "Stop without amending or adding cleanup and write a BLOCKED handoff if the authorized report remains the sole safe metadata change."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After candidate_commit, only docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml may change, and it must be committed separately without amending candidate_commit. The handoff does not and cannot name its own metadata commit."
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "lineage_base_commit"
+    - "review_base_commit"
+    - "failed_candidate_commit"
+    - "failed_metadata_commit"
+    - "coordinator_packet_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "finding_resolution"
+    - "acceptance_evidence"
+    - "checks"
+    - "licenses"
+    - "known_risks"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+  required_review_target:
+    complete_updated_candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    fixer_delta: "producer_start_commit..candidate_commit"
+    candidate_parent: "candidate_parent_commit must equal candidate_commit^ and be recorded as an exact 40-character SHA."
+    handoff_metadata_rule: "The later cold-review or coordinator attestation records exact candidate_commit..metadata_commit after the metadata commit exists; the range must contain only docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml."
+
+cold_review:
+  required: true
+  new_independent_task_required: true
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  inherits_producer_explanation: false
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: "docs/ai/reviews/FOUNDATION-02-FIX-01-cold-review.yaml"
+  exact_metadata_attestation_required: true
+  immutable_ranges:
+    complete_updated_candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
+    fixer_implementation: "producer_start_commit..candidate_commit"
+    handoff_metadata: "candidate_commit..metadata_commit; docs/ai/reviews/FOUNDATION-02-FIX-01-handoff.yaml only; metadata_commit recorded by the cold review after it exists"
+  required_focus:
+    - "Independently reproduce all seven former defects and verify their bounded regressions."
+    - "Re-run focused tests, scoped lint, typecheck, pnpm run verify, YAML assertions, diff checks, and candidate-parent checks at immutable exact commits."
+    - "Review sparse-array no-throw behavior, all-safe referential diagnostics, exact release-review equality, negative-zero rejection, early-year Gregorian validation, and syntactic HTTPS authority/host/port validation."
+    - "Confirm the historical failed handoff is unchanged, the governing schema is non-circular, the candidate has only three authorized paths, and the metadata commit has only the new fixer handoff."
+    - "Record the exact metadata commit and candidate-to-metadata range in the cold-review report; do not infer it from chat or require the handoff to self-identify."
+
+merge:
+  allowed_only_after: "PASS"
+  target: "main"
+  squash_policy: "Keep coordinator cold-review/fixer packet, fixer candidate, fixer handoff, and new cold-review commits distinct through review; merge policy is decided only after recorded PASS."

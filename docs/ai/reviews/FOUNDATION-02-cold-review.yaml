@@ -1,0 +1,218 @@
+schema_version: 1
+packet_id: "FOUNDATION-02"
+verdict: "FAIL"
+reviewed_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+reviewed_head_commit: "21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+reviewed_metadata_commit: "e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f"
+reviewed_candidate_range: "f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+reviewed_metadata_range: "21e88fe4d9c1426363a792d0cf351d3d665f9cc5..e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f"
+reviewed_at: "2026-08-24T11:11:24+07:00"
+reviewer_model: "gpt-5.6-sol"
+
+scope:
+  changed_paths_in_scope: true
+  unexpected_paths: []
+  candidate_paths:
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/index.ts"
+  producer_implementation_paths:
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/index.ts"
+  metadata_only_handoff: true
+  metadata_path: "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+  model_gate_satisfied: true
+  subagents_used: false
+
+acceptance:
+  - id: "F02-AC-01"
+    result: "pass"
+    evidence:
+      - "The three independent animation version constants are publicly exported as literal 1 values, and the reviewed range changes no existing app, database, backup, catalog, nutrition, workout, or package version."
+  - id: "F02-AC-02"
+    result: "fail"
+    evidence:
+      - "The dependency-free public parser surface exists, but malformed HTTPS authorities and ports are accepted and valid early ISO/RFC 3339 years are rejected, so unknown values are not parsed under the required strict primitive rules."
+  - id: "F02-AC-03"
+    result: "pass"
+    evidence:
+      - "The descriptor exclusively owns archiveByteSize, archiveSha256, manifestPath, manifestByteSize, and manifestSha256, and the manifest rejects those forbidden fields."
+  - id: "F02-AC-04"
+    result: "fail"
+    evidence:
+      - "Schema/protocol/catalog/minimum-app and identity compatibility checks exist, but the manifest's bound review may disagree with the unique declared review record while validation and descriptor compatibility both succeed."
+  - id: "F02-AC-05"
+    result: "fail"
+    evidence:
+      - "Independent malformed-input probes reproduced sparse-array acceptance or throws, lossy negative zero, early-year rejection, malformed HTTPS acceptance, incomplete safe referential diagnostics, and incomplete bound-review integrity."
+  - id: "F02-AC-06"
+    result: "fail"
+    evidence:
+      - "Sparse holes and negative zero violate lossless JSON round-trip, a sparse assets array can throw TypeError, and all-or-nothing element parsing both creates false referential issues and suppresses independently detectable issues."
+  - id: "F02-AC-07"
+    result: "pass"
+    evidence:
+      - "Exact exerciseVariantId and animationCatalogVersion lookup remains byte-for-byte and the reviewed defects do not introduce cross-equipment fallback or identity coercion."
+  - id: "F02-AC-08"
+    result: "fail"
+    evidence:
+      - "The installed/player discriminated unions are present, but parseAnimationPlayerState accepts negative zero for positionSeconds, violating the required serializable result contract."
+  - id: "F02-AC-09"
+    result: "pass"
+    evidence:
+      - "The public index exports the complete ordered stable AnimationPackError code set and tests pin all required spellings."
+  - id: "F02-AC-10"
+    result: "pass"
+    evidence:
+      - "The producer delta contains only animation-pack.ts, animation-pack.test.ts, and index.ts; there are no dependency, configuration, storage, media, app, catalog, backup, content, builder, fixture, or asset changes."
+  - id: "F02-AC-11"
+    result: "fail"
+    evidence:
+      - "The candidate and metadata commits resolve exactly, and the metadata range contains only FOUNDATION-02-handoff.yaml, but the handoff itself retains an unresolved SELF expression rather than recording a non-circular exact evidence range."
+
+checks:
+  - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    result: "pass"
+    evidence: "The immutable handoff records 1 test file and 95 tests passing at candidate 21e88fe4d9c1426363a792d0cf351d3d665f9cc5; the suite lacks the seven required regressions reproduced by cold review."
+  - command: "pnpm run typecheck"
+    result: "pass"
+    evidence: "The immutable handoff records tsc -b --pretty false exiting 0 at the candidate."
+  - command: "pnpm exec eslint packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts packages/contracts/src/index.ts --max-warnings=0"
+    result: "pass"
+    evidence: "The immutable handoff records exit 0 with no warnings or errors at the candidate."
+  - command: "pnpm run verify"
+    result: "pass"
+    evidence: "The immutable handoff records architecture, lint, typecheck, content validation/audit, 244 tests, build, PWA generation, and performance budgets passing at the candidate."
+  - command: "git diff --check f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+    result: "pass"
+    evidence: "Exit 0 with no whitespace errors."
+  - command: "git diff --name-only 208d5c606c72d1d175dfa1d7552689186eec9ffe..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+    result: "pass"
+    evidence: "Only packages/contracts/src/animation-pack.test.ts, packages/contracts/src/animation-pack.ts, and packages/contracts/src/index.ts changed."
+  - command: "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..21e88fe4d9c1426363a792d0cf351d3d665f9cc5"
+    result: "pass"
+    evidence: "Only the FOUNDATION-02 packet and the three authorized contract implementation paths changed."
+  - command: "git diff --name-only 21e88fe4d9c1426363a792d0cf351d3d665f9cc5..e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f"
+    result: "pass"
+    evidence: "Only docs/ai/reviews/FOUNDATION-02-handoff.yaml changed after the candidate."
+  - command: "Parse docs/ai/packets/FOUNDATION-02.yaml and docs/ai/reviews/FOUNDATION-02-handoff.yaml with bundled Node and repository js-yaml"
+    result: "pass"
+    evidence: "Both reviewed YAML documents parse as objects and identify the expected packet, candidate, branch, paths, checks, and review targets; semantic review found the circular SELF evidence defect."
+  - command: "manual review against docs/code-review.md"
+    result: "fail"
+    evidence: "Scope and module boundaries pass, but untrusted-input validation can throw, accept malformed or lossy values, omit safe diagnostics, and accept inconsistent release-review evidence."
+  - command: "manual public-boundary and internal-import audit"
+    result: "pass"
+    evidence: "The animation-pack surface is exported through packages/contracts/src/index.ts, tests import the public index, and no production consumer imports the implementation path directly."
+  - command: "manual trust-boundary and compatibility trace"
+    result: "fail"
+    evidence: "Descriptor-only integrity ownership and future-version failure behavior pass, but release-review binding checks only ID membership rather than equality with the unique declared record."
+  - command: "independent malformed-input regression probes"
+    result: "fail"
+    evidence: "All seven findings below were independently reproduced against the reviewed candidate."
+
+licenses:
+  result: "pass"
+  findings: []
+  evidence:
+    - "No media, model, archive, fixture, image, generated binary, or third-party source content is included."
+    - "Only synthetic example.test source/license metadata is used by tests."
+
+findings:
+  - severity: "P1"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 598
+    issue: "Sparse array holes are accepted, produce lossy success data, and can make manifest parsing throw."
+    reproduction_or_evidence: >-
+      A trailing hole in reviews, licenses, sources, or entries, and a hole in equipmentProps,
+      produced success; JSON round-trip changed each hole to null. A trailing hole in assets
+      threw TypeError at the Map construction on line 662 instead of returning validation issues.
+    required_fix: >-
+      Explicitly reject missing own indices in every accepted array before mapping, including
+      equipmentProps, and never construct referential maps until every array element is defined.
+      Add sparse-array and JSON-round-trip regression tests for every array field.
+
+  - severity: "P2"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 599
+    issue: "All-or-nothing array parsing causes false referential issues and suppresses safely detectable issues."
+    reproduction_or_evidence: >-
+      Making sources[0].author empty reported invalid_string plus false missing_source issues for
+      the asset and entry even though source.one was declared. Conversely, with one structurally
+      invalid entry and another valid entry referencing asset.missing-too, parsing reported only
+      invalid_id and omitted the safely detectable missing_asset.
+    required_fix: >-
+      Preserve per-element structural results and independently validated identities while
+      collecting issues. Run referential checks for every safely inspectable record, without
+      treating an existing but malformed declaration as absent.
+
+  - severity: "P1"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 663
+    issue: "The bound release review can disagree with the manifest's declared review record."
+    reproduction_or_evidence: >-
+      A manifest whose review and reviews[0] shared review.release-1 but had different reviewer
+      and reviewedAt values parsed successfully; compatibility with the descriptor also returned
+      success. Only review-ID membership is checked.
+    required_fix: >-
+      Require the bound manifest review to equal the unique reviews entry with that ID across
+      id, reviewer, reviewedAt, and status, or remove the duplicate representation. Test each
+      disagreement with stable paths.
+
+  - severity: "P2"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 288
+    issue: "Accepted negative-zero numbers do not survive JSON round-trip without loss."
+    reproduction_or_evidence: >-
+      parseAnimationPackEntry accepted -0 for loop.startSeconds and a camera component, and
+      parseAnimationPlayerState accepted -0 for positionSeconds. Object.is confirmed -0 in the
+      returned data, while JSON.stringify/JSON.parse changed every value to +0.
+    required_fix: >-
+      Reject Object.is(value, -0) in numeric positions where zero is permitted, consistent with
+      the no-coercion rule, and add negative-zero serialization tests for loop, camera, and player
+      position fields.
+
+  - severity: "P2"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 322
+    issue: "Valid ISO years 0001 through 0099 are rejected."
+    reproduction_or_evidence: >-
+      reviewedAt 0099-12-31 returned invalid_date. Installed and verified timestamps using
+      0099-12-31T23:59:59Z also returned invalid_timestamp. Date.UTC interprets years 0-99 as
+      1900-1999, so the real-date comparison fails.
+    required_fix: >-
+      Validate Gregorian date parts without Date.UTC's 0-99 remapping, and avoid Date.parse as
+      the validity authority. Add boundary and leap-year tests covering 0001, 0004, and 0099 for
+      dates and timestamps.
+
+  - severity: "P2"
+    path: "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
+    line: 11
+    issue: "The handoff does not record the exact metadata commit required by the packet."
+    reproduction_or_evidence: >-
+      handoff_commit remains an unresolved SELF expression and review_target.handoff_metadata
+      still ends at handoff_commit. The actual metadata commit is
+      e05f5d5ebf5485e5ed7a3064c7f65d2457e5837f, contradicting AC-11's requirement that immutable
+      ranges be recorded with exact SHAs in the handoff.
+    required_fix: >-
+      Establish an authorized non-self-referential evidence mechanism that binds the exact
+      metadata SHA, record the exact candidate-to-metadata range, and do not claim AC-11 until
+      that evidence exists.
+
+  - severity: "P1"
+    path: "packages/contracts/src/animation-pack.ts"
+    line: 368
+    issue: "Malformed HTTPS strings are accepted as source and license URLs."
+    reproduction_or_evidence: >-
+      Both record parsers accepted https://[, https://example.test:99999/path, and
+      https://user@:443/path, while the platform URL parser rejected each with TypeError.
+    required_fix: >-
+      Perform deterministic syntactic HTTPS URL validation with a valid hostname and port,
+      document the canonical form, and add malformed-host, malformed-authority, and invalid-port
+      regression tests.
+
+residual_risks:
+  - "Archive I/O, hashing, authenticated descriptor delivery, storage activation/rollback, rendering, and real license review remain deferred exactly as in FOUNDATION-02."
+merge_authorized: false
