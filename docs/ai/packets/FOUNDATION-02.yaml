@@ -272,8 +272,8 @@ acceptance_tests:
     requirement: "The candidate contains only the three authorized contract implementation paths; no package, dependency, storage, media, UI, backup, content, PWA, builder, fixture, or asset change exists."
     evidence: "git diff --name-only coordinator_packet_commit..candidate_commit and git diff --stat, recorded in handoff."
   - id: "F02-AC-11"
-    requirement: "The complete review range starts at f20bf05d3f640b94e7df178a4303d0105134c492, includes the unchanged coordinator packet plus the implementation candidate, and the only post-candidate delta is the handoff report."
-    evidence: "Immutable candidate and metadata range commands recorded with exact SHAs in the handoff."
+    requirement: "The complete review range starts at f20bf05d3f640b94e7df178a4303d0105134c492, includes the coordinator packet plus the implementation candidate, records the candidate's actual parent non-circularly, and has only the handoff report after the candidate."
+    evidence: "The handoff records exact pre-existing coordinator, producer-start, candidate-parent, candidate, and candidate ranges; the later independent cold review or coordinator attestation records the exact metadata commit and candidate-to-metadata range after that commit exists."
 
 required_checks:
   commands:
@@ -283,7 +283,8 @@ required_checks:
     - "git diff --check f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
     - "git diff --name-only coordinator_packet_commit..candidate_commit"
     - "git diff --name-only f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
-    - "git diff --name-only candidate_commit..handoff_commit"
+    - "git rev-parse candidate_commit^"
+    - "After the metadata commit exists, git diff --name-only candidate_commit..metadata_commit must print only docs/ai/reviews/FOUNDATION-02-handoff.yaml; the independent cold review or coordinator attestation records the exact metadata_commit and range."
     - "Parse docs/ai/packets/FOUNDATION-02.yaml and docs/ai/reviews/FOUNDATION-02-handoff.yaml with the bundled Node runtime and repository js-yaml."
   timing:
     - "Run focused tests and typecheck during implementation and again at the final candidate bytes."
@@ -327,15 +328,16 @@ stop_gates:
 handoff:
   report_path: "docs/ai/reviews/FOUNDATION-02-handoff.yaml"
   candidate_commit_excludes_handoff_metadata_commit: true
-  metadata_commit_rule: "After candidate_commit, only docs/ai/reviews/FOUNDATION-02-handoff.yaml may change before cold review, and it must be committed separately without amending candidate_commit."
+  metadata_commit_rule: "After candidate_commit, only docs/ai/reviews/FOUNDATION-02-handoff.yaml may change before cold review, and it must be committed separately without amending candidate_commit. The handoff must not and cannot contain its own metadata commit SHA."
   required_fields:
     - "packet_id"
     - "status"
     - "lineage_base_commit"
+    - "review_base_commit"
     - "coordinator_packet_commit"
     - "producer_start_commit"
+    - "candidate_parent_commit"
     - "candidate_commit"
-    - "handoff_commit"
     - "branch"
     - "changed_paths"
     - "acceptance_evidence"
@@ -343,10 +345,13 @@ handoff:
     - "licenses"
     - "known_risks"
     - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
   required_review_target:
     candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
     producer_delta: "coordinator_packet_commit..candidate_commit"
-    handoff_metadata: "candidate_commit..handoff_commit; docs/ai/reviews/FOUNDATION-02-handoff.yaml only"
+    candidate_parent: "candidate_parent_commit must equal candidate_commit^ and be recorded as an exact 40-character SHA."
+    handoff_metadata_rule: "The later independent cold review or coordinator attestation records exact candidate_commit..metadata_commit after metadata_commit exists; that range must contain only docs/ai/reviews/FOUNDATION-02-handoff.yaml."
 
 cold_review:
   required: true
@@ -360,14 +365,16 @@ cold_review:
     - "FAIL"
     - "BLOCKED"
   report_path: "docs/ai/reviews/FOUNDATION-02-cold-review.yaml"
+  exact_metadata_attestation_required: true
   immutable_ranges:
     candidate: "f20bf05d3f640b94e7df178a4303d0105134c492..candidate_commit"
     producer_implementation: "coordinator_packet_commit..candidate_commit"
-    handoff_metadata: "candidate_commit..handoff_commit; docs/ai/reviews/FOUNDATION-02-handoff.yaml only"
+    handoff_metadata: "candidate_commit..metadata_commit; docs/ai/reviews/FOUNDATION-02-handoff.yaml only; metadata_commit is recorded by the independent cold review or coordinator attestation after it exists"
   required_focus:
     - "Re-run or independently verify focused tests, typecheck, and pnpm run verify at candidate_commit."
     - "Review runtime validation strictness, deterministic issue ordering/paths, trust-boundary field ownership, compatibility failure behavior, exact-variant semantics, and public @gym/contracts exports."
     - "Confirm the packet is the only coordinator delta, implementation is limited to three contract paths, and the handoff is the only post-candidate delta."
+    - "Record the exact metadata commit and candidate-to-metadata range without requiring the handoff to identify its own commit."
 
 merge:
   allowed_only_after: "PASS"

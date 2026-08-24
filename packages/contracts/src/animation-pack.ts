@@ -18,8 +18,11 @@
  * Dependency-free v1 contracts for trusted animation-pack release metadata.
  *
  * Canonical IDs use lowercase ASCII alphanumerics separated by `.`, `_`, or `-`.
- * Metadata dates are real `YYYY-MM-DD` dates. Installed timestamps are canonical
- * RFC 3339 timestamps with seconds and either no fraction or exactly milliseconds.
+ * Metadata dates are real proleptic-Gregorian `YYYY-MM-DD` dates with years
+ * `0001` through `9999`. Installed timestamps are canonical RFC 3339 timestamps
+ * with seconds and either no fraction or exactly milliseconds. URLs are absolute
+ * `https` URLs with no credentials, a lowercase ASCII DNS host or bracketed IPv6
+ * host, and an optional decimal port from 0 through 65535.
  */
 
 export const animationPackSchemaVersion = 1 as const;
@@ -286,7 +289,7 @@ function booleanValue(value: unknown, path: Path, context: ValidationContext): b
 }
 
 function finiteNumber(value: unknown, path: Path, context: ValidationContext, minimum: number, maximum: number, code = "invalid_number"): number | undefined {
-  if (typeof value !== "number" || !Number.isFinite(value) || value < minimum || value > maximum) {
+  if (typeof value !== "number" || !Number.isFinite(value) || Object.is(value, -0) || value < minimum || value > maximum) {
     context.issue(code, path);
     return undefined;
   }
@@ -318,9 +321,10 @@ function semver(value: unknown, path: Path, context: ValidationContext): string 
 }
 
 function isRealDateParts(year: number, month: number, day: number): boolean {
-  if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31) return false;
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+  if (year < 1 || year > 9999 || month < 1 || month > 12 || day < 1) return false;
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day <= daysInMonth[month - 1];
 }
 
 function metadataDate(value: unknown, path: Path, context: ValidationContext): string | undefined {
@@ -349,7 +353,7 @@ function timestamp(value: unknown, path: Path, context: ValidationContext): stri
   const [, year, month, day, hour, minute, second, , zone] = match;
   const zoneHour = zone === "Z" ? 0 : Number(zone.slice(1, 3));
   const zoneMinute = zone === "Z" ? 0 : Number(zone.slice(4, 6));
-  if (!isRealDateParts(Number(year), Number(month), Number(day)) || Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59 || zoneHour > 14 || zoneMinute > 59 || (zoneHour === 14 && zoneMinute !== 0) || !Number.isFinite(Date.parse(value))) {
+  if (!isRealDateParts(Number(year), Number(month), Number(day)) || Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59 || zoneHour > 14 || zoneMinute > 59 || (zoneHour === 14 && zoneMinute !== 0)) {
     context.issue("invalid_timestamp", path);
     return undefined;
   }
@@ -365,7 +369,61 @@ function sha256(value: unknown, path: Path, context: ValidationContext): string 
 }
 
 function httpsUrl(value: unknown, path: Path, context: ValidationContext): string | undefined {
-  if (typeof value !== "string" || !/^https:\/\/[^\s/?#]+(?:[^\s]*)$/.test(value)) {
+  if (typeof value !== "string" || !value.startsWith("https://") || /[\s\\]/.test(value)) {
+    context.issue("invalid_url", path);
+    return undefined;
+  }
+  const authorityMatch = /^https:\/\/([^/?#]+)(?:[/?#]|$)/.exec(value);
+  if (authorityMatch === null || authorityMatch[1].includes("@")) {
+    context.issue("invalid_url", path);
+    return undefined;
+  }
+  const authority = authorityMatch[1];
+  let rawHost: string;
+  let rawPort: string | undefined;
+  if (authority.startsWith("[")) {
+    const closingBracket = authority.indexOf("]");
+    if (closingBracket < 0) {
+      context.issue("invalid_url", path);
+      return undefined;
+    }
+    rawHost = authority.slice(0, closingBracket + 1);
+    const remainder = authority.slice(closingBracket + 1);
+    if (remainder !== "") {
+      if (!remainder.startsWith(":")) {
+        context.issue("invalid_url", path);
+        return undefined;
+      }
+      rawPort = remainder.slice(1);
+    }
+  } else {
+    const firstColon = authority.indexOf(":");
+    const lastColon = authority.lastIndexOf(":");
+    if (firstColon !== lastColon) {
+      context.issue("invalid_url", path);
+      return undefined;
+    }
+    rawHost = firstColon < 0 ? authority : authority.slice(0, firstColon);
+    rawPort = firstColon < 0 ? undefined : authority.slice(firstColon + 1);
+  }
+  const dnsHostIsValid = rawHost.length <= 253
+    && rawHost === rawHost.toLowerCase()
+    && rawHost.split(".").every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label));
+  if ((!rawHost.startsWith("[") && !dnsHostIsValid) || (rawPort !== undefined && (!/^(?:0|[1-9]\d{0,4})$/.test(rawPort) || Number(rawPort) > 65_535))) {
+    context.issue("invalid_url", path);
+    return undefined;
+  }
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "https:" || parsed.username !== "" || parsed.password !== "" || parsed.hostname === "") {
+      context.issue("invalid_url", path);
+      return undefined;
+    }
+    if (!rawHost.startsWith("[") && parsed.hostname !== rawHost) {
+      context.issue("invalid_url", path);
+      return undefined;
+    }
+  } catch {
     context.issue("invalid_url", path);
     return undefined;
   }
@@ -393,11 +451,26 @@ function arrayValue(value: unknown, path: Path, context: ValidationContext): unk
   return value;
 }
 
+function parseArrayElements<T>(
+  input: unknown[],
+  path: Path,
+  context: ValidationContext,
+  parser: (item: unknown, itemPath: Path, itemContext: ValidationContext) => T | undefined
+): Array<T | undefined> {
+  return Array.from({ length: input.length }, (_, index) => {
+    if (!Object.hasOwn(input, index)) {
+      context.issue("missing_array_element", [...path, index]);
+      return undefined;
+    }
+    return parser(input[index], [...path, index], context);
+  });
+}
+
 function vector3(value: unknown, path: Path, context: ValidationContext): [number, number, number] | undefined {
   const array = arrayValue(value, path, context);
   if (array === undefined) return undefined;
   if (array.length !== 3) context.issue("invalid_vector", path);
-  const components = [0, 1, 2].map((index) => finiteNumber(array[index], [...path, index], context, -10_000, 10_000, "invalid_camera_number"));
+  const components = parseArrayElements(array, path, context, (item, itemPath, itemContext) => finiteNumber(item, itemPath, itemContext, -10_000, 10_000, "invalid_camera_number"));
   if (array.length !== 3 || components.some((item) => item === undefined)) return undefined;
   return components as [number, number, number];
 }
@@ -508,7 +581,9 @@ function parseEntry(value: unknown, path: Path, context: ValidationContext): Ani
   }
   const defaultCamera = parseCamera(input.defaultCamera, [...path, "defaultCamera"], context);
   const equipmentInput = arrayValue(input.equipmentProps, [...path, "equipmentProps"], context);
-  const equipmentProps = equipmentInput?.map((item, index) => canonicalId(item, [...path, "equipmentProps", index], context));
+  const equipmentProps = equipmentInput === undefined
+    ? undefined
+    : parseArrayElements(equipmentInput, [...path, "equipmentProps"], context, canonicalId);
   if (equipmentProps !== undefined) {
     const seen = new Set<string>();
     equipmentProps.forEach((item, index) => {
@@ -592,17 +667,87 @@ export function parseAnimationPackReleaseDescriptor(value: unknown): AnimationPa
   return finish(context, parsed);
 }
 
-function parseRecordArray<T>(value: unknown, path: Path, context: ValidationContext, parser: (item: unknown, itemPath: Path, itemContext: ValidationContext) => T | undefined): T[] | undefined {
-  const input = arrayValue(value, path, context);
-  if (input === undefined) return undefined;
-  const parsed = input.map((item, index) => parser(item, [...path, index], context));
-  return parsed.every((item) => item !== undefined) ? parsed as T[] : undefined;
+interface ParsedRecordArray<T> {
+  input: unknown[];
+  items: Array<T | undefined>;
+  complete: T[] | undefined;
 }
 
-function reportDuplicates<T>(items: readonly T[], path: Path, context: ValidationContext, select: (item: T) => string, field: string, code = "duplicate_id"): void {
+function parseRecordArray<T>(value: unknown, path: Path, context: ValidationContext, parser: (item: unknown, itemPath: Path, itemContext: ValidationContext) => T | undefined): ParsedRecordArray<T> | undefined {
+  const input = arrayValue(value, path, context);
+  if (input === undefined) return undefined;
+  const items = parseArrayElements(input, path, context, parser);
+  return {
+    input,
+    items,
+    complete: items.every((item) => item !== undefined) ? items as T[] : undefined
+  };
+}
+
+interface InspectedRecord {
+  index: number;
+  input: UnknownRecord;
+}
+
+function inspectedRecords<T>(array: ParsedRecordArray<T> | undefined): InspectedRecord[] {
+  if (array === undefined) return [];
+  const records: InspectedRecord[] = [];
+  for (let index = 0; index < array.input.length; index += 1) {
+    if (!Object.hasOwn(array.input, index)) continue;
+    const input = array.input[index];
+    if (isRecord(input)) records.push({ index, input });
+  }
+  return records;
+}
+
+function inspectWith<T>(parser: (context: ValidationContext) => T | undefined): T | undefined {
+  return parser(new ValidationContext());
+}
+
+function inspectId(input: UnknownRecord, field: string): string | undefined {
+  return inspectWith((context) => canonicalId(input[field], [], context));
+}
+
+function inspectText(input: UnknownRecord, field: string): string | undefined {
+  return inspectWith((context) => plainText(input[field], [], context));
+}
+
+function inspectDate(input: UnknownRecord, field: string): string | undefined {
+  return inspectWith((context) => metadataDate(input[field], [], context));
+}
+
+function inspectVersion(input: UnknownRecord, field: string): number | undefined {
+  return inspectWith((context) => positiveVersion(input[field], [], context));
+}
+
+function inspectBoolean(input: UnknownRecord, field: string): boolean | undefined {
+  return inspectWith((context) => booleanValue(input[field], [], context));
+}
+
+function inspectPath(input: UnknownRecord, field: string): string | undefined {
+  return inspectWith((context) => relativePath(input[field], [], context));
+}
+
+function inspectDuration(input: UnknownRecord, field: string): number | undefined {
+  return inspectWith((context) => finiteNumber(input[field], [], context, Number.MIN_VALUE, 86_400, "invalid_duration"));
+}
+
+function inspectReviewStatus(input: UnknownRecord): AnimationReviewRecord["status"] | undefined {
+  return inspectWith((context) => enumValue(input.status, ["approved"], [], context));
+}
+
+function reportInspectedDuplicates(
+  records: readonly InspectedRecord[],
+  path: Path,
+  context: ValidationContext,
+  select: (input: UnknownRecord) => string | undefined,
+  field: string,
+  code = "duplicate_id"
+): void {
   const seen = new Set<string>();
-  items.forEach((item, index) => {
-    const value = select(item);
+  records.forEach(({ index, input }) => {
+    const value = select(input);
+    if (value === undefined) return;
     if (seen.has(value)) context.issue(code, [...path, index, field]);
     seen.add(value);
   });
@@ -625,63 +770,114 @@ export function parseAnimationPackManifest(value: unknown): AnimationPackValidat
     const releaseDate = metadataDate(input.releaseDate, ["releaseDate"], context);
     const createdAt = metadataDate(input.createdAt, ["createdAt"], context);
     const review = parseReview(input.review, ["review"], context);
-    const reviews = parseRecordArray(input.reviews, ["reviews"], context, parseReview);
-    const licenses = parseRecordArray(input.licenses, ["licenses"], context, parseLicense);
-    const sources = parseRecordArray(input.sources, ["sources"], context, parseSource);
-    const assets = parseRecordArray(input.assets, ["assets"], context, parseAsset);
-    const entries = parseRecordArray(input.entries, ["entries"], context, parseEntry);
+    const reviewArray = parseRecordArray(input.reviews, ["reviews"], context, parseReview);
+    const licenseArray = parseRecordArray(input.licenses, ["licenses"], context, parseLicense);
+    const sourceArray = parseRecordArray(input.sources, ["sources"], context, parseSource);
+    const assetArray = parseRecordArray(input.assets, ["assets"], context, parseAsset);
+    const entryArray = parseRecordArray(input.entries, ["entries"], context, parseEntry);
+    const reviews = reviewArray?.complete;
+    const licenses = licenseArray?.complete;
+    const sources = sourceArray?.complete;
+    const assets = assetArray?.complete;
+    const entries = entryArray?.complete;
     ([
-      ["reviews", reviews],
-      ["licenses", licenses],
-      ["sources", sources],
-      ["assets", assets],
-      ["entries", entries]
+      ["reviews", reviewArray],
+      ["licenses", licenseArray],
+      ["sources", sourceArray],
+      ["assets", assetArray],
+      ["entries", entryArray]
     ] as const).forEach(([field, items]) => {
-      if (items !== undefined && items.length === 0) context.issue("empty_array", [field]);
+      if (items !== undefined && items.input.length === 0) context.issue("empty_array", [field]);
     });
-    if (reviews) reportDuplicates(reviews, ["reviews"], context, (item) => item.id, "id");
-    if (licenses) reportDuplicates(licenses, ["licenses"], context, (item) => item.id, "id");
-    if (sources) reportDuplicates(sources, ["sources"], context, (item) => item.id, "id");
-    if (assets) {
-      reportDuplicates(assets, ["assets"], context, (item) => item.id, "id");
-      reportDuplicates(assets, ["assets"], context, (item) => item.path, "path", "duplicate_path");
+    const reviewRecords = inspectedRecords(reviewArray);
+    const licenseRecords = inspectedRecords(licenseArray);
+    const sourceRecords = inspectedRecords(sourceArray);
+    const assetRecords = inspectedRecords(assetArray);
+    const entryRecords = inspectedRecords(entryArray);
+    reportInspectedDuplicates(reviewRecords, ["reviews"], context, (item) => inspectId(item, "id"), "id");
+    reportInspectedDuplicates(licenseRecords, ["licenses"], context, (item) => inspectId(item, "id"), "id");
+    reportInspectedDuplicates(sourceRecords, ["sources"], context, (item) => inspectId(item, "id"), "id");
+    reportInspectedDuplicates(assetRecords, ["assets"], context, (item) => inspectId(item, "id"), "id");
+    reportInspectedDuplicates(assetRecords, ["assets"], context, (item) => inspectPath(item, "path"), "path", "duplicate_path");
+    reportInspectedDuplicates(entryRecords, ["entries"], context, (item) => inspectId(item, "animationId"), "animationId");
+    reportInspectedDuplicates(entryRecords, ["entries"], context, (item) => {
+      const exerciseVariantId = inspectId(item, "exerciseVariantId");
+      const mappingVersion = inspectVersion(item, "animationCatalogVersion");
+      const animationId = inspectId(item, "animationId");
+      return exerciseVariantId && mappingVersion && animationId ? `${exerciseVariantId}\u0000${mappingVersion}\u0000${animationId}` : undefined;
+    }, "animationId", "duplicate_mapping");
+    const primarySeen = new Set<string>();
+    entryRecords.forEach(({ index, input: item }) => {
+      const exerciseVariantId = inspectId(item, "exerciseVariantId");
+      const mappingVersion = inspectVersion(item, "animationCatalogVersion");
+      const primary = inspectBoolean(item, "primary");
+      if (exerciseVariantId === undefined || mappingVersion === undefined || primary !== true) return;
+      const tuple = `${exerciseVariantId}\u0000${mappingVersion}`;
+      if (primarySeen.has(tuple)) context.issue("duplicate_primary_mapping", ["entries", index, "primary"]);
+      primarySeen.add(tuple);
+    });
+
+    const reviewIds = new Set(reviewRecords.map(({ input: item }) => inspectId(item, "id")).filter((item): item is string => item !== undefined));
+    const licenseIds = new Set(licenseRecords.map(({ input: item }) => inspectId(item, "id")).filter((item): item is string => item !== undefined));
+    const sourceIds = new Set(sourceRecords.map(({ input: item }) => inspectId(item, "id")).filter((item): item is string => item !== undefined));
+    const assetIds = new Set(assetRecords.map(({ input: item }) => inspectId(item, "id")).filter((item): item is string => item !== undefined));
+    const boundReviewInput = isRecord(input.review) ? input.review : undefined;
+    const boundReviewId = boundReviewInput === undefined ? undefined : inspectId(boundReviewInput, "id");
+    if (boundReviewInput !== undefined && boundReviewId !== undefined) {
+      const matchingReviews = reviewRecords.filter(({ input: item }) => inspectId(item, "id") === boundReviewId);
+      if (matchingReviews.length === 0) context.issue("missing_review", ["review", "id"]);
+      else if (matchingReviews.length > 1) context.issue("ambiguous_review_binding", ["review", "id"]);
+      else {
+        const declaredReview = matchingReviews[0].input;
+        if (inspectText(declaredReview, "reviewer") !== inspectText(boundReviewInput, "reviewer")) context.issue("review_binding_mismatch", ["review", "reviewer"]);
+        if (inspectDate(declaredReview, "reviewedAt") !== inspectDate(boundReviewInput, "reviewedAt")) context.issue("review_binding_mismatch", ["review", "reviewedAt"]);
+        if (inspectReviewStatus(declaredReview) !== inspectReviewStatus(boundReviewInput)) context.issue("review_binding_mismatch", ["review", "status"]);
+      }
     }
-    if (entries) {
-      reportDuplicates(entries, ["entries"], context, (item) => item.animationId, "animationId");
-      reportDuplicates(entries, ["entries"], context, (item) => `${item.exerciseVariantId}\u0000${item.animationCatalogVersion}\u0000${item.animationId}`, "animationId", "duplicate_mapping");
-      const primarySeen = new Set<string>();
-      entries.forEach((entry, index) => {
-        const tuple = `${entry.exerciseVariantId}\u0000${entry.animationCatalogVersion}`;
-        if (entry.primary && primarySeen.has(tuple)) context.issue("duplicate_primary_mapping", ["entries", index, "primary"]);
-        if (entry.primary) primarySeen.add(tuple);
-      });
-    }
-    const reviewIds = new Set(reviews?.map((item) => item.id));
-    const licenseIds = new Set(licenses?.map((item) => item.id));
-    const sourceIds = new Set(sources?.map((item) => item.id));
-    const assetById = new Map(assets?.map((item) => [item.id, item]));
-    if (review && !reviewIds.has(review.id)) context.issue("missing_review", ["review", "id"]);
-    licenses?.forEach((license, index) => { if (!reviewIds.has(license.reviewId)) context.issue("missing_review", ["licenses", index, "reviewId"]); });
-    sources?.forEach((source, index) => {
-      if (!licenseIds.has(source.licenseId)) context.issue("missing_license", ["sources", index, "licenseId"]);
-      if (!reviewIds.has(source.reviewId)) context.issue("missing_review", ["sources", index, "reviewId"]);
+    licenseRecords.forEach(({ index, input: item }) => {
+      const reviewId = inspectId(item, "reviewId");
+      if (reviewId !== undefined && !reviewIds.has(reviewId)) context.issue("missing_review", ["licenses", index, "reviewId"]);
     });
-    assets?.forEach((asset, index) => {
-      if (!sourceIds.has(asset.sourceId)) context.issue("missing_source", ["assets", index, "sourceId"]);
-      if (!licenseIds.has(asset.licenseId)) context.issue("missing_license", ["assets", index, "licenseId"]);
-      const source = sources?.find((item) => item.id === asset.sourceId);
-      if (source && source.licenseId !== asset.licenseId) context.issue("license_reference_mismatch", ["assets", index, "licenseId"]);
+    sourceRecords.forEach(({ index, input: item }) => {
+      const licenseId = inspectId(item, "licenseId");
+      const reviewId = inspectId(item, "reviewId");
+      if (licenseId !== undefined && !licenseIds.has(licenseId)) context.issue("missing_license", ["sources", index, "licenseId"]);
+      if (reviewId !== undefined && !reviewIds.has(reviewId)) context.issue("missing_review", ["sources", index, "reviewId"]);
     });
-    entries?.forEach((entry, index) => {
-      const asset = assetById.get(entry.assetId);
-      if (!asset) context.issue("missing_asset", ["entries", index, "assetId"]);
-      if (!sourceIds.has(entry.sourceId)) context.issue("missing_source", ["entries", index, "sourceId"]);
-      if (!licenseIds.has(entry.licenseId)) context.issue("missing_license", ["entries", index, "licenseId"]);
-      if (asset && asset.path !== entry.assetPath) context.issue("asset_path_mismatch", ["entries", index, "assetPath"]);
-      if (asset && asset.durationSeconds !== entry.durationSeconds) context.issue("asset_duration_mismatch", ["entries", index, "durationSeconds"]);
-      if (asset && asset.sourceId !== entry.sourceId) context.issue("source_reference_mismatch", ["entries", index, "sourceId"]);
-      if (asset && asset.licenseId !== entry.licenseId) context.issue("license_reference_mismatch", ["entries", index, "licenseId"]);
-      if (catalogVersion !== undefined && entry.animationCatalogVersion !== catalogVersion) context.issue("mapping_catalog_mismatch", ["entries", index, "animationCatalogVersion"]);
+    assetRecords.forEach(({ index, input: item }) => {
+      const sourceId = inspectId(item, "sourceId");
+      const licenseId = inspectId(item, "licenseId");
+      if (sourceId !== undefined && !sourceIds.has(sourceId)) context.issue("missing_source", ["assets", index, "sourceId"]);
+      if (licenseId !== undefined && !licenseIds.has(licenseId)) context.issue("missing_license", ["assets", index, "licenseId"]);
+      const matchingSources = sourceRecords.filter(({ input: sourceItem }) => inspectId(sourceItem, "id") === sourceId);
+      if (matchingSources.length === 1) {
+        const sourceLicenseId = inspectId(matchingSources[0].input, "licenseId");
+        if (sourceLicenseId !== undefined && licenseId !== undefined && sourceLicenseId !== licenseId) context.issue("license_reference_mismatch", ["assets", index, "licenseId"]);
+      }
+    });
+    entryRecords.forEach(({ index, input: item }) => {
+      const assetId = inspectId(item, "assetId");
+      const sourceId = inspectId(item, "sourceId");
+      const licenseId = inspectId(item, "licenseId");
+      const mappingVersion = inspectVersion(item, "animationCatalogVersion");
+      if (assetId !== undefined && !assetIds.has(assetId)) context.issue("missing_asset", ["entries", index, "assetId"]);
+      if (sourceId !== undefined && !sourceIds.has(sourceId)) context.issue("missing_source", ["entries", index, "sourceId"]);
+      if (licenseId !== undefined && !licenseIds.has(licenseId)) context.issue("missing_license", ["entries", index, "licenseId"]);
+      const matchingAssets = assetRecords.filter(({ input: assetItem }) => inspectId(assetItem, "id") === assetId);
+      if (matchingAssets.length === 1) {
+        const declaredAsset = matchingAssets[0].input;
+        const assetPath = inspectPath(declaredAsset, "path");
+        const entryPath = inspectPath(item, "assetPath");
+        const assetDuration = inspectDuration(declaredAsset, "durationSeconds");
+        const entryDuration = inspectDuration(item, "durationSeconds");
+        const assetSourceId = inspectId(declaredAsset, "sourceId");
+        const assetLicenseId = inspectId(declaredAsset, "licenseId");
+        if (assetPath !== undefined && entryPath !== undefined && assetPath !== entryPath) context.issue("asset_path_mismatch", ["entries", index, "assetPath"]);
+        if (assetDuration !== undefined && entryDuration !== undefined && assetDuration !== entryDuration) context.issue("asset_duration_mismatch", ["entries", index, "durationSeconds"]);
+        if (assetSourceId !== undefined && sourceId !== undefined && assetSourceId !== sourceId) context.issue("source_reference_mismatch", ["entries", index, "sourceId"]);
+        if (assetLicenseId !== undefined && licenseId !== undefined && assetLicenseId !== licenseId) context.issue("license_reference_mismatch", ["entries", index, "licenseId"]);
+      }
+      if (catalogVersion !== undefined && mappingVersion !== undefined && mappingVersion !== catalogVersion) context.issue("mapping_catalog_mismatch", ["entries", index, "animationCatalogVersion"]);
     });
     if (packId && version && schemaVersion && protocolVersion && catalogVersion && minimumAppVersion && releaseDate && createdAt && review && reviews && licenses && sources && assets && entries) {
       parsed = { packId, version, animationPackSchemaVersion: schemaVersion, animationPlayerProtocolVersion: protocolVersion, animationCatalogVersion: catalogVersion, minimumAppVersion, releaseDate, createdAt, review, reviews, licenses, sources, assets, entries };
@@ -844,6 +1040,10 @@ export function validateAnimationPackCompatibility(
   if (!isRecord(manifest.review)) context.issue("invalid_type", ["manifest", "review"]);
   if (!isRecord(descriptor.review) || !isRecord(manifest.review)) {
     return finish<{ descriptor: AnimationPackReleaseDescriptor; manifest: AnimationPackManifest }>(context, undefined);
+  }
+  const parsedManifest = parseAnimationPackManifest(manifest);
+  if (!parsedManifest.success) {
+    parsedManifest.issues.forEach((issue) => context.issue(issue.code, ["manifest", ...issue.path], issue.message));
   }
   const current = parseSemverForComparison(currentAppVersion);
   if (current === undefined) context.issue("invalid_semver", ["currentAppVersion"]);

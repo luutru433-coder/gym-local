@@ -151,6 +151,14 @@ function setAtPath(root: Record<string, any>, path: Array<string | number>, valu
   cursor[path.at(-1)!] = value;
 }
 
+function sparseThree<T>(value: T, holeIndex: number): T[] {
+  const result = new Array<T>(3);
+  for (let index = 0; index < result.length; index += 1) {
+    if (index !== holeIndex) result[index] = structuredClone(value);
+  }
+  return result;
+}
+
 const request = {
   exerciseVariantId: entry.exerciseVariantId,
   animationId: entry.animationId,
@@ -350,6 +358,245 @@ describe("manifest integrity", () => {
       { code: "invalid_semver", path: ["version"] }
     ]);
     expect("data" in first).toBe(false);
+  });
+});
+
+describe("strict lossless regression matrix", () => {
+  const sparseFields = [
+    { label: "reviews", path: ["reviews"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.reviews = sparseThree(review, hole); } },
+    { label: "licenses", path: ["licenses"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.licenses = sparseThree(license, hole); } },
+    { label: "sources", path: ["sources"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.sources = sparseThree(source, hole); } },
+    { label: "assets", path: ["assets"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.assets = sparseThree(asset, hole); } },
+    { label: "entries", path: ["entries"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.entries = sparseThree(entry, hole); } },
+    { label: "equipmentProps", path: ["entries", 0, "equipmentProps"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.entries[0].equipmentProps = sparseThree("prop", hole); } },
+    { label: "camera position", path: ["entries", 0, "defaultCamera", "position"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.entries[0].defaultCamera.position = sparseThree(1, hole); } },
+    { label: "camera target", path: ["entries", 0, "defaultCamera", "target"] as Array<string | number>, apply: (input: Record<string, any>, hole: number) => { input.entries[0].defaultCamera.target = sparseThree(1, hole); } }
+  ];
+
+  it.each(sparseFields.flatMap((field) => [0, 1, 2].map((hole) => ({ ...field, hole }))))(
+    "rejects a sparse $label array hole at index $hole without throwing or losing JSON data",
+    ({ path, apply, hole }) => {
+      const input = manifest() as unknown as Record<string, any>;
+      apply(input, hole);
+      const before = structuredClone(input);
+      let first: ReturnType<typeof parseAnimationPackManifest> | undefined;
+      expect(() => { first = parseAnimationPackManifest(input); }).not.toThrow();
+      if (first === undefined) throw new Error("Parser did not return a result");
+      expectIssue(first, "missing_array_element", [...path, hole]);
+      expect(parseAnimationPackManifest(input)).toEqual(first);
+      expect(JSON.parse(JSON.stringify(first))).toEqual(first);
+      expect(input).toEqual(before);
+    }
+  );
+
+  it.each([
+    {
+      label: "review",
+      malformed: (input: AnimationPackManifest) => { input.reviews[0].reviewer = ""; },
+      addIndependentMissing: (input: AnimationPackManifest) => { input.licenses.push({ ...structuredClone(license), id: "license.other", reviewId: "review.missing" }); },
+      structuralPath: ["reviews", 0, "reviewer"],
+      structuralCode: "invalid_string",
+      absentFalseIssues: [["review", "id"], ["licenses", 0, "reviewId"], ["sources", 0, "reviewId"]],
+      missingCode: "missing_review",
+      missingPath: ["licenses", 1, "reviewId"]
+    },
+    {
+      label: "license",
+      malformed: (input: AnimationPackManifest) => { input.licenses[0].name = ""; },
+      addIndependentMissing: (input: AnimationPackManifest) => { input.sources.push({ ...structuredClone(source), id: "source.other", licenseId: "license.missing" }); },
+      structuralPath: ["licenses", 0, "name"],
+      structuralCode: "invalid_string",
+      absentFalseIssues: [["sources", 0, "licenseId"], ["assets", 0, "licenseId"], ["entries", 0, "licenseId"]],
+      missingCode: "missing_license",
+      missingPath: ["sources", 1, "licenseId"]
+    },
+    {
+      label: "source",
+      malformed: (input: AnimationPackManifest) => { input.sources[0].author = ""; },
+      addIndependentMissing: (input: AnimationPackManifest) => { input.assets.push({ ...structuredClone(asset), id: "asset.other", path: "assets/other.glb", sourceId: "source.missing" }); },
+      structuralPath: ["sources", 0, "author"],
+      structuralCode: "invalid_string",
+      absentFalseIssues: [["assets", 0, "sourceId"], ["entries", 0, "sourceId"]],
+      missingCode: "missing_source",
+      missingPath: ["assets", 1, "sourceId"]
+    },
+    {
+      label: "asset",
+      malformed: (input: AnimationPackManifest) => { input.assets[0].sha256 = "invalid"; },
+      addIndependentMissing: (input: AnimationPackManifest) => { input.entries.push({ ...structuredClone(entry), animationId: "animation.other", exerciseVariantId: "squat__other", assetId: "asset.missing" }); },
+      structuralPath: ["assets", 0, "sha256"],
+      structuralCode: "invalid_sha256",
+      absentFalseIssues: [["entries", 0, "assetId"]],
+      missingCode: "missing_asset",
+      missingPath: ["entries", 1, "assetId"]
+    },
+    {
+      label: "entry",
+      malformed: (input: AnimationPackManifest) => { input.entries[0].clipName = ""; },
+      addIndependentMissing: (input: AnimationPackManifest) => { input.entries.push({ ...structuredClone(entry), animationId: "animation.other", exerciseVariantId: "squat__other", assetId: "asset.missing" }); },
+      structuralPath: ["entries", 0, "clipName"],
+      structuralCode: "invalid_string",
+      absentFalseIssues: [["entries", 0, "assetId"], ["entries", 0, "sourceId"], ["entries", 0, "licenseId"]],
+      missingCode: "missing_asset",
+      missingPath: ["entries", 1, "assetId"]
+    }
+  ])("retains safe $label identities while reporting independent missing references", ({ malformed, addIndependentMissing, structuralPath, structuralCode, absentFalseIssues, missingCode, missingPath }) => {
+    const input = manifest();
+    malformed(input);
+    addIndependentMissing(input);
+    const result = parseAnimationPackManifest(input);
+    expectIssue(result, structuralCode, structuralPath);
+    expectIssue(result, missingCode, missingPath);
+    if (result.success) throw new Error("Expected validation failure");
+    for (const path of absentFalseIssues) {
+      expect(result.issues.some((issue) => issue.path.join(".") === path.join(".") && issue.code.startsWith("missing_"))).toBe(false);
+    }
+  });
+
+  it("accepts an exactly equal bound review record", () => {
+    expect(parseAnimationPackManifest(manifest()).success).toBe(true);
+  });
+
+  it.each([
+    ["reviewer", "Another reviewer", "review_binding_mismatch", ["review", "reviewer"]],
+    ["reviewedAt", "2026-08-25", "review_binding_mismatch", ["review", "reviewedAt"]],
+    ["status", "draft", "review_binding_mismatch", ["review", "status"]],
+    ["id", "review.other", "missing_review", ["review", "id"]]
+  ] as const)("rejects a bound review disagreement in %s", (field, value, code, path) => {
+    const input = manifest() as unknown as Record<string, any>;
+    input.review[field] = value;
+    expectIssue(parseAnimationPackManifest(input), code, [...path]);
+  });
+
+  it("rejects duplicate review identity as an ambiguous binding", () => {
+    const input = manifest();
+    input.reviews.push(structuredClone(review));
+    const result = parseAnimationPackManifest(input);
+    expectIssue(result, "duplicate_id", ["reviews", 1, "id"]);
+    expectIssue(result, "ambiguous_review_binding", ["review", "id"]);
+  });
+
+  it("prevents compatibility from accepting an internally inconsistent manifest review", () => {
+    const release = descriptor();
+    const input = manifest();
+    release.review.reviewer = "Another reviewer";
+    input.review.reviewer = release.review.reviewer;
+    expectIssue(validateAnimationPackCompatibility(release, input, "9.0.0"), "review_binding_mismatch", ["manifest", "review", "reviewer"]);
+  });
+
+  it.each([
+    ["loop start", ["loop", "startSeconds"]],
+    ["loop end", ["loop", "endSeconds"]],
+    ["camera position x", ["defaultCamera", "position", 0]],
+    ["camera position y", ["defaultCamera", "position", 1]],
+    ["camera position z", ["defaultCamera", "position", 2]],
+    ["camera target x", ["defaultCamera", "target", 0]],
+    ["camera target y", ["defaultCamera", "target", 1]],
+    ["camera target z", ["defaultCamera", "target", 2]]
+  ] as const)("rejects negative zero for %s", (_label, path) => {
+    const input = structuredClone(entry) as unknown as Record<string, any>;
+    setAtPath(input, [...path], -0);
+    const code = path[0] === "loop" ? "invalid_loop_window" : "invalid_camera_number";
+    expectIssue(parseAnimationPackEntry(input), code, [...path]);
+  });
+
+  it("rejects negative zero for player position", () => {
+    expectIssue(parseAnimationPlayerState({ status: "paused", request, positionSeconds: -0, durationSeconds: 4, offlineFallback: "none" }), "invalid_position", ["positionSeconds"]);
+  });
+
+  it("keeps every audited positive-zero control valid and JSON-lossless", () => {
+    const zeroEntry = structuredClone(entry);
+    zeroEntry.loop.startSeconds = 0;
+    zeroEntry.defaultCamera.position = [0, 0, 0];
+    zeroEntry.defaultCamera.target = [0, 0, 0];
+    const results = [
+      parseAnimationPackEntry(zeroEntry),
+      parseAnimationPlayerState({ status: "paused", request, positionSeconds: 0, durationSeconds: 4, offlineFallback: "none" })
+    ];
+    for (const result of results) {
+      expect(result.success).toBe(true);
+      expect(JSON.parse(JSON.stringify(result))).toEqual(result);
+    }
+  });
+
+  it.each(["0001-01-01", "0004-02-29", "0099-12-31"])("accepts real early Gregorian metadata date %s", (reviewedAt) => {
+    expect(parseAnimationReviewRecord({ ...review, reviewedAt }).success).toBe(true);
+  });
+
+  it.each(["0001-02-29", "0004-02-30", "0099-02-29", "0000-12-31"])("rejects impossible or out-of-range Gregorian metadata date %s", (reviewedAt) => {
+    expectIssue(parseAnimationReviewRecord({ ...review, reviewedAt }), "invalid_date", ["reviewedAt"]);
+  });
+
+  it.each([
+    "0001-01-01T00:00:00Z",
+    "0004-02-29T23:59:59.999+14:00",
+    "0099-12-31T23:59:59-14:00"
+  ])("accepts real early-year RFC 3339 timestamp %s", (installedAt) => {
+    const input = {
+      status: "staged",
+      packId: descriptor().packId,
+      version: "1.2.3",
+      installedByteSize: 20_000,
+      installedAt,
+      verifiedAt: installedAt,
+      verification: "verified",
+      stagedPointer: "pointer.staged"
+    };
+    expect(parseInstalledAnimationPack(input).success).toBe(true);
+  });
+
+  it.each([
+    "0001-02-29T00:00:00Z",
+    "0004-02-30T00:00:00Z",
+    "0099-02-29T00:00:00Z",
+    "0004-02-29T24:00:00Z",
+    "0004-02-29T23:59:60Z"
+  ])("rejects impossible early-year RFC 3339 timestamp %s", (installedAt) => {
+    const input = {
+      status: "staged",
+      packId: descriptor().packId,
+      version: "1.2.3",
+      installedByteSize: 20_000,
+      installedAt,
+      verifiedAt: "0004-02-29T00:00:00Z",
+      verification: "verified",
+      stagedPointer: "pointer.staged"
+    };
+    expectIssue(parseInstalledAnimationPack(input), "invalid_timestamp", ["installedAt"]);
+  });
+
+  const invalidHttpsUrls = [
+    "https://[",
+    "https://[::1",
+    "https:///path",
+    "https://user@:443/path",
+    "https://user:pass@example.test/path",
+    "https://-bad.example/path",
+    "https://bad_.example/path",
+    "https://example..test/path",
+    "https://example.test:/path",
+    "https://example.test:abc/path",
+    "https://example.test:00080/path",
+    "https://example.test:65536/path",
+    "https://example.test:99999/path",
+    "http://example.test/path"
+  ];
+
+  it.each(invalidHttpsUrls)("rejects malformed source HTTPS URL %s", (sourceUrl) => {
+    expectIssue(parseAnimationSourceRecord({ ...source, sourceUrl }), "invalid_url", ["sourceUrl"]);
+  });
+
+  it.each(invalidHttpsUrls)("rejects malformed license HTTPS URL %s", (termsUrl) => {
+    expectIssue(parseAnimationLicenseRecord({ ...license, termsUrl }), "invalid_url", ["termsUrl"]);
+  });
+
+  it.each([
+    "https://example.test/path",
+    "https://example.test:8443/path?query=value#section",
+    "https://[2001:db8::1]:8443/path"
+  ])("accepts documented canonical HTTPS URL %s in both source and license records", (url) => {
+    expect(parseAnimationSourceRecord({ ...source, sourceUrl: url }).success).toBe(true);
+    expect(parseAnimationLicenseRecord({ ...license, termsUrl: url }).success).toBe(true);
   });
 });
 
