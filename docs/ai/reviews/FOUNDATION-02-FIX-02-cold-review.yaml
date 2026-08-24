@@ -1,0 +1,127 @@
+schema_version: 1
+packet_id: "FOUNDATION-02-FIX-02"
+verdict: "PASS"
+reviewed_base_commit: "f20bf05d3f640b94e7df178a4303d0105134c492"
+reviewed_head_commit: "54b3ddada6d07b0ecd6b387fb2b7f40871ab3210"
+reviewed_metadata_commit: "e2c470fa4b0f0f14cdfca9f793ad892137776052"
+reviewed_candidate_range: "f20bf05d3f640b94e7df178a4303d0105134c492..54b3ddada6d07b0ecd6b387fb2b7f40871ab3210"
+reviewed_fixer_range: "181a6444156fb49205b2b443600548fde3d9b0ed..54b3ddada6d07b0ecd6b387fb2b7f40871ab3210"
+reviewed_metadata_range: "54b3ddada6d07b0ecd6b387fb2b7f40871ab3210..e2c470fa4b0f0f14cdfca9f793ad892137776052"
+reviewed_coordinator_range: "9177484dbf67aec669747be8e0ea49e34173c6a4..181a6444156fb49205b2b443600548fde3d9b0ed"
+reviewed_at: "2026-08-24T12:30:06+07:00"
+reviewer_model: "gpt-5.6-sol"
+reviewer_session: "01a03231-9f3a-7db1-b82f-5a6585b221a8"
+model_gate_evidence: "The coordinator launched the independent process with CLI model argument -m gpt-5.6-sol; invocation metadata is authoritative."
+
+scope:
+  detached_head_verified: "e2c470fa4b0f0f14cdfca9f793ad892137776052"
+  worktree_clean: true
+  subagents_used: false
+  unexpected_paths: []
+  fixer_candidate_paths:
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/animation-pack.ts"
+  metadata_only_handoff: true
+  metadata_path: "docs/ai/reviews/FOUNDATION-02-FIX-02-handoff.yaml"
+  candidate_parent_verified: "181a6444156fb49205b2b443600548fde3d9b0ed"
+  metadata_parent_verified: "54b3ddada6d07b0ecd6b387fb2b7f40871ab3210"
+  historical_failed_handoff_blob_verified: "69f7760c0099ee7f8df4105eb9b03014c77777d2"
+  governing_evidence_non_circular: true
+
+acceptance:
+  - id: "F02-FIX-02-AC-01"
+    result: "pass"
+    evidence: "Both URL record parsers reject literal controls, encoded structural normalization, noncanonical IPv6, and every probed input whose canonical href differs."
+  - id: "F02-FIX-02-AC-02"
+    result: "pass"
+    evidence: "Canonical lowercase DNS, non-default port/query/fragment, and lowercase bracketed IPv6 controls remain deterministic, lossless, and mutation-free."
+  - id: "F02-FIX-02-AC-03"
+    result: "pass"
+    evidence: "Symbol, object, null, bigint, function, and array currentAppVersion probes return deterministic invalid_semver issues without throw or coercion."
+  - id: "F02-FIX-02-AC-04"
+    result: "pass"
+    evidence: "Malformed descriptor and manifest minimum-app versions remain no-throw with stable issue paths and ordering."
+  - id: "F02-FIX-02-AC-05"
+    result: "pass"
+    evidence: "Strict SemVer precedence, arbitrarily large components, future-version failure, and descriptor/manifest identity behavior remain intact."
+  - id: "F02-FIX-02-AC-06"
+    result: "pass"
+    evidence: "Both authorized files carry the exact MIT/Gym Local contributors header; placeholder and Apache text are absent; LICENSE is unchanged."
+  - id: "F02-FIX-02-AC-07"
+    result: "pass"
+    evidence: "All seven original FOUNDATION-02 findings independently reproduce as resolved."
+  - id: "F02-FIX-02-AC-08"
+    result: "pass"
+    evidence: "Public exports, 18 stable issue codes, version literals 1/1/1, exact equipment variants, dependencies, and configurations are unchanged."
+  - id: "F02-FIX-02-AC-09"
+    result: "pass"
+    evidence: "The FIX-02 candidate has the exact coordinator parent and contains only the two authorized contract files."
+  - id: "F02-FIX-02-AC-10"
+    result: "pass"
+    evidence: "The direct-child metadata range contains only the non-circular FIX-02 handoff and is attested by exact SHA here."
+
+prior_finding_reverification:
+  - finding: "Sparse array holes"
+    result: "pass"
+    evidence: "Exact deterministic no-throw results passed for all 24 leading, interior, and trailing cases."
+  - finding: "Safe identity and referential diagnostics"
+    result: "pass"
+    evidence: "Malformed declarations retain safe identities without false missing issues while independent missing relations remain detectable."
+  - finding: "Bound release-review equality"
+    result: "pass"
+    evidence: "Unique resolution and equality across id, reviewer, reviewedAt, and status remain enforced."
+  - finding: "Negative-zero losslessness"
+    result: "pass"
+    evidence: "Every audited zero-permitting field rejects negative zero and accepts lossless positive-zero controls."
+  - finding: "Early Gregorian dates and RFC 3339 timestamps"
+    result: "pass"
+    evidence: "Years 0001, 0004, and 0099 plus leap, impossible-date, time, and year-zero boundaries pass."
+  - finding: "Non-circular handoff evidence"
+    result: "pass"
+    evidence: "Exact candidate and direct-child metadata endpoints are recorded without SELF or self-SHA fields."
+  - finding: "Malformed HTTPS authority, host, port, credential, and scheme"
+    result: "pass"
+    evidence: "The earlier malformed URL matrix and the stricter canonical URL matrix both pass symmetrically."
+  - finding: "Canonical HTTPS normalization bypasses"
+    result: "pass"
+    evidence: "7,886 independent symmetric assertions cover C0/C1 controls at every position and requested authority/canonicalization cases."
+  - finding: "Compatibility SemVer could throw"
+    result: "pass"
+    evidence: "140 compatibility stress calls and 121 malformed top-level parser cases complete without exceptions or coercion."
+  - finding: "Contradictory placeholder license headers"
+    result: "pass"
+    evidence: "Repository-aligned MIT headers and unchanged LICENSE are independently verified."
+
+checks:
+  - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts"
+    result: "pass"
+    evidence: "209 of 209 focused tests passed."
+  - command: "pnpm exec eslint packages/contracts/src/animation-pack.ts packages/contracts/src/animation-pack.test.ts --max-warnings=0"
+    result: "pass"
+    evidence: "Exit 0 with zero warnings."
+  - command: "pnpm run typecheck"
+    result: "pass"
+    evidence: "Exit 0 without diagnostics."
+  - command: "pnpm run verify"
+    result: "pass"
+    evidence: "Architecture, lint, typecheck, content checks, 19 files and 358 tests, production/PWA build, and performance budgets passed."
+  - command: "YAML, SHA, parent, range, path, blob, and git diff --check assertions"
+    result: "pass"
+    evidence: "All immutable endpoints, direct-child relationships, allowed paths, and four reviewed ranges passed."
+  - command: "Manual review against docs/code-review.md"
+    result: "pass"
+    evidence: "No new actionable issue was found across trust boundaries, deterministic parsing, exact variants, licensing, or protected modules."
+
+licenses:
+  result: "pass"
+  bundled_assets: []
+  findings: []
+  evidence:
+    - "No media, model, archive, fixture, image, generated binary, or third-party content was added."
+    - "Both contract files align with the repository MIT/Gym Local contributors license."
+
+findings: []
+residual_risks:
+  - "Archive I/O, hashing, authenticated delivery, storage activation and rollback, rendering, and real asset-license review remain intentionally deferred."
+  - "Canonical HTTPS validation establishes syntax only, not ownership, availability, reachability, or redistribution rights."
+merge_authorized: true
