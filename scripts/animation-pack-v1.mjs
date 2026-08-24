@@ -13,31 +13,45 @@ import {
   realpath,
   rename,
   rm,
-  stat,
   unlink
 } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { createRequire, registerHooks } from "node:module";
+import { createRequire, register } from "node:module";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import JSZip from "jszip";
 
-// The workspace package exports TypeScript directly and its public index uses an
-// extensionless relative export. Node 24 strips TypeScript but does not add the
-// extension, so this narrow built-in hook completes only that ordinary lookup.
-registerHooks({
-  resolve(specifier, context, nextResolve) {
+// The public workspace package exports TypeScript and its index has one
+// extensionless relative export. The asynchronous built-in loader registration
+// API exists at the repository's Node floor; its loader uses the Node 22.13
+// type-stripper and completes only relative public-contract TypeScript lookups.
+const contractsLoaderSource = `
+  import { readFile } from "node:fs/promises";
+  import { stripTypeScriptTypes } from "node:module";
+
+  export async function resolve(specifier, context, nextResolve) {
     try {
-      return nextResolve(specifier, context);
+      return await nextResolve(specifier, context);
     } catch (error) {
       if (specifier.startsWith(".") && context.parentURL?.includes("/packages/contracts/")) {
-        const candidate = new URL(`${specifier}.ts`, context.parentURL);
-        if (existsSync(fileURLToPath(candidate))) return { url: candidate.href, shortCircuit: true };
+        return nextResolve(specifier + ".ts", context);
       }
       throw error;
     }
   }
-});
+
+  export async function load(url, context, nextLoad) {
+    if (url.startsWith("file:") && url.endsWith(".ts")) {
+      const source = await readFile(new URL(url), "utf8");
+      return {
+        format: "module",
+        source: stripTypeScriptTypes(source, { mode: "strip" }),
+        shortCircuit: true
+      };
+    }
+    return nextLoad(url, context);
+  }
+`;
+register(`data:text/javascript,${encodeURIComponent(contractsLoaderSource)}`, import.meta.url);
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const contractsRequire = createRequire(pathToFileURL(resolve(scriptDirectory, "../packages/contracts/package.json")));
@@ -366,24 +380,42 @@ function assertContained(rootReal, candidateReal, label) {
   if (rel === "" || rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) fail("source_root_escape", label);
 }
 
-function statIdentity(value) {
-  return [value.dev, value.ino, value.size, value.mtimeMs, value.ctimeMs].join(":");
+function normalizedPhysicalPath(path) {
+  const resolved = resolve(path);
+  return process.platform === "win32" ? resolved.toLowerCase() : resolved;
 }
 
-async function readStableRegularFile(path, rootReal, label, hooks) {
-  const before = await lstat(path);
+function assertUnaliasedPath(path, physicalPath, code) {
+  if (normalizedPhysicalPath(path) !== normalizedPhysicalPath(physicalPath)) fail(code, path);
+}
+
+function objectIdentity(value) {
+  return [value.dev, value.ino, value.mode].join(":");
+}
+
+function stableIdentity(value) {
+  return [objectIdentity(value), value.size, value.mtimeNs, value.ctimeNs].join(":");
+}
+
+async function lstatIdentity(path) {
+  return lstat(path, { bigint: true });
+}
+
+async function readStableRegularFile(path, rootReal, label, expected, hooks) {
+  const before = await lstatIdentity(path).catch(() => fail("source_changed", label));
   if (!before.isFile() || before.isSymbolicLink()) fail("non_regular_file", label);
   if (before.size <= 0) fail("empty_asset", label);
-  if (before.size > RESOURCE_LIMITS.assetBytes) fail("asset_byte_limit", label);
+  if (before.size > BigInt(RESOURCE_LIMITS.assetBytes)) fail("asset_byte_limit", label);
+  if (stableIdentity(before) !== expected.identity) fail("source_changed", label);
   const candidateReal = await realpath(path);
   assertContained(rootReal, candidateReal, label);
-  const immediate = await lstat(path);
-  if (statIdentity(before) !== statIdentity(immediate)) fail("source_changed", label);
+  const immediate = await lstatIdentity(path).catch(() => fail("source_changed", label));
+  if (stableIdentity(before) !== stableIdentity(immediate)) fail("source_changed", label);
   await hooks?.afterImmediateStat?.(path, label);
   const bytes = await readFile(path).catch(() => fail("unreadable_asset", label));
   await hooks?.afterAssetRead?.(path, label);
-  const after = await lstat(path);
-  if (statIdentity(immediate) !== statIdentity(after) || bytes.length !== after.size) fail("source_changed", label);
+  const after = await lstatIdentity(path).catch(() => fail("source_changed", label));
+  if (stableIdentity(immediate) !== stableIdentity(after) || BigInt(bytes.length) !== after.size) fail("source_changed", label);
   return bytes;
 }
 
@@ -394,19 +426,25 @@ export function classifySourceEntryKind(info, label = "source entry") {
   fail("source_special_file", label);
 }
 
-async function walkSource(root, current = "") {
+async function walkSource(root, current = "", hooks) {
   const directory = join(root, current);
-  const entries = await readdir(directory, { withFileTypes: true });
+  const readEntries = hooks?.readDirectory
+    ? await hooks.readDirectory(directory, current)
+    : await readdir(directory, { withFileTypes: true });
+  const entries = [...readEntries].sort((left, right) => compareRaw(left.name, right.name));
   const results = [];
   for (const entry of entries) {
     const relativePath = current === "" ? entry.name : `${current}/${entry.name}`;
     const path = join(directory, entry.name);
-    const info = await lstat(path);
+    const info = await lstatIdentity(path);
     const kind = classifySourceEntryKind(info, relativePath);
     if (entry.isDirectory() && kind === "directory") {
-      results.push({ path: relativePath, type: "directory" }, ...(await walkSource(root, relativePath)));
+      results.push(
+        { path: relativePath, type: "directory", identity: stableIdentity(info), objectIdentity: objectIdentity(info), size: Number(info.size) },
+        ...(await walkSource(root, relativePath, hooks))
+      );
     } else if (entry.isFile() && kind === "file") {
-      results.push({ path: relativePath, type: "file" });
+      results.push({ path: relativePath, type: "file", identity: stableIdentity(info), objectIdentity: objectIdentity(info), size: Number(info.size) });
     } else {
       fail("source_special_file", relativePath);
     }
@@ -452,7 +490,10 @@ export function validateGlbEnvelope(bytes, label = "GLB") {
       let json;
       try {
         let jsonEnd = jsonBytes.length;
-        while (jsonEnd > 0 && (jsonBytes[jsonEnd - 1] === 0x20 || jsonBytes[jsonEnd - 1] === 0)) jsonEnd -= 1;
+        while (jsonEnd > 0 && jsonBytes[jsonEnd - 1] === 0x20) jsonEnd -= 1;
+        if (jsonEnd === 0 || jsonBytes[jsonEnd - 1] <= 0x20 || jsonBytes[jsonEnd - 1] === 0x7f) {
+          fail("glb_json_padding", label);
+        }
         const text = new TextDecoder("utf-8", { fatal: true }).decode(jsonBytes.subarray(0, jsonEnd));
         json = parseStrictJsonBytes(Buffer.from(text, "utf8"), `${label} JSON chunk`);
       } catch (error) {
@@ -503,12 +544,78 @@ function assertDigestAbsent(value, digests, path = "$") {
   }
 }
 
-export async function validateAnimationPackSource(sourceRoot, options = {}) {
-  const root = resolve(sourceRoot);
-  const rootInfo = await lstat(root).catch(() => fail("missing_source_root", root));
+function sourceSnapshotDifference(expected, actual) {
+  const paths = [...new Set([...expected.records.keys(), ...actual.records.keys()])].sort(compareRaw);
+  for (const path of paths) {
+    const before = expected.records.get(path);
+    const after = actual.records.get(path);
+    if (JSON.stringify(before) !== JSON.stringify(after)) return path;
+  }
+  return undefined;
+}
+
+async function captureSourceSnapshot(root, hooks) {
+  const rootInfo = await lstatIdentity(root).catch(() => fail("missing_source_root", root));
   if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) fail("invalid_source_root", root);
   const rootReal = await realpath(root);
-  const inventory = await walkSource(root);
+  assertUnaliasedPath(root, rootReal, "source_root_alias");
+  const immediateRoot = await lstatIdentity(root);
+  if (stableIdentity(rootInfo) !== stableIdentity(immediateRoot)) fail("source_changed", ".");
+  const inventory = await walkSource(root, "", hooks);
+  const afterRoot = await lstatIdentity(root);
+  if (stableIdentity(immediateRoot) !== stableIdentity(afterRoot)) fail("source_changed", ".");
+  const records = new Map([[".", {
+    path: ".",
+    type: "directory",
+    identity: stableIdentity(afterRoot),
+    objectIdentity: objectIdentity(afterRoot),
+    size: Number(afterRoot.size)
+  }], ...inventory.map((entry) => [entry.path, entry])]);
+  return { root, rootReal, inventory, records };
+}
+
+async function assertSourceSnapshotStable(expected, hooks, phase) {
+  await hooks?.beforeSourceSnapshotRecheck?.(phase, expected.root);
+  const actual = await captureSourceSnapshot(expected.root, hooks);
+  if (normalizedPhysicalPath(actual.rootReal) !== normalizedPhysicalPath(expected.rootReal)) fail("source_changed", ".");
+  const difference = sourceSnapshotDifference(expected, actual);
+  if (difference !== undefined) fail("source_changed", `${phase}:${difference}`);
+}
+
+async function readStablePackSource(path, snapshot, hooks) {
+  const expected = snapshot.records.get("pack-source.json");
+  if (!expected || expected.type !== "file") fail("missing_pack_source", snapshot.root);
+  const before = await lstatIdentity(path).catch(() => fail("source_changed", "pack-source.json"));
+  if (!before.isFile() || before.isSymbolicLink() || before.size > BigInt(RESOURCE_LIMITS.sourceJsonBytes)) fail("invalid_pack_source", path);
+  if (stableIdentity(before) !== expected.identity) fail("source_changed", "pack-source.json");
+  const candidateReal = await realpath(path);
+  assertContained(snapshot.rootReal, candidateReal, "pack-source.json");
+  const bytes = await readFile(path).catch(() => fail("unreadable_pack_source", path));
+  await hooks?.afterPackSourceRead?.(path);
+  const after = await lstatIdentity(path).catch(() => fail("source_changed", "pack-source.json"));
+  if (stableIdentity(before) !== stableIdentity(after) || BigInt(bytes.length) !== after.size) fail("source_changed", "pack-source.json");
+  return bytes;
+}
+
+function preflightAssetReads(source, snapshot) {
+  let totalAssetBytes = 0;
+  const plan = [...source.assets].sort((left, right) => compareRaw(left.path, right.path));
+  for (const asset of plan) {
+    const expected = snapshot.records.get(asset.path);
+    if (!expected || expected.type !== "file") fail("asset_inventory_mismatch", asset.path);
+    if (expected.size <= 0) fail("empty_asset", asset.path);
+    if (expected.size > RESOURCE_LIMITS.assetBytes) fail("asset_byte_limit", asset.path);
+    totalAssetBytes += expected.size;
+    if (totalAssetBytes > RESOURCE_LIMITS.totalAssetBytes) fail("total_asset_bytes_limit", asset.path);
+  }
+  return { plan, totalAssetBytes };
+}
+
+export async function validateAnimationPackSource(sourceRoot, options = {}) {
+  const root = resolve(sourceRoot);
+  const sourceSnapshot = await captureSourceSnapshot(root, options.hooks);
+  await options.hooks?.afterSourceSnapshot?.(sourceSnapshot);
+  const { inventory, rootReal } = sourceSnapshot;
   const files = inventory.filter((entry) => entry.type === "file").map((entry) => entry.path);
   const directories = inventory.filter((entry) => entry.type === "directory").map((entry) => entry.path);
   if (!files.includes("pack-source.json")) fail("missing_pack_source", root);
@@ -516,11 +623,7 @@ export async function validateAnimationPackSource(sourceRoot, options = {}) {
   if (directories.some((path) => path !== "assets" && !path.startsWith("assets/"))) fail("unexpected_source_directory", root);
   if (files.some((path) => path !== "pack-source.json" && !path.startsWith("assets/"))) fail("unexpected_source_file", root);
   const sourcePath = join(root, "pack-source.json");
-  const sourceStat = await lstat(sourcePath);
-  if (!sourceStat.isFile() || sourceStat.isSymbolicLink() || sourceStat.size > RESOURCE_LIMITS.sourceJsonBytes) fail("invalid_pack_source", sourcePath);
-  const sourceBytes = await readFile(sourcePath).catch(() => fail("unreadable_pack_source", sourcePath));
-  const sourceAfter = await lstat(sourcePath);
-  if (statIdentity(sourceStat) !== statIdentity(sourceAfter)) fail("source_changed", "pack-source.json");
+  const sourceBytes = await readStablePackSource(sourcePath, sourceSnapshot, options.hooks);
   const source = parseStrictJsonBytes(sourceBytes, "pack-source.json");
   assertSourceSchema(source, sourceBytes.length);
   const declaredPaths = source.assets.map((asset) => asset.path);
@@ -536,14 +639,14 @@ export async function validateAnimationPackSource(sourceRoot, options = {}) {
     if (inventoryByPath.has(path) && inventoryByPath.get(path) !== "file") fail("non_regular_file", path);
   }
   if (JSON.stringify(inventoryAssets) !== JSON.stringify(declaredSorted)) fail("asset_inventory_mismatch", JSON.stringify({ inventoryAssets, declaredSorted }));
+  const { plan: assetReadPlan, totalAssetBytes } = preflightAssetReads(source, sourceSnapshot);
+  await options.hooks?.afterAssetSizePreflight?.(assetReadPlan.map((asset) => ({ path: asset.path, size: sourceSnapshot.records.get(asset.path).size })));
   const assetBytes = new Map();
-  let totalAssetBytes = 0;
-  for (const asset of source.assets) {
+  for (const asset of assetReadPlan) {
     const resolved = resolve(root, ...asset.path.split("/"));
     assertContained(rootReal, resolved, asset.path);
-    const bytes = await readStableRegularFile(resolved, rootReal, asset.path, options.hooks);
+    const bytes = await readStableRegularFile(resolved, rootReal, asset.path, sourceSnapshot.records.get(asset.path), options.hooks);
     validateAssetEnvelope(asset, bytes);
-    totalAssetBytes += bytes.length;
     assetBytes.set(asset.path, bytes);
   }
   assertPackResourceLimits({
@@ -553,6 +656,7 @@ export async function validateAnimationPackSource(sourceRoot, options = {}) {
     recordCount: source.reviews.length + source.licenses.length + source.sources.length + source.assets.length + source.entries.length,
     totalAssetBytes
   });
+  await assertSourceSnapshotStable(sourceSnapshot, options.hooks, "after_validation_reads");
   const boundReviews = source.reviews.filter((review) => review.id === source.releaseReviewId);
   if (boundReviews.length !== 1) fail("release_review_binding", source.releaseReviewId);
   const manifestInput = schemaSortManifest({
@@ -581,7 +685,7 @@ export async function validateAnimationPackSource(sourceRoot, options = {}) {
   const reparsed = parseStrictJsonBytes(manifestBytes, "canonical manifest");
   const revalidated = validationData(parseAnimationPackManifest(reparsed), "canonical manifest round trip");
   if (!canonicalJsonBytes(schemaSortManifest(revalidated)).equals(manifestBytes)) fail("manifest_round_trip", "canonical bytes differ");
-  return { root, source, manifest, manifestBytes, assetBytes };
+  return { root, source, manifest, manifestBytes, assetBytes, sourceSnapshot, hooks: options.hooks };
 }
 
 function crc32(bytes) {
@@ -625,12 +729,25 @@ function readName(buffer, offset, length) {
   return nameBytes.toString("ascii");
 }
 
+function terminalEocdOffsets(buffer) {
+  const signature = 0x06054b50;
+  const offsets = [];
+  const firstPossible = Math.max(0, buffer.length - 22 - 0xffff);
+  for (let offset = firstPossible; offset <= buffer.length - 22; offset += 1) {
+    if (buffer.readUInt32LE(offset) !== signature) continue;
+    const commentLength = buffer.readUInt16LE(offset + 20);
+    if (offset + 22 + commentLength === buffer.length) offsets.push(offset);
+  }
+  return offsets;
+}
+
 export async function verifyRawZip(bytes, expectedEntries) {
   const buffer = Buffer.from(bytes);
   const expected = expectedEntries instanceof Map ? expectedEntries : new Map(Object.entries(expectedEntries));
   if (buffer.length < 22) fail("corrupt_zip", "too short");
-  const eocdOffset = buffer.length - 22;
-  if (buffer.readUInt32LE(eocdOffset) !== 0x06054b50 || buffer.indexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06])) !== eocdOffset) fail("zip_eocd", "EOCD position/count");
+  const eocdOffsets = terminalEocdOffsets(buffer);
+  if (eocdOffsets.length !== 1) fail("zip_eocd", "structurally valid terminal EOCD count");
+  const [eocdOffset] = eocdOffsets;
   const disk = buffer.readUInt16LE(eocdOffset + 4);
   const centralDisk = buffer.readUInt16LE(eocdOffset + 6);
   const diskCount = buffer.readUInt16LE(eocdOffset + 8);
@@ -704,8 +821,11 @@ export async function verifyRawZip(bytes, expectedEntries) {
   return { entries: central, centralOffset, centralSize, eocdOffset };
 }
 
-export async function createAnimationPackArtifacts(validatedSource) {
-  const { manifest, manifestBytes, assetBytes } = validatedSource;
+export async function createAnimationPackArtifacts(validatedSource, options = {}) {
+  const { manifest, manifestBytes, assetBytes, sourceSnapshot } = validatedSource;
+  const hooks = options.hooks ?? validatedSource.hooks;
+  await hooks?.beforeArtifactCreation?.(validatedSource);
+  await assertSourceSnapshotStable(sourceSnapshot, hooks, "before_artifact_creation");
   const archiveBytes = await buildDeterministicZip(manifestBytes, assetBytes);
   const descriptorInput = {
     packId: manifest.packId,
@@ -734,6 +854,8 @@ export async function createAnimationPackArtifacts(validatedSource) {
     [OUTPUT_FILES[2], descriptorBytes]
   ]);
   await verifyBuiltArtifacts(artifacts, assetBytes);
+  await hooks?.afterArtifactCreation?.({ artifacts, descriptor, manifest, assetBytes });
+  await assertSourceSnapshotStable(sourceSnapshot, hooks, "after_artifact_creation");
   return { artifacts, descriptor, manifest, assetBytes };
 }
 
@@ -782,47 +904,140 @@ export function stagingPathFor(outputDirectory) {
   return join(dirname(output), `.${basename(output)}.animation-pack-v1.staging`);
 }
 
-export async function publishAnimationPack(sourceRoot, outputDirectory, options = {}) {
+function isAtOrInside(root, candidate) {
+  const rel = relative(root, candidate);
+  return rel === "" || (!rel.startsWith(`..${sep}`) && rel !== ".." && !isAbsolute(rel));
+}
+
+async function preparePublicationContext(validatedSource, outputDirectory) {
   const output = resolve(outputDirectory);
   const parent = dirname(output);
   const staging = stagingPathFor(output);
-  if (output === resolve(sourceRoot) || output.startsWith(`${resolve(sourceRoot)}${sep}`)) fail("output_inside_source", output);
-  await stat(parent).then((info) => { if (!info.isDirectory()) fail("invalid_output_parent", parent); });
+  const parentInfo = await lstatIdentity(parent).catch(() => fail("invalid_output_parent", parent));
+  if (!parentInfo.isDirectory() || parentInfo.isSymbolicLink()) fail("invalid_output_parent", parent);
+  const parentReal = await realpath(parent);
+  assertUnaliasedPath(parent, parentReal, "output_parent_alias");
+  const immediateParent = await lstatIdentity(parent);
+  if (objectIdentity(parentInfo) !== objectIdentity(immediateParent)) fail("output_parent_changed", parent);
+  const outputPhysical = join(parentReal, basename(output));
+  const stagingPhysical = join(parentReal, basename(staging));
+  if (isAtOrInside(validatedSource.sourceSnapshot.rootReal, outputPhysical)
+    || isAtOrInside(validatedSource.sourceSnapshot.rootReal, stagingPhysical)) {
+    fail("output_inside_source", output);
+  }
   await assertAbsent(output, "output_exists");
   await assertAbsent(staging, "staging_exists");
-  const built = await createAnimationPackArtifacts(await validateAnimationPackSource(sourceRoot, options));
+  return {
+    output,
+    parent,
+    parentReal,
+    parentIdentity: objectIdentity(immediateParent),
+    outputPhysical,
+    staging,
+    stagingPhysical,
+    stagingIdentity: undefined
+  };
+}
+
+async function assertPublicationContextStable(context, validatedSource, phase, stagingState) {
+  await validatedSource.hooks?.beforePublicationContextRecheck?.(phase, context);
+  await assertSourceSnapshotStable(validatedSource.sourceSnapshot, validatedSource.hooks, phase);
+  const parentInfo = await lstatIdentity(context.parent).catch(() => fail("output_parent_changed", context.parent));
+  if (!parentInfo.isDirectory() || parentInfo.isSymbolicLink() || objectIdentity(parentInfo) !== context.parentIdentity) {
+    fail("output_parent_changed", context.parent);
+  }
+  const parentReal = await realpath(context.parent);
+  if (normalizedPhysicalPath(parentReal) !== normalizedPhysicalPath(context.parentReal)) fail("output_parent_changed", context.parent);
+  assertUnaliasedPath(context.parent, parentReal, "output_parent_alias");
+  if (normalizedPhysicalPath(join(parentReal, basename(context.output))) !== normalizedPhysicalPath(context.outputPhysical)
+    || normalizedPhysicalPath(join(parentReal, basename(context.staging))) !== normalizedPhysicalPath(context.stagingPhysical)) {
+    fail("output_parent_changed", context.parent);
+  }
+  await assertAbsent(context.output, "output_race");
+  if (stagingState === "absent") {
+    await assertAbsent(context.staging, "staging_race");
+  } else {
+    const stageInfo = await lstatIdentity(context.staging).catch(() => fail("staging_identity_mismatch", context.staging));
+    if (!stageInfo.isDirectory() || stageInfo.isSymbolicLink() || objectIdentity(stageInfo) !== context.stagingIdentity) {
+      fail("staging_identity_mismatch", context.staging);
+    }
+    const stageReal = await realpath(context.staging);
+    if (normalizedPhysicalPath(stageReal) !== normalizedPhysicalPath(context.stagingPhysical)) fail("staging_identity_mismatch", context.staging);
+  }
+}
+
+async function assertOwnedStaging(context) {
+  const stageInfo = await lstatIdentity(context.staging).catch(() => fail("staging_identity_mismatch", context.staging));
+  if (!stageInfo.isDirectory() || stageInfo.isSymbolicLink() || objectIdentity(stageInfo) !== context.stagingIdentity) {
+    fail("staging_identity_mismatch", context.staging);
+  }
+  const stageReal = await realpath(context.staging).catch(() => fail("staging_identity_mismatch", context.staging));
+  if (normalizedPhysicalPath(stageReal) !== normalizedPhysicalPath(context.stagingPhysical)) fail("staging_identity_mismatch", context.staging);
+  let owner;
+  try {
+    owner = await readFile(join(context.staging, OWNER_FILE));
+  } catch {
+    fail("staging_owner_unreadable", context.staging);
+  }
+  if (!owner.equals(OWNER_BYTES)) fail("staging_owner_mismatch", context.staging);
+}
+
+async function cleanupOwnedStaging(context, hooks, originalError) {
+  try {
+    await assertOwnedStaging(context);
+    await hooks?.beforeCleanupRemoval?.(context.staging);
+    await assertOwnedStaging(context);
+  } catch (ownershipError) {
+    throw new AggregateError([originalError, ownershipError], "Staging ownership proof failed", { cause: ownershipError });
+  }
+  try {
+    await rm(context.staging, { recursive: true });
+  } catch (cleanupError) {
+    throw new AggregateError([originalError, cleanupError], "Owned staging cleanup failed", { cause: cleanupError });
+  }
+}
+
+export async function publishAnimationPack(sourceRoot, outputDirectory, options = {}) {
+  const validatedSource = await validateAnimationPackSource(sourceRoot, options);
+  const context = await preparePublicationContext(validatedSource, outputDirectory);
+  const built = await createAnimationPackArtifacts(validatedSource, options);
+  await options.hooks?.beforePublication?.(context);
+  await assertPublicationContextStable(context, validatedSource, "before_publication", "absent");
   let created = false;
   try {
-    await mkdir(staging);
+    await mkdir(context.staging);
     created = true;
-    await writeExclusive(join(staging, OWNER_FILE), OWNER_BYTES);
-    options.faultInjector?.("afterMarker");
+    const createdStage = await lstatIdentity(context.staging);
+    context.stagingIdentity = objectIdentity(createdStage);
+    const createdStageReal = await realpath(context.staging);
+    if (!createdStage.isDirectory() || createdStage.isSymbolicLink()
+      || normalizedPhysicalPath(createdStageReal) !== normalizedPhysicalPath(context.stagingPhysical)) {
+      fail("staging_identity_mismatch", context.staging);
+    }
+    await writeExclusive(join(context.staging, OWNER_FILE), OWNER_BYTES);
+    await options.faultInjector?.("afterMarker", context);
     for (const name of OUTPUT_FILES) {
-      options.faultInjector?.(`beforeWrite:${name}`);
-      await writeExclusive(join(staging, name), built.artifacts.get(name));
-      options.faultInjector?.(`afterWrite:${name}`);
+      await options.faultInjector?.(`beforeWrite:${name}`, context);
+      await writeExclusive(join(context.staging, name), built.artifacts.get(name));
+      await options.faultInjector?.(`afterWrite:${name}`, context);
     }
-    options.faultInjector?.("beforeVerify");
+    await options.faultInjector?.("beforeVerify", context);
     const stagedArtifacts = new Map();
-    for (const name of OUTPUT_FILES) stagedArtifacts.set(name, await readFile(join(staging, name)));
+    for (const name of OUTPUT_FILES) stagedArtifacts.set(name, await readFile(join(context.staging, name)));
     await verifyBuiltArtifacts(stagedArtifacts, built.assetBytes);
-    options.faultInjector?.("afterVerify");
-    const owner = await readFile(join(staging, OWNER_FILE));
-    if (!owner.equals(OWNER_BYTES)) fail("staging_owner_mismatch", staging);
-    await assertAbsent(output, "output_race");
-    options.faultInjector?.("beforeRename");
-    await unlink(join(staging, OWNER_FILE));
-    await rename(staging, output);
-    return { ...built, outputDirectory: output };
+    await options.faultInjector?.("afterVerify", context);
+    await assertPublicationContextStable(context, validatedSource, "after_staged_verification", "owned");
+    await assertOwnedStaging(context);
+    await options.faultInjector?.("beforeRename", context);
+    await assertPublicationContextStable(context, validatedSource, "immediately_before_rename", "owned");
+    await assertOwnedStaging(context);
+    await unlink(join(context.staging, OWNER_FILE));
+    await options.faultInjector?.("afterMarkerRemoval", context);
+    await assertPublicationContextStable(context, validatedSource, "after_marker_removal", "owned");
+    await rename(context.staging, context.output);
+    return { ...built, outputDirectory: context.output };
   } catch (error) {
-    if (created) {
-      const resolvedStaging = resolve(staging);
-      if (dirname(resolvedStaging) !== resolve(parent) || resolvedStaging !== stagingPathFor(output)) throw new AggregateError([error], "Unsafe staging cleanup refused", { cause: error });
-      let ownerMatches;
-      try { ownerMatches = (await readFile(join(staging, OWNER_FILE))).equals(OWNER_BYTES); } catch { ownerMatches = true; }
-      if (!ownerMatches) throw new AggregateError([error], "Staging ownership proof failed", { cause: error });
-      await rm(staging, { recursive: true });
-    }
+    if (created) await cleanupOwnedStaging(context, options.hooks, error);
     throw error;
   }
 }

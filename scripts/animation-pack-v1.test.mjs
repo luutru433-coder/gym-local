@@ -7,14 +7,18 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
 import {
+  copyFile,
   lstat,
   mkdir,
   mkdtemp,
+  open,
   readFile,
   readdir,
+  rename,
   rm,
   stat,
   symlink,
+  unlink,
   writeFile
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -105,6 +109,72 @@ function cloneArtifacts(artifacts) {
 
 function digestTuple(artifacts) {
   return OUTPUT_FILES.map((name) => `${artifacts.get(name).length}:${sha256Bytes(artifacts.get(name))}`).join("|");
+}
+
+function glbWithBinPayload(payload) {
+  const json = Buffer.from('{"asset":{"version":"2.0"}} ', "utf8");
+  const bin = Buffer.from(payload);
+  assert.equal(json.length % 4, 0);
+  assert.equal(bin.length % 4, 0);
+  const bytes = Buffer.alloc(12 + 8 + json.length + 8 + bin.length);
+  bytes.write("glTF", 0, "ascii");
+  bytes.writeUInt32LE(2, 4);
+  bytes.writeUInt32LE(bytes.length, 8);
+  bytes.writeUInt32LE(json.length, 12);
+  bytes.writeUInt32LE(0x4e4f534a, 16);
+  json.copy(bytes, 20);
+  const binHeader = 20 + json.length;
+  bytes.writeUInt32LE(bin.length, binHeader);
+  bytes.writeUInt32LE(0x004e4942, binHeader + 4);
+  bin.copy(bytes, binHeader + 8);
+  return bytes;
+}
+
+async function sourceForGltfAssets(count) {
+  const source = await fixtureObject();
+  const template = source.assets[0];
+  source.assets = Array.from({ length: count }, (_, index) => ({
+    ...structuredClone(template),
+    id: `asset.foundation-03-budget-${index}`,
+    path: `assets/budget-${index}.gltf`,
+    mediaType: "model/gltf+json"
+  }));
+  source.entries[0].assetId = source.assets[0].id;
+  source.entries[0].assetPath = source.assets[0].path;
+  return source;
+}
+
+async function writeGltfAssetSource(root, count, bytesOrSize) {
+  const source = await sourceForGltfAssets(count);
+  await mkdir(join(root, "assets"), { recursive: true });
+  await writeFile(join(root, "pack-source.json"), `${JSON.stringify(source, null, 2)}\n`);
+  for (const asset of source.assets) {
+    const path = join(root, ...asset.path.split("/"));
+    if (Buffer.isBuffer(bytesOrSize)) {
+      await writeFile(path, bytesOrSize);
+    } else {
+      const handle = await open(path, "w");
+      try { await handle.truncate(bytesOrSize); } finally { await handle.close(); }
+    }
+  }
+  return source;
+}
+
+function errorFingerprint(error) {
+  return { code: error?.code, message: error?.message };
+}
+
+async function createJunction(target, path, context) {
+  try {
+    await symlink(target, path, "junction");
+    return true;
+  } catch (error) {
+    if (error?.code === "EPERM") {
+      context.diagnostic(`junction creation unavailable for ${path}`);
+      return false;
+    }
+    throw error;
+  }
 }
 
 test("fixture is tiny, project-authored text that decodes to the exact reviewed GLB envelope", async () => {
@@ -260,6 +330,53 @@ test("source and record resource limits reject at the boundary without large all
   }
 });
 
+test("asset size preflight rejects an exceeding asset before any asset read and accepts the exact aggregate boundary", async () => {
+  await withTemporaryDirectory(async (root) => {
+    await writeGltfAssetSource(root, 5, RESOURCE_LIMITS.assetBytes);
+    let reads = 0;
+    let preflight;
+    await expectFailure(() => validateAnimationPackSource(root, { hooks: {
+      afterAssetSizePreflight(plan) { preflight = plan; },
+      afterAssetRead() { reads += 1; }
+    } }), "total_asset_bytes_limit");
+    assert.equal(reads, 0);
+    assert.equal(preflight, undefined);
+  });
+  await withTemporaryDirectory(async (root) => {
+    const prefix = Buffer.from('{"asset":{"version":"2.0"},"extras":{"padding":"');
+    const suffix = Buffer.from('"}}');
+    const validLargeGltf = Buffer.concat([
+      prefix,
+      Buffer.alloc(RESOURCE_LIMITS.assetBytes - prefix.length - suffix.length, 0x61),
+      suffix
+    ]);
+    assert.equal(validLargeGltf.length, RESOURCE_LIMITS.assetBytes);
+    await writeGltfAssetSource(root, 4, validLargeGltf);
+    let reads = 0;
+    const validated = await validateAnimationPackSource(root, { hooks: { afterAssetRead() { reads += 1; } } });
+    assert.equal(reads, 4);
+    assert.equal([...validated.assetBytes.values()].reduce((total, bytes) => total + bytes.length, 0), RESOURCE_LIMITS.totalAssetBytes);
+  });
+  await withTemporaryDirectory(async (root) => {
+    await writeGltfAssetSource(root, 1, RESOURCE_LIMITS.assetBytes + 1);
+    let reads = 0;
+    await expectFailure(() => validateAnimationPackSource(root, { hooks: { afterAssetRead() { reads += 1; } } }), "asset_byte_limit");
+    assert.equal(reads, 0);
+  });
+  await withTemporaryDirectory(async (root) => {
+    await writeSource(root);
+    await expectFailure(() => validateAnimationPackSource(root, { hooks: {
+      async afterAssetSizePreflight() {
+        const path = join(root, "assets", "synthetic-minimal.glb");
+        const replacement = `${path}.replacement`;
+        await copyFile(path, replacement);
+        await unlink(path);
+        await rename(replacement, path);
+      }
+    } }), "source_changed");
+  });
+});
+
 test("path policy rejects traversal, delimiters, reserved devices, overlong paths, and collisions before normalization", () => {
   const invalid = [
     "/assets/a.glb", "C:/a.glb", "https://example.test/a.glb", "assets\\a.glb", "assets/./a.glb",
@@ -334,6 +451,38 @@ test("symlink, junction/reparse link, and special/non-regular source entries fai
   });
 });
 
+test("source traversal selects the same first failure regardless of creation and enumeration order", async (context) => {
+  await withTemporaryDirectory(async (root) => {
+    const targetA = join(root, "target-a");
+    const targetZ = join(root, "target-z");
+    await mkdir(targetA);
+    await mkdir(targetZ);
+    const fingerprints = [];
+    for (const [index, creationOrder] of [[0, ["z-invalid", "a-invalid"]], [1, ["a-invalid", "z-invalid"]]]) {
+      const source = join(root, `source-${index}`);
+      await writeSource(source);
+      for (const name of creationOrder) {
+        const target = name.startsWith("a") ? targetA : targetZ;
+        if (!await createJunction(target, join(source, "assets", name), context)) return;
+      }
+      try {
+        await validateAnimationPackSource(source, { hooks: {
+          async readDirectory(directory) {
+            return (await readdir(directory, { withFileTypes: true })).reverse();
+          }
+        } });
+        assert.fail("expected deterministic traversal failure");
+      } catch (error) {
+        fingerprints.push(errorFingerprint(error));
+      }
+    }
+    assert.deepEqual(fingerprints, [
+      { code: "source_link", message: "source_link: assets/a-invalid" },
+      { code: "source_link", message: "source_link: assets/a-invalid" }
+    ]);
+  });
+});
+
 test("license, source, review, approval, URL, date, and relation evidence fails closed", async () => {
   const mutations = [
     (source) => { source.releaseReviewId = "review.missing"; },
@@ -394,6 +543,17 @@ test("GLB and glTF envelopes reject corrupt headers, chunks, UTF-8, JSON, versio
   ]) assert.throws(() => validateGltfEnvelope(Buffer.from(JSON.stringify(value))));
 });
 
+test("GLB JSON accepts required ASCII-space padding and rejects NUL and control padding", async () => {
+  const valid = Buffer.from((await readFile(fixtureBase64Path, "utf8")).trim(), "base64");
+  assert.equal(valid.at(-1), 0x20);
+  assert.doesNotThrow(() => validateGlbEnvelope(valid));
+  for (const padding of [0x00, 0x09, 0x0a, 0x0d, 0x1f, 0x7f]) {
+    const mutated = Buffer.from(valid);
+    mutated[mutated.length - 1] = padding;
+    assert.throws(() => validateGlbEnvelope(mutated), /glb_json_padding|malformed_json/, `padding 0x${padding.toString(16)}`);
+  }
+});
+
 test("source mutation after immediate stat is detected without source rewriting", async () => {
   await withTemporaryDirectory(async (root) => {
     await writeSource(root);
@@ -412,6 +572,113 @@ test("source mutation after immediate stat is detected without source rewriting"
   });
 });
 
+test("complete source snapshots reject inventory, pack-source, file, and directory races", async () => {
+  const cases = [
+    ["added inventory", async (root) => { await writeFile(join(root, "assets", "undeclared.glb"), "foreign"); }],
+    ["removed asset", async (_root, candidate) => { await unlink(candidate); }],
+    ["replaced asset identity", async (_root, candidate) => {
+      const replacement = `${candidate}.replacement`;
+      await copyFile(candidate, replacement);
+      await unlink(candidate);
+      await rename(replacement, candidate);
+    }],
+    ["replaced assets directory identity", async (root) => {
+      const assets = join(root, "assets");
+      const oldAssets = join(root, "assets-old");
+      await rename(assets, oldAssets);
+      await mkdir(assets);
+      await copyFile(join(oldAssets, "synthetic-minimal.glb"), join(assets, "synthetic-minimal.glb"));
+    }]
+  ];
+  for (const [label, mutate] of cases) {
+    await withTemporaryDirectory(async (root) => {
+      await writeSource(root);
+      await assert.rejects(() => validateAnimationPackSource(root, { hooks: {
+        async afterAssetRead(candidate) { await mutate(root, candidate); }
+      } }), /source_changed|source_special_file/, label);
+    });
+  }
+  for (const replace of [false, true]) {
+    await withTemporaryDirectory(async (root) => {
+      await writeSource(root);
+      await assert.rejects(() => validateAnimationPackSource(root, { hooks: {
+        async afterPackSourceRead(path) {
+          const bytes = await readFile(path);
+          if (replace) {
+            const replacement = `${path}.replacement`;
+            await writeFile(replacement, bytes);
+            await unlink(path);
+            await rename(replacement, path);
+          } else {
+            await writeFile(path, Buffer.concat([bytes, Buffer.from(" ")]));
+          }
+        }
+      } }), /source_changed/, replace ? "pack-source replacement" : "pack-source mutation");
+    });
+  }
+});
+
+test("source identity is rechecked before and after artifacts and before publication", async (context) => {
+  const phases = ["beforeArtifactCreation", "afterArtifactCreation", "beforePublication"];
+  for (const phase of phases) {
+    await withTemporaryDirectory(async (root) => {
+      const source = join(root, "source");
+      const output = join(root, "output");
+      await writeSource(source);
+      let changed = false;
+      await assert.rejects(() => publishAnimationPack(source, output, { hooks: {
+        async [phase]() {
+          if (changed) return;
+          changed = true;
+          await writeFile(join(source, "assets", "late.glb"), "late");
+        }
+      } }), /source_changed|asset_inventory_mismatch/, phase);
+      await assert.rejects(() => lstat(output), { code: "ENOENT" });
+      await assert.rejects(() => lstat(stagingPathFor(output)), { code: "ENOENT" });
+    });
+  }
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const oldSource = join(root, "source-old");
+    const output = join(root, "output");
+    await writeSource(source);
+    await assert.rejects(() => publishAnimationPack(source, output, { hooks: {
+      async beforeArtifactCreation() {
+        await rename(source, oldSource);
+        await writeSource(source);
+      }
+    } }), /source_changed/);
+    await assert.rejects(() => lstat(output), { code: "ENOENT" });
+  });
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const oldSource = join(root, "source-old");
+    const output = join(root, "output");
+    await writeSource(source);
+    const probe = join(root, "junction-probe");
+    if (!await createJunction(source, probe, context)) return;
+    await rm(probe);
+    await assert.rejects(() => publishAnimationPack(source, output, { hooks: {
+      async beforeArtifactCreation() {
+        await rename(source, oldSource);
+        await symlink(oldSource, source, "junction");
+      }
+    } }), /invalid_source_root|source_changed/);
+    assert.equal((await lstat(source)).isSymbolicLink(), true);
+    await assert.rejects(() => lstat(output), { code: "ENOENT" });
+  });
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const output = join(root, "output");
+    await writeSource(source);
+    await assert.rejects(() => publishAnimationPack(source, output, { async faultInjector(phase) {
+      if (phase === "beforeRename") await unlink(join(source, "assets", "synthetic-minimal.glb"));
+    } }), /source_changed/);
+    await assert.rejects(() => lstat(output), { code: "ENOENT" });
+    await assert.rejects(() => lstat(stagingPathFor(output)), { code: "ENOENT" });
+  });
+});
+
 test("ZIP has exact STORE records and extracts exact manifest/asset bytes", async () => {
   await withTemporaryDirectory(async (root) => {
     await writeSource(root);
@@ -422,6 +689,20 @@ test("ZIP has exact STORE records and extracts exact manifest/asset bytes", asyn
   });
 });
 
+test("terminal EOCD parsing ignores EOCD signature bytes stored in a valid GLB BIN payload", async () => {
+  await withTemporaryDirectory(async (root) => {
+    const { source } = await writeSource(root);
+    const payload = glbWithBinPayload(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+    validateGlbEnvelope(payload);
+    await writeFile(join(root, ...source.assets[0].path.split("/")), payload);
+    const built = await artifactsForSource(root);
+    const archive = built.artifacts.get("animation-pack.zip");
+    assert.ok(archive.indexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06])) < archive.length - 22);
+    const evidence = await verifyRawZip(archive, new Map([[MANIFEST_ARCHIVE_PATH, built.artifacts.get("animation-pack-manifest.json")], ...built.assetBytes]));
+    assert.equal(evidence.eocdOffset, archive.length - 22);
+  });
+});
+
 test("raw ZIP verification rejects corrupt bytes, CRC, sizes, offsets, flags, method, time, attributes, extras, and trailing data", async () => {
   await withTemporaryDirectory(async (root) => {
     await writeSource(root);
@@ -429,6 +710,7 @@ test("raw ZIP verification rejects corrupt bytes, CRC, sizes, offsets, flags, me
     const original = built.artifacts.get("animation-pack.zip");
     const expected = new Map([[MANIFEST_ARCHIVE_PATH, built.artifacts.get("animation-pack-manifest.json")], ...built.assetBytes]);
     const central = original.indexOf(Buffer.from([0x50, 0x4b, 0x01, 0x02]));
+    const eocd = original.length - 22;
     const mutations = [
       (bytes) => { bytes[40] ^= 1; },
       (bytes) => { bytes.writeUInt16LE(8, 6); },
@@ -438,7 +720,10 @@ test("raw ZIP verification rejects corrupt bytes, CRC, sizes, offsets, flags, me
       (bytes) => { bytes.writeUInt32LE(0, 18); },
       (bytes) => { bytes.writeUInt16LE(1, central + 30); },
       (bytes) => { bytes.writeUInt32LE(0, central + 38); },
-      (bytes) => { bytes.writeUInt32LE(1, central + 42); }
+      (bytes) => { bytes.writeUInt32LE(1, central + 42); },
+      (bytes) => { bytes.writeUInt16LE(1, eocd + 8); },
+      (bytes) => { bytes.writeUInt16LE(1, eocd + 20); },
+      (bytes) => { bytes.writeUInt32LE(1, eocd + 16); }
     ];
     for (const mutate of mutations) {
       const bytes = Buffer.from(original);
@@ -467,6 +752,7 @@ test("raw ZIP verification rejects corrupt bytes, CRC, sizes, offsets, flags, me
     const extraArchive = await extraZip.generateAsync({ type: "nodebuffer", compression: "STORE", streamFiles: false, platform: "UNIX", comment: "" });
     await assert.rejects(() => verifyRawZip(extraArchive, expected));
     await assert.rejects(() => verifyRawZip(Buffer.concat([original, Buffer.from("tail")]), expected));
+    await assert.rejects(() => verifyRawZip(Buffer.concat([original.subarray(0, eocd), original.subarray(eocd), original.subarray(eocd)]), expected));
     await assert.rejects(() => verifyRawZip(original, new Map([...expected, ["assets/extra.glb", Buffer.from("x")]])));
   });
 });
@@ -542,6 +828,101 @@ test("exact exerciseVariantId is preserved; case changes fail and equipment near
   });
 });
 
+test("realpath containment rejects source and output aliases and rechecks output identity before rename", async (context) => {
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const sourceAlias = join(root, "source-alias");
+    await writeSource(source);
+    if (await createJunction(source, sourceAlias, context)) {
+      await expectFailure(() => validateAnimationPackSource(sourceAlias), "invalid_source_root");
+    }
+  });
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const parentAlias = join(root, "parent-alias");
+    await writeSource(source);
+    if (await createJunction(source, parentAlias, context)) {
+      await expectFailure(() => publishAnimationPack(source, join(parentAlias, "output")), "invalid_output_parent");
+      await assert.rejects(() => lstat(join(source, "output")), { code: "ENOENT" });
+    }
+  });
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const foreign = join(root, "foreign");
+    const output = join(root, "output");
+    await writeSource(source);
+    await mkdir(foreign);
+    if (await createJunction(foreign, output, context)) {
+      await expectFailure(() => publishAnimationPack(source, output), "output_exists");
+      assert.equal((await lstat(output)).isSymbolicLink(), true);
+    }
+    const stageOutput = join(root, "stage-output");
+    const staging = stagingPathFor(stageOutput);
+    if (await createJunction(foreign, staging, context)) {
+      await expectFailure(() => publishAnimationPack(source, stageOutput), "staging_exists");
+      assert.equal((await lstat(staging)).isSymbolicLink(), true);
+    }
+  });
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const foreign = join(root, "foreign");
+    const output = join(root, "output");
+    await writeSource(source);
+    await mkdir(foreign);
+    const probe = join(root, "junction-probe");
+    if (!await createJunction(foreign, probe, context)) return;
+    await rm(probe);
+    await assert.rejects(() => publishAnimationPack(source, output, { async faultInjector(phase) {
+      if (phase === "beforeRename") await symlink(foreign, output, "junction");
+    } }), /output_race|injected|staging/i);
+    assert.equal((await lstat(output)).isSymbolicLink(), true);
+    await assert.rejects(() => lstat(stagingPathFor(output)), { code: "ENOENT" });
+  });
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const foreign = join(root, "foreign-stage");
+    const output = join(root, "output");
+    const staging = stagingPathFor(output);
+    await writeSource(source);
+    await mkdir(foreign);
+    const probe = join(root, "junction-probe");
+    if (!await createJunction(foreign, probe, context)) return;
+    await rm(probe);
+    await assert.rejects(() => publishAnimationPack(source, output, { async faultInjector(phase) {
+      if (phase === "beforeRename") {
+        await rm(staging, { recursive: true });
+        await symlink(foreign, staging, "junction");
+        await writeFile(join(foreign, "foreign-sentinel"), "foreign");
+      }
+    } }), /ownership proof|staging_identity_mismatch/i);
+    assert.equal((await lstat(staging)).isSymbolicLink(), true);
+    assert.equal(await readFile(join(foreign, "foreign-sentinel"), "utf8"), "foreign");
+    await assert.rejects(() => lstat(output), { code: "ENOENT" });
+  });
+});
+
+test("output parent identity swaps are rejected before staging creation", async (context) => {
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const parent = join(root, "publish-parent");
+    const oldParent = join(root, "publish-parent-old");
+    const output = join(parent, "output");
+    await writeSource(source);
+    await mkdir(parent);
+    let junctionAvailable = true;
+    await assert.rejects(() => publishAnimationPack(source, output, { hooks: {
+      async beforePublication() {
+        await rename(parent, oldParent);
+        junctionAvailable = await createJunction(oldParent, parent, context);
+        if (!junctionAvailable) await mkdir(parent);
+      }
+    } }), /output_parent_changed|output_parent_alias/);
+    await assert.rejects(() => lstat(output), { code: "ENOENT" });
+    await assert.rejects(() => lstat(stagingPathFor(output)), { code: "ENOENT" });
+    if (junctionAvailable) assert.equal((await lstat(parent)).isSymbolicLink(), true);
+  });
+});
+
 test("atomic publication refuses existing output/stage and cleans only current staging for every injected phase", async () => {
   await withTemporaryDirectory(async (root) => {
     const source = join(root, "source");
@@ -581,6 +962,61 @@ test("atomic publication refuses existing output/stage and cleans only current s
   });
 });
 
+test("questionable staging is preserved when owner proof or staging identity changes", async () => {
+  const ownerName = ".foundation-03-owner";
+  const ownerBytes = "Gym Local FOUNDATION-03 staging ownership\n";
+  const cases = [
+    ["missing marker", async (staging) => { await unlink(join(staging, ownerName)); await writeFile(join(staging, "foreign-sentinel"), "foreign"); }],
+    ["mismatched marker", async (staging) => { await writeFile(join(staging, ownerName), "foreign"); await writeFile(join(staging, "foreign-sentinel"), "foreign"); }],
+    ["unreadable marker", async (staging) => { await unlink(join(staging, ownerName)); await mkdir(join(staging, ownerName)); await writeFile(join(staging, "foreign-sentinel"), "foreign"); }],
+    ["replaced staging identity", async (staging) => {
+      await rm(staging, { recursive: true });
+      await mkdir(staging);
+      await writeFile(join(staging, ownerName), ownerBytes);
+      await writeFile(join(staging, "foreign-sentinel"), "foreign");
+    }]
+  ];
+  for (const [label, mutate] of cases) {
+    await withTemporaryDirectory(async (root) => {
+      const source = join(root, "source");
+      const output = join(root, "output");
+      const staging = stagingPathFor(output);
+      await writeSource(source);
+      await assert.rejects(() => publishAnimationPack(source, output, { async faultInjector(phase) {
+        if (phase === "beforeRename") await mutate(staging);
+      } }), (error) => {
+        assert.equal(error instanceof AggregateError, true, `${label}: ${error?.stack}`);
+        assert.match(error.message, /ownership proof/i);
+        return true;
+      });
+      await assert.rejects(() => lstat(output), { code: "ENOENT" });
+      assert.equal(await readFile(join(staging, "foreign-sentinel"), "utf8"), "foreign");
+    });
+  }
+});
+
+test("failure after owner-marker removal preserves the unprovable stage and never deletes publication", async () => {
+  await withTemporaryDirectory(async (root) => {
+    const source = join(root, "source");
+    const output = join(root, "output");
+    const staging = stagingPathFor(output);
+    await writeSource(source);
+    await assert.rejects(() => publishAnimationPack(source, output, { async faultInjector(phase) {
+      if (phase === "afterMarkerRemoval") {
+        await writeFile(join(staging, "foreign-sentinel"), "foreign");
+        throw new Error("injected afterMarkerRemoval");
+      }
+    } }), (error) => {
+      assert.equal(error instanceof AggregateError, true, error?.stack);
+      assert.match(error.message, /ownership proof/i);
+      return true;
+    });
+    await assert.rejects(() => lstat(output), { code: "ENOENT" });
+    assert.equal(await readFile(join(staging, "foreign-sentinel"), "utf8"), "foreign");
+    await assert.rejects(() => lstat(join(staging, ".foundation-03-owner")), { code: "ENOENT" });
+  });
+});
+
 test("concurrent deterministic staging collision fails without deleting the pre-existing stage", async () => {
   await withTemporaryDirectory(async (root) => {
     const source = join(root, "source");
@@ -615,7 +1051,10 @@ test("imports are restricted to Node built-ins, direct jszip, and public @gym/co
   const combined = `${source}\n${cli}`;
   assert.ok(combined.includes('from "jszip"'));
   assert.ok(combined.includes('resolve("@gym/contracts")'));
-  for (const forbidden of ["packages/contracts/src", "pako", "readable-stream", "setimmediate", "fetch(", "http.request", "https.request", "localeCompare", "Intl.", "Date.now", "Math.random", "randomUUID"]) assert.equal(combined.includes(forbidden), false, forbidden);
+  assert.ok(combined.includes("stripTypeScriptTypes"));
+  assert.ok(combined.includes("register("));
+  const unavailableFloorApi = ["register", "Hooks"].join("");
+  for (const forbidden of ["packages/contracts/src", "pako", "readable-stream", "setimmediate", "fetch(", "http.request", "https.request", "localeCompare", "Intl.", "Date.now", "Math.random", "randomUUID", unavailableFloorApi]) assert.equal(combined.includes(forbidden), false, forbidden);
 });
 
 test("direct jszip 3.10.1 lock integrity and selected MIT license are pinned", async () => {
