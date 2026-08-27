@@ -1,0 +1,393 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-04"
+  title: "Install and atomically activate verified offline animation packs"
+  type: "foundation"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "ce39902a705aeb59615dcbbf6a78006b254c9c07"
+  target_branch: "codex/foundation-04"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-03"
+  owner_process_override:
+    cold_review_required: false
+    authority: "The repository owner explicitly instructed Codex on 2026-08-27 to skip cold review and enter the app-editing workflow."
+    reporting_rule: "Never report PASS from a cold reviewer. Record OWNER_WAIVED only after all producer and coordinator verification gates pass."
+
+authority:
+  allowed_paths:
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "packages/storage/src/animation-pack/archive.ts"
+    - "packages/storage/src/animation-pack/archive.test.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/opfs.ts"
+    - "packages/storage/src/animation-pack/opfs.test.ts"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/storage/src/index.ts"
+    - "docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+  candidate_implementation_paths:
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "packages/storage/src/animation-pack/archive.ts"
+    - "packages/storage/src/animation-pack/archive.test.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/opfs.ts"
+    - "packages/storage/src/animation-pack/opfs.test.ts"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/storage/src/index.ts"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "apps/**"
+    - "content/**"
+    - "public/**"
+    - "packages/backup/**"
+    - "packages/catalog/**"
+    - "packages/contracts/**"
+    - "packages/media/**"
+    - "packages/nutrition/**"
+    - "packages/progress/**"
+    - "packages/ui/**"
+    - "packages/workouts/**"
+    - "packages/storage/src/nutrition-pack-client.ts"
+    - "packages/storage/src/nutrition-pack.worker.ts"
+    - "packages/storage/src/providers/**"
+    - "packages/storage/src/storage.test.ts"
+    - "scripts/**"
+    - "tests/fixtures/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - "vite.config.ts"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+    - "docs/** except docs/adr/0017-animation-pack-opfs-storage.md and docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  generated_binary_assets_allowed: false
+  network_access_in_runtime_allowed: false
+  temporary_test_outputs_allowed: true
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "packages/storage/AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/code-review.md"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/packets/FOUNDATION-03.yaml"
+    - "docs/ai/packets/FOUNDATION-03-FIX-01.yaml"
+    - "docs/ai/reviews/FOUNDATION-03-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/packets/FOUNDATION-04.yaml"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/contracts/src/index.ts"
+    - "packages/storage/src/index.ts"
+    - "packages/storage/src/storage.test.ts"
+    - "packages/storage/src/providers/nutrition-pack.ts"
+    - "packages/storage/src/providers/nutrition-pack.test.ts"
+    - "packages/storage/src/nutrition-pack-client.ts"
+    - "packages/backup/src/index.ts"
+    - "packages/backup/src/backup.test.ts"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "tests/fixtures/animation-pack-v1/README.md"
+    - "tests/fixtures/animation-pack-v1/valid/pack-source.json"
+    - "tests/fixtures/animation-pack-v1/valid/assets/synthetic-minimal.glb.base64"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/SKILL.md"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+  assumptions:
+    - "The trusted caller supplies an AnimationPackReleaseDescriptor obtained through a trusted distribution channel; authenticating or fetching that channel is outside this packet."
+    - "FOUNDATION-03 version-1 archives are deterministic STORE-only ZIP files and are the only accepted container in this packet."
+    - "Installed pack bytes and public pack metadata are reproducible public content, not personal data."
+    - "The existing public @gym/contracts animation-pack types and validators are sufficient; this packet makes no contract or version change."
+    - "The owner waived the cold-review task for this packet workflow, but did not waive implementation checks, handoff accuracy, scope restrictions, stop gates, or coordinator verification."
+
+outcome:
+  objective: "Implement a storage-owned, offline animation-pack store that stages and verifies a v1 archive, activates it failure-safely, retains one previous verified pack, rolls back, handles quota and interruption, and never mutates personal data."
+  user_visible_result: "No UI yet; later player/UI packets can install, inspect, read, remove, and roll back verified offline animation packs through the public @gym/storage boundary."
+  deliverables:
+    - "ADR 0017 records the no-DB6 decision, OPFS content-addressed object layout, two-slot pointer journal, recovery semantics, quota policy, and backup exclusion."
+    - "A bounded STORE-only ZIP reader validates terminal EOCD, central/local records, CRC32, canonical paths, entry uniqueness, descriptor-selected manifest identity, and safe Blob slices without extracting untrusted paths."
+    - "A pure animation-pack store verifies descriptor, archive, manifest, compatibility, every asset, exact archive inventory, license/source relations, and staged object metadata before activation."
+    - "An OPFS backend streams archive bytes to storage, persists content-addressed objects, uses an ownership marker for cleanup, and implements a two-slot checksummed generation journal."
+    - "Public @gym/storage exports expose status, install, asset read, rollback, remove, and recovery without exposing IndexedDB, OPFS handles, or network access to UI code."
+    - "Deterministic tests cover normal install/update/rollback/relaunch plus corruption, interruption, quota, alias/path, cleanup, and personal-data isolation cases."
+    - "One candidate commit contains only candidate implementation paths, followed by one direct-child handoff-only metadata commit."
+  non_goals:
+    - "No UI, renderer, player state machine, animation catalog mapping, exercise discovery, workout integration, production animation, network fetch, release-index authentication, service-worker change, or PWA precache entry."
+    - "No DB6, Dexie table, database migration, backup-version change, app/catalog/pack version bump, contract change, personal preference, or backup payload change."
+    - "No archive format change, DEFLATE support, ZIP64 support, encrypted ZIP support, data descriptor support, external URI support, or best-effort compatibility with arbitrary ZIP tools."
+    - "No reuse of the nutrition-pack worker, SQLite pack format, or UI-side storage access."
+
+decisions:
+  contract_or_schema_change: "none"
+  version_decisions:
+    - "Keep app 0.7.0, database 5, backup 5, catalog 3, animationPackSchemaVersion 1, animationPlayerProtocolVersion 1, and animationCatalogVersion 1."
+    - "Introduce only an internal animation storage layout version 1 in packages/storage; it is not a public contract version."
+  migration_or_rollback: "implementation"
+  migration_decision:
+    db6_required: false
+    rationale: "A dedicated DB table would place reproducible public pack state inside the personal IndexedDB lifecycle and force an unnecessary migration. A storage-owned OPFS registry remains outside PersonalDataSnapshot and backup while still providing durable activation pointers."
+    database_schema_validation: "Not applicable: no SQL file or Dexie schema is authorized. APP_VERSIONS.database remains 5."
+  source_or_license_impact: "metadata_only"
+  storage_layout:
+    root: "gym-local/animation-packs/v1"
+    objects: "objects/<pack-id>/<version>/<archive-sha256>/"
+    transient_archive: "The verified STORE ZIP remains the installed object; manifest and assets are read as bounded Blob slices so assets are not duplicated on iPhone storage."
+    object_metadata:
+      - "descriptor.json"
+      - "manifest.json"
+      - "archive-index.json"
+      - "verified.json"
+      - "owner.json"
+      - "animation-pack.zip"
+    journal_slots:
+      - "registry/slot-a.json"
+      - "registry/slot-b.json"
+    journal_rule: "Each canonical checksummed record has a safe-integer generation plus active and optional previous pointer. Readers select the highest fully valid generation. Writers replace only the inactive/older slot, close, reread, and verify before it becomes selectable; a torn slot leaves the older valid generation authoritative."
+    retention_rule: "Never delete current active or current previous before a new journal generation commits. After commit, best-effort delete only unreferenced owned objects; retain the new active and immediately prior active as previous."
+
+preflight:
+  report_before_editing:
+    - "authoritative_model_and_no_subagents"
+    - "branch_head_base_and_cleanliness"
+    - "allowed_and_forbidden_paths"
+    - "all_required_reads_and_nested_instructions"
+    - "current_contract_versions_and_no_db6_decision"
+    - "existing_dependency_and_license_inventory"
+    - "app_browser_support_and_test_environment"
+    - "all_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    head_matches_base_commit: true
+    instructions_read: true
+    required_inputs_present: true
+    exact_model_available: true
+
+implementation_requirements:
+  module_boundaries:
+    - "archive.ts is pure container parsing and byte verification; it knows no OPFS, UI, database, backup, nutrition, or network API."
+    - "store.ts owns install/update/rollback/remove/recovery policy against an injected backend; it imports animation types and validators only from public @gym/contracts."
+    - "opfs.ts is the sole browser filesystem adapter; store tests use an in-memory backend and do not require real user storage."
+    - "animation-pack/index.ts composes and exports only stable storage-facing APIs; packages/storage/src/index.ts re-exports that public boundary."
+    - "Every new TypeScript source/test file uses the repository MIT header for Gym Local contributors, not any external template owner."
+  trust_order:
+    - "Parse and approve the supplied trusted descriptor before accepting archive bytes."
+    - "Preflight quota when StorageManager.estimate is available; an uncertain estimate must not replace actual write failure handling."
+    - "Stage archive bytes while enforcing exact descriptor byte count and incremental SHA-256; never buffer the complete archive solely for hashing."
+    - "Open only the staged verified archive, structurally validate its STORE ZIP index, and locate exactly descriptor.manifestPath."
+    - "Verify manifest byte size and SHA-256 before strict UTF-8/JSON parsing."
+    - "Parse manifest with public contracts and validate descriptor/manifest/app compatibility."
+    - "Require archive inventory to equal exactly the descriptor-selected manifest plus every declared asset; reject undeclared, duplicate, colliding, directory, special, or extra entries."
+    - "Verify every asset byte size, SHA-256, CRC32, source/license/review relation, and every entry-to-asset exact path before writing verified object metadata."
+    - "Reread descriptor, manifest, archive index, verified marker, and object identity from the backend before journal activation."
+    - "Commit the next journal generation only after all verification; any earlier failure leaves the previous journal authoritative."
+  archive_policy:
+    - "Locate a unique structurally terminal EOCD, reject comments/trailing bytes/multi-disk/ZIP64/encryption/data descriptors/extras and non-STORE methods."
+    - "Validate central and local signatures, counts, sizes, CRC32, offsets, flags, fixed names, non-overlap, and exact central-to-local agreement."
+    - "Accept canonical relative POSIX file paths only; reject backslashes, dot segments, absolute paths, controls, percent-encoded ambiguity, Unicode normalization collisions, ASCII case collisions, reserved device names, duplicate entries, and directory entries."
+    - "Expose entry bytes only as bounded immutable Blob slices after structure verification; never call an extraction API with archive-controlled paths."
+    - "Enforce descriptor archive limits and contract manifest/asset limits before reads and allocations; no test may allocate an unbounded declared size."
+  lifecycle_policy:
+    - "First install produces active with no previous. Update produces new active plus old active as previous. A second update deletes only the oldest unreferenced object after the new generation commits."
+    - "Rollback revalidates the previous object, swaps active and previous in a new journal generation, and never silently selects a different pack or equipment variant."
+    - "Recovery ignores torn/invalid lower-quality slots, validates the selected active object, promotes the verified previous object only when active is invalid, and otherwise returns a stable text-fallback-compatible unavailable/error state."
+    - "Remove commits an empty registry generation before best-effort object cleanup; cleanup failure may leave unreferenced bytes but never a live pointer or personal-data change."
+    - "Cleanup requires exact expected object path, non-alias identity, readable matching owner marker, and current journal non-reference. Missing, unreadable, mismatched, or foreign ownership preserves bytes and reports a bounded cleanup warning."
+    - "QuotaExceededError and equivalent backend quota signals map to AnimationPackError code quota_exceeded; all verification or activation failures map to stable public error codes without leaking arbitrary filesystem paths."
+    - "Operations serialize per store instance so concurrent installs, rollback, remove, and recovery cannot race journal generations."
+  personal_data_policy:
+    - "Do not import Dexie or GymDatabase in implementation files, add any table, touch settings, sessions, routines, custom variants, nutrition, pantry, meal plans, recovery points, or backup payloads."
+    - "Do not add InstalledAnimationPack to PersonalDataSnapshot, AppSettings, backup manifests, service-worker precache, or PWA update state."
+    - "Tests snapshot representative personal DB data and prove all install/update/failure/rollback/remove paths leave it byte-equivalent; the test may use existing storage exports but implementation may not."
+
+acceptance_tests:
+  - id: "F04-AC-01"
+    requirement: "ADR 0017 records the no-DB6 OPFS journal decision, exact layout, trust order, recovery, quota, retention, and backup exclusion."
+    evidence: "ADR review plus unchanged APP_VERSIONS, GymDatabase versions, backup source, and package/lock files."
+  - id: "F04-AC-02"
+    requirement: "A valid FOUNDATION-03 v1 fixture installs from a trusted descriptor and reports a verified active InstalledAnimationPack through public @gym/storage exports."
+    evidence: "Focused install test using byte-identical deterministic fixture artifacts."
+  - id: "F04-AC-03"
+    requirement: "Archive size and incremental SHA-256 are checked before any ZIP/manifest trust, with overrun and underrun rejected while staging."
+    evidence: "Chunked stream tests for exact, too short, too long, empty, throwing, cancelled, and post-limit unread behavior."
+  - id: "F04-AC-04"
+    requirement: "STORE ZIP structure and paths are validated without path extraction."
+    evidence: "EOCD/local/central/CRC/offset/count/flag/method/comment/extra/trailing/ZIP64/encryption/data-descriptor/path/collision corruption matrix."
+  - id: "F04-AC-05"
+    requirement: "Descriptor-selected manifest size/SHA-256, strict JSON/contracts, identity, review approval, and compatibility are verified before assets."
+    evidence: "Manifest mismatch, malformed UTF-8/JSON, unknown field, incompatible schema/protocol/catalog/app, identity, and review tests."
+  - id: "F04-AC-06"
+    requirement: "Archive inventory equals the manifest plus every declared asset exactly, and every asset relation/size/SHA-256/CRC is verified."
+    evidence: "Missing/extra/duplicate/colliding asset, wrong path, size/hash/CRC, source/license/review, and entry relation tests."
+  - id: "F04-AC-07"
+    requirement: "Activation uses a checksummed two-slot monotonically generated journal and never exposes an unverified object."
+    evidence: "Slot alternation and failure injection before/during/after stage, metadata, slot write, close, reread, and selection."
+  - id: "F04-AC-08"
+    requirement: "A torn, malformed, checksum-invalid, stale, or single missing journal slot recovers the newest fully valid generation deterministically."
+    evidence: "Relaunch matrix with each slot independently corrupted and generation ties/overflow rejected."
+  - id: "F04-AC-09"
+    requirement: "Update retains new active and immediately prior active only after commit; failed update retains the old active and previous unchanged."
+    evidence: "Three-version lifecycle tests with failures at every commit phase and exact retained object inventory."
+  - id: "F04-AC-10"
+    requirement: "Rollback revalidates and swaps only the exact previous verified object; corrupt previous never replaces active."
+    evidence: "Successful, absent, corrupt, incompatible, and interrupted rollback tests."
+  - id: "F04-AC-11"
+    requirement: "Quota preflight and write-time quota failure preserve current state and return quota_exceeded."
+    evidence: "Estimate unavailable/sufficient/insufficient plus quota failure at archive and metadata writes; no current pointer mutation."
+  - id: "F04-AC-12"
+    requirement: "Owned staging cleanup is bounded; foreign, aliased, markerless, mismatched, unreadable, or referenced objects are preserved."
+    evidence: "Ownership/identity/reference cleanup matrix with foreign sentinel assertions."
+  - id: "F04-AC-13"
+    requirement: "Concurrent lifecycle calls are serialized and result in one deterministic journal history without lost generations."
+    evidence: "Deferred-promise concurrency tests covering install/install, install/rollback, install/remove, and recovery/install."
+  - id: "F04-AC-14"
+    requirement: "Public asset reads return only the exact active pack's verified Blob slice and reject stale, previous-only, unknown, or path-substituted requests."
+    evidence: "Exact byte and negative pointer/path tests; no cross-variant or cross-pack fallback API exists."
+  - id: "F04-AC-15"
+    requirement: "Install, update, recovery, rollback, failure, and removal do not mutate personal records or backups."
+    evidence: "Representative PersonalDataSnapshot/database before-after byte equivalence and unchanged backup source/range."
+  - id: "F04-AC-16"
+    requirement: "Animation pack payloads remain outside service-worker precache and runtime code contains no fetch/network path."
+    evidence: "Import/API audit, production PWA build, precache inventory, and unchanged apps/public/media ranges."
+  - id: "F04-AC-17"
+    requirement: "Current animation/contracts, nutrition-pack behavior, DB1-DB5 migration, backup v1-v5, and workout update deferral remain passing."
+    evidence: "Focused contracts/storage/backup/app tests and full verify."
+  - id: "F04-AC-18"
+    requirement: "The candidate and handoff commits have exact parents and path scopes, and all new files carry the repository MIT header where applicable."
+    evidence: "Git range assertions, YAML parse, header/license audit, and clean worktree."
+
+required_checks:
+  commands:
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+    - "pnpm exec vitest run packages/storage/src/animation-pack/archive.test.ts packages/storage/src/animation-pack/store.test.ts packages/storage/src/animation-pack/opfs.test.ts"
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "pnpm exec eslint packages/storage/src/animation-pack packages/storage/src/index.ts --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run db:test-migrations"
+    - "pnpm run backup:test"
+    - "pnpm run verify"
+    - "git diff --check ce39902a705aeb59615dcbbf6a78006b254c9c07..candidate_commit"
+    - "git diff --name-only ce39902a705aeb59615dcbbf6a78006b254c9c07..candidate_commit must contain exactly candidate_implementation_paths that were needed and no other path"
+    - "git diff --name-only candidate_commit..metadata_commit must print only docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+    - "Parse packet and handoff with repository js-yaml 4.3.0; reject placeholders, unresolved SHAs, circular self-SHA fields, missing acceptance IDs, or unsupported claims"
+    - "Assert package.json, pnpm-lock.yaml, contracts, GymDatabase schemas, APP_VERSIONS, backup, apps, content, public, media, nutrition, workout, and service-worker source blobs/trees equal base_commit"
+    - "Assert no implementation import of Dexie, GymDatabase, backup, nutrition, UI, app, network APIs, internal @gym/contracts paths, Node-only APIs, or unapproved dependencies"
+    - "Assert all new TypeScript files begin with Copyright (c) 2026 Gym Local contributors and SPDX-License-Identifier: MIT"
+  manual_reviews:
+    - "Trace trusted descriptor through stream byte limits/hash, ZIP structure, manifest identity, every asset, object verification, journal commit, relaunch selection, asset read, rollback, and removal."
+    - "Trace every failure edge and prove current active/previous pointers and unrelated bytes remain unchanged until the new slot is fully written, closed, reread, and valid."
+    - "Review OPFS adapter against current browser APIs without adding a polyfill or exposing handles outside @gym/storage."
+    - "Review the journal selection comparator for safe integers, wrap/overflow, equal generation ambiguity, checksum canonicalization, and corrupt/torn records."
+    - "Review path handling using raw and Unicode-normalized comparisons; prove no archive-controlled extraction or filesystem path join occurs."
+    - "Review memory behavior: hashing and staging are chunked; manifest and individual asset reads are bounded; the complete archive is not duplicated in JavaScript memory or OPFS."
+    - "Confirm no DB6 or SQL exists. The schema-validator skill is not run because the packet authorizes no SQL schema file; any need for one triggers STOP-05."
+    - "Confirm no production animation/license content is bundled and existing fixture licensing remains unchanged."
+    - "Confirm the owner waiver is recorded as OWNER_WAIVED rather than PASS and no cold-review report is fabricated."
+  evidence_paths:
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+
+stop_gates:
+  - id: "F04-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, authoritative model metadata cannot be verified, or a subagent would be required."
+    action: "Stop before implementation and write a BLOCKED handoff; do not substitute another model."
+  - id: "F04-STOP-02"
+    condition: "The branch is not codex/foundation-04, HEAD is not exact base commit ce39902a705aeb59615dcbbf6a78006b254c9c07, the worktree is dirty, or required instructions/inputs are missing."
+    action: "Stop before editing and write a BLOCKED handoff with exact preflight evidence; do not clean, rebase, amend, or guess."
+  - id: "F04-STOP-03"
+    condition: "Implementation requires any file outside authority.candidate_implementation_paths or changes a protected blob/tree."
+    action: "Stop without widening scope and write a BLOCKED handoff naming the required owning packet/path."
+  - id: "F04-STOP-04"
+    condition: "The existing public animation contracts cannot express the required verified active/previous state, errors, descriptor/manifest compatibility, or exact asset read boundary without a contract change."
+    action: "Stop and request a separate additive contract packet; do not edit packages/contracts here."
+  - id: "F04-STOP-05"
+    condition: "Durable failure-safe activation cannot be implemented outside personal IndexedDB and would require DB6, SQL, Dexie schema, AppSettings, PersonalDataSnapshot, or backup changes."
+    action: "Stop and write a migration decision blocker; do not add a table or version bump implicitly."
+  - id: "F04-STOP-06"
+    condition: "OPFS semantics or supported browser APIs cannot provide the two-slot journal guarantees without rename assumptions, private APIs, polyfills, or UI-side storage access."
+    action: "Stop with the exact browser/API gap; preserve the no-DB6 decision for explicit reconsideration."
+  - id: "F04-STOP-07"
+    condition: "A new dependency, package/lock/config change, DEFLATE/ZIP64/encryption compatibility, archive extraction library, or Node-only runtime API is required."
+    action: "Stop without adding it; record the bounded dependency/format decision needed."
+  - id: "F04-STOP-08"
+    condition: "The implementation would need to fetch or authenticate a release descriptor, use network access, bundle production media, or change source/license content."
+    action: "Stop at the trusted-input boundary and defer distribution/content to a later packet."
+  - id: "F04-STOP-09"
+    condition: "Any failure, quota path, cleanup, rollback, recovery, or concurrent operation can replace/delete the current verified object, referenced previous object, foreign bytes, or personal data before a valid journal commit."
+    action: "Stop and write a BLOCKED handoff with the exact phase/reproduction; do not weaken atomicity or tests."
+  - id: "F04-STOP-10"
+    condition: "Any required check fails, a new regression cannot be resolved within allowed paths, the candidate needs multiple implementation commits, or exact handoff evidence would be circular or unresolved."
+    action: "Stop before candidate completion and write a BLOCKED handoff; do not amend, widen scope, or report success."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After the single candidate commit, add and commit only report_path as its direct child. The handoff may name candidate_commit but must not name its own metadata commit."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "decisions"
+    - "acceptance_evidence"
+    - "failure_injection_evidence"
+    - "checks"
+    - "licenses"
+    - "protected_path_audit"
+    - "personal_data_and_backup_audit"
+    - "known_risks"
+    - "owner_review_waiver"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  exact_fact_requirements:
+    - "Record only test names, fault phases, journal slots/generations, paths, hashes, ranges, and browser APIs that actually exist."
+    - "Distinguish producer verification from later coordinator verification and do not claim a cold-review PASS."
+    - "Record DB6=false, database=5, backup=5, unchanged PersonalDataSnapshot, and exact protected blob/tree evidence."
+
+cold_review:
+  required: false
+  waived_by_owner: true
+  waiver_recorded_at: "2026-08-27"
+  may_edit_files: false
+  allowed_verdicts: []
+  report_path: null
+  merge_rule: "Coordinator may merge only after independently rerunning every required command, checking handoff facts and immutable ranges, and recording OWNER_WAIVED in the coordinator ledger."
+
+merge:
+  allowed_only_after: "OWNER_WAIVED plus all producer and coordinator verification gates pass"
+  target: "main"
+  squash_policy: "Keep coordinator packet, one candidate commit, one handoff commit, and one coordinator ledger checkpoint commit distinct."
