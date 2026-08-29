@@ -1,0 +1,50 @@
+schema_version: 1
+packet_id: "FOUNDATION-04"
+verdict: "FAIL"
+review_type: "coordinator_audit"
+reviewed_base_commit: "ce39902a705aeb59615dcbbf6a78006b254c9c07"
+reviewed_packet_commit: "a1d8f7c8a9449e1717b5a82833de05897d6c501d"
+reviewed_candidate_commit: "7d336b1787d3ee1c99d6fb7da32915b959317ec8"
+reviewed_metadata_commit: "0c3d96f7019e068612356911871117c22c2ab400"
+reviewed_at: "2026-08-29T23:16:58+07:00"
+reviewer_model: "gpt-5.6-sol"
+cold_review_claimed: false
+owner_cold_review_waiver: true
+
+scope:
+  changed_paths_in_scope: true
+  unexpected_paths: []
+  candidate_parent_verified: "a1d8f7c8a9449e1717b5a82833de05897d6c501d"
+  metadata_parent_verified: "7d336b1787d3ee1c99d6fb7da32915b959317ec8"
+  metadata_only_handoff: true
+
+checks:
+  - command: "Producer-recorded FOUNDATION-04 verification suite"
+    result: "pass"
+    evidence: "The handoff records 115 focused tests, 265 regression tests, DB1-DB5 and backup v1-v5 tests, 473 full repository tests, production/PWA build, and exact Git scope checks."
+  - command: "Coordinator source and adversarial-boundary audit"
+    result: "fail"
+    evidence: "Three actionable defects remain in terminal EOCD selection, OPFS cleanup identity revalidation, and aggregate asset-byte enforcement."
+
+findings:
+  - id: "F04-FINDING-01"
+    severity: "P1"
+    path: "packages/storage/src/animation-pack/archive.ts"
+    issue: "EOCD uniqueness is inferred by counting terminal-looking PK 05 06 byte sequences in the raw tail. A valid stored asset payload can contain that byte sequence and matching following bytes, causing a structurally valid archive to be rejected."
+    required_fix: "Validate the actual terminal EOCD and its central/local structure without treating arbitrary payload bytes as a second structural EOCD. Add a positive payload-signature regression while retaining rejection of malformed real EOCD, comments, trailing bytes, and genuinely inconsistent central-directory structures."
+  - id: "F04-FINDING-02"
+    severity: "P1"
+    path: "packages/storage/src/animation-pack/opfs.ts"
+    issue: "cleanupObject resolves and checks an owned directory handle, then removes the entry by name without relooking up and proving the current entry is the same handle. A replacement between the ownership check and removeEntry can delete a foreign directory."
+    required_fix: "Immediately before recursive removal, relookup the current entry, require FileSystemHandle.isSameEntry with the originally verified directory, reread the owner marker from that current identity, and preserve/report a cleanup warning on any mismatch. Add a deterministic replacement-race test."
+  - id: "F04-FINDING-03"
+    severity: "P1"
+    path: "packages/storage/src/animation-pack/store.ts"
+    issue: "The store enforces archive and per-entry limits but not FOUNDATION-03's 64 MiB aggregate declared-asset limit. A manifest can therefore cause more than 64 MiB of asset data to be accepted and hashed."
+    required_fix: "Sum only declared asset byte sizes using a safe integer before asset hash reads, accept exactly 64 MiB, reject 64 MiB plus one byte, and prove the first exceeding asset is not read or hashed. Keep the manifest outside that asset total."
+
+residual_risks:
+  - "Trusted descriptor distribution and authentication remain outside FOUNDATION-04."
+  - "Cross-tab serialization is not added; the packet requires serialization per store instance only."
+
+merge_authorized: false

@@ -1,0 +1,212 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-04-FIX-01"
+  title: "Close animation-pack archive, OPFS cleanup, and aggregate-budget defects"
+  type: "review-fix"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  lineage_base_commit: "ce39902a705aeb59615dcbbf6a78006b254c9c07"
+  failed_packet_commit: "a1d8f7c8a9449e1717b5a82833de05897d6c501d"
+  failed_candidate_commit: "7d336b1787d3ee1c99d6fb7da32915b959317ec8"
+  failed_metadata_commit: "0c3d96f7019e068612356911871117c22c2ab400"
+  target_branch: "codex/foundation-04-fix-01"
+  worktree_required: true
+  producer_start_rule:
+    start_commit: "The committed FOUNDATION-04-FIX-01 coordinator packet HEAD supplied to the producer."
+    required_parent: "The producer start commit's first parent must be exactly 0c3d96f7019e068612356911871117c22c2ab400."
+    required_coordinator_delta:
+      - "git diff --name-only 0c3d96f7019e068612356911871117c22c2ab400..HEAD must print only docs/ai/packets/FOUNDATION-04-FIX-01.yaml and docs/ai/reviews/FOUNDATION-04-coordinator-review.yaml before producer edits."
+      - "The producer must not edit the original FOUNDATION-04 packet, handoff, ADR, or coordinator artifacts."
+    single_candidate_commit_rule: "The fixer implementation is one commit whose first parent is the producer start commit."
+
+authority:
+  allowed_paths:
+    - "packages/storage/src/animation-pack/archive.ts"
+    - "packages/storage/src/animation-pack/archive.test.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/opfs.ts"
+    - "packages/storage/src/animation-pack/opfs.test.ts"
+    - "docs/ai/reviews/FOUNDATION-04-FIX-01-handoff.yaml"
+  candidate_implementation_paths:
+    - "packages/storage/src/animation-pack/archive.ts"
+    - "packages/storage/src/animation-pack/archive.test.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/opfs.ts"
+    - "packages/storage/src/animation-pack/opfs.test.ts"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-04-FIX-01-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  contract_or_schema_changes_allowed: false
+  database_or_backup_changes_allowed: false
+  generated_binary_assets_allowed: false
+  network_access_allowed: false
+  temporary_test_outputs_allowed: true
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/code-review.md"
+    - "docs/ai/packets/FOUNDATION-04.yaml"
+    - "docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+    - "docs/ai/reviews/FOUNDATION-04-coordinator-review.yaml"
+    - "docs/ai/packets/FOUNDATION-04-FIX-01.yaml"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/storage/src/animation-pack/archive.ts"
+    - "packages/storage/src/animation-pack/archive.test.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/opfs.ts"
+    - "packages/storage/src/animation-pack/opfs.test.ts"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/SKILL.md"
+  immutable_evidence:
+    original_packet: "docs/ai/packets/FOUNDATION-04.yaml"
+    original_handoff: "docs/ai/reviews/FOUNDATION-04-handoff.yaml"
+    original_adr: "docs/adr/0017-animation-pack-opfs-storage.md"
+  owner_process_override:
+    cold_review_required: false
+    authority: "The repository owner explicitly instructed Codex to skip cold review."
+    reporting_rule: "Do not claim a cold-review PASS; coordinator records OWNER_WAIVED only after independently rerunning all required gates."
+
+outcome:
+  objective: "Correct exactly the three coordinator findings without weakening any original FOUNDATION-04 invariant, acceptance criterion, public boundary, or test."
+  non_goals:
+    - "No UI, renderer, catalog, media, workout, nutrition, production asset, network, dependency, contract, schema, DB6, backup, service-worker, or PWA change."
+    - "No DEFLATE, ZIP64, encryption, arbitrary ZIP compatibility, cross-tab coordinator, or changed archive format."
+
+implementation_requirements:
+  eocd:
+    - "Treat the final fixed 22 bytes as the version-1 EOCD because comments and trailing bytes are forbidden."
+    - "Validate its signature, zero comment, single-disk fields, entry counts, central size/offset, and exact adjacency to the terminal EOCD before trusting any central or local record."
+    - "Ignore PK 05 06 lookalikes inside payload bytes; do not weaken rejection of malformed actual terminal records or impossible central-directory topology."
+  opfs_cleanup:
+    - "Keep the originally resolved owned directory handle. Immediately before removeEntry, relookup the current directory entry and require await current.isSameEntry(original) to be true."
+    - "Reread and compare owner.json from the current same entry immediately before removal. Missing API, lookup failure, type mismatch, alias, replacement, marker failure, or marker mismatch preserves bytes and returns a bounded warning."
+    - "Tests use standards-shaped fake handles with isSameEntry and a deterministic pre-remove replacement hook; no production test-only hook is exported."
+  aggregate_budget:
+    - "Define or reuse one explicit 64 * 1024 * 1024 byte storage aggregate asset limit consistent with FOUNDATION-03."
+    - "Sum manifest.assets[].byteSize only, reject unsafe arithmetic, and reject an excess before reading or hashing the first asset that crosses the limit."
+    - "The descriptor-selected manifest is not counted as an asset. Exactly 64 MiB passes; 64 MiB plus one byte fails with the stable resource_limit error."
+  preservation:
+    - "All original FOUNDATION-04 F04-AC-01 through F04-AC-18 remain satisfied."
+    - "Do not change public contracts, IDs, versions, OPFS layout, journal format, backup exclusion, exact variant isolation, or error-code semantics beyond mapping the new aggregate rejection to the existing resource_limit code."
+
+acceptance_tests:
+  - id: "F04-FIX-01-AC-01"
+    requirement: "A valid STORE archive whose asset payload contains EOCD signature bytes parses successfully."
+    evidence: "Positive payload-lookalike test plus all prior archive corruption tests."
+  - id: "F04-FIX-01-AC-02"
+    requirement: "Malformed actual terminal EOCD, comments, trailing bytes, count/offset/size corruption, and invalid central topology remain rejected."
+    evidence: "Focused archive suite with explicit actual-terminal mutations."
+  - id: "F04-FIX-01-AC-03"
+    requirement: "Cleanup removes only the exact directory identity that passed ownership checks immediately before removal."
+    evidence: "isSameEntry positive test and deterministic replacement race preserving a foreign sentinel."
+  - id: "F04-FIX-01-AC-04"
+    requirement: "Missing or failing isSameEntry, lookup/type changes, and changed/unreadable/missing owner marker preserve the object and report a cleanup warning."
+    evidence: "Expanded OPFS cleanup matrix."
+  - id: "F04-FIX-01-AC-05"
+    requirement: "Declared assets totaling exactly 64 MiB are allowed without requiring retained 64 MiB allocations in the unit test."
+    evidence: "Instrumented StoreZipEntry stubs or equivalent bounded test doubles."
+  - id: "F04-FIX-01-AC-06"
+    requirement: "64 MiB plus one byte is rejected before reading or hashing the first exceeding asset."
+    evidence: "Read/hash counter remains unchanged for the crossing entry."
+  - id: "F04-FIX-01-AC-07"
+    requirement: "All 115 original focused tests and all original repository/storage/backup/DB/PWA gates remain passing."
+    evidence: "Fresh immutable-candidate command output and exact handoff counts."
+  - id: "F04-FIX-01-AC-08"
+    requirement: "The candidate changes only six finding-scoped files and the direct-child metadata commit adds only the FIX-01 handoff."
+    evidence: "Exact parent, range, name-only, diff-check, and YAML assertions."
+
+required_checks:
+  commands:
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+    - "pnpm exec vitest run packages/storage/src/animation-pack/archive.test.ts packages/storage/src/animation-pack/store.test.ts packages/storage/src/animation-pack/opfs.test.ts"
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "pnpm exec eslint packages/storage/src/animation-pack --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run db:test-migrations"
+    - "pnpm run backup:test"
+    - "pnpm run verify:affected"
+    - "pnpm run verify"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "Assert producer start parent, exact coordinator delta, candidate parent, six-file candidate delta, metadata-only handoff delta, clean worktree, unchanged protected paths, unchanged APP_VERSIONS database=5 and backup=5, and no package/lock/config/contract/backup/app/content/public changes."
+  manual_reviews:
+    - "Review against docs/code-review.md and trace terminal EOCD, central/local boundaries, payload lookalike, OPFS identity/owner revalidation, budget preflight, error mapping, journal integrity, cleanup preservation, and personal-data isolation."
+    - "Confirm no test weakens or deletes an original negative assertion merely to pass."
+
+stop_gates:
+  - id: "F04-FIX-01-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or preflight branch/parent/cleanliness/coordinator-delta checks fail."
+    action: "Stop and write a BLOCKED handoff; do not substitute a model, clean, amend, rebase, or guess."
+  - id: "F04-FIX-01-STOP-02"
+    condition: "A fix needs any path outside the six candidate files or requires a dependency, contract/schema/version, DB/backup, configuration, archive-format, UI, or runtime-network change."
+    action: "Stop without widening scope and record the exact owning packet needed."
+  - id: "F04-FIX-01-STOP-03"
+    condition: "The supported browser FileSystemHandle.isSameEntry API or TypeScript environment cannot provide the required identity recheck within authorized paths."
+    action: "Stop with the exact API/type gap; do not add a polyfill, dependency, private API, or weaken cleanup safety."
+  - id: "F04-FIX-01-STOP-04"
+    condition: "Foreign replacement can still be deleted in the deterministic cleanup race, or any active/previous/referenced/personal object can be removed before a valid journal commit."
+    action: "Stop with exact reproduction and preserve questionable bytes."
+  - id: "F04-FIX-01-STOP-05"
+    condition: "Any finding remains reproducible, any inherited acceptance/test regresses, exact 64 MiB boundary cannot be tested without unsafe allocation, or a required check fails beyond authorized repair."
+    action: "Stop before candidate completion and write a BLOCKED handoff; do not weaken tests or redefine limits."
+  - id: "F04-FIX-01-STOP-06"
+    condition: "The candidate needs multiple implementation commits, contains an unexpected path, or the handoff cannot state exact non-circular evidence."
+    action: "Stop without amending/rebasing and record the boundary failure in the authorized handoff."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-04-FIX-01-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After the single candidate commit, add and commit only the handoff report as its direct child; do not amend the candidate or name the metadata commit inside the report."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "lineage_base_commit"
+    - "failed_candidate_commit"
+    - "failed_metadata_commit"
+    - "coordinator_parent_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "finding_resolution"
+    - "inherited_acceptance_evidence"
+    - "checks"
+    - "licenses"
+    - "protected_path_audit"
+    - "known_risks"
+    - "owner_review_waiver"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+
+cold_review:
+  required: false
+  waived_by_owner: true
+  may_claim_pass: false
+  report_path: null
+  merge_rule: "Coordinator may merge only after independently rerunning every required command, validating the complete updated range and handoff facts, and recording OWNER_WAIVED rather than PASS."
+
+merge:
+  allowed_only_after: "All FIX-01 and inherited FOUNDATION-04 gates pass plus coordinator records OWNER_WAIVED"
+  target: "main"
+  squash_policy: "Keep coordinator artifacts, fixer candidate, handoff metadata, and coordinator ledger checkpoint distinct."
