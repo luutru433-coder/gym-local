@@ -160,14 +160,7 @@ function readEocd(bytes: Uint8Array, archiveSize: number): { entries: number; ce
 export async function readStoreZip(blob: Blob, requested: Partial<StoreZipLimits> = {}): Promise<StoreZipArchive> {
   const limits = { ...ANIMATION_PACK_ZIP_LIMITS, ...requested };
   if (!Number.isSafeInteger(blob.size) || blob.size < 22 || blob.size > limits.archiveBytes) corrupt("ZIP archive size is outside the accepted limit.");
-  const tailLength = Math.min(blob.size, 22 + 0xffff);
-  const tail = await read(blob, blob.size - tailLength, tailLength);
-  let terminalEocdCount = 0;
-  for (let offset = 0; offset <= tail.length - 22; offset += 1) {
-    if (view(tail).getUint32(offset, true) === EOCD_SIGNATURE && offset + 22 + view(tail).getUint16(offset + 20, true) === tail.length) terminalEocdCount += 1;
-  }
-  if (terminalEocdCount !== 1) corrupt("ZIP must contain exactly one structurally terminal EOCD record.");
-  const eocd = readEocd(tail.slice(-22), blob.size);
+  const eocd = readEocd(await read(blob, blob.size - 22, 22), blob.size);
   if (eocd.entries < 1 || eocd.entries > limits.entries) corrupt("ZIP entry count is outside the accepted limit.");
   if (eocd.centralSize > eocd.entries * (46 + limits.nameBytes)) corrupt("ZIP central directory exceeds the accepted limit.");
   const centralBytes = await read(blob, eocd.centralOffset, eocd.centralSize);

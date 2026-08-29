@@ -59,6 +59,15 @@ function centralOffset(bytes: Uint8Array): number {
   return new DataView(bytes.buffer).getUint32(bytes.length - 6, true);
 }
 
+function zipWithPayloadEocdLookalike(): { bytes: Uint8Array; payload: Uint8Array } {
+  const payload = new Uint8Array(40);
+  const dataOffset = 31;
+  const probe = zip([{ name: "a", bytes: payload }]);
+  u32(payload, 0, 0x06054b50);
+  u16(payload, 20, probe.length - dataOffset - 22);
+  return { bytes: zip([{ name: "a", bytes: payload }]), payload };
+}
+
 async function rejected(bytes: Uint8Array): Promise<void> {
   await expect(readStoreZip(new Blob([bytes as BlobPart]))).rejects.toBeInstanceOf(StoreZipError);
 }
@@ -143,11 +152,19 @@ describe("STORE ZIP reader", () => {
     await rejected(special);
   });
 
-  it("rejects multiple structurally terminal EOCD candidates", async () => {
-    const original = zip([{ name: "a", bytes: new Uint8Array(40) }]);
-    const first = 31;
-    u32(original, first, 0x06054b50);
-    u16(original, first + 20, original.length - first - 22);
-    await rejected(original);
+  it("rejects multiple EOCD records in the actual archive topology", async () => {
+    const original = zip([{ name: "a", bytes: new Uint8Array([1]) }]);
+    await rejected(concat([original, original.slice(-22)]));
+  });
+
+  it("ignores a terminal-looking EOCD signature inside stored payload bytes", async () => {
+    const { bytes, payload } = zipWithPayloadEocdLookalike();
+    const archive = await readStoreZip(new Blob([bytes as BlobPart]));
+    expect(new Uint8Array(await archive.entry("a")!.blob().arrayBuffer())).toEqual(payload);
+  });
+
+  it("does not let a payload EOCD lookalike rescue a malformed actual terminal record", async () => {
+    const { bytes } = zipWithPayloadEocdLookalike();
+    await rejected(mutate(bytes, bytes.length - 22, 0));
   });
 });

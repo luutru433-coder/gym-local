@@ -7,12 +7,14 @@ import { resolve } from "node:path";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { parseAnimationPackReleaseDescriptor, type AnimationPackReleaseDescriptor } from "@gym/contracts";
+import { parseAnimationPackManifest, parseAnimationPackReleaseDescriptor, type AnimationPackManifest, type AnimationPackReleaseDescriptor } from "@gym/contracts";
 import { sha256 } from "@noble/hashes/sha2.js";
 import JSZip from "jszip";
+import type { StoreZipArchive, StoreZipEntry } from "./archive";
 import {
   AnimationPackStore,
   AnimationPackStoreError,
+  verifyInventory,
   type AnimationPackBackend,
   type AnimationPackCleanupResult,
   type AnimationPackJournalSlot,
@@ -203,6 +205,84 @@ async function derivedFixture(options: {
   return { descriptor, descriptorBytes, archive };
 }
 
+interface EntryReadCounter {
+  blobCalls: number;
+  sliceCalls: number;
+}
+
+class InstrumentedBlob extends Blob {
+  readonly #counter: EntryReadCounter;
+
+  constructor(bytes: Uint8Array, counter: EntryReadCounter) {
+    super([bytes as BlobPart]);
+    this.#counter = counter;
+  }
+
+  override slice(start?: number, end?: number, contentType?: string): Blob {
+    this.#counter.sliceCalls += 1;
+    return super.slice(start, end, contentType);
+  }
+}
+
+async function boundedInventoryFixture(declaredSizes: readonly number[]): Promise<{
+  archive: StoreZipArchive;
+  descriptor: AnimationPackReleaseDescriptor;
+  manifest: AnimationPackManifest;
+  counters: EntryReadCounter[];
+}> {
+  const source = await JSZip.loadAsync(fixture.archive);
+  const parsed = parseAnimationPackManifest(JSON.parse(await source.file(fixture.descriptor.manifestPath)!.async("string")));
+  if (!parsed.success) throw new Error(`invalid fixture manifest ${JSON.stringify(parsed.issues)}`);
+  const originalAsset = parsed.data.assets[0];
+  const payloads = declaredSizes.map((_size, index) => new Uint8Array([index + 1]));
+  const manifest: AnimationPackManifest = {
+    ...parsed.data,
+    assets: declaredSizes.map((byteSize, index) => ({
+      ...originalAsset,
+      id: index === 0 ? originalAsset.id : `asset.aggregate-${index}`,
+      path: index === 0 ? originalAsset.path : `assets/aggregate-${index}.glb`,
+      byteSize,
+      sha256: digest(payloads[index])
+    }))
+  };
+  const validated = parseAnimationPackManifest(manifest);
+  if (!validated.success) throw new Error(`invalid bounded manifest ${JSON.stringify(validated.issues)}`);
+  const manifestBytes = encoder.encode(`${JSON.stringify(manifest)}\n`);
+  const descriptor: AnimationPackReleaseDescriptor = {
+    ...fixture.descriptor,
+    manifestByteSize: manifestBytes.length,
+    manifestSha256: digest(manifestBytes)
+  };
+  const counters = declaredSizes.map(() => ({ blobCalls: 0, sliceCalls: 0 }));
+  const assetEntries = manifest.assets.map((asset, index): StoreZipEntry => {
+    const blob = new InstrumentedBlob(payloads[index], counters[index]);
+    return {
+      path: asset.path,
+      byteSize: asset.byteSize,
+      crc32: 0,
+      dataOffset: 0,
+      dataEnd: asset.byteSize,
+      blob: () => { counters[index].blobCalls += 1; return blob; }
+    };
+  });
+  const manifestEntry: StoreZipEntry = {
+    path: descriptor.manifestPath,
+    byteSize: manifestBytes.length,
+    crc32: 0,
+    dataOffset: 0,
+    dataEnd: manifestBytes.length,
+    blob: () => new Blob([manifestBytes as BlobPart])
+  };
+  const entries = [manifestEntry, ...assetEntries];
+  const byPath = new Map(entries.map((entry) => [entry.path, entry]));
+  return {
+    archive: { byteSize: fixture.archive.length, entries, entry: (path) => byPath.get(path) },
+    descriptor,
+    manifest,
+    counters
+  };
+}
+
 describe("animation pack lifecycle store", () => {
   it("installs the byte-identical FOUNDATION-03 fixture and exposes verified active state", async () => {
     const target = store();
@@ -289,6 +369,20 @@ describe("animation pack lifecycle store", () => {
     const unread: AsyncIterable<Uint8Array> = { [Symbol.asyncIterator]: () => ({ next: async () => { throw new Error("must not read"); } }) };
     await expect(target.store.install(oversized, unread)).rejects.toMatchObject({ error: { code: "corrupt_archive" } });
     expect(target.backend.objects.size).toBe(0);
+  });
+
+  it("accepts exactly 64 MiB of declared assets with bounded entry doubles", async () => {
+    const boundary = await boundedInventoryFixture([16 * 1024 * 1024, 16 * 1024 * 1024, 16 * 1024 * 1024, 16 * 1024 * 1024]);
+    await expect(verifyInventory(boundary.archive, boundary.descriptor, boundary.manifest)).resolves.toBeUndefined();
+    expect(boundary.counters).toEqual(Array.from({ length: 4 }, () => ({ blobCalls: 1, sliceCalls: 1 })));
+  });
+
+  it("rejects 64 MiB plus one byte as corrupt_archive before the crossing asset is read or hashed", async () => {
+    const overLimit = await boundedInventoryFixture([16 * 1024 * 1024, 16 * 1024 * 1024, 16 * 1024 * 1024, 16 * 1024 * 1024, 1]);
+    const error = await verifyInventory(overLimit.archive, overLimit.descriptor, overLimit.manifest).then(() => undefined, (failure: unknown) => failure);
+    expect(error).toBeInstanceOf(AnimationPackStoreError);
+    expect(error).toMatchObject({ error: { code: "corrupt_archive" } });
+    expect(overLimit.counters.at(-1)).toEqual({ blobCalls: 0, sliceCalls: 0 });
   });
 
   it("rejects malformed, unknown-field, incompatible, and identity-mismatched descriptors before staging", async () => {

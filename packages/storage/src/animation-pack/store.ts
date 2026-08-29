@@ -118,6 +118,7 @@ const EMPTY_RECORD: JournalRecord = {
 const textEncoder = new TextEncoder();
 const OBJECT_OVERHEAD_BYTES = 128 * 1024;
 const MAX_JSON_BYTES = 1024 * 1024;
+const MAX_DECLARED_ASSET_BYTES = 64 * 1024 * 1024;
 
 function fail(code: AnimationPackErrorCode, message: string, cause?: unknown): never {
   throw new AnimationPackStoreError(code, message, cause === undefined ? undefined : { cause });
@@ -386,11 +387,22 @@ async function verifyObject(backend: AnimationPackBackend, pointer: AnimationPac
   return { pointer, descriptor: descriptor.data, manifest: manifest.data, archive, marker };
 }
 
-async function verifyInventory(archive: StoreZipArchive, descriptor: AnimationPackReleaseDescriptor, manifest: AnimationPackManifest): Promise<void> {
+function verifyDeclaredAssetBudget(manifest: AnimationPackManifest): void {
+  let total = 0;
+  for (const asset of manifest.assets) {
+    if (!Number.isSafeInteger(asset.byteSize) || asset.byteSize <= 0 || asset.byteSize > MAX_DECLARED_ASSET_BYTES - total) {
+      fail("corrupt_archive", "Declared animation assets exceed the v1 aggregate byte limit.");
+    }
+    total += asset.byteSize;
+  }
+}
+
+export async function verifyInventory(archive: StoreZipArchive, descriptor: AnimationPackReleaseDescriptor, manifest: AnimationPackManifest): Promise<void> {
   const manifestEntry = archive.entry(descriptor.manifestPath);
   if (manifestEntry === undefined) fail("missing_asset", "Descriptor-selected manifest is missing.");
   if (manifestEntry.byteSize !== descriptor.manifestByteSize) fail("manifest_size_mismatch", "Manifest byte size does not match its descriptor.");
   if (await hashBlob(manifestEntry.blob()) !== descriptor.manifestSha256) fail("manifest_checksum_mismatch", "Manifest checksum does not match its descriptor.");
+  verifyDeclaredAssetBudget(manifest);
   const expected = new Set([descriptor.manifestPath, ...manifest.assets.map((asset) => asset.path)]);
   for (const asset of manifest.assets) {
     const entry = archive.entry(asset.path);

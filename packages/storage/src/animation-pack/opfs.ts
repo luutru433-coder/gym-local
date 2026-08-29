@@ -167,6 +167,11 @@ export class OpfsAnimationPackBackend implements AnimationPackBackend {
       if (owner === undefined || !equalBytes(new Uint8Array(await owner.arrayBuffer()), expectedOwner)) return { status: "preserved", warning: "Foreign or markerless animation-pack object was preserved." };
       const parent = await existingDirectory(root, parts.slice(0, -1));
       if (parent === undefined) return { status: "preserved", warning: "Animation-pack object parent disappeared during cleanup." };
+      const current = await parent.getDirectoryHandle(parts[parts.length - 1]);
+      if (current.kind !== "directory" || typeof current.isSameEntry !== "function") return { status: "preserved", warning: "Animation-pack object identity could not be verified; bytes were preserved." };
+      if (await current.isSameEntry(folder) !== true) return { status: "preserved", warning: "Replaced animation-pack object was preserved." };
+      const currentOwner = await readFile(current, "owner.json");
+      if (currentOwner === undefined || !equalBytes(new Uint8Array(await currentOwner.arrayBuffer()), expectedOwner)) return { status: "preserved", warning: "Animation-pack ownership changed during cleanup; bytes were preserved." };
       await parent.removeEntry(parts[parts.length - 1], { recursive: true });
       return { status: "deleted" };
     } catch {

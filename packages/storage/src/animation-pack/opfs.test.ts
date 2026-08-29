@@ -5,13 +5,14 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 import { OpfsAnimationPackBackend } from "./opfs";
-import type { AnimationPackObjectPointer } from "./store";
+import type { AnimationPackCleanupResult, AnimationPackObjectPointer } from "./store";
 
 type Node = FakeDirectory | FakeFile;
 
 class FakeFile {
   blob = new Blob();
   unreadable = false;
+  reads = 0;
 }
 
 class FakeWritable {
@@ -37,12 +38,16 @@ class FakeFileHandle {
   lastWriter?: FakeWritable;
   constructor(name: string, file: FakeFile) { this.name = name; this.file = file; }
   async getFile(): Promise<File> {
+    this.file.reads += 1;
     if (this.file.unreadable) throw new Error("unreadable");
     return new File([await this.file.blob.arrayBuffer()], this.name);
   }
   async createWritable(): Promise<FileSystemWritableFileStream> {
     this.lastWriter = new FakeWritable(this.file);
     return this.lastWriter as unknown as FileSystemWritableFileStream;
+  }
+  async isSameEntry(other: FileSystemHandle): Promise<boolean> {
+    return other instanceof FakeFileHandle && other.file === this.file;
   }
 }
 
@@ -52,9 +57,12 @@ class FakeDirectory {
   readonly children = new Map<string, Node>();
   readonly root: FakeDirectory;
   resolveAsAlias = false;
+  sameEntryCalls = 0;
+  beforeDirectoryLookup?: (name: string) => void;
   constructor(name: string, root?: FakeDirectory) { this.name = name; this.root = root ?? this; }
 
   async getDirectoryHandle(name: string, options: FileSystemGetDirectoryOptions = {}): Promise<FileSystemDirectoryHandle> {
+    this.beforeDirectoryLookup?.(name);
     const node = this.children.get(name);
     if (node instanceof FakeDirectory) return node as unknown as FileSystemDirectoryHandle;
     if (node !== undefined) throw new DOMException("type", "TypeMismatchError");
@@ -90,6 +98,11 @@ class FakeDirectory {
     };
     return search(this, []) ?? null;
   }
+
+  async isSameEntry(other: FileSystemHandle): Promise<boolean> {
+    this.sameEntryCalls += 1;
+    return (other as unknown) === this;
+  }
 }
 
 const pointer: AnimationPackObjectPointer = {
@@ -98,6 +111,8 @@ const pointer: AnimationPackObjectPointer = {
   archiveSha256: "a".repeat(64)
 };
 const owner = new TextEncoder().encode("owner\n");
+const objectPath = `gym-local/animation-packs/v1/objects/${pointer.packId}/${pointer.version}/${pointer.archiveSha256}`;
+const objectParentPath = `gym-local/animation-packs/v1/objects/${pointer.packId}/${pointer.version}`;
 
 function child(root: FakeDirectory, path: string): Node | undefined {
   let node: Node = root;
@@ -112,6 +127,11 @@ function child(root: FakeDirectory, path: string): Node | undefined {
 
 function backend(root = new FakeDirectory("")): { root: FakeDirectory; backend: OpfsAnimationPackBackend } {
   return { root, backend: new OpfsAnimationPackBackend(Promise.resolve(root as unknown as FileSystemDirectoryHandle)) };
+}
+
+function expectBoundedWarning(result: AnimationPackCleanupResult): void {
+  expect(result).toMatchObject({ status: "preserved", warning: expect.any(String) });
+  if (result.status === "preserved") expect(result.warning.length).toBeLessThanOrEqual(160);
 }
 
 beforeEach(() => {
@@ -158,28 +178,96 @@ describe("OPFS animation pack backend", () => {
 
   it("deletes only an exact unreferenced object with the exact owner marker", async () => {
     const target = backend(); await target.backend.beginObject(pointer, owner); await target.backend.closeArchive(pointer);
+    const folder = child(target.root, objectPath) as FakeDirectory;
+    const marker = child(target.root, `${objectPath}/owner.json`) as FakeFile;
     expect(await target.backend.cleanupObject(pointer, owner, [])).toEqual({ status: "deleted" });
+    expect(folder.sameEntryCalls).toBe(1);
+    expect(marker.reads).toBe(2);
     expect(await target.backend.readArchive(pointer)).toBeUndefined();
   });
 
   it("preserves referenced, aliased, markerless, mismatched, and unreadable objects", async () => {
     const referenced = backend(); await referenced.backend.beginObject(pointer, owner); await referenced.backend.closeArchive(pointer);
-    expect((await referenced.backend.cleanupObject(pointer, owner, [pointer])).status).toBe("preserved");
+    expectBoundedWarning(await referenced.backend.cleanupObject(pointer, owner, [pointer]));
 
     const aliased = backend(); await aliased.backend.beginObject(pointer, owner); await aliased.backend.closeArchive(pointer); aliased.root.resolveAsAlias = true;
-    expect((await aliased.backend.cleanupObject(pointer, owner, [])).status).toBe("preserved");
+    expectBoundedWarning(await aliased.backend.cleanupObject(pointer, owner, []));
 
     const markerless = backend(); await markerless.backend.beginObject(pointer, owner); await markerless.backend.closeArchive(pointer);
-    const folder = child(markerless.root, `gym-local/animation-packs/v1/objects/${pointer.packId}/${pointer.version}/${pointer.archiveSha256}`) as FakeDirectory;
+    const folder = child(markerless.root, objectPath) as FakeDirectory;
     folder.children.delete("owner.json");
-    expect((await markerless.backend.cleanupObject(pointer, owner, [])).status).toBe("preserved");
+    expectBoundedWarning(await markerless.backend.cleanupObject(pointer, owner, []));
 
     const mismatched = backend(); await mismatched.backend.beginObject(pointer, owner); await mismatched.backend.closeArchive(pointer);
-    expect((await mismatched.backend.cleanupObject(pointer, new Uint8Array([9]), [])).status).toBe("preserved");
+    expectBoundedWarning(await mismatched.backend.cleanupObject(pointer, new Uint8Array([9]), []));
 
     const unreadable = backend(); await unreadable.backend.beginObject(pointer, owner); await unreadable.backend.closeArchive(pointer);
-    (child(unreadable.root, `gym-local/animation-packs/v1/objects/${pointer.packId}/${pointer.version}/${pointer.archiveSha256}/owner.json`) as FakeFile).unreadable = true;
-    expect((await unreadable.backend.cleanupObject(pointer, owner, [])).status).toBe("preserved");
+    (child(unreadable.root, `${objectPath}/owner.json`) as FakeFile).unreadable = true;
+    expectBoundedWarning(await unreadable.backend.cleanupObject(pointer, owner, []));
+  });
+
+  it("preserves a foreign replacement introduced before the final identity lookup", async () => {
+    const target = backend(); await target.backend.beginObject(pointer, owner); await target.backend.closeArchive(pointer);
+    const parent = child(target.root, objectParentPath) as FakeDirectory;
+    const original = child(target.root, objectPath) as FakeDirectory;
+    let targetLookups = 0;
+    parent.beforeDirectoryLookup = (name) => {
+      if (name !== pointer.archiveSha256 || ++targetLookups !== 2) return;
+      const replacement = new FakeDirectory(name, target.root);
+      const matchingMarker = new FakeFile(); matchingMarker.blob = new Blob([owner as BlobPart]);
+      const sentinel = new FakeFile(); sentinel.blob = new Blob(["foreign"]);
+      replacement.children.set("owner.json", matchingMarker);
+      replacement.children.set("foreign.txt", sentinel);
+      parent.children.set(name, replacement);
+    };
+
+    expectBoundedWarning(await target.backend.cleanupObject(pointer, owner, []));
+    const replacement = child(target.root, objectPath) as FakeDirectory;
+    expect(replacement).not.toBe(original);
+    expect(await (child(target.root, `${objectPath}/foreign.txt`) as FakeFile).blob.text()).toBe("foreign");
+  });
+
+  it.each(["missing", "failing"] as const)("preserves bytes when isSameEntry is %s", async (mode) => {
+    const target = backend(); await target.backend.beginObject(pointer, owner); await target.backend.closeArchive(pointer);
+    const folder = child(target.root, objectPath) as FakeDirectory;
+    if (mode === "missing") Object.defineProperty(folder, "isSameEntry", { configurable: true, value: undefined });
+    else Object.defineProperty(folder, "isSameEntry", { configurable: true, value: async () => { throw new Error("identity failed"); } });
+
+    expectBoundedWarning(await target.backend.cleanupObject(pointer, owner, []));
+    expect(child(target.root, objectPath)).toBe(folder);
+  });
+
+  it.each(["missing", "type mismatch"] as const)("preserves a target whose final lookup becomes %s", async (mode) => {
+    const target = backend(); await target.backend.beginObject(pointer, owner); await target.backend.closeArchive(pointer);
+    const parent = child(target.root, objectParentPath) as FakeDirectory;
+    const original = child(target.root, objectPath) as FakeDirectory;
+    let targetLookups = 0;
+    parent.beforeDirectoryLookup = (name) => {
+      if (name !== pointer.archiveSha256 || ++targetLookups !== 2) return;
+      if (mode === "missing") parent.children.delete(name);
+      else parent.children.set(name, new FakeFile());
+    };
+
+    expectBoundedWarning(await target.backend.cleanupObject(pointer, owner, []));
+    expect(original.children.has("animation-pack.zip")).toBe(true);
+    if (mode === "type mismatch") expect(parent.children.get(pointer.archiveSha256)).toBeInstanceOf(FakeFile);
+  });
+
+  it.each(["missing", "changed", "unreadable"] as const)("preserves bytes when the owner marker becomes %s before removal", async (mode) => {
+    const target = backend(); await target.backend.beginObject(pointer, owner); await target.backend.closeArchive(pointer);
+    const parent = child(target.root, objectParentPath) as FakeDirectory;
+    const folder = child(target.root, objectPath) as FakeDirectory;
+    let targetLookups = 0;
+    parent.beforeDirectoryLookup = (name) => {
+      if (name !== pointer.archiveSha256 || ++targetLookups !== 2) return;
+      const marker = folder.children.get("owner.json") as FakeFile;
+      if (mode === "missing") folder.children.delete("owner.json");
+      else if (mode === "changed") marker.blob = new Blob([new Uint8Array([9])]);
+      else marker.unreadable = true;
+    };
+
+    expectBoundedWarning(await target.backend.cleanupObject(pointer, owner, []));
+    expect(child(target.root, objectPath)).toBe(folder);
   });
 
   it("rejects a foreign preexisting directory before opening a writer", async () => {
