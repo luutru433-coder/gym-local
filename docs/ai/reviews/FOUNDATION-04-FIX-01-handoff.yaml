@@ -1,0 +1,97 @@
+schema_version: 1
+packet_id: "FOUNDATION-04-FIX-01"
+status: "BLOCKED"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence: "The repository owner invoked this exact producer task with required model gpt-5.6-sol; no model substitution occurred."
+subagents_used: false
+
+lineage_base_commit: "ce39902a705aeb59615dcbbf6a78006b254c9c07"
+failed_candidate_commit: "7d336b1787d3ee1c99d6fb7da32915b959317ec8"
+failed_metadata_commit: "0c3d96f7019e068612356911871117c22c2ab400"
+coordinator_parent_commit: "0c3d96f7019e068612356911871117c22c2ab400"
+producer_start_commit: "e4f463823656e1fcec623912096748e5170b31b7"
+candidate_parent_commit: null
+candidate_commit: null
+branch: "codex/foundation-04-fix-01"
+
+changed_paths: []
+
+blocker:
+  stop_gate: "F04-FIX-01-STOP-02"
+  triggered_at: "2026-08-29T23:29:13+07:00"
+  summary: "The aggregate-budget fix requires a resource_limit AnimationPackError code, but that code does not exist in the immutable public animation-pack contract."
+  evidence:
+    - "packages/contracts/src/animation-pack.ts defines 18 AnimationPackErrorCode values; resource_limit is not one of them."
+    - "A repository-wide rg search finds resource_limit only in docs/ai/packets/FOUNDATION-04-FIX-01.yaml, not in a contract, implementation, or test."
+    - "FOUNDATION-03 uses builder-local total_asset_bytes_limit for the 64 MiB aggregate boundary; it does not define a public resource_limit AnimationPackError code."
+    - "Returning resource_limit from AnimationPackStoreError would require editing packages/contracts/src/animation-pack.ts or emitting a runtime value that violates AnimationPackErrorCode and parseAnimationPackError. Both are forbidden by this packet."
+  required_resolution:
+    - "Issue a separate additive contract packet if resource_limit is the intended public error code, including compatibility tests and an authorized contracts path."
+    - "Otherwise, coordinator authority must revise and recommit the fixer packet to name an error code that actually exists in the accepted public contract."
+
+finding_resolution:
+  - id: "F04-FINDING-01"
+    result: "not_started"
+    evidence: "No implementation edit was permitted after the pre-edit stop gate triggered."
+  - id: "F04-FINDING-02"
+    result: "not_started"
+    evidence: "No implementation edit was permitted after the pre-edit stop gate triggered."
+  - id: "F04-FINDING-03"
+    result: "blocked"
+    evidence: "The 64 MiB enforcement itself is implementable in store.ts, but its mandated resource_limit public error cannot be expressed within the authorized paths and immutable contract."
+
+inherited_acceptance_evidence:
+  result: "not_run"
+  evidence: "F04-AC-01 through F04-AC-18 were not re-claimed or rerun because implementation stopped at preflight. The failed FOUNDATION-04 candidate remains unchanged."
+
+checks:
+  - command: "git branch --show-current; git rev-parse HEAD; git rev-parse HEAD^; git status --short"
+    result: "pass"
+    evidence: "Branch is codex/foundation-04-fix-01; HEAD is e4f463823656e1fcec623912096748e5170b31b7; first parent is 0c3d96f7019e068612356911871117c22c2ab400; the worktree was clean before this report."
+  - command: "git diff --name-only 0c3d96f7019e068612356911871117c22c2ab400..e4f463823656e1fcec623912096748e5170b31b7"
+    result: "pass"
+    evidence: "The coordinator delta contains exactly docs/ai/packets/FOUNDATION-04-FIX-01.yaml and docs/ai/reviews/FOUNDATION-04-coordinator-review.yaml."
+  - command: "pnpm install --offline --frozen-lockfile; git status --short"
+    result: "pass"
+    evidence: "pnpm 11.19.0 reused all 594 packages with zero downloads; the frozen lockfile was unchanged and Git remained clean before this report."
+  - command: "Required-read and browser/type preflight"
+    result: "pass"
+    evidence: "All packet required_reads and applicable AGENTS.md files were read. TypeScript 5.9.3 lib.dom.d.ts provides FileSystemHandle.isSameEntry and StorageManager.getDirectory; Vitest 4.1.10 uses jsdom 30.0.1."
+  - command: "rg -n resource_limit .; audit packages/contracts/src/animation-pack.ts"
+    result: "blocked"
+    evidence: "resource_limit appears only in the FIX-01 packet and is absent from AnimationPackErrorCode, parseAnimationPackError, runtime code, and tests."
+  - command: "Remaining FIX-01 required checks"
+    result: "not_run"
+    evidence: "Not run because STOP-02 requires stopping before implementation; no success evidence is claimed."
+
+licenses:
+  result: "not_applicable"
+  evidence: "No source or test file was created or edited. Existing Gym Local MIT headers and dependency/license inventory remain unchanged."
+
+protected_path_audit:
+  result: "pass"
+  database: 5
+  db6: false
+  backup: 5
+  app: "0.7.0"
+  animation_pack_schema: 1
+  animation_player_protocol: 1
+  animation_catalog: 1
+  evidence: "No implementation path or protected path was edited. Before this report, Git was clean at the exact producer start commit. This report is the only authorized worktree addition."
+
+known_risks:
+  - "All three P1 coordinator findings remain unresolved; the FOUNDATION-04 candidate must not be merged."
+  - "Inventing or casting resource_limit locally would bypass the accepted public contract and could produce an AnimationPackError that parseAnimationPackError rejects."
+
+owner_review_waiver:
+  waived_by_owner: true
+  cold_review_required: false
+  cold_review_pass_claimed: false
+  coordinator_owner_waived_gate_eligible: false
+  evidence: "The cold-review waiver does not waive producer stop gates or coordinator verification; OWNER_WAIVED cannot be recorded while this packet is blocked."
+
+review_target:
+  packet_path: "docs/ai/packets/FOUNDATION-04-FIX-01.yaml"
+  report_path: "docs/ai/reviews/FOUNDATION-04-FIX-01-handoff.yaml"
+  candidate_range: null
+  next_task: "Resolve the public error-code authority mismatch, then issue a new committed fixer packet from the newest safe checkpoint."
