@@ -1,0 +1,355 @@
+schema_version: 1
+packet:
+  id: "FOUNDATION-05"
+  title: "Add the renderer-neutral animation player and accessible shell"
+  type: "foundation"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "d6181b3871a642215b5d5929e2ad65e56ce82434"
+  target_branch: "codex/foundation-05"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-04"
+  owner_process_override:
+    cold_review_required: false
+    authority: "The repository owner explicitly instructed Codex to skip cold review and continue the app-editing workflow."
+    reporting_rule: "Never report a cold-review PASS. Record OWNER_WAIVED only after all producer and coordinator verification gates pass."
+
+authority:
+  allowed_paths:
+    - "docs/adr/0018-animation-player-controller.md"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/animation-player.test-renderer.ts"
+    - "packages/media/src/index.ts"
+    - "apps/web/src/components/ExerciseAnimationPlayer.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.test.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.css"
+    - "docs/ai/reviews/FOUNDATION-05-handoff.yaml"
+  candidate_implementation_paths:
+    - "docs/adr/0018-animation-player-controller.md"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/animation-player.test-renderer.ts"
+    - "packages/media/src/index.ts"
+    - "apps/web/src/components/ExerciseAnimationPlayer.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.test.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.css"
+  post_candidate_metadata_path: "docs/ai/reviews/FOUNDATION-05-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "packages/contracts/**"
+    - "packages/storage/**"
+    - "packages/catalog/**"
+    - "packages/backup/**"
+    - "packages/nutrition/**"
+    - "packages/progress/**"
+    - "packages/ui/**"
+    - "packages/workouts/**"
+    - "content/**"
+    - "public/**"
+    - "scripts/**"
+    - "tests/fixtures/**"
+    - "apps/web/src/App.tsx"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/components/ExerciseVideoPlayer.tsx"
+    - "apps/web/src/features/**"
+    - "apps/web/src/pwa/**"
+    - "apps/web/src/styles.css"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - "vite.config.ts"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+    - "docs/** except docs/adr/0018-animation-player-controller.md and docs/ai/reviews/FOUNDATION-05-handoff.yaml"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  contract_or_schema_changes_allowed: false
+  generated_binary_assets_allowed: false
+  production_renderer_allowed: false
+  network_access_allowed: false
+  temporary_test_outputs_allowed: true
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/code-review.md"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/packets/FOUNDATION-04.yaml"
+    - "docs/ai/packets/FOUNDATION-04-FIX-02.yaml"
+    - "docs/ai/reviews/FOUNDATION-04-FIX-02-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/packets/FOUNDATION-05.yaml"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/media/package.json"
+    - "packages/media/src/index.ts"
+    - "packages/media/src/media.test.ts"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "apps/web/src/components/ExerciseVideoPlayer.tsx"
+    - "apps/web/src/styles.css"
+    - "apps/web/src/App.test.tsx"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "LICENSE"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/resources/HEADER_TEMPLATE.txt"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+  assumptions:
+    - "AnimationPlayerRequest, AnimationPlayerState, AnimationPackEntry, AnimationAssetDescriptor, and AnimationPackError protocol v1 are sufficient and remain immutable."
+    - "A later catalog/pilot packet owns exact installed-pack mapping; this packet receives an injected exact asset loader and never searches the catalog."
+    - "A later pilot benchmark selects the production glTF/GLB renderer and measures iPhone performance; this packet adds no decoder or renderer dependency."
+    - "The accessibility shell is built and tested as an internal web component but is not placed in CatalogPage or WorkoutPage until their owning integration packets."
+    - "The repository MIT header for Gym Local contributors overrides the unrelated MyCompany Apache template supplied by the generic license-header skill."
+
+outcome:
+  objective: "Implement a public @gym/media animation player controller with exact-identity loading and deterministic state transitions, plus an accessible responsive web shell and controllable test renderer, without choosing or bundling a production renderer."
+  user_visible_result: "No production route changes yet; the tested player shell is ready for the animation pilot and later catalog/workout composition while existing optional video remains unchanged."
+  deliverables:
+    - "ADR 0018 records controller/renderer/source ownership, exact identity, lifecycle cancellation, reduced-motion, accessibility, failure fallback, and the deferred production-renderer benchmark."
+    - "@gym/media exports a renderer-neutral player controller, injected exact asset loader/renderer interfaces, immutable state subscription, attach/load/play/pause/seek/retry/dispose operations, and no storage or network implementation."
+    - "A test-only renderer fixture deterministically controls load, frame, ended, and failure events and records every renderer/session call."
+    - "ExerciseAnimationPlayer provides bilingual loading/ready/playing/paused/failed/reduced-motion states, native keyboard controls, VoiceOver labels, progress control, retry, and always-available written fallback."
+    - "Component CSS has no fixed minimum viewport width, wraps controls, uses at least 44 px targets, and disables nonessential motion under prefers-reduced-motion."
+    - "One candidate commit contains only candidate paths and one direct-child metadata commit contains only the handoff."
+  non_goals:
+    - "No Three.js, Babylon.js, model-viewer, WebGL/WebGPU/canvas production renderer, GLB decoder, new dependency, dynamic CDN, object URL, production asset, source/license record, or animation quality claim."
+    - "No storage install/read change, OPFS access, catalog mapping, exercise discovery, routine/workout integration, active-workout UI change, service-worker/PWA change, network fetch, external-video change, or release-index authentication."
+    - "No physical iPhone performance, battery, thermal, memory, first-frame, biomechanics, or production visual-quality claim; the animation pilot owns those gates."
+    - "No contract/schema/version/database/backup/catalog/nutrition change and no cross-variant fallback."
+
+decisions:
+  contract_or_schema_change: "none"
+  version_decisions:
+    - "Keep app 0.7.0, database 5, backup 5, catalog 3, animationPackSchemaVersion 1, animationPlayerProtocolVersion 1, and animationCatalogVersion 1."
+    - "The TypeScript controller API is a public @gym/media boundary, not a persisted or serialized protocol version. Any future serialized player-field change still requires a contract ADR/version decision."
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "none"
+  renderer_decision:
+    production_renderer: "deferred"
+    test_renderer: "deterministic in-memory adapter only"
+    benchmark_owner: "ANIMATION-PILOT-01"
+
+preflight:
+  report_before_editing:
+    - "authoritative_model_and_no_subagents"
+    - "branch_head_base_and_cleanliness"
+    - "allowed_and_forbidden_paths"
+    - "all_required_reads"
+    - "existing_protocol_and_app_versions"
+    - "existing_media_storage_video_and_pwa_boundaries"
+    - "dependency_and_license_inventory"
+    - "jsdom_matchMedia_and_browser_API_test_support"
+    - "all_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    head_matches_base_commit: true
+    instructions_read: true
+    required_inputs_present: true
+    exact_model_available: true
+
+implementation_requirements:
+  module_boundaries:
+    - "animation-player.ts imports player/entry/asset/error types and parsers only from public @gym/contracts. It imports no storage, catalog, UI, app, network, filesystem, or renderer library."
+    - "The asset loader is injected and returns one contract-shaped entry, asset descriptor, and verified Blob for the exact request. The controller never searches, redirects, lowercases, aliases, or substitutes variant/animation IDs."
+    - "The renderer adapter is injected and receives the attached HTMLElement, exact Blob, entry, asset descriptor, and immutable request. The renderer session owns render resources and must dispose them."
+    - "ExerciseAnimationPlayer imports only React, existing lucide-react, public @gym/contracts, and public @gym/media. It never imports OPFS, IndexedDB, storage internals, catalog internals, or network APIs."
+    - "Existing ExerciseVideoPlayer and online video behavior remain byte-identical."
+    - "Every new TypeScript and CSS file uses the repository MIT header for Gym Local contributors; do not copy the generic skill's MyCompany Apache header."
+  exact_identity:
+    - "Validate every request with parseAnimationPlayerRequest before publishing loading."
+    - "Require resolved entry.exerciseVariantId and entry.animationId to equal request exactly, entry.assetId/path to equal the asset descriptor exactly, duration and media type to be protocol-compatible, and reject any mismatch before renderer mount."
+    - "Variant mismatch maps to missing_variant, animation/asset mismatch maps to missing_asset, malformed input maps to activation_failed, and no failure path retries a similar identity."
+    - "Renderer calls receive request playbackSpeed, cameraPreset, mirrorMode, and reducedMotion unchanged except that the web shell may only strengthen reducedMotion from false to true when the OS preference is active."
+  state_machine:
+    - "Initial state is the exact contract idle state. Every published state must pass parseAnimationPlayerState; invalid internal state is a hard activation_failed text fallback, never silently published."
+    - "attach is required before load and binds one viewport. Reattach/detach/load/dispose cancels obsolete work, disposes stale sessions exactly once, and prevents stale loader/renderer callbacks from changing current state."
+    - "load publishes loading synchronously, then ready only after exact source and renderer session succeed. It never autoplays."
+    - "play is allowed only from ready/paused and calls the current session once; pause is allowed only while playing; seek clamps to [0,duration], updates the session, and publishes a valid paused/playing position."
+    - "Renderer time updates are finite, clamped, generation-scoped, and cannot move state backward after detach/new load. Ended publishes paused at duration so replay can seek to zero explicitly."
+    - "retry reloads only the last exact request when the current failure is recoverable. dispose is idempotent and leaves exact idle state with no live listener/session/loader generation."
+    - "Loader public AnimationPackError values are preserved. Unknown load failures map to missing_asset; renderer/session failures map to activation_failed. Failed states always use offlineFallback text."
+  reduced_motion:
+    - "A reducedMotion request may load/mount a static first frame but play is disabled and no renderer play call occurs. Ready state uses text fallback and the shell announces static-reference mode."
+    - "The web shell observes matchMedia('(prefers-reduced-motion: reduce)') when available, combines it with request.reducedMotion using logical OR, and reloads only when the effective value changes."
+    - "Turning OS reduced motion off never overrides an explicit request.reducedMotion=true."
+  accessibility_shell:
+    - "Use useSyncExternalStore or an equivalent tear-free subscription; do not mirror controller state through polling."
+    - "The figure/group has a bilingual accessible name; viewport has a meaningful role/label; loading and failures use a polite live region without repeated per-frame announcements."
+    - "Play/pause/replay/retry are native buttons with localized accessible names and visible text or tooltips. The seek control is a labeled native range with localized current/total time text."
+    - "Controls are disabled when semantically unavailable, focus is not stolen on state changes, keyboard behavior remains native, and no global key handler captures typing or workout input."
+    - "Written fallback content is present in the DOM for every state and visibly emphasized for failed or reduced-motion states. Failure text never exposes filesystem paths or arbitrary exception strings."
+    - "No animation auto-starts on mount, load, online event, route render, or active-workout render."
+  responsive_css:
+    - "Component styles are locally prefixed exercise-animation, use width:100%, min-width:0, overflow containment, wrapped controls, and no fixed width greater than 320 px."
+    - "Interactive controls have min-height and min-width at least 44 px, visible :focus-visible outlines, adequate dark-surface contrast, and range input remains operable at 320 px."
+    - "At max-width:390px metadata and controls stack/wrap without horizontal scrolling. At prefers-reduced-motion:reduce transitions/animations and smooth motion are disabled."
+    - "Unit/CSS evidence proves DOM state and source constraints; physical 320/390 Safari rendering remains an explicit pilot gate and must not be claimed here."
+  test_renderer_fixture:
+    - "The fixture lives only in animation-player.test-renderer.ts, is not re-exported by @gym/media, performs no WebGL/canvas/network/object-URL work, and allocates no production asset."
+    - "It exposes deterministic deferred mount, frame, ended, and failure controls plus exact call/dispose counters needed by tests."
+    - "Fixture behavior is not used as evidence that GLB decoding, clip playback, camera behavior, biomechanics, or iPhone performance works."
+
+acceptance_tests:
+  - id: "F05-AC-01"
+    requirement: "ADR 0018 records ownership, exact identity, state, cancellation, reduced motion, accessibility, fallback, and renderer benchmark deferral without changing protocol versions."
+    evidence: "ADR review plus unchanged contract/version/package objects."
+  - id: "F05-AC-02"
+    requirement: "A valid exact source loads idle -> loading -> ready without autoplay and passes every request field unchanged to the renderer."
+    evidence: "Controller test with deferred test renderer and exact call assertions."
+  - id: "F05-AC-03"
+    requirement: "Variant, animation, asset ID/path, duration/media, and malformed-request mismatches fail before renderer mount with stable public errors and text fallback."
+    evidence: "Mismatch matrix and zero renderer-mount calls."
+  - id: "F05-AC-04"
+    requirement: "Play, pause, seek, frame updates, ended, replay, and renderer failure produce only contract-valid deterministic states."
+    evidence: "State history assertions parsed again with parseAnimationPlayerState."
+  - id: "F05-AC-05"
+    requirement: "Overlapping loads, detach, reattach, and dispose cannot publish stale state and dispose every obsolete renderer session exactly once."
+    evidence: "Deferred loader/mount race matrix and call counters."
+  - id: "F05-AC-06"
+    requirement: "Reduced motion never calls renderer play, shows static/text fallback, follows OS preference changes, and never weakens an explicit reducedMotion request."
+    evidence: "Controller and component matchMedia tests."
+  - id: "F05-AC-07"
+    requirement: "The shell exposes bilingual group/viewport/status/control/range labels, native keyboard controls, no focus theft, and written fallback in every state."
+    evidence: "Testing Library role/name/focus/user-event assertions in Vietnamese and English."
+  - id: "F05-AC-08"
+    requirement: "Loading, ready, playing, paused, failed recoverable/nonrecoverable, retry, ended, and static-reference UI states render correctly without arbitrary error text."
+    evidence: "Component state matrix with controlled public controller/test double."
+  - id: "F05-AC-09"
+    requirement: "CSS satisfies bounded responsive/touch/focus/reduced-motion rules and component markup has no horizontal-width assumption."
+    evidence: "Source assertions plus manual 320/390 DOM/CSS review; no physical Safari claim."
+  - id: "F05-AC-10"
+    requirement: "The test renderer is deterministic, test-only, not publicly re-exported, and makes no production renderer or decoding claim."
+    evidence: "Import/export audit and fixture tests."
+  - id: "F05-AC-11"
+    requirement: "Existing online video, storage, exact variants, personal data, backup, PWA update deferral, and service-worker payload boundaries remain unchanged."
+    evidence: "Protected object hashes plus existing media/storage/App/Workout/PWA regression tests and build precache audit."
+  - id: "F05-AC-12"
+    requirement: "No dependency/contract/version/config change or production renderer/asset/network path exists."
+    evidence: "Git object/import/lock/license audits and no forbidden API matches."
+  - id: "F05-AC-13"
+    requirement: "Focused tests, regressions, lint, typecheck, architecture and full verify pass on immutable candidate bytes."
+    evidence: "Exact command output recorded in handoff."
+  - id: "F05-AC-14"
+    requirement: "One candidate direct child changes only eight candidate paths, followed by one handoff-only direct child with exact non-circular facts."
+    evidence: "Git parent/range/name-only/YAML assertions and clean worktree."
+
+required_checks:
+  commands:
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+    - "pnpm exec vitest run packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx"
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/media.test.ts packages/storage/src/animation-pack/archive.test.ts packages/storage/src/animation-pack/store.test.ts packages/storage/src/animation-pack/opfs.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "pnpm exec eslint packages/media/src/animation-player.ts packages/media/src/animation-player.test.ts packages/media/src/animation-player.test-renderer.ts packages/media/src/index.ts apps/web/src/components/ExerciseAnimationPlayer.tsx apps/web/src/components/ExerciseAnimationPlayer.test.tsx --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run verify:affected"
+    - "pnpm run verify"
+    - "git diff --check base_commit..candidate_commit"
+    - "Assert base/coordinator/candidate/metadata parents, exact eight-path candidate range, handoff-only metadata range, clean worktree, required MIT headers, test-renderer non-export, public @gym entrypoint imports only, and unchanged protected objects."
+    - "Assert package/lock/workspace/config/contracts/storage/catalog/backup/content/public/features/PWA/ExerciseVideoPlayer/styles.css objects equal base; APP_VERSIONS remain app 0.7.0/database 5/backup 5/catalog 3 and animation versions remain 1."
+    - "Reject added fetch/XMLHttpRequest/WebSocket/EventSource/object-URL/WebGL/WebGPU/three/babylon/model-viewer/CDN/internal-package imports and animation pack/GLB/ZIP additions to dist/sw.js or precache."
+  timing:
+    - "Run focused tests during implementation and again on final bytes."
+    - "Create one candidate commit containing only eight candidate paths, then rerun all checks on the immutable candidate."
+    - "Create one direct-child metadata commit containing only FOUNDATION-05-handoff.yaml; do not amend candidate or name metadata SHA inside handoff."
+  manual_reviews:
+    - "Review against docs/code-review.md, emphasizing exact variant identity, source/renderer injection, stale async cancellation, disposal, valid state publication, reduced motion, native keyboard/VoiceOver semantics, written fallback, 320/390 CSS constraints, offline behavior, and PWA workout-update boundary."
+    - "Trace attach/load/source/renderer/session callbacks through retry/new load/detach/dispose and prove every stale callback is generation-gated."
+    - "Review Vietnamese and English labels for understandable player states; nutrition remains untouched."
+    - "Confirm no visual, biomechanical, GLB decoder, performance, or physical-device claim exceeds the test fixture evidence."
+  evidence_paths:
+    - "docs/ai/reviews/FOUNDATION-05-handoff.yaml"
+
+stop_gates:
+  - id: "F05-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or authoritative invocation metadata cannot be verified."
+    action: "Stop without model substitution and write a BLOCKED handoff."
+  - id: "F05-STOP-02"
+    condition: "Branch, exact base HEAD, cleanliness, instructions, required reads, package graph, or protocol/version preflight does not match this packet."
+    action: "Stop before editing and report exact mismatch; do not clean, rebase, amend, or guess."
+  - id: "F05-STOP-03"
+    condition: "Correctness requires a contract/schema/version change, storage/catalog mapping, feature-page integration, PWA change, app store change, or any path outside allowed candidate files."
+    action: "Stop without widening scope and name the required owning packet."
+  - id: "F05-STOP-04"
+    condition: "A production renderer, GLB decoder, browser polyfill, dependency/package/lock/config change, external CDN, network call, object URL, binary asset, or source/license record is required."
+    action: "Stop and defer the renderer/asset decision to the animation pilot benchmark."
+  - id: "F05-STOP-05"
+    condition: "The controller can publish a contract-invalid state, silently resolve another variant/animation, accept mismatched asset metadata, or allow a stale async callback after new load/detach/dispose."
+    action: "Stop with exact reproduction; do not weaken exact identity, parser, cancellation, or disposal tests."
+  - id: "F05-STOP-06"
+    condition: "Reduced motion can start motion, the shell autoplays, written fallback is absent, native keyboard/VoiceOver semantics fail, focus is stolen, or 320 px structure requires horizontal scrolling due to component-owned fixed width."
+    action: "Stop and correct only within authorized media/component/CSS/test files; if another UI owner is needed, write BLOCKED handoff."
+  - id: "F05-STOP-07"
+    condition: "Existing external video, storage, personal data, backup, exact-variant history, workout UI, PWA update deferral, service-worker payload, nutrition, or protected object changes."
+    action: "Stop and preserve the last safe checkpoint; do not accept a regression for the player shell."
+  - id: "F05-STOP-08"
+    condition: "A required check fails beyond allowed repair, candidate needs multiple implementation commits, an unexpected path changes, or exact handoff evidence would be circular/unresolved."
+    action: "Stop before candidate completion and write a BLOCKED handoff; do not amend, widen scope, or invent evidence."
+
+handoff:
+  report_path: "docs/ai/reviews/FOUNDATION-05-handoff.yaml"
+  candidate_commit_excludes_handoff_metadata_commit: true
+  metadata_commit_rule: "After the single candidate commit, add and commit only report_path as its direct child. The handoff may name candidate_commit but must not name its own metadata commit."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "decisions"
+    - "acceptance_evidence"
+    - "state_machine_evidence"
+    - "accessibility_evidence"
+    - "responsive_evidence"
+    - "checks"
+    - "licenses"
+    - "protected_path_audit"
+    - "known_risks"
+    - "owner_review_waiver"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  exact_fact_requirements:
+    - "Record only states, callbacks, test counts, labels, CSS rules, imports, versions, hashes, and ranges that actually exist."
+    - "Distinguish jsdom/source accessibility evidence from physical Safari/VoiceOver/device evidence and do not claim production animation rendering."
+    - "Distinguish producer verification from coordinator verification and do not claim cold-review PASS."
+
+cold_review:
+  required: false
+  waived_by_owner: true
+  waiver_recorded_at: "2026-08-30"
+  may_edit_files: false
+  may_claim_pass: false
+  report_path: null
+  merge_rule: "Coordinator may merge only after independently rerunning every required command, checking handoff facts and immutable ranges, and recording OWNER_WAIVED in the ledger."
+
+merge:
+  allowed_only_after: "OWNER_WAIVED plus all producer and coordinator verification gates pass"
+  target: "main"
+  squash_policy: "Keep coordinator packet, one candidate commit, one handoff commit, and one coordinator ledger checkpoint commit distinct."
