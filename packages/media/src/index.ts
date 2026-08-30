@@ -1,5 +1,7 @@
 import type { ContentSource, ExerciseVariant, ExerciseVideoGuide, MediaAsset } from "@gym/contracts";
 
+export * from "./animation-player";
+
 export interface MediaAuditIssue {
   code:
     | "missing_offline_fallback"
