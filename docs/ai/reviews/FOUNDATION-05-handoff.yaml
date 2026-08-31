@@ -1,0 +1,206 @@
+schema_version: 1
+packet_id: "FOUNDATION-05"
+status: "candidate"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence: "The immutable candidate was created by the packet's gpt-5.6-sol producer invocation with no model substitution or subagent. A later gpt-5.6-sol continuation was stopped before any write after making no progress beyond preflight; the coordinator then revalidated the unchanged candidate bytes and records no cold-review claim."
+subagents_used: false
+
+base_commit: "d6181b3871a642215b5d5929e2ad65e56ce82434"
+coordinator_commit: "05dd775d12173a70c3b879482b63c7b95cd27d5a"
+candidate_parent_commit: "05dd775d12173a70c3b879482b63c7b95cd27d5a"
+candidate_commit: "18b6e562257fa65d9d491edd0fabb521c2044ec7"
+branch: "codex/foundation-05"
+
+changed_paths:
+  - "apps/web/src/components/ExerciseAnimationPlayer.css"
+  - "apps/web/src/components/ExerciseAnimationPlayer.test.tsx"
+  - "apps/web/src/components/ExerciseAnimationPlayer.tsx"
+  - "docs/adr/0018-animation-player-controller.md"
+  - "packages/media/src/animation-player.test-renderer.ts"
+  - "packages/media/src/animation-player.test.ts"
+  - "packages/media/src/animation-player.ts"
+  - "packages/media/src/index.ts"
+
+decisions:
+  contract_or_schema_change: "none"
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "none"
+  production_renderer: "deferred to ANIMATION-PILOT-01"
+  test_renderer: "deterministic in-memory test adapter only; not exported by @gym/media"
+  versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+
+acceptance_evidence:
+  - id: "F05-AC-01"
+    result: "pass"
+    evidence: "ADR 0018 records ownership, exact identity, state publication, cancellation, disposal, reduced motion, accessibility, fallback, and pilot renderer deferral; all protocol and app version objects equal the base."
+  - id: "F05-AC-02"
+    result: "pass"
+    evidence: "Controller tests prove exact idle -> loading -> ready, no autoplay, and unchanged variant, animation, speed, camera, mirror, and reduced-motion fields at renderer mount."
+  - id: "F05-AC-03"
+    result: "pass"
+    evidence: "The mismatch matrix rejects malformed requests plus variant, animation, asset ID/path, duration, source/license, Blob size/type, and contract-shape mismatches before renderer mount with stable public errors."
+  - id: "F05-AC-04"
+    result: "pass"
+    evidence: "Play, pause, clamped seek, finite monotonic frames, ended, replay, and renderer failures publish snapshots accepted again by parseAnimationPlayerState."
+  - id: "F05-AC-05"
+    result: "pass"
+    evidence: "Deferred overlapping loads/mounts, detach, reattach, renderer failure, and dispose are generation/viewport gated; stale sessions are disposed and each session identity is disposed at most once."
+  - id: "F05-AC-06"
+    result: "pass"
+    evidence: "Reduced-motion controller and matchMedia component tests prove no renderer play call, static/text fallback, logical-OR strengthening, and no weakening of an explicit true request."
+  - id: "F05-AC-07"
+    result: "pass"
+    evidence: "Testing Library proves bilingual group/viewport/status/control/range labels, native controls, written guidance in every state, no global key handler, and no focus theft."
+  - id: "F05-AC-08"
+    result: "pass"
+    evidence: "Component state tests cover idle, loading, ready, playing, paused, ended, reduced motion, recoverable failure/retry, and terminal failure without exposing arbitrary error text."
+  - id: "F05-AC-09"
+    result: "pass"
+    evidence: "Locally prefixed CSS uses width 100%, min-width 0, overflow containment, wrapping/stacking below 390 px, 44 px controls, focus-visible outlines, and a reduced-motion media query. This is source/jsdom evidence, not physical Safari evidence."
+  - id: "F05-AC-10"
+    result: "pass"
+    evidence: "The deterministic renderer fixture is confined to animation-player.test-renderer.ts, is imported only by tests, is absent from the public index, and performs no production rendering, decoding, network, object-URL, or canvas work."
+  - id: "F05-AC-11"
+    result: "pass"
+    evidence: "ExerciseVideoPlayer, App/App tests, feature pages, storage, personal data, backup, content, public, PWA, and global styles are byte/tree-identical to the base; existing regression suites and precache audit pass."
+  - id: "F05-AC-12"
+    result: "pass"
+    evidence: "Package, lock, workspace, config, contracts, and versions are unchanged; exact source audit finds no fetch, browser network API, object URL, WebGL/WebGPU, production renderer import, CDN, GLB, ZIP, or binary addition."
+  - id: "F05-AC-13"
+    result: "pass"
+    evidence: "Focused tests, regressions, scoped ESLint, typecheck, architecture audit, verify:affected, and full verify all exited 0 on candidate 18b6e56."
+  - id: "F05-AC-14"
+    result: "pass"
+    evidence: "Coordinator 05dd775 is a direct child of base d6181b3 and changes only FOUNDATION-05.yaml; candidate 18b6e56 is its direct child and changes exactly the eight candidate paths. This report is the sole authorized post-candidate path."
+
+state_machine_evidence:
+  initial_and_dispose: "The exact frozen idle state is returned initially and after idempotent dispose; dispose cancels work, clears viewport/retry request/subscribers, and leaves later commands inert."
+  exact_identity: "Requests are parsed before loading; resolved entry/asset/blob relations are parsed and compared byte-for-byte; no aliasing, lowercasing, search, redirect, or cross-variant fallback exists."
+  load_and_mount: "Loading publishes synchronously; ready publishes only after exact source validation and an interface-valid renderer session; no load path calls play."
+  commands: "Play is ready/paused only, pause is playing only, seek is finite and clamped, ended pauses at duration, and replay explicitly seeks to zero before play."
+  cancellation: "Generation, expected viewport, abort signal, current-session identity, and one-time WeakSet disposal guard every loader, mount, frame, ended, failure, detach, reattach, replacement load, and dispose race."
+  failure_mapping: "Public AnimationPackError values are preserved; unknown loader errors become missing_asset; malformed input and renderer/session failures become activation_failed; every failure selects text fallback."
+
+accessibility_evidence:
+  subscription: "React uses useSyncExternalStore for controller state and OS reduced-motion state; no polling mirrors snapshots."
+  semantics: "The figure is an accessible group, viewport has an exercise-specific image label and written-description relation, lifecycle uses one polite atomic status region, and position changes are not live-announced."
+  controls: "Play, pause, replay, retry, and seek are native controls with localized visible/accessibility text and semantic disabled states; no global keyboard handler or programmatic focus move exists."
+  fallback: "Localized written guidance remains in the DOM for every state and is emphasized for failed/static-reference modes; raw exception text and paths are never rendered."
+  evidence_scope: "Automated evidence is jsdom/DOM/source coverage only; physical VoiceOver, Safari, contrast instrumentation, and device behavior remain pilot gates."
+
+responsive_evidence:
+  source_rules: "The component owns no fixed width above 320 px; root/viewport/controls use width 100%, min-width 0, overflow containment, wrapped controls, and overflow-wrap."
+  touch_and_focus: "Buttons and range input use at least 44 px dimensions and visible 3 px focus-visible outlines on the dark surface."
+  mobile: "At max-width 390 px controls and metadata stack and the seek control stays width 100%; source tests reject fixed-width and overflow regressions."
+  reduced_motion: "The media query disables animation, transition, and smooth scrolling; controller/component behavior independently prevents renderer play."
+  evidence_scope: "No physical 320/390 Safari rendering claim is made."
+
+checks:
+  - command: "pnpm install --offline --frozen-lockfile; git status --short"
+    result: "pass"
+    evidence: "All workspace projects were already up to date using pnpm 11.19.0; install finished in 288 ms with no source or lock change."
+  - command: "pnpm exec vitest run packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx"
+    result: "pass"
+    evidence: "2 files and 27 tests passed, 0 failed."
+  - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/media.test.ts packages/storage/src/animation-pack/archive.test.ts packages/storage/src/animation-pack/store.test.ts packages/storage/src/animation-pack/opfs.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx"
+    result: "pass"
+    evidence: "7 files and 354 tests passed, 0 failed."
+  - command: "pnpm exec eslint packages/media/src/animation-player.ts packages/media/src/animation-player.test.ts packages/media/src/animation-player.test-renderer.ts packages/media/src/index.ts apps/web/src/components/ExerciseAnimationPlayer.tsx apps/web/src/components/ExerciseAnimationPlayer.test.tsx --max-warnings=0"
+    result: "pass"
+    evidence: "Exited 0 with no warning or diagnostic."
+  - command: "pnpm run typecheck"
+    result: "pass"
+    evidence: "TypeScript project references exited 0 with no diagnostic."
+  - command: "pnpm run architecture:audit"
+    result: "pass"
+    evidence: "Architecture boundaries verified."
+  - command: "pnpm run verify:affected"
+    result: "pass_with_limitation"
+    evidence: "Architecture exited 0, then the script reported no uncommitted code. The script inspects git status only, so this clean-candidate result is not evidence about the committed candidate diff; explicit range checks, focused suites, and full verify provide that evidence."
+  - command: "pnpm run verify"
+    result: "pass"
+    evidence: "Architecture, full lint, typecheck, content validation/audit, 24 Vitest files with 512 tests, 2754-module production build, 38-entry PWA precache, and performance budgets passed (entry 202.5 KiB, initial graph 609.8 KiB, precache 3206.7 KiB)."
+  - command: "git diff --check 05dd775d12173a70c3b879482b63c7b95cd27d5a..18b6e562257fa65d9d491edd0fabb521c2044ec7"
+    result: "pass"
+    evidence: "Exited 0 with no output."
+  - command: "Exact lineage, eight-path range, protected object, MIT header, public import/export, version, forbidden API, and PWA precache assertions"
+    result: "pass"
+    evidence: "Parent/ranges are exact; all six new TS/TSX/CSS sources carry the Gym Local MIT header; the test renderer is not exported; protected objects equal base; animation-player is exported only through public @gym/media; no production animation token appears in dist/sw.js."
+  - command: "Manual review against docs/code-review.md and FOUNDATION-05 manual-review requirements"
+    result: "pass"
+    evidence: "Traced exact source validation, attach/load/mount/session callbacks, stale races, disposal, retry, reduced motion, native accessibility semantics, localized fallback, responsive CSS, online video isolation, personal-data isolation, and PWA boundaries."
+
+licenses:
+  result: "pass"
+  repository: "MIT; Copyright (c) 2026 Gym Local contributors."
+  source_headers: "All six new TypeScript/TSX/CSS source files use the exact repository MIT header; the generic MyCompany Apache template was not copied."
+  dependencies: "package.json and pnpm-lock.yaml are unchanged; no dependency or production renderer was added."
+  media: "No production animation, binary asset, external media, source record, license record, attribution, or network source changed."
+
+protected_path_audit:
+  result: "pass"
+  review_base: "d6181b3871a642215b5d5929e2ad65e56ce82434"
+  app: "0.7.0"
+  database: 5
+  backup: 5
+  catalog: 3
+  animation_pack_schema: 1
+  animation_player_protocol: 1
+  animation_catalog: 1
+  personal_data_changed: false
+  storage_changed: false
+  catalog_changed: false
+  feature_integration_changed: false
+  pwa_changed: false
+  video_changed: false
+  unchanged_objects:
+    package_json: "485bffca88295d9c458dc8706d84e46f75d92dcd"
+    pnpm_lock_yaml: "8af6caac77c93f58c5cfce23feb37303ee4c9620"
+    pnpm_workspace_yaml: "6bc432d83c0be318804535340aed4e27bfbeff2c"
+    eslint_config: "1b407167cc91482fe3471f2fd744c2affa7bdb17"
+    tsconfig: "1ffef600d959ec9e396d5a260bd3f5b927b2cef8"
+    vite_config: "04055943b776036d9f01d4db28b0acde725e96e0"
+    contracts_tree: "689904789935288582f93d525d11e69f065e88ee"
+    storage_tree: "331c1a172cd076064430d4369f71d9309de1fecc"
+    catalog_tree: "dfe0b2ad65b1135e89fc1bed951bf0a9b229043c"
+    backup_tree: "4162e7601fb23158a8d7182b508a08c46cae7278"
+    nutrition_tree: "15abe8f81c1bee6b15431567026fd2a5e33da6e7"
+    progress_tree: "781450a07fe6a309963fc6ea108a8f429f31675c"
+    ui_tree: "7508a5796d6416f59b991a9b08616eb9c885cfa1"
+    workouts_tree: "818daf4f4395b68648bb4bf00e7bd57395e9e251"
+    content_tree: "f8a06b5df08802550acc88958894eff54d8f91d2"
+    public_tree: "97bebe1b67d4c2fa7c04d46d7e302a25f5f2bc09"
+    app_entry: "d24f32441780eeaa626a26a94d2854a984307f3c"
+    app_test: "ae5327fa7e9d678c01df98bdd7c51faf10d8d16e"
+    exercise_video: "80b11f8d27075daa4ec12bb60c53743de84ec1f0"
+    features_tree: "c5f06b5f26d3a7b08f1fe47405fa7cc7fa9cccf5"
+    pwa_tree: "e9f42c1dce2b4c700546b2c6e18871ce10fa00cd"
+    global_styles: "cc865030618de199a131bd1fec8f5f921559f31f"
+  evidence: "Every listed object is byte/tree-identical between base_commit and candidate_commit; the candidate range contains only changed_paths."
+
+known_risks:
+  - "No production GLB decoder, renderer, animation asset, catalog mapping, storage adapter composition, or feature-page integration exists; ANIMATION-PILOT-01 owns those decisions and evidence."
+  - "Physical iPhone Safari, VoiceOver, 320/390 rendering, decoding, first-frame latency, memory, battery, thermal behavior, biomechanics, and visual quality remain unverified pilot gates."
+  - "verify:affected currently examines only dirty working-tree paths, so a clean immutable candidate receives a documentation-only message; full verify and explicit committed-range checks cover this packet, and a later tooling packet should make the script accept a base SHA."
+  - "The current test fixture proves controller state/races/disposal only and must not be treated as production animation playback evidence."
+
+owner_review_waiver:
+  waived_by_owner: true
+  cold_review_required: false
+  cold_review_pass_claimed: false
+  coordinator_owner_waived_gate_eligible: true
+  evidence: "The packet records the explicit owner waiver. This handoff reports producer/coordinator technical evidence only; merge metadata must record OWNER_WAIVED and must not claim cold-review PASS."
+
+review_target:
+  packet_path: "docs/ai/packets/FOUNDATION-05.yaml"
+  coordinator_range: "d6181b3871a642215b5d5929e2ad65e56ce82434..05dd775d12173a70c3b879482b63c7b95cd27d5a"
+  candidate_range: "05dd775d12173a70c3b879482b63c7b95cd27d5a..18b6e562257fa65d9d491edd0fabb521c2044ec7"
+  report_path: "docs/ai/reviews/FOUNDATION-05-handoff.yaml"
+  next_task: "Coordinator validates the handoff-only direct-child commit, independently reruns all required checks, records OWNER_WAIVED in the ledger, fast-forwards main, and creates the FOUNDATION-05 checkpoint."
