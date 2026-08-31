@@ -1,0 +1,135 @@
+schema_version: 1
+packet_id: "ANIMATION-PILOT-01"
+status: "BLOCKED"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence: "This packet task is running with the required gpt-5.6-sol model; no substitution occurred."
+subagents_used: false
+
+base_commit: "8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9"
+coordinator_commit: "7e56770c78507bc3db68a0fe11ace161ce0ff336"
+candidate_parent_commit: null
+candidate_commit: null
+branch: "codex/animation-pilot-01"
+changed_paths: []
+
+blocker:
+  stop_gates:
+    - "AP01-STOP-03"
+    - "AP01-STOP-14"
+  triggered_at: "2026-08-31T22:04:41+07:00"
+  summary: "The owner requested skipping the packet's mandatory review gate and continuing to the next roadmap packet, while the named rights reviewer, named motion/equipment reviewer, qualifying physical iPhone runs, secure installable HTTPS path, and required evidence are not available in repository evidence."
+  evidence:
+    - "The packet states that the FOUNDATION-05 waiver is not inherited and requires an independent gpt-5.6-sol cold-review PASS."
+    - "AP01-AC-12 requires two complete physical low-end iPhone trials to pass every performance budget; no device-runs evidence exists."
+    - "AP01-AC-18 requires an independent cold-review PASS with merge_authorized true and explicitly rejects an owner waiver."
+    - "The pilot gate forbids creating an ANIMATION-WAVE packet before checkpoint/animation-pilot-01-pass exists."
+    - "Before this report, the coordinator commit had no candidate implementation, release artifact evidence, reviewer approval, handoff, or cold-review report."
+  required_resolution:
+    - "Provide a qualifying physical iPhone, reviewable memory/energy/thermal tooling, and a secure installable HTTPS test path."
+    - "Provide named rights and motion/equipment reviewers distinct from the producer invocation."
+    - "Resume ANIMATION-PILOT-01 from coordinator commit 7e56770, produce the complete candidate and evidence, then run a new independent cold-review task."
+    - "Continue to ANIMATION-WAVE-01 only after a PASS report authorizes merge and checkpoint/animation-pilot-01-pass exists."
+
+versions:
+  app: "0.7.0"
+  database: 5
+  backup: 5
+  catalog: 3
+  animation_pack_schema: 1
+  animation_player_protocol: 1
+  animation_catalog: 1
+
+variant_matrix:
+  expected_count: 12
+  result: "not_started"
+  evidence: "No catalog mapping or pilot asset source was created before the pre-edit stop gates triggered."
+
+release_artifacts:
+  result: "not_created"
+  releases: []
+  evidence: "No GLB, manifest, ZIP, descriptor, or ignored release output was generated."
+
+determinism_evidence:
+  result: "not_run"
+  evidence: "No release input exists to materialize or compare."
+
+renderer_candidates:
+  result: "not_benchmarked"
+  candidates:
+    - "three-direct"
+    - "babylon-modular"
+    - "google-model-viewer"
+  evidence: "The packet's pinned candidates were not installed or benchmarked because preflight did not authorize implementation."
+
+renderer_selection:
+  result: "not_selected"
+  evidence: "Selecting a renderer without comparable desktop and physical-device evidence would violate AP01-STOP-09."
+
+dependency_and_license_evidence:
+  result: "blocked"
+  evidence: "No dependency was added and no renderer license closure was copied. Named rights approval is absent."
+
+source_and_motion_reviews:
+  result: "blocked"
+  rights_reviewer: null
+  motion_equipment_reviewer: null
+  evidence: "No distinct named reviewer approval exists."
+
+acceptance_evidence:
+  - ids: ["AP01-AC-01", "AP01-AC-02", "AP01-AC-03", "AP01-AC-04", "AP01-AC-05", "AP01-AC-06", "AP01-AC-07", "AP01-AC-08", "AP01-AC-09", "AP01-AC-10", "AP01-AC-11", "AP01-AC-12", "AP01-AC-13", "AP01-AC-14", "AP01-AC-15", "AP01-AC-16", "AP01-AC-17", "AP01-AC-18"]
+    result: "blocked"
+    evidence: "No candidate or required physical/reviewer evidence exists; none of the acceptance criteria is claimed."
+
+offline_relaunch_evidence:
+  result: "not_run"
+  evidence: "No pilot PWA or installed pilot pack exists."
+
+rollback_evidence:
+  result: "not_run"
+  evidence: "Pilot releases 1.0.0 and 1.0.1 were not created."
+
+personal_data_evidence:
+  result: "not_run"
+  evidence: "No pilot lifecycle operation occurred; no personal data path was edited."
+
+device_runs:
+  result: "blocked"
+  runs: []
+  evidence: "No qualifying physical iPhone, Safari/Instruments trace, or two-run dataset was provided."
+
+performance_budget_results:
+  result: "not_run"
+  evidence: "No physical-device measurements exist and no budget is claimed."
+
+accessibility_evidence:
+  result: "blocked"
+  evidence: "Physical VoiceOver, reduced-motion, focus, and 320/390 layout evidence is absent."
+
+visual_evidence:
+  result: "blocked"
+  evidence: "No rendered contact sheets or named motion/equipment review exists."
+
+checks:
+  - command: "git verify coordinator lineage, checkpoint, changed path, and worktree cleanliness"
+    result: "pass"
+    evidence: "Coordinator 7e56770 is a direct child of base 8fdc9fb, changes only docs/ai/packets/ANIMATION-PILOT-01.yaml, and the producer branch was clean before this report."
+  - command: "pnpm install --offline --frozen-lockfile; git status --short"
+    result: "pass"
+    evidence: "All 10 workspace projects were already up to date with pnpm 11.19.0; no tracked file changed."
+  - command: "ANIMATION-PILOT-01 required implementation, evidence, device, and release checks"
+    result: "not_run"
+    evidence: "AP01-STOP-03 and AP01-STOP-14 require stopping before candidate creation; no success evidence is claimed."
+
+protected_path_audit:
+  result: "pass"
+  evidence: "No implementation or protected path was edited. This blocker handoff is the only added path and is explicitly authorized by the packet."
+
+known_risks:
+  - "Skipping the mandatory independent review would permit unverified licensed media, renderer code, storage behavior, and physical-device performance into later production waves."
+  - "No animation wave is authorized because the pilot candidate, PASS verdict, merge authorization, and checkpoint do not exist."
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-PILOT-01.yaml"
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-handoff.yaml"
+  candidate_range: null
+  next_task: "Resolve the device, reviewer, HTTPS, evidence, and mandatory independent-review prerequisites, then resume this packet from coordinator commit 7e56770."
