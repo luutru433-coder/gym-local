@@ -1,0 +1,188 @@
+schema_version: 2
+packet:
+  id: "GOVERNANCE-01"
+  title: "Replace the mandatory cold-review gate with recorded owner verification"
+  type: "governance"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9"
+  target_branch: "codex/governance-owner-verification"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-05"
+  one_time_authority: "The repository owner explicitly authorized GOVERNANCE-01 to replace the review governance without changing product code."
+
+authority:
+  allowed_paths:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/GOVERNANCE-01.yaml"
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/adr/0020-owner-verification-governance.md"
+  candidate_paths:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/GOVERNANCE-01.yaml"
+    - "docs/adr/0020-owner-verification-governance.md"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "scripts/**"
+    - "tests/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - "vite.config.ts"
+    - "docs/ai/packets/ANIMATION-PILOT-01*.yaml"
+    - "docs/ai/reviews/*-cold-review.yaml"
+    - "docs/ai/reviews/FOUNDATION-*.yaml"
+    - "docs/adr/0001-*.md through docs/adr/0019-*.md"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  generated_binary_assets_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/GOVERNANCE-01.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/code-review.md"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+  accepted_adrs: []
+  assumptions:
+    - "Historical cold-review reports and verdicts remain immutable evidence and are not migrated to the new schema."
+    - "The owner verification record is stored inside the packet handoff because no separate owner-verification path is authorized."
+    - "ANIMATION-PILOT-01 is not continued or revised here; a later task must issue a superseding packet revision."
+
+outcome:
+  objective: "Make recorded owner approval, not cold-review PASS, the merge gate for future coordinate packets while preserving optional cold review and all pilot evidence requirements."
+  user_visible_result: "None; governance documentation and audit metadata only."
+  deliverables:
+    - "Root guidance, master plan, packet template, and review procedure consistently define owner verification as the required merge gate."
+    - "The owner-verification schema contains schema_version, packet_id, candidate_commit, status, approved_by, approved_at, checks_verified, accepted_risks, and merge_authorized."
+    - "ADR 0020 records the rationale, self-verification risks, mitigations, and durable Git/YAML audit trail."
+    - "A candidate commit is followed by a separate handoff commit containing the schema-valid handoff and OWNER_APPROVED ledger checkpoint."
+  non_goals:
+    - "No product code, contract, storage, content, product test, dependency, build configuration, or historical review change."
+    - "No cold-review PASS claim for GOVERNANCE-01."
+    - "No ANIMATION-PILOT-01 work, supersession, implementation, or evidence claim."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "main_branch_cleanliness"
+    - "base_commit_and_created_target_branch"
+    - "allowed_and_forbidden_paths"
+    - "required_reads"
+    - "stop_gates"
+  required_conditions:
+    clean_worktree: true
+    head_matches_base_commit: true
+    instructions_read: true
+    required_inputs_present: true
+    exact_model_available: true
+
+decisions:
+  contract_or_schema_change: "governance_schema_only"
+  version_decisions:
+    - "Coordinate packet template advances to schema version 2."
+    - "Owner verification starts at schema version 1."
+    - "Existing packet, handoff, ledger, and cold-review records remain valid historical evidence without rewrite."
+  migration_or_rollback: "Documentation rollback is a revert of the two GOVERNANCE-01 commits; historical records remain untouched."
+  source_or_license_impact: "none"
+
+acceptance_tests:
+  - id: "G01-AC-01"
+    requirement: "Cold review is optional and is not a completion or merge gate; no active policy says merge only after PASS."
+    evidence: "Review AGENTS.md, master plan, review procedure, and coordinate packet template together."
+  - id: "G01-AC-02"
+    requirement: "A packet completes only with a candidate commit, schema-valid handoff, passing required checks, and owner verification status APPROVED."
+    evidence: "Master plan completion rule and review procedure owner-verification gate."
+  - id: "G01-AC-03"
+    requirement: "Only APPROVED owner verification can set merge_authorized true, and the schema contains every required field."
+    evidence: "Coordinate packet template schema and review procedure schema example."
+  - id: "G01-AC-04"
+    requirement: "The pilot retains license, deterministic build, rollback, offline relaunch, exact-variant mapping, and two iPhone test-run evidence requirements."
+    evidence: "Master plan pilot gate and ADR 0020."
+  - id: "G01-AC-05"
+    requirement: "Historical verdicts and cold-review reports are byte-identical to the base commit."
+    evidence: "Git path audit from base_commit through branch HEAD."
+  - id: "G01-AC-06"
+    requirement: "No product or ANIMATION-PILOT-01 file changes."
+    evidence: "Changed-path audit from base_commit through branch HEAD."
+
+required_checks:
+  commands:
+    - "parse every YAML file under docs/ai"
+    - "git diff --check"
+    - "pnpm run verify:affected"
+  manual_reviews:
+    - "Review the complete governance diff against docs/code-review.md and every acceptance test."
+    - "Confirm no historical verdict or cold-review report changed."
+    - "Confirm pilot evidence gates remain mandatory except independent cold review."
+  evidence_paths:
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+
+stop_gates:
+  - id: "G01-STOP-01"
+    condition: "Any changed path falls outside authority.allowed_paths or any product, pilot, or historical review file changes."
+    action: "Stop, revert the unauthorized edit, and record a blocker instead of widening scope."
+  - id: "G01-STOP-02"
+    condition: "Any required YAML parse, diff check, or affected verification fails."
+    action: "Do not approve or commit the handoff until the failure is resolved within allowed paths."
+  - id: "G01-STOP-03"
+    condition: "The policy weakens a pilot evidence requirement other than independent cold review."
+    action: "Stop and restore the license, deterministic build, rollback, offline relaunch, exact-variant, and two-iPhone requirements."
+  - id: "G01-STOP-04"
+    condition: "Owner approval cannot be recorded truthfully with the required identity, time, verified checks, accepted risks, and authorization fields."
+    action: "Set owner verification to BLOCKED with merge_authorized false and do not update the ledger as OWNER_APPROVED."
+
+handoff:
+  report_path: "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+  candidate_commit_excludes_handoff_and_approval_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+  metadata_commit_rule: "After candidate_commit, only the declared post_candidate_metadata_paths may change in the separate handoff commit."
+
+owner_verification:
+  required: true
+  record_location: "docs/ai/reviews/GOVERNANCE-01-handoff.yaml#owner_verification"
+  schema_version: 1
+  allowed_statuses:
+    - "APPROVED"
+    - "REJECTED"
+    - "BLOCKED"
+  authorization_rule: "Only status APPROVED may set merge_authorized true."
+
+cold_review:
+  required: false
+  requested_for_this_packet: false
+  report_path: null
+  governance_effect: "Optional evidence only; never a merge gate and no PASS is claimed."
+
+merge:
+  allowed_only_after: "owner_verification.status == APPROVED and owner_verification.merge_authorized == true"
+  target: "main"
+  squash_policy: "preserve candidate and handoff commits"

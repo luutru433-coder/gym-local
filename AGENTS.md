@@ -2,12 +2,13 @@
 
 ## Packet execution
 
-- Use `gpt-5.6-sol` for repository implementation and cold-review tasks. Stop if that model is unavailable.
+- Use `gpt-5.6-sol` for repository implementation, owner-verification, and optional cold-review tasks. Stop if that model is unavailable.
 - One Codex task handles exactly one coordinate packet.
 - Read the root and applicable nested `AGENTS.md`, `docs/ai/master-plan.md`, the packet, and `docs/ai/review-procedure.md` before changing files.
 - Do not edit outside the packet's `allowed_paths`; do not widen scope implicitly.
 - Stop at any packet stop gate and write a blocker report instead of continuing.
-- Run every check required by the packet. A missing handoff report means the packet is incomplete.
+- Run every check required by the packet. A packet is incomplete without a candidate commit, schema-valid handoff, passing required checks, and recorded owner verification with `status: APPROVED`.
+- Cold review is optional evidence, not a completion or merge gate. Only approved owner verification may authorize merge.
 
 ## Product invariants
 

@@ -8,10 +8,11 @@ This document governs the sequential Codex work needed to add licensed offline e
 
 - Use `gpt-5.6-sol`; do not use subagents.
 - A coordinator task creates one packet and does not implement it.
-- A producer task starts from the packet's immutable base commit, performs preflight, edits only `allowed_paths`, creates a candidate commit, and writes a handoff report.
-- A new cold-review task reads only the packet, candidate diff, test evidence, renders, licenses, and handoff report. It does not edit files and returns `PASS`, `FAIL`, or `BLOCKED`.
-- A fixer task exists only after `FAIL`, edits only the finding-scoped paths, and must be cold-reviewed again.
-- Merge is allowed only after `PASS`. `BLOCKED` stops at the newest safe checkpoint.
+- A producer task starts from the packet's immutable base commit, performs preflight, edits only `allowed_paths`, creates a candidate commit, and prepares a schema-valid handoff report with check evidence.
+- The repository owner verifies the immutable candidate, handoff, required checks, scope, and risks. The owner records `APPROVED`, `REJECTED`, or `BLOCKED` in the handoff; only `APPROVED` may set `merge_authorized: true`.
+- A cold-review task is optional advisory evidence. It does not edit files, is not required for completion, and is not a merge gate.
+- A fixer task exists after owner `REJECTED`, or when the owner requires fixes for advisory findings. It edits only finding-scoped paths and returns through owner verification.
+- Merge is allowed only after recorded owner verification is `APPROVED` with `merge_authorized: true`. Owner `BLOCKED` stops at the newest safe checkpoint.
 - Work is sequential even when Codex worktrees are used, because contracts, pack format, storage, player, and content waves depend on prior decisions.
 
 ## Product outcome
@@ -114,8 +115,8 @@ Contract rules:
 
 ## Pilot gate
 
-The pilot must pass before any 199-variant production wave begins. It must include 10–12 variants, at least two low-end iPhone test runs, cold-review `PASS`, confirmed redistribution rights, deterministic reproduction, atomic rollback, offline relaunch, no cross-variant fallback, and agreed performance budgets. A failed or blocked pilot returns to a narrowly scoped fixer packet; it does not authorize bulk asset generation.
+The pilot must pass before any 199-variant production wave begins. It must include 10–12 variants and evidence for confirmed source and redistribution licenses, deterministic build reproduction, atomic rollback, offline relaunch, exact equipment-variant mapping with no cross-variant fallback, at least two low-end iPhone test runs, and agreed performance budgets. Independent cold review is optional and is not part of this gate. A rejected or blocked pilot returns to a narrowly scoped fixer packet; it does not authorize bulk asset generation.
 
 ## Packet completion rule
 
-A packet is complete only when all deliverables exist, every required check has evidence, the diff is within `allowed_paths`, a candidate commit exists, a schema-valid handoff report exists, and a cold review returns `PASS`. Coordinator notes or conversation summaries are not substitutes for repository evidence.
+A packet is complete only when all deliverables exist, the diff is within `allowed_paths`, a candidate commit exists, a schema-valid handoff report exists, every required check has passing evidence, and owner verification records `status: APPROVED` with `merge_authorized: true`. Coordinator notes, conversation summaries, or an optional cold-review verdict are not substitutes for the owner-verification audit record.

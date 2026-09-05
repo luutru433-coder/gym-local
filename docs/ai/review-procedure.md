@@ -1,86 +1,77 @@
-# Cold review procedure
+# Owner verification and optional cold review procedure
 
 ## Purpose
 
-Cold review decides whether one candidate packet is safe to merge. It is a new Codex task using `gpt-5.6-sol`, without subagents and without the producer's conversational rationale. The reviewer does not fix files.
+Owner verification decides whether one immutable candidate packet is authorized to merge. It uses `gpt-5.6-sol`, runs without subagents, and leaves a repository audit record. Cold review remains available as advisory evidence but is neither required for packet completion nor a merge gate.
 
-## Inputs
+## Required inputs
 
-The reviewer reads only:
+The owner verifies:
 
 1. Root and applicable nested `AGENTS.md` files.
-2. `docs/ai/master-plan.md`.
-3. The exact coordinate packet.
-4. The immutable candidate diff from `base_commit` through the handoff's `candidate_commit`.
-5. The metadata diff from `candidate_commit` through branch HEAD, which must contain only the packet's handoff report.
-6. The handoff report and referenced command output, renders, manifests, checksums, and license records.
-7. Existing ADRs or contracts explicitly listed by the packet.
+2. `docs/ai/master-plan.md` and the exact coordinate packet.
+3. The immutable candidate diff from `base_commit` through `candidate_commit`.
+4. The packet handoff, command evidence, renders, manifests, checksums, license records, and accepted ADRs required by the packet.
+5. The post-candidate metadata diff, which may contain only paths explicitly declared by the packet.
+6. Any optional cold-review report requested for this packet.
 
-If any required input is absent or the candidate commit cannot be resolved, return `BLOCKED`.
+If a required input is absent, the candidate cannot be resolved, or authority is ambiguous, record `BLOCKED` and keep `merge_authorized: false`.
 
-## Review order
+## Verification order
 
-1. Verify model, packet ID, base commit, candidate commit, branch, clean candidate worktree, and one-packet scope. Confirm the only post-candidate change is the handoff report; otherwise return `FAIL`.
-2. Compare every changed path with `allowed_paths`. Any unexplained out-of-scope path is `FAIL`; an ambiguous authority boundary is `BLOCKED`.
-3. Check every stop gate and confirm the producer did not continue through a triggered gate.
+1. Verify model, packet ID, immutable base and candidate commits, target branch, one-packet scope, and declared metadata paths.
+2. Compare every changed path with `allowed_paths`; an out-of-scope change is `REJECTED`, while an unresolved authority boundary is `BLOCKED`.
+3. Check every stop gate and confirm work did not continue through a triggered gate.
 4. Review decisions and contracts for compatibility, immutable IDs, exact equipment-variant mapping, offline behavior, personal-data safety, rollback, and optional external-video fallback.
-5. Trace every bundled or proposed asset to author, source, license/terms, redistribution right, attribution, modification record, and review date.
+5. Trace every bundled or proposed asset to author, source, license or terms, redistribution right, attribution, modification record, and review date.
 6. Match every acceptance criterion to concrete evidence.
-7. Confirm required commands ran on the candidate, passed, and are proportional to the packet.
+7. Confirm every required command ran against the candidate, passed, and is proportional to the packet.
 8. Review mobile, keyboard, VoiceOver, reduced-motion, failed-network, corrupt-pack, quota, update, and rollback evidence when applicable.
-9. Review the handoff for omissions, unsupported claims, and unresolved risk.
+9. Review known and newly found risks. Every risk allowed to remain must be listed in `accepted_risks`; an unaccepted material risk requires `REJECTED` or `BLOCKED`.
+10. Write the owner-verification record in the schema-valid handoff and commit the packet-declared approval metadata.
 
-## Verdicts
+## Owner-verification statuses
 
-- `PASS`: all acceptance criteria and checks have evidence, no stop gate was crossed, licenses are clear, and the diff stays in scope.
-- `FAIL`: the packet is reviewable but has one or more actionable defects. Findings must be specific, prioritized, and bounded to the packet.
-- `BLOCKED`: evidence, authority, a license, the base commit, or another prerequisite is missing, so a safe correctness verdict is impossible.
+- `APPROVED`: deliverables, scope, acceptance criteria, and required checks have evidence; remaining risks are explicitly accepted. This is the only status that may set `merge_authorized: true`.
+- `REJECTED`: the packet is reviewable but has actionable defects. Set `merge_authorized: false` and issue a bounded fixer packet if work should continue.
+- `BLOCKED`: evidence, authority, license, base commit, or another prerequisite is missing. Set `merge_authorized: false` and resolve the prerequisite before continuing.
 
-Warnings cannot replace a verdict. `PASS_WITH_COMMENTS` is not a valid result.
+## Owner-verification schema
 
-## Review report schema
-
-Write `docs/ai/reviews/<PACKET-ID>-cold-review.yaml`:
+Store the following object in `docs/ai/reviews/<PACKET-ID>-handoff.yaml` under `owner_verification`:
 
 ```yaml
-schema_version: 1
-packet_id: "PACKET-ID"
-verdict: "PASS|FAIL|BLOCKED"
-reviewed_base_commit: "sha"
-reviewed_head_commit: "sha"
-reviewed_at: "ISO-8601"
-reviewer_model: "gpt-5.6-sol"
-scope:
-  changed_paths_in_scope: true
-  unexpected_paths: []
-acceptance:
-  - id: "AC-01"
-    result: "pass|fail|blocked"
-    evidence: []
-checks:
-  - command: "command"
-    result: "pass|fail|not_run"
-    evidence: "summary or report path"
-licenses:
-  result: "pass|fail|blocked|not_applicable"
-  findings: []
-findings:
-  - severity: "P0|P1|P2|P3"
-    path: "path"
-    issue: "Actionable defect"
-    required_fix: "Bounded correction"
-residual_risks: []
-merge_authorized: false
+owner_verification:
+  schema_version: 1
+  packet_id: "PACKET-ID"
+  candidate_commit: "40-character commit SHA"
+  status: "APPROVED|REJECTED|BLOCKED"
+  approved_by: "repository-owner identity or null"
+  approved_at: "ISO-8601 timestamp or null"
+  checks_verified:
+    - command: "command"
+      result: "pass|fail|not_run"
+      evidence: "summary or report path"
+  accepted_risks: []
+  merge_authorized: false
 ```
 
-Set `merge_authorized: true` only for `PASS`.
+All nine fields are required. For `APPROVED`, `approved_by` and `approved_at` must be non-null, every required check must appear in `checks_verified` with `result: pass`, and `merge_authorized` may be `true`. For `REJECTED` or `BLOCKED`, `merge_authorized` must be `false`; `approved_by` and `approved_at` are null because approval was not granted. `accepted_risks` is always present, even when empty.
+
+## Optional cold review
+
+The owner may request a separate cold-review task to inspect the packet, immutable candidate diff, evidence, and handoff without inheriting the producer's rationale. It may report `PASS`, `FAIL`, or `BLOCKED` and must not edit files. Its verdict is advisory: it cannot set `merge_authorized`, cannot replace owner verification, and cannot independently complete or reject a packet.
+
+When optional review finds a defect, the owner either requires a bounded fixer packet or records why the residual risk is accepted. A cold-review `PASS` is additional evidence only. No new policy or ledger entry may describe it as the merge gate.
 
 ## Fixer loop
 
-After `FAIL`, the coordinator creates a fixer packet that references only the review findings, the same candidate lineage, and the minimum additional `allowed_paths`. The fixer produces a new candidate commit and handoff report. A different cold-review task reviews the complete updated range again.
+After owner `REJECTED`, the coordinator creates a fixer packet referencing only the actionable findings, the same candidate lineage, and the minimum additional `allowed_paths`. The fixer produces a new candidate commit and handoff. The owner verifies the complete updated range again and may optionally request another cold review.
 
-After `BLOCKED`, do not create a fixer automatically. Resolve the missing authority, license, input, or base decision first, then issue a new packet from a safe checkpoint.
+After owner `BLOCKED`, do not create a fixer automatically. Resolve the missing authority, license, input, or base decision first, then issue a new packet from a safe checkpoint.
 
-## Merge gate
+## Merge gate and audit trail
 
-Merge only when the latest cold-review report is committed, matches the reviewed candidate and metadata ranges, says `PASS`, and has `merge_authorized: true`. Re-run release checks if merge resolution changes candidate bytes. Record the merge commit in the coordinator ledger; never infer approval from chat text alone.
+Merge only when the committed handoff matches the immutable candidate, contains a schema-valid owner verification with `status: APPROVED` and `merge_authorized: true`, and all required checks are recorded as passed. Re-run affected or release checks if merge resolution changes candidate bytes. Record the authorization and resulting commit lineage in the coordinator ledger; never infer approval from chat text alone.
+
+Historical handoffs, cold-review reports, verdicts, waivers, and ledger checkpoints remain immutable evidence. Do not rewrite them into the owner-verification schema or relabel any historical verdict.

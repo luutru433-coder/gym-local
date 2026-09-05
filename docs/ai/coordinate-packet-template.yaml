@@ -1,9 +1,9 @@
-schema_version: 1
+schema_version: 2
 packet:
   id: "PACKET-ID"
   title: "Short outcome"
-  type: "foundation|implementation|content|review-fix"
-  status: "draft|ready|in_progress|candidate|passed|failed|blocked|merged"
+  type: "foundation|implementation|content|review-fix|governance"
+  status: "draft|ready|in_progress|candidate|owner_approved|rejected|blocked|merged"
 
 execution:
   model: "gpt-5.6-sol"
@@ -17,6 +17,10 @@ execution:
 authority:
   allowed_paths:
     - "exact/path/or/glob/**"
+  candidate_paths:
+    - "exact/candidate/path/or/glob/**"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PACKET-ID-handoff.yaml"
   forbidden_paths:
     - "path/outside/scope/**"
   external_writes_allowed: false
@@ -52,7 +56,7 @@ preflight:
     required_inputs_present: true
 
 decisions:
-  contract_or_schema_change: "none|proposal_only|runtime_change"
+  contract_or_schema_change: "none|proposal_only|runtime_change|governance_schema_only"
   version_decisions: []
   migration_or_rollback: "not_applicable|proposal|implementation"
   source_or_license_impact: "none|metadata_only|bundled_assets"
@@ -74,8 +78,10 @@ stop_gates:
 
 handoff:
   report_path: "docs/ai/reviews/PACKET-ID-handoff.yaml"
-  candidate_commit_excludes_handoff_metadata_commit: true
-  metadata_commit_rule: "After candidate_commit, only report_path may change before cold review."
+  candidate_commit_excludes_handoff_and_approval_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PACKET-ID-handoff.yaml"
+  metadata_commit_rule: "After candidate_commit, only declared post_candidate_metadata_paths may change before merge."
   required_fields:
     - "packet_id"
     - "status"
@@ -87,22 +93,40 @@ handoff:
     - "checks"
     - "licenses"
     - "known_risks"
+    - "owner_verification"
     - "review_target"
 
-cold_review:
+owner_verification:
   required: true
-  inherits_producer_explanation: false
+  record_location: "handoff.report_path#owner_verification"
+  schema:
+    schema_version: 1
+    packet_id: "PACKET-ID"
+    candidate_commit: "40-character commit SHA"
+    status: "APPROVED|REJECTED|BLOCKED"
+    approved_by: "repository-owner identity or null"
+    approved_at: "ISO-8601 timestamp or null"
+    checks_verified:
+      - command: "command"
+        result: "pass|fail|not_run"
+        evidence: "summary or report path"
+    accepted_risks: []
+    merge_authorized: false
+  authorization_rule: "Only status APPROVED may set merge_authorized true; all other statuses require false."
+
+cold_review:
+  required: false
+  requested: false
+  advisory_only: true
   may_edit_files: false
   allowed_verdicts:
     - "PASS"
     - "FAIL"
     - "BLOCKED"
-  report_path: "docs/ai/reviews/PACKET-ID-cold-review.yaml"
-  immutable_ranges:
-    candidate: "base_commit..candidate_commit"
-    handoff_metadata: "candidate_commit..branch HEAD; report_path only"
+  report_path: null
+  merge_gate_effect: "none"
 
 merge:
-  allowed_only_after: "PASS"
+  allowed_only_after: "owner_verification.status == APPROVED and owner_verification.merge_authorized == true"
   target: "main"
   squash_policy: "packet-defined"
