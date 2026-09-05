@@ -1,0 +1,144 @@
+schema_version: 2
+packet_id: "ANIMATION-PILOT-01-REV-01"
+status: "BLOCKED"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence: "The producer run used the packet-required gpt-5.6-sol model with no substitution."
+subagents_used: false
+
+base_commit: "1444044123c6d8768a6949cc8036b6cc8455f522"
+coordinator_commit: "7fc60bae5a2b2aab052e2b17b98c76a30840fbd0"
+candidate_parent_commit: null
+candidate_commit: null
+branch: "codex/animation-pilot-01-rev-01"
+changed_paths: []
+
+blocker:
+  stop_gate: "AP01R1-STOP-03"
+  triggered_at: "2026-09-05T16:03:21+07:00"
+  summary: "Preflight cannot establish the packet-required physical-device and independent reviewer inputs."
+  evidence:
+    - "No docs/ai/evidence/ANIMATION-PILOT-01-REV-01 directory or device-runs evidence exists at the coordinator commit."
+    - "No named rights reviewer or named motion/equipment reviewer is recorded for this pilot revision."
+    - "Windows present-device inspection found no connected iPhone or Apple mobile device."
+    - "No secure installable HTTPS pilot origin or reviewable physical-device memory, energy, and thermal toolchain is recorded."
+    - "The packet expressly rejects simulator, desktop emulation, self-approval, or not_applicable as substitutes."
+  required_resolution:
+    - "Provide a physical A12/A13-class 3 GiB iPhone and identify its model, iOS/Safari builds, and reviewable measurement tooling."
+    - "Provide a secure installable HTTPS test path for the pilot PWA."
+    - "Provide named rights and motion/equipment reviewers distinct from the producer invocation."
+    - "Resume this exact packet from coordinator commit 7fc60ba only after those preflight inputs are available."
+
+versions:
+  app: "0.7.0"
+  database: 5
+  backup: 5
+  catalog: 3
+  animation_pack_schema: 1
+  animation_player_protocol: 1
+  animation_catalog: 1
+
+variant_matrix:
+  expected_count: 12
+  result: "not_started"
+  evidence: "No catalog mapping or pilot asset source was created after the pre-edit stop gate triggered."
+
+release_artifacts:
+  result: "not_created"
+  releases: []
+  evidence: "No GLB, manifest, ZIP, descriptor, or release output was generated."
+
+determinism_evidence:
+  result: "not_run"
+  evidence: "There are no pilot release inputs to reproduce."
+
+renderer_candidates:
+  result: "not_benchmarked"
+  candidates: ["three-direct", "babylon-modular", "google-model-viewer"]
+  evidence: "No dependency was installed or benchmarked before preflight completion."
+
+renderer_selection:
+  result: "not_selected"
+  evidence: "Comparable desktop and qualifying physical-device evidence is absent."
+
+dependency_and_license_evidence:
+  result: "blocked"
+  evidence: "No renderer dependency closure or named rights approval exists."
+
+source_and_motion_reviews:
+  result: "blocked"
+  rights_reviewer: null
+  motion_equipment_reviewer: null
+  evidence: "The required distinct named reviewers were not provided."
+
+acceptance_evidence:
+  - ids: ["AP01R1-AC-01", "AP01R1-AC-02", "AP01R1-AC-03", "AP01R1-AC-04", "AP01R1-AC-05", "AP01R1-AC-06", "AP01R1-AC-07", "AP01R1-AC-08", "AP01R1-AC-09", "AP01R1-AC-10", "AP01R1-AC-11", "AP01R1-AC-12", "AP01R1-AC-13", "AP01R1-AC-14", "AP01R1-AC-15", "AP01R1-AC-16", "AP01R1-AC-17", "AP01R1-AC-18"]
+    result: "blocked"
+    evidence: "No candidate exists and no acceptance criterion is claimed."
+
+offline_relaunch_evidence:
+  result: "not_run"
+  evidence: "No pilot PWA or installed pilot pack exists."
+
+rollback_evidence:
+  result: "not_run"
+  evidence: "Pilot releases 1.0.0 and 1.0.1 were not created."
+
+personal_data_evidence:
+  result: "not_run"
+  evidence: "No pilot lifecycle operation occurred; no personal-data path changed."
+
+device_runs:
+  result: "blocked"
+  runs: []
+  evidence: "No qualifying physical iPhone run or raw measurement trace was provided."
+
+performance_budget_results:
+  result: "not_run"
+  evidence: "No physical-device samples exist; no budget result is claimed."
+
+accessibility_evidence:
+  result: "blocked"
+  evidence: "Physical VoiceOver, reduced-motion, focus, and responsive-device evidence is absent."
+
+visual_evidence:
+  result: "blocked"
+  evidence: "No contact sheets or named motion/equipment review exists."
+
+checks:
+  - command: "verify base, checkpoint, coordinator parent, packet-only delta, branch, and cleanliness"
+    result: "pass"
+    evidence: "Coordinator 7fc60ba is a direct child of base/checkpoint 1444044, changes only the revision packet, and the target worktree was clean before this report."
+  - command: "inspect repository evidence and connected Windows devices"
+    result: "blocked"
+    evidence: "No pilot evidence/reviewer/HTTPS record exists and no iPhone or Apple mobile device was present."
+  - command: "remaining ANIMATION-PILOT-01-REV-01 required checks"
+    result: "not_run"
+    evidence: "AP01R1-STOP-03 requires stopping at preflight; no implementation success is claimed."
+
+protected_path_audit:
+  result: "pass"
+  evidence: "No implementation or protected path changed. This blocker handoff is the sole added path and is packet-authorized metadata."
+
+known_risks:
+  - "The complete 12-variant pilot remains unimplemented and unmeasured."
+  - "Proceeding without physical-device and independent reviewer inputs would make license, visual, accessibility, and performance claims unverifiable."
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-PILOT-01-REV-01.yaml"
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml"
+  candidate_range: null
+  next_task: "Resolve AP01R1-STOP-03 inputs, then resume this packet from coordinator commit 7fc60ba."
+
+owner_verification:
+  schema_version: 1
+  packet_id: "ANIMATION-PILOT-01-REV-01"
+  candidate_commit: null
+  status: "BLOCKED"
+  approved_by: null
+  approved_at: null
+  checks_verified:
+    - command: "preflight physical-device and reviewer inputs"
+      result: "fail"
+      evidence: "Required device, HTTPS/toolchain, and named reviewer inputs are absent."
+  accepted_risks: []
+  merge_authorized: false
