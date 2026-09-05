@@ -172,11 +172,14 @@ checkpoints:
     next_packet: "ANIMATION-PILOT-01"
 
   - id: "GOVERNANCE-01"
-    status: "owner_approved"
+    status: "merged_owner_approved"
     recorded_at: "2026-09-05T14:31:58.2796238+07:00"
-    target_branch: "codex/governance-owner-verification"
+    target_branch: "main"
+    merge_mode: "fast_forward"
     lineage_base_commit: "8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9"
     candidate_commit: "bdc1fb4ee334076d3b468a07d6a0be12ada4e3f4"
+    handoff_commit: "89d0fc68637000c1fc47c5c0f5d9b831c5aa7c45"
+    merged_head: "89d0fc68637000c1fc47c5c0f5d9b831c5aa7c45"
     handoff_path: "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
     verdict: "OWNER_APPROVED"
     merge_authorized: true
@@ -204,6 +207,7 @@ checkpoints:
       required: false
       performed: false
       pass_claimed: false
+    checkpoint_tag: "checkpoint/governance-01-owner-approved"
     accepted_risks:
       - "Owner self-verification reduces independent defect detection and can introduce confirmation bias."
       - "No optional cold review was performed for this governance-only packet."
