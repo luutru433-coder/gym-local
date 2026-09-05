@@ -170,3 +170,42 @@ checkpoints:
         result: "waived"
         evidence: "Skipped by explicit owner directive and packet authority; ledger and checkpoint preserve OWNER_WAIVED rather than a false PASS."
     next_packet: "ANIMATION-PILOT-01"
+
+  - id: "GOVERNANCE-01"
+    status: "owner_approved"
+    recorded_at: "2026-09-05T14:31:58.2796238+07:00"
+    target_branch: "codex/governance-owner-verification"
+    lineage_base_commit: "8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9"
+    candidate_commit: "bdc1fb4ee334076d3b468a07d6a0be12ada4e3f4"
+    handoff_path: "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    verdict: "OWNER_APPROVED"
+    merge_authorized: true
+    authorization: "The repository owner explicitly authorized GOVERNANCE-01 and approved the immutable candidate after the required evidence was verified."
+    owner_verification:
+      schema_version: 1
+      status: "APPROVED"
+      approved_by: "repository-owner (explicit GOVERNANCE-01 authorization)"
+      approved_at: "2026-09-05T14:31:58.2796238+07:00"
+      record: "docs/ai/reviews/GOVERNANCE-01-handoff.yaml#owner_verification"
+    verification:
+      - command: "parse every YAML file under docs/ai with js-yaml 4.3.0"
+        result: "pass"
+        evidence: "All 32 YAML files at the candidate commit parsed successfully."
+      - command: "git diff --check"
+        result: "pass"
+        evidence: "Candidate worktree and immutable candidate range passed."
+      - command: "pnpm run verify:affected"
+        result: "pass"
+        evidence: "Architecture verified; documentation-only verification completed."
+      - command: "Exact changed-path, historical-review, product-path, and pilot-gate audit"
+        result: "pass"
+        evidence: "Only six candidate governance paths changed; historical verdicts/reviews and all product and pilot files are unchanged; required pilot evidence remains locked."
+    cold_review:
+      required: false
+      performed: false
+      pass_claimed: false
+    accepted_risks:
+      - "Owner self-verification reduces independent defect detection and can introduce confirmation bias."
+      - "No optional cold review was performed for this governance-only packet."
+      - "ANIMATION-PILOT-01 remains paused until a separate task creates a superseding packet revision."
+    next_packet: "ANIMATION-PILOT-01 superseding packet revision in a separate task"

@@ -1,0 +1,123 @@
+schema_version: 2
+packet_id: "GOVERNANCE-01"
+status: "owner_approved"
+producer_model: "gpt-5.6-sol"
+subagents_used: false
+base_commit: "8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9"
+candidate_commit: "bdc1fb4ee334076d3b468a07d6a0be12ada4e3f4"
+branch: "codex/governance-owner-verification"
+
+changed_paths:
+  candidate:
+    - "AGENTS.md"
+    - "docs/adr/0020-owner-verification-governance.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/packets/GOVERNANCE-01.yaml"
+    - "docs/ai/review-procedure.md"
+  post_candidate_metadata:
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+
+preflight:
+  result: "pass"
+  evidence:
+    - "Repository was on main at 8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9 with an empty git status before the target branch was created."
+    - "Branch codex/governance-owner-verification was created from that exact main commit."
+    - "The root guidance, master plan, review procedure, template, ledger, code-review checklist, packet, and Conventional Commits skill were read; no nested product AGENTS.md applied because product paths were forbidden."
+    - "The task used gpt-5.6-sol and no subagent."
+
+acceptance_evidence:
+  - id: "G01-AC-01"
+    result: "pass"
+    evidence:
+      - "AGENTS.md, master-plan.md, review-procedure.md, and coordinate-packet-template.yaml make cold review optional and give it no completion or merge-gate effect."
+      - "No active policy contains a merge-only-after-PASS rule."
+  - id: "G01-AC-02"
+    result: "pass"
+    evidence:
+      - "The locked operating model and packet completion rule require candidate commit, schema-valid handoff, passing required checks, and owner verification APPROVED with merge_authorized true."
+  - id: "G01-AC-03"
+    result: "pass"
+    evidence:
+      - "Template schema version 2 and the review procedure include all nine required owner-verification fields and restrict true authorization to APPROVED."
+  - id: "G01-AC-04"
+    result: "pass"
+    evidence:
+      - "The master-plan Pilot gate and ADR 0020 retain license, deterministic build, atomic rollback, offline relaunch, exact-variant mapping, performance budgets, and at least two low-end iPhone runs."
+  - id: "G01-AC-05"
+    result: "pass"
+    evidence:
+      - "The candidate range changes no docs/ai/reviews path, so every historical verdict, waiver, handoff, ledger entry, and cold-review report is byte-identical to the base."
+  - id: "G01-AC-06"
+    result: "pass"
+    evidence:
+      - "The candidate range contains exactly the six declared governance candidate paths and no product or ANIMATION-PILOT-01 file."
+
+checks:
+  - command: "parse every YAML file under docs/ai with js-yaml 4.3.0"
+    result: "pass"
+    evidence: "Parsed all 32 YAML files present at the candidate commit without error."
+  - command: "git diff --check"
+    result: "pass"
+    evidence: "The candidate worktree check and the exact 8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9..bdc1fb4ee334076d3b468a07d6a0be12ada4e3f4 range check exited 0 with no output."
+  - command: "pnpm run verify:affected"
+    result: "pass"
+    evidence: "Architecture boundaries verified; the script detected documentation-only changes and completed successfully."
+
+execution_notes:
+  - "The first check invocation could not find Node in the shell PATH, and the next YAML-only attempt could not resolve the transitive js-yaml package. No files were changed or committed by those attempts."
+  - "The final checks used the bundled Codex Node runtime, the repository's installed js-yaml 4.3.0 path, and bundled pnpm; all required checks then passed."
+
+licenses:
+  result: "not_applicable"
+  evidence: "Governance documentation only; no source asset, media, content, dependency, license record, or attribution changed."
+
+manual_review:
+  result: "pass"
+  evidence:
+    - "Reviewed the immutable candidate against docs/code-review.md and all packet acceptance tests."
+    - "Confirmed product modules, contracts, storage, content, product tests, dependencies, and build configuration are unchanged."
+    - "Confirmed historical cold-review and verdict artifacts are unchanged."
+    - "Confirmed the pilot loses only mandatory independent cold review and retains every specified evidence gate."
+
+known_risks:
+  - "Owner self-verification has less independence and more confirmation-bias risk than mandatory cold review."
+  - "No optional cold review was performed for GOVERNANCE-01, so the candidate has no independent review evidence."
+  - "ANIMATION-PILOT-01 has not been superseded; a separate task must issue its packet revision before pilot work resumes."
+
+owner_verification:
+  schema_version: 1
+  packet_id: "GOVERNANCE-01"
+  candidate_commit: "bdc1fb4ee334076d3b468a07d6a0be12ada4e3f4"
+  status: "APPROVED"
+  approved_by: "repository-owner (explicit GOVERNANCE-01 authorization)"
+  approved_at: "2026-09-05T14:31:58.2796238+07:00"
+  checks_verified:
+    - command: "parse every YAML file under docs/ai with js-yaml 4.3.0"
+      result: "pass"
+      evidence: "32 YAML files parsed successfully at the candidate commit."
+    - command: "git diff --check"
+      result: "pass"
+      evidence: "Candidate worktree and immutable candidate range passed."
+    - command: "pnpm run verify:affected"
+      result: "pass"
+      evidence: "Architecture verified; documentation-only verification completed."
+  accepted_risks:
+    - "The owner accepts reduced reviewer independence and confirmation-bias risk from self-verification."
+    - "The owner accepts that no optional cold review was performed for this governance-only packet."
+    - "Pilot work remains paused until a separate task creates a superseding ANIMATION-PILOT-01 packet revision."
+  merge_authorized: true
+
+cold_review:
+  required: false
+  performed: false
+  pass_claimed: false
+  merge_gate_effect: "none"
+
+review_target:
+  packet_path: "docs/ai/packets/GOVERNANCE-01.yaml"
+  candidate_range: "8fdc9fb0553bcb73618e0c9cd012fc646c5a4ff9..bdc1fb4ee334076d3b468a07d6a0be12ada4e3f4"
+  report_path: "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+  ledger_path: "docs/ai/reviews/coordinator-ledger.yaml"
+  next_task: "In a separate task, create a superseding ANIMATION-PILOT-01 packet revision under ADR 0020 before resuming pilot work."
