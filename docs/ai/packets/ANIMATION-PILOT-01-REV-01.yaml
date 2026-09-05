@@ -1,0 +1,877 @@
+schema_version: 2
+packet:
+  id: "ANIMATION-PILOT-01-REV-01"
+  title: "Prove the licensed offline animation pilot under owner verification"
+  type: "content"
+  status: "ready"
+
+supersession:
+  supersedes_packet_id: "ANIMATION-PILOT-01"
+  superseded_packet_object: "7e56770c78507bc3db68a0fe11ace161ce0ff336:docs/ai/packets/ANIMATION-PILOT-01.yaml"
+  superseded_blocker_object: "9119586ba109282862100bb989ff3f5586d07cd2:docs/ai/reviews/ANIMATION-PILOT-01-handoff.yaml"
+  rule: "This revision is the only pilot packet authorized to resume from checkpoint/governance-01-owner-approved. The superseded packet and blocker remain immutable historical evidence and must not be resumed, edited, or relabeled."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "1444044123c6d8768a6949cc8036b6cc8455f522"
+  base_checkpoint: "checkpoint/governance-01-owner-approved"
+  target_branch: "codex/animation-pilot-01-rev-01"
+  worktree_required: true
+  sequential_after:
+    - "FOUNDATION-05"
+    - "GOVERNANCE-01"
+  coordinator_lineage:
+    required: true
+    rule: "The packet-only coordinator commit must be a direct child of base_commit. The producer candidate must be its single direct child."
+  governance:
+    accepted_adr: "docs/adr/0020-owner-verification-governance.md"
+    owner_verification_required: true
+    cold_review_required: false
+    rule: "Owner verification with status APPROVED and merge_authorized true is the only merge gate. Cold review is optional advisory evidence and cannot authorize merge."
+
+authority:
+  allowed_paths:
+    - "content/animation-packs/animation-pilot-01/**"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/**"
+    - "docs/licenses/animation-pilot-01/**"
+    - "packages/catalog/src/animation-catalog.ts"
+    - "packages/catalog/src/animation-catalog.test.ts"
+    - "packages/catalog/src/index.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/media/src/gltf-renderer.ts"
+    - "packages/media/src/gltf-renderer.test.ts"
+    - "packages/media/src/index.ts"
+    - "apps/web/src/pilot/**"
+    - "apps/web/src/App.tsx"
+    - "apps/web/src/App.test.tsx"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/content-validate.mjs"
+    - "scripts/content-audit.mjs"
+    - "scripts/performance-report.mjs"
+    - "tests/animation-pilot/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "THIRD_PARTY_NOTICES.md"
+    - "vite.config.ts"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml"
+  candidate_paths:
+    - "content/animation-packs/animation-pilot-01/**"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/**"
+    - "docs/licenses/animation-pilot-01/**"
+    - "packages/catalog/src/animation-catalog.ts"
+    - "packages/catalog/src/animation-catalog.test.ts"
+    - "packages/catalog/src/index.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/media/src/gltf-renderer.ts"
+    - "packages/media/src/gltf-renderer.test.ts"
+    - "packages/media/src/index.ts"
+    - "apps/web/src/pilot/**"
+    - "apps/web/src/App.tsx"
+    - "apps/web/src/App.test.tsx"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/content-validate.mjs"
+    - "scripts/content-audit.mjs"
+    - "scripts/performance-report.mjs"
+    - "tests/animation-pilot/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "THIRD_PARTY_NOTICES.md"
+    - "vite.config.ts"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/packets/**"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/adr/0018-animation-player-controller.md"
+    - "packages/contracts/**"
+    - "packages/backup/**"
+    - "packages/nutrition/**"
+    - "packages/progress/**"
+    - "packages/ui/**"
+    - "packages/workouts/**"
+    - "packages/catalog/src/catalog.test.ts"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/animation-player.test-renderer.ts"
+    - "packages/storage/src/animation-pack/archive.ts"
+    - "packages/storage/src/animation-pack/archive.test.ts"
+    - "packages/storage/src/animation-pack/opfs.ts"
+    - "packages/storage/src/animation-pack/opfs.test.ts"
+    - "apps/web/src/components/ExerciseAnimationPlayer.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.test.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.css"
+    - "apps/web/src/components/ExerciseVideoPlayer.tsx"
+    - "apps/web/src/components/UpdatePrompt.tsx"
+    - "apps/web/src/features/**"
+    - "apps/web/src/pwa/**"
+    - "apps/web/src/store/**"
+    - "apps/web/src/styles.css"
+    - "content/exercise-video-guides.json"
+    - "content/nutrition-*/**"
+    - "content/nutrition-recipes/**"
+    - "public/**"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "tests/fixtures/animation-pack-v1/**"
+    - "LICENSE"
+    - "pnpm-workspace.yaml"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+  external_writes_allowed: false
+  dependency_changes_allowed: true
+  package_or_lockfile_changes_allowed: true
+  configuration_changes_allowed: true
+  contract_or_schema_changes_allowed: false
+  database_or_backup_changes_allowed: false
+  generated_binary_release_artifacts_allowed: true
+  tracked_production_binary_assets_allowed: false
+  tracked_binary_evidence_allowed: true
+  network_read_policy: "Only the exact pinned npm candidates and their official source/license metadata may be read. Runtime, pack generation, release verification, and offline/device gates use no network."
+  network_write_policy: "No upload, release publication, analytics, telemetry, remote benchmark, or external service mutation."
+  scraping_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "content/AGENTS.md"
+    - "packages/storage/AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/code-review.md"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/adr/0018-animation-player-controller.md"
+    - "docs/adr/0020-owner-verification-governance.md"
+    - "docs/ai/packets/GOVERNANCE-01.yaml"
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/ai/packets/FOUNDATION-02.yaml"
+    - "docs/ai/packets/FOUNDATION-03.yaml"
+    - "docs/ai/packets/FOUNDATION-04.yaml"
+    - "docs/ai/packets/FOUNDATION-05.yaml"
+    - "docs/ai/reviews/FOUNDATION-05-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-01.yaml"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/catalog/src/index.ts"
+    - "packages/catalog/src/catalog.test.ts"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/index.ts"
+    - "apps/web/src/components/ExerciseAnimationPlayer.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.test.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.css"
+    - "apps/web/src/App.tsx"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/components/UpdatePrompt.tsx"
+    - "apps/web/src/pwa/install.ts"
+    - "vite.config.ts"
+    - "scripts/performance-report.mjs"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "THIRD_PARTY_NOTICES.md"
+    - "LICENSE"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/resources/HEADER_TEMPLATE.txt"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/adr/0018-animation-player-controller.md"
+    - "docs/adr/0020-owner-verification-governance.md"
+  immutable_baseline_objects:
+    package_json: "485bffca88295d9c458dc8706d84e46f75d92dcd"
+    pnpm_lock_yaml: "8af6caac77c93f58c5cfce23feb37303ee4c9620"
+    pnpm_workspace_yaml: "6bc432d83c0be318804535340aed4e27bfbeff2c"
+    third_party_notices: "7dfab0eecc6cfde65a84a24d0ffe6dd6dc4eb03b"
+    vite_config: "04055943b776036d9f01d4db28b0acde725e96e0"
+    contracts_tree: "689904789935288582f93d525d11e69f065e88ee"
+    catalog_tree: "dfe0b2ad65b1135e89fc1bed951bf0a9b229043c"
+    storage_tree: "331c1a172cd076064430d4369f71d9309de1fecc"
+    media_tree: "14d7e326a8d150da7cf5c60bf6c128cc8415623a"
+    backup_tree: "4162e7601fb23158a8d7182b508a08c46cae7278"
+    workouts_tree: "818daf4f4395b68648bb4bf00e7bd57395e9e251"
+    nutrition_tree: "15abe8f81c1bee6b15431567026fd2a5e33da6e7"
+    app_source_tree: "9e4a575ad1bbac4dfb9e75e32d7d14a8127d6fd5"
+    workout_feature_tree: "8b27bb18b4d5903c40f0c900b1aa1ce502dadd60"
+    pwa_tree: "e9f42c1dce2b4c700546b2c6e18871ce10fa00cd"
+    content_tree: "f8a06b5df08802550acc88958894eff54d8f91d2"
+    public_tree: "97bebe1b67d4c2fa7c04d46d7e302a25f5f2bc09"
+    pack_builder: "7ed215ab673aea0fe26830b3c930443e290b93a8"
+    pack_cli: "d8f8ebcf66f0e210a46b25c47c075b8457ac133d"
+    performance_report: "f29e5bb9c8e140aaeb101e1db1ee3a3eefd4069e"
+  catalog_baseline:
+    movement_count: 50
+    reviewed_variant_count: 199
+    app_catalog_version: 3
+    animation_catalog_version: 1
+  assumptions:
+    - "The accepted v1 descriptor, manifest, builder, OPFS journal, exact asset read, renderer-neutral controller, and accessible shell remain authoritative and unchanged except for the narrowly authorized storage source read and production renderer adapter."
+    - "The pilot harness is a mode-gated verification surface, not a normal application route or product integration."
+    - "The trusted descriptor is supplied to the harness as a reviewed local sidecar file. Authentication and remote release-index distribution remain deferred."
+    - "All exercise geometry, rigging, keyframes, materials, and equipment props are project-authored from committed declarative source. No third-party or generative media service is authorized."
+    - "The repository MIT header for Gym Local contributors overrides the unrelated MyCompany Apache template supplied by the generic license-header skill."
+
+outcome:
+  objective: "Produce and owner-verify a deterministic, licensed, 12-variant offline animation pilot; select a production renderer by reproducible comparison; prove exact mapping, install, relaunch, update, rollback, accessibility, and agreed low-end iPhone budgets before any 199-variant wave."
+  user_visible_result: "No normal product route changes. A mode-gated installable pilot PWA can load reviewed sidecar/archive files, play the 12 exact variants from OPFS, and exercise update/rollback while offline."
+  deliverables:
+    - "Exactly 12 catalog references and exactly 12 primary pack entries matching the locked representative matrix."
+    - "Project-authored declarative animation/prop sources, a deterministic GLB materializer, two reproducible release inputs, and v1.0.0/v1.0.1 descriptor-manifest-archive artifacts generated only under ignored output directories."
+    - "Complete per-byte author/source/license/attribution/modification/review records plus dependency license texts and THIRD_PARTY_NOTICES updates."
+    - "A same-assets benchmark of three pinned renderer candidates, raw desktop/device measurements, a scored selection, and ADR 0019 recording the winner and rejected alternatives."
+    - "A production renderer adapter behind the FOUNDATION-05 interface, with exact clip/camera/mirror/speed/reduced-motion behavior and complete GPU/DOM/timer disposal."
+    - "A storage-owned exact player-source read returning the active manifest entry, descriptor, and verified Blob without exposing OPFS or accepting a similar variant."
+    - "A mode-gated PWA pilot harness using the public catalog, storage, media, and player boundaries, with no pilot pack byte in public assets or service-worker precache."
+    - "Automated, visual, VoiceOver, offline relaunch, rollback, personal-data isolation, and two-run physical iPhone evidence validated against explicit budgets."
+    - "One immutable candidate commit followed only by declared handoff and owner-verification metadata."
+  non_goals:
+    - "No production wave beyond these 12 entries and no animation mapping for the other 187 catalog variants."
+    - "No CatalogPage, WorkoutPage, routine, plan, discovery, substitution, active-workout, or settings product integration."
+    - "No new contract/schema/protocol/database/backup/app/catalog version and no reinterpretation of v1 bytes."
+    - "No remote release index, authentication, CDN, analytics, telemetry, runtime fetch, upload, publishing, or service account."
+    - "No third-party exercise model, Mixamo motion, scraped media, image/video/audio/font/texture download, generative asset service, or ownership-unclear byte."
+    - "No pack ZIP, GLB, descriptor, manifest, or release output committed to public, bundled into the default app, or added to service-worker precache."
+    - "No claim of medical advice, universal biomechanics, or coverage outside the reviewed pilot matrix and measured complexity envelope."
+    - "No external-video behavior change; YouTube remains optional and online-only."
+
+decisions:
+  contract_or_schema_change: "none"
+  public_in_process_api_change: "Additive catalog mapping, storage source read, and media renderer adapter only."
+  version_decisions:
+    - "Keep package/app 0.7.0, database 5, backup 5, catalog 3, animationPackSchemaVersion 1, animationPlayerProtocolVersion 1, and animationCatalogVersion 1."
+    - "Use packId gym-local.animation-pilot-01 with release versions 1.0.0 and 1.0.1. IDs are immutable once the candidate is created."
+  migration_or_rollback: "No migration; prove the accepted OPFS active/previous journal by update and rollback on real generated releases."
+  source_or_license_impact: "bundled_assets"
+  renderer_decision: "Select exactly one winner only after all hard gates and the locked benchmark matrix. Do not preselect by popularity."
+  distribution_trust: "The pilot harness accepts an explicitly selected reviewed local descriptor sidecar and archive. Production authentication remains out of scope."
+
+preflight:
+  report_before_editing:
+    - "authoritative_model_and_no_subagents"
+    - "base_checkpoint_coordinator_parent_branch_and_cleanliness"
+    - "allowed_and_forbidden_paths"
+    - "all_required_reads_and_accepted_ADRs"
+    - "catalog_count_versions_and_exact_selected_IDs"
+    - "builder_storage_player_PWA_and_backup_boundaries"
+    - "pinned_renderer_registry_integrities_license_files_and_transitive_closures"
+    - "project_authorship_and_named_rights_motion_release_reviewers"
+    - "physical_low_end_iPhone_access_iOS_Safari_version_and_measurement_tools"
+    - "offline_installable_HTTPS_test_origin_or_equivalent_secure_local_test_path"
+    - "all_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    head_is_packet_only_direct_child_of_base: true
+    instructions_read: true
+    required_inputs_present: true
+    exact_model_available: true
+    physical_device_and_reviewers_available: true
+    network_reads_limited_to_authorized_sources: true
+
+representative_variant_matrix:
+  exact_count: 12
+  selection_rule: "The listed exerciseVariantId, animationId, pattern, clipName, default camera preset, and equipment props are exact. Calibrated camera coordinates/FOV are reviewed per asset. Replacing a row requires a new coordinate packet."
+  coverage_assertions:
+    required_equipment:
+      - "bodyweight"
+      - "dumbbell"
+      - "barbell"
+      - "cable"
+      - "machine"
+      - "smith"
+      - "resistance_band"
+    required_motion_characteristics:
+      - "unilateral"
+      - "seated"
+      - "compound"
+      - "isolation"
+      - "ground_contact"
+      - "isometric_hold"
+      - "locomotion"
+    required_patterns:
+      - "push"
+      - "pull"
+      - "squat"
+      - "hinge"
+      - "lunge"
+      - "isolation"
+      - "core"
+      - "carry"
+  variants:
+    - exercise_variant_id: "push_up__bodyweight"
+      animation_id: "animation.pilot-01.push-up.bodyweight"
+      pattern: "push"
+      clip_name: "PushUpBodyweightLoop"
+      default_camera: "side"
+      equipment_props: []
+      coverage: ["bodyweight", "compound", "ground_contact", "closed_chain"]
+      visual_gate: "Hands and feet remain planted; trunk stays braced; elbows and shoulders follow the reviewed bodyweight setup."
+    - exercise_variant_id: "plank__bodyweight"
+      animation_id: "animation.pilot-01.plank.bodyweight"
+      pattern: "core"
+      clip_name: "PlankBodyweightHold"
+      default_camera: "side"
+      equipment_props: []
+      coverage: ["bodyweight", "isometric_hold", "ground_contact", "reduced_motion_reference"]
+      visual_gate: "The hold has no rep-like pumping; neutral trunk and supported forearms remain clear at the static first frame."
+    - exercise_variant_id: "one_arm_row__dumbbell"
+      animation_id: "animation.pilot-01.one-arm-row.dumbbell"
+      pattern: "pull"
+      clip_name: "OneArmRowDumbbellLoop"
+      default_camera: "three_quarter"
+      equipment_props: ["prop.dumbbell"]
+      coverage: ["dumbbell", "unilateral", "pull", "mirror_mode"]
+      visual_gate: "One dumbbell remains attached to the working hand; the torso does not rotate into a bilateral row."
+    - exercise_variant_id: "squat__barbell"
+      animation_id: "animation.pilot-01.squat.barbell"
+      pattern: "squat"
+      clip_name: "SquatBarbellLoop"
+      default_camera: "side"
+      equipment_props: ["prop.barbell"]
+      coverage: ["barbell", "compound", "squat", "loaded_large_range"]
+      visual_gate: "The bar remains fixed to the reviewed back position and the feet, knees, hips, and trunk remain coherent through the loop."
+    - exercise_variant_id: "face_pull__cable"
+      animation_id: "animation.pilot-01.face-pull.cable"
+      pattern: "pull"
+      clip_name: "FacePullCableLoop"
+      default_camera: "three_quarter"
+      equipment_props: ["prop.cable-station", "prop.rope-handle"]
+      coverage: ["cable", "pull", "standing", "linked_prop"]
+      visual_gate: "The rope remains connected to the cable anchor and finishes near eye level without becoming a band or free-weight motion."
+    - exercise_variant_id: "leg_press__machine"
+      animation_id: "animation.pilot-01.leg-press.machine"
+      pattern: "squat"
+      clip_name: "LegPressMachineLoop"
+      default_camera: "side"
+      equipment_props: ["prop.leg-press-machine"]
+      coverage: ["machine", "seated", "compound", "moving_sled"]
+      visual_gate: "Back and hips remain supported; the sled path and knee range visibly belong to a leg-press machine."
+    - exercise_variant_id: "leg_extension__machine"
+      animation_id: "animation.pilot-01.leg-extension.machine"
+      pattern: "isolation"
+      clip_name: "LegExtensionMachineLoop"
+      default_camera: "side"
+      equipment_props: ["prop.leg-extension-machine"]
+      coverage: ["machine", "seated", "isolation", "single_joint"]
+      visual_gate: "The knee axis aligns with the machine pivot and the motion cannot be mistaken for a squat or cable kick."
+    - exercise_variant_id: "split_squat__smith"
+      animation_id: "animation.pilot-01.split-squat.smith"
+      pattern: "lunge"
+      clip_name: "SplitSquatSmithLoop"
+      default_camera: "three_quarter"
+      equipment_props: ["prop.smith-machine", "prop.smith-bar"]
+      coverage: ["smith", "unilateral", "compound", "guided_bar"]
+      visual_gate: "The staggered stance and vertical Smith guide remain explicit; it must not look like the bodyweight, dumbbell, or barbell variant."
+    - exercise_variant_id: "anti_rotation__resistance_band"
+      animation_id: "animation.pilot-01.anti-rotation.resistance-band"
+      pattern: "core"
+      clip_name: "AntiRotationBandLoop"
+      default_camera: "front"
+      equipment_props: ["prop.resistance-band", "prop.band-anchor"]
+      coverage: ["resistance_band", "core", "elastic_link", "anti_rotation"]
+      visual_gate: "The band stays attached to the side anchor with visible tension while the chest and hips resist rotation."
+    - exercise_variant_id: "lateral_raise__dumbbell"
+      animation_id: "animation.pilot-01.lateral-raise.dumbbell"
+      pattern: "isolation"
+      clip_name: "LateralRaiseDumbbellLoop"
+      default_camera: "front"
+      equipment_props: ["prop.dumbbell-pair"]
+      coverage: ["dumbbell", "isolation", "bilateral", "upper_body"]
+      visual_gate: "Both dumbbells track with the hands and the shoulder motion remains a lateral raise without torso heave."
+    - exercise_variant_id: "hip_thrust__barbell"
+      animation_id: "animation.pilot-01.hip-thrust.barbell"
+      pattern: "hinge"
+      clip_name: "HipThrustBarbellLoop"
+      default_camera: "side"
+      equipment_props: ["prop.barbell", "prop.bench"]
+      coverage: ["barbell", "compound", "bench_supported", "horizontal_torso"]
+      visual_gate: "Upper back remains supported by the bench and the bar tracks the hips without substituting spinal hyperextension."
+    - exercise_variant_id: "farmer_carry__kettlebell"
+      animation_id: "animation.pilot-01.farmer-carry.kettlebell"
+      pattern: "carry"
+      clip_name: "FarmerCarryKettlebellLoop"
+      default_camera: "three_quarter"
+      equipment_props: ["prop.kettlebell-pair"]
+      coverage: ["kettlebell", "locomotion", "duration_distance", "full_body"]
+      visual_gate: "Two kettlebells stay at the sides through a seamless walking cycle with no treadmill drift or camera jump."
+
+source_asset_and_license_policy:
+  pack:
+    pack_id: "gym-local.animation-pilot-01"
+    releases: ["1.0.0", "1.0.1"]
+    rig_id: "rig.gym-local-pilot-v1"
+    media_type: "model/gltf-binary"
+    compression: "none"
+    one_asset_per_variant: true
+    exact_asset_count_per_release: 12
+    exact_primary_entry_count_per_release: 12
+  authorship:
+    rule: "Every geometry primitive, rig node, keyframe, material color, and equipment prop is derived deterministically from committed Gym Local declarative source."
+    prohibited_sources:
+      - "web-downloaded model or animation"
+      - "Mixamo or another hosted motion library"
+      - "ExerciseDB or video/image tracing"
+      - "BlenderKit or marketplace asset"
+      - "generative image, video, 3D, or motion service"
+      - "font, texture, environment map, audio, or opaque binary template"
+    external_media_bytes: 0
+  required_license_record:
+    id: "license.mit-gym-local"
+    name: "MIT License"
+    terms_url: "https://github.com/luutru433-coder/gym-local/blob/main/LICENSE"
+    redistribution_scope: "offline"
+    attribution: "Copyright (c) 2026 Gym Local contributors"
+  provenance:
+    - "Use one exact source record per GLB and release sentinel. Each record names the author, committed source path URL, license, attribution, explicit modifications, review date, and approved review ID."
+    - "A named rights reviewer and a named motion/equipment reviewer, both distinct from the producer invocation, approve records before releaseReviewId can be approved."
+    - "Every release, license, source, asset, and entry relation passes the v1 parser and deterministic builder; unresolved or self-contradictory rights fail closed."
+    - "Copy exact third-party renderer license texts from installed pinned packages to docs/licenses/animation-pilot-01 and record package integrity plus NOTICE obligations."
+    - "THIRD_PARTY_NOTICES distinguishes benchmark-only packages from the selected runtime renderer and includes the complete selected dependency closure."
+  glb_requirements:
+    - "Generate self-contained GLB 2.0 only. No external URI, data URI, image, texture, audio, compression extension, decoder, network reference, hidden payload, or unknown required extension."
+    - "Each GLB contains exactly the declared clip name, finite monotonic keyframes, the declared duration/loop, the shared rig ID metadata, and nodes matching every equipmentProps ID."
+    - "The source validator proves scene, node, mesh, accessor, animation channel, target, buffer view, duration, and prop relationships that the FOUNDATION-03 envelope intentionally did not prove."
+    - "Use representative low-poly production intent rather than empty fixtures: record triangles, vertices, nodes, animated tracks, keyframes, materials, bytes, and decode complexity for every asset."
+    - "Each asset is at most 4 MiB; all 12 asset bytes are at most 24 MiB. At least one stress asset exercises the declared upper production complexity without artificial invisible geometry."
+    - "No generated GLB, ZIP, manifest, or release descriptor is tracked. Two clean materializations from committed source must produce byte-identical GLBs and release artifacts."
+  visual_review:
+    - "Render start, mid, end, front/side or required three-quarter contact sheets for all 12 variants at 320 and 390 CSS-pixel layouts."
+    - "The named motion/equipment reviewer records pass/fail against every visual_gate; uncertainty, clipping that obscures setup, detached props, joint discontinuity, or wrong equipment blocks release."
+    - "Mirrored one_arm_row and split_squat are separately reviewed. Mirror mode changes presentation only and never changes variant identity."
+    - "The review is instructional clarity evidence only and makes no medical or universal biomechanics claim."
+
+renderer_benchmark:
+  metadata_as_of: "2026-08-31"
+  candidates:
+    - id: "three-direct"
+      packages:
+        - name: "three"
+          version: "0.185.1"
+          integrity: "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg=="
+          license: "MIT"
+          license_url: "https://github.com/mrdoob/three.js/blob/dev/LICENSE"
+      adapter: "Direct WebGLRenderer, GLTFLoader.parse/parseAsync on verified bytes, and AnimationMixer."
+    - id: "babylon-modular"
+      packages:
+        - name: "@babylonjs/core"
+          version: "9.23.0"
+          integrity: "sha512-FpDaTPx485J1H0AEJpoJ785Z1CwCkEPNnZFu7WzHTy0ByGCy75bkZZILh4QFU4LLnzK1iuHwUfecCguATIeKSA=="
+          license: "Apache-2.0"
+        - name: "@babylonjs/loaders"
+          version: "9.23.0"
+          integrity: "sha512-4qNxiHmi2udyZmTsVL3iUUfVF4BKecgmFpp1//wBoZ6RhTWlkbBT4CIJLVPeibXZeJliZ5vII8rvZqDPgGiotw=="
+          license: "Apache-2.0"
+        - name: "babylonjs-gltf2interface"
+          version: "9.23.0"
+          integrity: "sha512-oD9rkfCafvGACikVWhVVl1Iy9bDuBVlI7zmeiDXI8y5gw7UOmQMffpvrl/ujoiw5agcsEAaQuF6Dbjfb+Cpaiw=="
+          license: "Apache-2.0"
+      license_url: "https://github.com/BabylonJS/Babylon.js/blob/master/license.md"
+      adapter: "Modular Engine/SceneLoader GLB path with exact animation group control and explicit scene/engine disposal."
+    - id: "google-model-viewer"
+      packages:
+        - name: "@google/model-viewer"
+          version: "4.3.1"
+          integrity: "sha512-GP+inXhAtY31E8rILVmByA6z8CZZjdlNajddppyI1/j1eIaSQiZcMRaUqTFe7+jv4mzRzwKIOiKBud0apiv+WQ=="
+          license: "Apache-2.0"
+        - name: "three"
+          version: "0.185.1"
+          integrity: "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg=="
+          license: "MIT"
+      license_url: "https://github.com/google/model-viewer/blob/master/LICENSE"
+      adapter: "Pinned npm web component only; no CDN. Prove exact seek/frame/mirror/camera/disposal semantics or reject at the hard gate."
+  dependency_rules:
+    - "Registry version, integrity, package license, repository license, transitive closure, and NOTICE data must match before installation. Any drift requires a new coordinate packet."
+    - "Keep exact benchmark candidates as development dependencies through owner verification so desktop comparison is reproducible. Only the selected winner may be a runtime dependency or production adapter import."
+    - "Rejected candidate code must not enter the normal production build or service-worker precache."
+  same_workload_protocol:
+    - "All candidates use the same 12 immutable GLBs, source Blob bytes, clip/camera request, canvas CSS size, device pixel ratio cap, lighting, background, variant order, warmup, sample duration, and cache state."
+    - "Run desktop smoke/feature/leak gates for all candidates, then a short physical low-end iPhone comparison for every hard-gate survivor, then two complete chosen-renderer release runs."
+    - "Record raw timing samples rather than screenshots alone: Blob read, parse/decode, scene mount, first drawn frame, 30-second frame intervals, long frames, play/pause/seek accuracy, and dispose/reload cycles."
+    - "Record unminified and production chunk bytes, gzip bytes, dependency closure, WebGL contexts, draw calls, triangles, and material/texture counts."
+  hard_gates:
+    - "Pinned license and redistribution obligations are compatible and fully recorded."
+    - "Consumes the verified Blob with no runtime network or CDN and never substitutes another entry, clip, or equipment variant."
+    - "Implements mount, static first frame, exact clip, play, pause, seek, loop window, playbackSpeed, camera preset, horizontal mirror, reduced motion, resize, failure, and dispose behind the existing interface."
+    - "No autoplay; reduced motion draws at most a static frame and never advances the clip."
+    - "Ten sequential mount/play/seek/dispose cycles leave no live RAF, observer, event listener, canvas, object URL, scene, mixer, material, geometry, texture, skeleton, or WebGL context owned by the disposed session."
+    - "Passes Safari/WebGL2 support on the physical baseline and all locked performance budgets."
+  scoring:
+    device_first_frame_and_decode_percent: 25
+    steady_frames_memory_thermal_battery_percent: 30
+    bundle_and_storage_percent: 15
+    controller_fit_disposal_offline_percent: 20
+    maintainability_and_license_percent: 10
+  selection_rule: "All hard gates are mandatory. Among survivors, select the highest reproducible weighted score. ADR 0019 records raw evidence, winner, rejected alternatives, and residual risks; a tie within measurement noise selects the smaller/simpler dependency closure."
+
+implementation_requirements:
+  catalog_mapping:
+    - "Export an immutable 12-record animation catalog from public @gym/catalog with exact variant ID, animation ID, pack ID, animationCatalogVersion 1, and availability status."
+    - "Validate every variant against EXERCISE_VARIANTS and the locked matrix. IDs are case-sensitive; lookups return undefined for all other 187 variants, case changes, or equipment neighbors."
+    - "Do not edit movement seeds, variant instructions, tracking profiles, videos, images, load modes, laterality, history, or app catalog version."
+  storage_source_read:
+    - "Add an exact public storage operation that accepts exerciseVariantId and animationId, selects only the verified active pack, uses animationCatalogVersion 1, and returns a contract-shaped entry, asset descriptor, and exact verified Blob."
+    - "Resolve exactly one primary entry from the stored manifest. Require requested animationId, entry/asset IDs, path, duration, source, license, byte size, media type, and active pack identity to match before returning."
+    - "AbortSignal cancellation may stop the read, but cancellation never changes journal state. No OPFS handle, archive index, path join, manifest mutator, fallback search, alias, redirect, lowercase conversion, or network API crosses the public boundary."
+    - "Retain current full-object revalidation and serialized lifecycle guarantees. Do not weaken install, readAsset, recovery, rollback, cleanup, quota, or corruption tests."
+  selected_renderer_adapter:
+    - "Implement only the benchmark winner in packages/media/src/gltf-renderer.ts and export it through public @gym/media."
+    - "Read the Blob as bounded bytes and parse the exact self-contained GLB. Reject missing/duplicate clip, external resource request, unsupported extension, invalid camera/loop/duration, or missing prop before publishing ready."
+    - "Mount resolves only after the first static frame is drawn. The session uses the request speed/camera/mirror values and reports finite clamped frame positions to the controller."
+    - "Cap device pixel ratio at the benchmarked value, resize without layout feedback loops, pause RAF while hidden or paused, and recover to text fallback on context loss."
+    - "Dispose all renderer-owned CPU/GPU/DOM/timer/listener/observer/object-URL resources exactly once. Unit tests inject controllable platform seams; physical evidence proves the real library path."
+  pilot_harness:
+    - "A compile-time animation-pilot mode bypasses normal onboarding only for the dedicated harness. The normal production mode contains no reachable pilot route, navigation item, or automatic renderer load."
+    - "Use ExerciseAnimationPlayer with the public controller, selected renderer, public catalog mapping, and public storage source read. Do not duplicate controller or storage logic in UI."
+    - "The harness accepts descriptor JSON and ZIP through explicit local file inputs, shows exact pack/version/hash/status, installs v1.0.0 and v1.0.1, rolls back, removes, and selects all 12 exact variants."
+    - "No fetch, XMLHttpRequest, WebSocket, EventSource, CDN, remote font, remote model, analytics, or telemetry exists in the harness or renderer."
+    - "The pilot PWA shell and selected renderer JavaScript may be precached. Descriptor, manifest, ZIP, GLB, source specs, benchmark traces, and evidence never enter public or the service-worker precache."
+    - "The normal production App, active workout, update prompt, external video, and PWA update-deferral behavior remain byte-identical except for the compile-time-dead pilot branch in App.tsx."
+  content_and_evidence_tooling:
+    - "The asset tool materializes both releases into fresh ignored directories, invokes the accepted v1 builder without modifying it, validates semantic GLB content, and emits exact hashes/complexity inventories."
+    - "content:validate and content:audit run the pilot mapping, source/license, semantic GLB, exact-count, and no-generated-output checks in addition to existing content checks."
+    - "The evidence validator uses exact JSON schemas and fails missing samples, invented devices, duplicate run IDs, nonfinite metrics, budget failures, missing hashes/screenshots, unapproved reviews, or claims outside the measured environment."
+    - "Evidence records command, candidate commit, tool/library versions, device model, hardware identifier class, RAM class, iOS/Safari build, viewport, DPR, battery health/level, brightness, ambient temperature, cache state, network state, sample timestamps, raw-file hashes, and reviewer identity without device serials or personal data."
+  protected_boundaries:
+    - "No personal IndexedDB table, APP_VERSIONS field, backup payload, custom exercise, routine, session, nutrition record, or historical snapshot changes during install, update, relaunch, rollback, or removal."
+    - "No contract parser, builder, ZIP reader, OPFS backend/layout, animation controller, accessible shell, feature page, PWA update code, external-video code, or public asset changes."
+    - "Default production build and service-worker audit must show zero pilot GLB/ZIP/descriptor/manifest/source/evidence bytes and zero rejected renderer candidate bytes."
+
+release_offline_and_rollback_protocol:
+  releases:
+    - version: "1.0.0"
+      role: "initial verified pilot"
+    - version: "1.0.1"
+      role: "rollback probe using the same matrix and a declared project-authored visible revision sentinel without changing motion identity"
+  deterministic_reproduction:
+    - "Build each version twice from separate clean temporary roots with the pinned Node/pnpm/builder/dependency state."
+    - "For a given version, every generated GLB, canonical manifest, ZIP, and descriptor byte plus every SHA-256 must be identical across builds."
+    - "Between versions, only reviewed release metadata and the declared sentinel may differ. The validator emits an exact expected-difference inventory."
+  install_update_rollback:
+    - "Install 1.0.0 and play all 12 exact entries; capture active identity and asset hashes."
+    - "Attempt corrupt, wrong-size, wrong-hash, incompatible, interrupted, quota-failed, missing-license, and wrong-variant updates and prove 1.0.0 remains active."
+    - "Install 1.0.1, prove it is active and 1.0.0 is previous, relaunch, then rollback and prove exact 1.0.0 identity/assets return while 1.0.1 becomes previous."
+    - "Repeat rollback after network disable and cold PWA relaunch. Never search another pack/version/variant when either exact object is unavailable."
+  offline_relaunch:
+    - "Install the pilot PWA shell and pack while online or from local Files, successfully play every row once, then fully terminate it."
+    - "Disable Wi-Fi and cellular data, preserve airplane/offline state, cold-launch the installed PWA from the Home Screen, recover the active OPFS journal, and play all 12 variants."
+    - "Network instrumentation must record zero runtime request attempt during the offline launch/play sequence. Written bilingual fallback remains available for every variant and forced renderer failure."
+    - "Repeat the full offline relaunch after update and after rollback."
+  personal_data_proof:
+    - "Seed representative profile, routine, program, active/completed sessions, custom variant, nutrition, pantry, plan, body metric, settings, and recovery data before lifecycle tests."
+    - "Record canonical counts and hashes before and after install, failed updates, successful update, relaunch, rollback, and removal; every personal object remains byte-equivalent."
+    - "Export/restore backup v5 before and after and prove animation pack bytes/references are absent and personal restore remains identical."
+
+iphone_performance_gate:
+  device_requirement:
+    - "Use at least one physical low-end supported iPhone with A12/A13-class SoC and 3 GiB RAM, such as iPhone XR/XS or iPhone SE (2nd generation), not a simulator or desktop emulation."
+    - "Run at least two independent complete chosen-renderer trials. Reset the app process and declared cache state between trials; record whether both trials use the same or different devices."
+    - "Record exact device model, iOS build, Mobile Safari build, free storage, battery health, viewport/DPR, and measurement tooling. Omit serial, Apple ID, filenames containing personal data, and unrelated screen content."
+  controlled_conditions:
+    - "Screen brightness fixed at 50 percent, Low Power Mode off, unplugged, battery start 40-80 percent, ambient 20-26 C, no other foreground app, and the declared network state fixed per phase."
+    - "Use Safari Web Inspector/Instruments or an equivalently reviewable physical-device tool for memory, energy, frame, and thermal evidence. Web timing alone cannot satisfy memory or thermal gates."
+    - "Run every variant for 30 seconds and the mixed 12-variant endurance loop for 15 minutes. Include mount/dispose cycling and background/foreground once."
+  budgets:
+    archive_bytes_max: 25165824
+    largest_asset_bytes_max: 4194304
+    default_initial_graph_delta_bytes_max: 5120
+    selected_renderer_lazy_chunk_gzip_bytes_max: 358400
+    cold_first_frame_p95_ms_max: 2500
+    cold_first_frame_single_sample_ms_max: 4000
+    warm_first_frame_p95_ms_max: 1000
+    warm_first_frame_single_sample_ms_max: 2000
+    steady_median_fps_min: 30
+    steady_p95_frame_time_ms_max: 50
+    frames_over_100ms_percent_max: 1
+    peak_process_memory_delta_mib_max: 160
+    post_dispose_retained_memory_delta_mib_max: 30
+    endurance_minutes: 15
+    endurance_battery_drop_percentage_points_max: 6
+    surface_temperature_delta_c_max: 8
+    storage_three_archive_peak_multiplier_max: 3.1
+  pass_rules:
+    - "Every budget passes in both complete chosen-renderer trials; averaging cannot hide a failed trial or variant."
+    - "No Safari/PWA reload, crash, WebGL context exhaustion, blank frame, runaway RAF, thermal warning, OS termination, animation drift, or unrecovered text fallback occurs."
+    - "Thermal state remains nominal or fair. If the tool cannot expose thermal state, an external surface-temperature trace plus no-warning evidence is mandatory; neither may be marked not_applicable."
+    - "Memory is measured after a consistent settling interval. Explicit GC is not assumed on iPhone; report both peak and retained deltas with the same method."
+    - "If a budget is infeasible for a justified reason, stop and issue a new coordination decision. The producer may not relax, re-average, omit, or redefine it."
+  accessibility_and_layout:
+    - "Physical VoiceOver covers group, viewport, status, play/pause/replay/retry, seek value, static-reference text, failure text, focus order, and no focus theft."
+    - "Physical reduced-motion preference proves no playback call and a usable static/text reference after relaunch."
+    - "Capture 320 and 390 CSS-pixel responsive layouts with no horizontal scrolling, clipped controls, detached canvas, or sub-44-pixel target. Clearly distinguish responsive-mode evidence from physical-device evidence."
+    - "Review contrast and both Vietnamese and English text; nutrition presentation remains untouched."
+
+acceptance_tests:
+  - id: "AP01R1-AC-01"
+    requirement: "Lineage is base checkpoint -> packet-only coordinator commit -> one candidate commit -> handoff-only commit, and every changed path is authorized."
+    evidence: "Git parent/range/name-only assertions, YAML parse, and clean worktree."
+  - id: "AP01R1-AC-02"
+    requirement: "The public catalog exposes exactly the locked 12 references over the 199 reviewed variants and returns no mapping for all other variants or near matches."
+    evidence: "Catalog matrix test covering exact count, IDs, equipment/pattern characteristics, uniqueness, and 187 negative variants."
+  - id: "AP01R1-AC-03"
+    requirement: "Each release contains exactly 12 primary entries and 12 exact self-contained GLBs with the declared clips, props, cameras, loops, sources, licenses, and accessibility keys."
+    evidence: "Semantic GLB inventory, v1 parser/builder output, and exact manifest audit."
+  - id: "AP01R1-AC-04"
+    requirement: "Every authored byte and renderer dependency is source-, license-, attribution-, modification-, review-, integrity-, and NOTICE-traceable with explicit offline redistribution rights."
+    evidence: "License audit JSON, source records, copied license texts, THIRD_PARTY_NOTICES, package closure, and named reviewer approvals."
+  - id: "AP01R1-AC-05"
+    requirement: "Two clean materializations of each release produce identical GLB, manifest, ZIP, descriptor, byte-size, and SHA-256 results."
+    evidence: "Reproducibility command plus exact file/hash manifests for 1.0.0 and 1.0.1."
+  - id: "AP01R1-AC-06"
+    requirement: "All pinned candidates run the same workload; hard gates and raw measurements select one renderer without unsupported claims."
+    evidence: "Renderer benchmark JSON/CSV, candidate build reports, device comparison, scored matrix, and ADR 0019."
+  - id: "AP01R1-AC-07"
+    requirement: "The selected adapter parses verified bytes offline, draws before ready, honors exact clip/camera/mirror/speed/loop/reduced motion, reports frames, handles context loss, and disposes all resources."
+    evidence: "Unit/browser tests, resource counters, ten-cycle leak trace, screenshots, and physical run."
+  - id: "AP01R1-AC-08"
+    requirement: "The storage source read returns only the exact active entry/asset/Blob and rejects wrong pack state, variant, animation, asset relation, cancellation, corruption, and case/equipment neighbors."
+    evidence: "Focused store exact-source matrix plus unchanged storage regression suite."
+  - id: "AP01R1-AC-09"
+    requirement: "Install 1.0.0, failed-update retention, update to 1.0.1, relaunch, rollback to exact 1.0.0, second relaunch, and removal follow the accepted journal semantics."
+    evidence: "Automated storage tests plus physical offline rollback log with exact pack/version/hash/generation."
+  - id: "AP01R1-AC-10"
+    requirement: "Network-disabled cold PWA relaunch plays all 12 installed variants from OPFS with zero runtime request attempt and usable bilingual fallback."
+    evidence: "Two complete offline run records, network capture, per-variant state/timing, and rendered evidence."
+  - id: "AP01R1-AC-11"
+    requirement: "Install, failures, update, relaunch, rollback, and removal do not alter personal data or backup v5."
+    evidence: "Seeded canonical before/after hashes/counts, backup round-trip, database version assertion, and pack-exclusion audit."
+  - id: "AP01R1-AC-12"
+    requirement: "Both complete physical low-end iPhone trials pass every first-frame, frame-time, memory, storage, battery, thermal, endurance, and disposal budget."
+    evidence: "Validated device-runs JSON, raw timing/energy/memory/thermal exports, hashes, screenshots, and reviewer sign-off."
+  - id: "AP01R1-AC-13"
+    requirement: "VoiceOver, reduced motion, keyboard/native controls, 320/390 layout, contrast, fallback, and focus behavior pass within the measured evidence scope."
+    evidence: "Physical VoiceOver checklist, responsive contact sheets, reduced-motion trace, and DOM tests."
+  - id: "AP01R1-AC-14"
+    requirement: "Visual review passes every exact variant/equipment gate, both mirrored unilateral presentations, prop attachment, loop continuity, and reviewed instructional clarity."
+    evidence: "Named motion-review record and hashed start/mid/end contact sheets."
+  - id: "AP01R1-AC-15"
+    requirement: "The normal production app has no reachable pilot route, renderer execution, rejected candidate code, pack byte, or pack precache entry; active-workout update deferral and external video remain unchanged."
+    evidence: "Default build manifest/chunk/precache audit, protected hashes, and existing App/Workout/PWA/media regression tests."
+  - id: "AP01R1-AC-16"
+    requirement: "Versions and protected boundaries remain app 0.7.0/database 5/backup 5/catalog 3/animation versions 1 with no contract, DB, backup, feature, public, video, or nutrition change."
+    evidence: "Exact constants, Git object/tree checks, architecture audit, and backup/database tests."
+  - id: "AP01R1-AC-17"
+    requirement: "Focused tests, content validation/audit, lint, typecheck, architecture, default/pilot builds, affected verification, and full verification pass on immutable candidate bytes."
+    evidence: "Exact command results and artifact hashes recorded in the handoff."
+  - id: "AP01R1-AC-18"
+    requirement: "The repository owner verifies the immutable candidate and complete evidence under ADR 0020, records APPROVED with merge_authorized true, and explicitly accepts any residual risks."
+    evidence: "Schema-valid owner_verification in docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml, committed only after the candidate; optional cold review is advisory and has no merge-gate effect."
+
+required_checks:
+  commands:
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+    - "pnpm animation:pilot:validate"
+    - "pnpm animation:pilot:repro"
+    - "pnpm animation:pilot:evidence:validate"
+    - "pnpm exec vitest run packages/catalog/src/animation-catalog.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts apps/web/src/pilot/AnimationPilotApp.test.tsx"
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx packages/storage/src/animation-pack/archive.test.ts packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts"
+    - "pnpm exec vitest run scripts/animation-pilot-assets.test.mjs scripts/animation-pilot-evidence.test.mjs scripts/animation-pack-v1.test.mjs"
+    - "pnpm run content:validate"
+    - "pnpm run content:audit"
+    - "pnpm exec eslint packages/catalog/src/animation-catalog.ts packages/catalog/src/animation-catalog.test.ts packages/catalog/src/index.ts packages/storage/src/animation-pack/store.ts packages/storage/src/animation-pack/store.test.ts packages/storage/src/animation-pack/index.ts packages/media/src/gltf-renderer.ts packages/media/src/gltf-renderer.test.ts packages/media/src/index.ts apps/web/src/pilot apps/web/src/App.tsx apps/web/src/App.test.tsx scripts/animation-pilot-assets.mjs scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/content-validate.mjs scripts/content-audit.mjs scripts/performance-report.mjs --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm animation:pilot:benchmark:desktop"
+    - "pnpm animation:pilot:build-pwa"
+    - "pnpm animation:pilot:audit-pwa"
+    - "pnpm run build"
+    - "pnpm run performance:report"
+    - "pnpm run verify:affected"
+    - "pnpm run verify"
+    - "git diff --check coordinator_commit..candidate_commit"
+    - "Assert exact lineage, authorized paths, 12 mappings/assets/entries, two releases, source/license/review relations, package integrities, version constants, no tracked release binary, no runtime network, no default-build pilot/rejected-renderer chunk, no pack/precache byte, and unchanged protected objects."
+  timing:
+    - "Run focused tests and deterministic builds during implementation, then repeat on the final bytes."
+    - "Complete and validate physical-device, VoiceOver, visual, license, offline, and rollback evidence before creating the candidate commit."
+    - "Create one candidate commit containing implementation/content/evidence only; rerun all non-device deterministic checks on that immutable commit."
+    - "After the immutable candidate, create or update only the declared handoff path; owner verification records the exact candidate SHA and may authorize merge only after every required check is verified as passing."
+  manual_reviews:
+    - "Review against docs/code-review.md with exact variant identity, license completeness, offline behavior, personal-data isolation, rollback, disposal, accessibility, iPhone evidence, and PWA update boundaries."
+    - "Trace source spec -> deterministic GLB -> pack source -> manifest -> descriptor/archive -> OPFS verify/activate -> exact source read -> controller -> selected renderer -> dispose for every matrix row."
+    - "Trace install/failure/update/relaunch/rollback/remove through journal generations and prove personal data and backup remain untouched."
+    - "Inspect all candidate renderer license/NOTICE closures and selected build output; reject package metadata claims not backed by installed bytes."
+    - "Review raw device samples and measurement conditions; do not accept averages, screenshots, simulator data, or desktop emulation as substitutes for a failed/missing run."
+    - "Review Vietnamese/English labels, physical VoiceOver, reduced motion, 320/390 layout, fallback, and no focus theft."
+    - "Confirm normal production mode, external video, active workout, PWA update deferral, nutrition, and all 187 unmapped variants remain unaffected."
+  evidence_paths:
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/release-reproducibility.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/license-audit.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/renderer-benchmark.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/offline-rollback.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/device-runs.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/visual-review.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/accessibility-review.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/renders/**"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-01/raw/**"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml"
+
+stop_gates:
+  - id: "AP01R1-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, or authoritative invocation metadata cannot be verified."
+    action: "Stop without model substitution and write a BLOCKED handoff."
+  - id: "AP01R1-STOP-02"
+    condition: "Base/checkpoint, coordinator parent, branch, cleanliness, instructions, required reads, catalog counts, accepted versions, or protected baseline does not match."
+    action: "Stop before editing; do not clean, rebase, amend, infer, or widen scope."
+  - id: "AP01R1-STOP-03"
+    condition: "A named rights reviewer, named motion/equipment reviewer, secure installable test path, physical qualifying iPhone, or reviewable memory/energy/thermal tooling is unavailable."
+    action: "Stop before claiming a candidate. A simulator, desktop emulation, self-approval, or not_applicable field is not a substitute."
+  - id: "AP01R1-STOP-04"
+    condition: "Any source or bundled byte has unclear authorship, source, license, terms, offline redistribution right, attribution, modification record, review date, or approved reviewer; or any asset derives from external/generative media."
+    action: "Exclude the byte and stop if the exact 12-row pilot can no longer be completed. Do not scrape, replace with a similar variant, or invent provenance."
+  - id: "AP01R1-STOP-05"
+    condition: "Pinned package version/integrity/license/NOTICE differs, a transitive license is incompatible or unresolved, or a candidate requires CDN/runtime network/telemetry."
+    action: "Stop renderer acquisition/selection and report the exact package evidence; do not float versions, use legacy peer overrides, or vendor opaque code."
+  - id: "AP01R1-STOP-06"
+    condition: "Correctness requires a contract/schema/protocol/version change, builder/ZIP/OPFS/controller/shell fix, DB6, backup change, feature integration, public asset, PWA update change, or any unlisted path."
+    action: "Stop and name the required foundation/fix/integration packet; do not widen ANIMATION-PILOT-01-REV-01."
+  - id: "AP01R1-STOP-07"
+    condition: "The exact 12 IDs, primary count, clip, prop, camera, source/license relation, or 199/187 mapping partition cannot be proven, or any lookup falls back across variant/equipment/case/version."
+    action: "Stop without substituting a nearby animation or editing catalog semantics."
+  - id: "AP01R1-STOP-08"
+    condition: "Generated GLB is not self-contained, exceeds size limits, lacks declared semantic content, uses an unapproved extension/resource, fails visual review, or cannot be reproduced byte-for-byte."
+    action: "Repair only committed declarative source/tooling within allowed paths; otherwise stop with hashes and the exact failed row."
+  - id: "AP01R1-STOP-09"
+    condition: "No renderer candidate passes every hard gate, candidate measurements are not comparable, selection changes the locked workload, or the winner cannot fully dispose resources."
+    action: "Stop without selecting a renderer or adding a runtime dependency. Record raw evidence and issue a new coordination decision."
+  - id: "AP01R1-STOP-10"
+    condition: "Install, corrupt/interrupted/quota failure, update, relaunch, rollback, or removal changes the wrong journal identity, loses the prior verified pack, searches a similar pack, or mutates personal/backup data."
+    action: "Stop at the last verified release; do not weaken storage verification, rollback, or personal-data assertions."
+  - id: "AP01R1-STOP-11"
+    condition: "Network-disabled cold relaunch cannot recover and play all 12 exact variants, any runtime request is attempted, or pack bytes enter public/default bundle/service-worker precache."
+    action: "Stop and preserve text fallback. Do not cache the pack in the PWA or re-enable network to claim offline success."
+  - id: "AP01R1-STOP-12"
+    condition: "Either physical chosen-renderer trial misses any first-frame, frame, memory, storage, battery, thermal, endurance, crash, context, accessibility, reduced-motion, or layout budget."
+    action: "Do not average away or relax the failure. Optimize only inside allowed paths and rerun both complete trials; otherwise write BLOCKED with raw evidence."
+  - id: "AP01R1-STOP-13"
+    condition: "External video, active workout, PWA update deferral, historical exact-variant semantics, nutrition, contracts, versions, default app behavior, or any protected object regresses."
+    action: "Stop and restore the pilot boundary without modifying the protected owner; if impossible, issue a separate packet."
+  - id: "AP01R1-STOP-14"
+    condition: "A required check/evidence validator fails beyond allowed repair, evidence is missing/nonfinite/circular, an unexpected path changes, or the single-candidate/handoff lineage cannot be preserved."
+    action: "Stop before candidate completion and write a BLOCKED handoff; do not amend, split implementation commits, invent evidence, or claim PASS."
+
+handoff:
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml"
+  candidate_commit_excludes_handoff_and_approval_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml"
+  metadata_commit_rule: "After candidate_commit, only the declared post_candidate_metadata_paths may change before merge. The handoff names the immutable candidate and records owner verification; it must not name its own metadata commit."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "coordinator_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "versions"
+    - "variant_matrix"
+    - "release_artifacts"
+    - "determinism_evidence"
+    - "renderer_candidates"
+    - "renderer_selection"
+    - "dependency_and_license_evidence"
+    - "source_and_motion_reviews"
+    - "acceptance_evidence"
+    - "offline_relaunch_evidence"
+    - "rollback_evidence"
+    - "personal_data_evidence"
+    - "device_runs"
+    - "performance_budget_results"
+    - "accessibility_evidence"
+    - "visual_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "known_risks"
+    - "review_target"
+    - "owner_verification"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+    - "cold_review_pass"
+    - "owner_waiver"
+  exact_fact_requirements:
+    - "Record exact package versions/integrities/licenses, generated artifact hashes/sizes, selected IDs, device/tool builds, sample counts, raw evidence paths/hashes, commands, exit codes, Git ranges, and measured budgets only."
+    - "Distinguish automated/jsdom/responsive-mode evidence from physical iPhone, Safari, VoiceOver, memory, energy, and thermal evidence."
+    - "Do not claim renderer superiority, biomechanics, offline behavior, disposal, or performance beyond the exact measured assets/devices/conditions."
+    - "Do not infer approval from chat, an optional cold-review verdict, or a historical waiver; only the committed owner_verification record may authorize merge."
+
+owner_verification:
+  required: true
+  record_location: "docs/ai/reviews/ANIMATION-PILOT-01-REV-01-handoff.yaml#owner_verification"
+  schema:
+    schema_version: 1
+    packet_id: "ANIMATION-PILOT-01-REV-01"
+    candidate_commit: "40-character commit SHA"
+    status: "APPROVED|REJECTED|BLOCKED"
+    approved_by: "repository-owner identity or null"
+    approved_at: "ISO-8601 timestamp or null"
+    checks_verified:
+      - command: "command"
+        result: "pass|fail|not_run"
+        evidence: "summary or report path"
+    accepted_risks: []
+    merge_authorized: false
+  authorization_rule: "Only status APPROVED with non-null owner identity/time and passing evidence for every required check may set merge_authorized true. REJECTED or BLOCKED requires false."
+  mandatory_verification_focus:
+    - "Exact 12/199 mapping and no cross-variant fallback."
+    - "Every asset byte and dependency license/provenance/review relationship."
+    - "Deterministic GLB and release reproduction."
+    - "Same-workload renderer benchmark, hard gates, score, selected dependency, and rejected-code build exclusion."
+    - "Storage exact source read, install/update/failure/relaunch/rollback identity, personal data, and backup isolation."
+    - "Raw physical iPhone first-frame/frame/memory/storage/battery/thermal/endurance evidence and both-trial budget pass."
+    - "Physical VoiceOver/reduced motion plus correctly scoped 320/390/visual evidence."
+    - "Normal app, external video, active workout, PWA update deferral, nutrition, public/precache, contracts, and versions remain protected."
+
+cold_review:
+  required: false
+  requested: false
+  advisory_only: true
+  may_edit_files: false
+  allowed_verdicts:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  report_path: null
+  merge_gate_effect: "none"
+
+merge:
+  allowed_only_after: "owner_verification.status == APPROVED and owner_verification.merge_authorized == true"
+  target: "main"
+  squash_policy: "Keep the packet-only coordinator, immutable candidate, handoff/owner-verification metadata, and later coordinator-ledger checkpoint commits distinct."
+  checkpoint_tag_after_merge: "checkpoint/animation-pilot-01-rev-01-owner-approved"
+  next_packet_gate: "No ANIMATION-WAVE packet may be created until this checkpoint exists and every measured complexity/license constraint is carried forward."
