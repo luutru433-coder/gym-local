@@ -213,3 +213,47 @@ checkpoints:
       - "No optional cold review was performed for this governance-only packet."
       - "ANIMATION-PILOT-01 remains paused until a separate task creates a superseding packet revision."
     next_packet: "ANIMATION-PILOT-01 superseding packet revision in a separate task"
+
+  - id: "GOVERNANCE-02"
+    status: "merged_automated_pass"
+    recorded_at: "2026-09-05T16:38:17.5640534+07:00"
+    target_branch: "main"
+    merge_mode: "fast_forward"
+    lineage_base_commit: "1444044123c6d8768a6949cc8036b6cc8455f522"
+    candidate_commit: "04c1290e820ef01cdb93f2dd0d7f74597a7a16c8"
+    handoff_path: "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+    merged_head_resolution: "The non-self-referential handoff/checkpoint commit is resolved by checkpoint/governance-02-automated-verification."
+    verdict: "AUTOMATED_PASS"
+    merge_authorized: true
+    automated_verification:
+      schema_version: 1
+      status: "PASS"
+      record: "docs/ai/reviews/GOVERNANCE-02-handoff.yaml#automated_verification"
+    verification:
+      - command: "parse every YAML file under docs/ai"
+        result: "pass"
+        evidence: "All 34 YAML files at the candidate commit parsed with js-yaml 4.3.0."
+      - command: "git diff --check"
+        result: "pass"
+        evidence: "Working, staged, and immutable candidate-range checks produced no output."
+      - command: "pnpm run verify:affected"
+        result: "pass"
+        evidence: "Architecture boundaries verified; documentation-only verification completed."
+      - command: "Exact candidate scope and product-path audit"
+        result: "pass"
+        evidence: "Exactly six authorized candidate paths changed; product, configuration, pilot, and historical evidence paths are unchanged."
+      - command: "Repository-wide active-policy gate scan"
+        result: "pass"
+        evidence: "29 files contain relevant terminology; all matches are non-gating current language or immutable historical evidence, with zero prohibited patterns in active policy surfaces."
+    optional_evidence:
+      cold_review: "not_run"
+      owner_review: "not_run"
+      independent_or_named_review: "not_run"
+      manual_or_device_review: "not_run"
+      pass_claimed: false
+    checkpoint_tag: "checkpoint/governance-02-automated-verification"
+    known_risks:
+      - "Automated checks cannot fully evaluate visual, biomechanical, equipment-fidelity, assistive-technology, device-performance, or legal nuance."
+      - "No optional human or device evidence was collected for GOVERNANCE-02."
+      - "Historical superseded language remains unchanged and must be interpreted under ADR 0021."
+    next_packet: "ANIMATION-PILOT-01-REV-02 in a separate task"

@@ -1,0 +1,115 @@
+schema_version: 3
+packet_id: "GOVERNANCE-02"
+status: "automated_pass"
+producer_model: "gpt-5.6-sol"
+subagents_used: false
+base_commit: "1444044123c6d8768a6949cc8036b6cc8455f522"
+base_checkpoint: "checkpoint/governance-01-owner-approved"
+candidate_commit: "04c1290e820ef01cdb93f2dd0d7f74597a7a16c8"
+branch: "codex/governance-automated-verification"
+
+changed_paths:
+  candidate:
+    - "AGENTS.md"
+    - "docs/adr/0021-automated-verification-governance.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/packets/GOVERNANCE-02.yaml"
+    - "docs/ai/review-procedure.md"
+  post_candidate_metadata:
+    - "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+
+preflight:
+  result: "pass"
+  evidence:
+    - "Local main was clean at 1444044123c6d8768a6949cc8036b6cc8455f522, exactly the peeled checkpoint/governance-01-owner-approved commit."
+    - "Branch codex/governance-automated-verification was created from that exact main commit."
+    - "All packet-required governance documents, GOVERNANCE-01 audit evidence, ADR 0020, docs/code-review.md, the commit-format skill, and GOVERNANCE-02 were read."
+    - "The task used gpt-5.6-sol and no subagent."
+
+acceptance_evidence:
+  - id: "G02-AC-01"
+    result: "pass"
+    evidence:
+      - "Active guidance, master plan, procedure, and template require immutable candidate, allowed-path diff, schema-valid handoff, passing automated commands, and no active safety stop gate."
+  - id: "G02-AC-02"
+    result: "pass"
+    evidence:
+      - "Repository policy scan found review/device gate terminology in 29 files; every match is either non-gating active text or immutable historical evidence superseded by ADR 0021."
+      - "Zero prohibited cold, owner, independent, named, manual, or device gate patterns remain in active policy surfaces."
+  - id: "G02-AC-03"
+    result: "pass"
+    evidence:
+      - "Template schema version 3 and the procedure define exactly schema_version, packet_id, candidate_commit, status, checks, optional_manual_evidence, and merge_authorized."
+  - id: "G02-AC-04"
+    result: "pass"
+    evidence:
+      - "The authorization rule permits merge_authorized true only for automated PASS with every required automated command recorded as pass."
+  - id: "G02-AC-05"
+    result: "pass"
+    evidence:
+      - "Master plan and ADR 0021 retain automated provenance/license, deterministic checksum, exact variant, personal-data, offline, rollback, backup, lint, typecheck, architecture, unit, build, performance, and service-worker precache protections."
+  - id: "G02-AC-06"
+    result: "pass"
+    evidence:
+      - "automated_verification.optional_manual_evidence is empty; cold, owner, independent, named, manual, and physical-device reviews are recorded as not_run without a PASS claim."
+  - id: "G02-AC-07"
+    result: "pass"
+    evidence:
+      - "The candidate contains exactly six declared governance paths and zero product, configuration, pilot, historical packet, or historical review changes."
+
+automated_verification:
+  schema_version: 1
+  packet_id: "GOVERNANCE-02"
+  candidate_commit: "04c1290e820ef01cdb93f2dd0d7f74597a7a16c8"
+  status: "PASS"
+  checks:
+    - command: "parse every YAML file under docs/ai"
+      result: "pass"
+      evidence: "Candidate audit parsed 34 YAML files under docs/ai with js-yaml 4.3.0."
+    - command: "git diff --check"
+      result: "pass"
+      evidence: "git diff --check and git diff --cached --check produced no output; immutable range 1444044123c6d8768a6949cc8036b6cc8455f522..04c1290e820ef01cdb93f2dd0d7f74597a7a16c8 also produced no output."
+    - command: "pnpm run verify:affected"
+      result: "pass"
+      evidence: "Architecture boundaries verified. No code or catalog changes detected; documentation-only verification complete."
+    - command: "assert the exact candidate and post-candidate path sets and zero product-path changes"
+      result: "pass"
+      evidence: "Candidate path audit: 6 expected paths; 0 product/configuration changes. Candidate parent equals the required base checkpoint commit."
+    - command: "search the repository and assert no active policy makes human or physical-device review a candidate, completion, or merge gate"
+      result: "pass"
+      evidence: "Repository policy scan: 29 files contain gate terminology; all are active policy surfaces with non-gating rules or immutable historical artifacts, and 0 prohibited active-gate patterns remain."
+  optional_manual_evidence: []
+  merge_authorized: true
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  rights_reviewer: "not_run"
+  motion_reviewer: "not_run"
+  equipment_reviewer: "not_run"
+  visual_review: "not_run"
+  voiceover_review: "not_run"
+  physical_iphone_or_device_run: "not_run"
+  battery_thermal_memory_measurement: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+licenses:
+  result: "not_applicable"
+  evidence: "Governance documentation only; no product asset, content, source record, dependency, license, or attribution changed."
+
+known_risks:
+  - "Automated checks cannot fully judge visual quality, biomechanics, motion naturalness, equipment fidelity, real assistive-technology behavior, device-specific performance, or legal nuance."
+  - "No cold, owner, independent, named, manual, VoiceOver, visual, or physical-device review ran for GOVERNANCE-02."
+  - "Historical files retain superseded gate language by design; ADR 0021 and current governance surfaces establish that it is no longer active policy."
+  - "ANIMATION-PILOT-01-REV-02 does not exist on main yet and must be created in a separate task before pilot work resumes."
+
+review_target:
+  packet_path: "docs/ai/packets/GOVERNANCE-02.yaml"
+  candidate_range: "1444044123c6d8768a6949cc8036b6cc8455f522..04c1290e820ef01cdb93f2dd0d7f74597a7a16c8"
+  report_path: "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+  ledger_path: "docs/ai/reviews/coordinator-ledger.yaml"
+  checkpoint_tag: "checkpoint/governance-02-automated-verification"
+  next_task: "Create ANIMATION-PILOT-01-REV-02 in a separate task to supersede the blocked revision before resuming pilot work."
