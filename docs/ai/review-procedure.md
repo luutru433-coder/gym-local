@@ -1,77 +1,71 @@
-# Owner verification and optional cold review procedure
+# Automated verification procedure
 
 ## Purpose
 
-Owner verification decides whether one immutable candidate packet is authorized to merge. It uses `gpt-5.6-sol`, runs without subagents, and leaves a repository audit record. Cold review remains available as advisory evidence but is neither required for packet completion nor a merge gate.
+Automated verification decides whether one immutable candidate packet is complete and mergeable. It uses `gpt-5.6-sol` without subagents to execute and record deterministic checks, but authorization is derived from machine-verifiable results rather than a human verdict. Cold review, owner review, independent review, manual review, named reviewers, and physical-device review are optional evidence with no gate effect.
 
 ## Required inputs
 
-The owner verifies:
+Automated verification consumes:
 
 1. Root and applicable nested `AGENTS.md` files.
 2. `docs/ai/master-plan.md` and the exact coordinate packet.
 3. The immutable candidate diff from `base_commit` through `candidate_commit`.
-4. The packet handoff, command evidence, renders, manifests, checksums, license records, and accepted ADRs required by the packet.
-5. The post-candidate metadata diff, which may contain only paths explicitly declared by the packet.
-6. Any optional cold-review report requested for this packet.
+4. The schema-valid handoff and exact command output or artifact references required by the packet.
+5. The post-candidate metadata diff, containing only paths declared by the packet.
 
-If a required input is absent, the candidate cannot be resolved, or authority is ambiguous, record `BLOCKED` and keep `merge_authorized: false`.
+Missing or unresolvable required input produces `BLOCKED` with `merge_authorized: false`.
 
-## Verification order
+## Automated evaluation order
 
-1. Verify model, packet ID, immutable base and candidate commits, target branch, one-packet scope, and declared metadata paths.
-2. Compare every changed path with `allowed_paths`; an out-of-scope change is `REJECTED`, while an unresolved authority boundary is `BLOCKED`.
-3. Check every stop gate and confirm work did not continue through a triggered gate.
-4. Review decisions and contracts for compatibility, immutable IDs, exact equipment-variant mapping, offline behavior, personal-data safety, rollback, and optional external-video fallback.
-5. Trace every bundled or proposed asset to author, source, license or terms, redistribution right, attribution, modification record, and review date.
-6. Match every acceptance criterion to concrete evidence.
-7. Confirm every required command ran against the candidate, passed, and is proportional to the packet.
-8. Review mobile, keyboard, VoiceOver, reduced-motion, failed-network, corrupt-pack, quota, update, and rollback evidence when applicable.
-9. Review known and newly found risks. Every risk allowed to remain must be listed in `accepted_risks`; an unaccepted material risk requires `REJECTED` or `BLOCKED`.
-10. Write the owner-verification record in the schema-valid handoff and commit the packet-declared approval metadata.
+1. Resolve the packet ID, base commit, candidate commit, target branch, and one-packet lineage.
+2. Compare every changed path with `allowed_paths`. Any out-of-scope path produces `FAIL`; an unresolvable authority boundary produces `BLOCKED`.
+3. Parse the handoff and require the automated-verification schema and exact candidate SHA.
+4. Execute every `required_checks.automated_commands` entry against the candidate or an explicitly identified immutable artifact.
+5. Require every command result to be `pass`; `fail` produces `FAIL` and `not_run` produces `BLOCKED`.
+6. Evaluate packet stop gates. Code or data safety errors, missing or unclear license/provenance, scraped or unauthorized assets, module-boundary violations, or test failures prevent `PASS`.
+7. For applicable product packets, require automated validation of deterministic builds and checksums, exact equipment-variant mapping, personal-data immutability, offline behavior, rollback, backup isolation, lint, typecheck, architecture, unit tests, production build, and service-worker precache exclusions.
+8. Record optional manual evidence exactly as supplied. Absence is represented by an empty list; an unperformed optional check is never inferred or reported as passed.
+9. Set `PASS` and `merge_authorized: true` only when steps 1–8 satisfy every required condition.
 
-## Owner-verification statuses
+## Statuses
 
-- `APPROVED`: deliverables, scope, acceptance criteria, and required checks have evidence; remaining risks are explicitly accepted. This is the only status that may set `merge_authorized: true`.
-- `REJECTED`: the packet is reviewable but has actionable defects. Set `merge_authorized: false` and issue a bounded fixer packet if work should continue.
-- `BLOCKED`: evidence, authority, license, base commit, or another prerequisite is missing. Set `merge_authorized: false` and resolve the prerequisite before continuing.
+- `PASS`: every required automated command passed, the candidate and handoff are valid, the diff is in scope, and no safety stop gate is active. This is the only status that may set `merge_authorized: true`.
+- `FAIL`: an automated command failed, an out-of-scope change exists, or a safety stop gate was triggered. Set `merge_authorized: false`.
+- `BLOCKED`: a required command was not run or required input, authority, source, license, provenance, or immutable commit cannot be resolved. Set `merge_authorized: false`.
 
-## Owner-verification schema
+## Automated-verification schema
 
-Store the following object in `docs/ai/reviews/<PACKET-ID>-handoff.yaml` under `owner_verification`:
+Store this exact object in `docs/ai/reviews/<PACKET-ID>-handoff.yaml` under `automated_verification`:
 
 ```yaml
-owner_verification:
+automated_verification:
   schema_version: 1
   packet_id: "PACKET-ID"
-  candidate_commit: "40-character commit SHA"
-  status: "APPROVED|REJECTED|BLOCKED"
-  approved_by: "repository-owner identity or null"
-  approved_at: "ISO-8601 timestamp or null"
-  checks_verified:
-    - command: "command"
+  candidate_commit: "40-character SHA"
+  status: "PASS|FAIL|BLOCKED"
+  checks:
+    - command: "exact command"
       result: "pass|fail|not_run"
-      evidence: "summary or report path"
-  accepted_risks: []
+      evidence: "exact output or artifact"
+  optional_manual_evidence: []
   merge_authorized: false
 ```
 
-All nine fields are required. For `APPROVED`, `approved_by` and `approved_at` must be non-null, every required check must appear in `checks_verified` with `result: pass`, and `merge_authorized` may be `true`. For `REJECTED` or `BLOCKED`, `merge_authorized` must be `false`; `approved_by` and `approved_at` are null because approval was not granted. `accepted_risks` is always present, even when empty.
+All seven fields are required. `status: PASS` requires every packet-required automated command to appear in `checks` with `result: pass`; only then may `merge_authorized` be `true`. `FAIL` and `BLOCKED` require `merge_authorized: false`. `optional_manual_evidence` is always present and may be empty.
 
-## Optional cold review
+## Optional evidence
 
-The owner may request a separate cold-review task to inspect the packet, immutable candidate diff, evidence, and handoff without inheriting the producer's rationale. It may report `PASS`, `FAIL`, or `BLOCKED` and must not edit files. Its verdict is advisory: it cannot set `merge_authorized`, cannot replace owner verification, and cannot independently complete or reject a packet.
+Cold review, owner review, independent review, rights review, motion or equipment review, visual inspection, human VoiceOver use, and physical-device measurements such as iPhone playback, battery, thermal, or memory are optional. They cannot change automated status, authorize merge, or block a candidate. If recorded, each item must state whether it ran and must not claim `PASS` unless it actually ran and produced that result.
 
-When optional review finds a defect, the owner either requires a bounded fixer packet or records why the residual risk is accepted. A cold-review `PASS` is additional evidence only. No new policy or ledger entry may describe it as the merge gate.
+Existing contract fields with review-oriented names remain compatibility data. Automated schema and provenance validation may validate those fields without requiring a named human identity.
 
-## Fixer loop
+## Failure and retry
 
-After owner `REJECTED`, the coordinator creates a fixer packet referencing only the actionable findings, the same candidate lineage, and the minimum additional `allowed_paths`. The fixer produces a new candidate commit and handoff. The owner verifies the complete updated range again and may optionally request another cold review.
+After `FAIL`, create a bounded fixer packet only for the failed automated checks or triggered stop gates. After `BLOCKED`, resolve the missing input or prerequisite before retrying. Every retry creates a new immutable candidate and reruns the complete required automated command set.
 
-After owner `BLOCKED`, do not create a fixer automatically. Resolve the missing authority, license, input, or base decision first, then issue a new packet from a safe checkpoint.
+## Merge and checkpoint
 
-## Merge gate and audit trail
+Fast-forward merge only when the committed handoff matches the immutable candidate, every required automated command is recorded as passed, no safety stop gate is active, and automated verification has `status: PASS` with `merge_authorized: true`. If merge resolution would change candidate bytes, create a new candidate and rerun verification. Record the lineage and automated result in the coordinator ledger.
 
-Merge only when the committed handoff matches the immutable candidate, contains a schema-valid owner verification with `status: APPROVED` and `merge_authorized: true`, and all required checks are recorded as passed. Re-run affected or release checks if merge resolution changes candidate bytes. Record the authorization and resulting commit lineage in the coordinator ledger; never infer approval from chat text alone.
-
-Historical handoffs, cold-review reports, verdicts, waivers, and ledger checkpoints remain immutable evidence. Do not rewrite them into the owner-verification schema or relabel any historical verdict.
+Historical packets, handoffs, cold-review reports, owner-verification records, device evidence, verdicts, waivers, and ledger checkpoints remain immutable. They may contain superseded governance language and must not be rewritten or relabeled.

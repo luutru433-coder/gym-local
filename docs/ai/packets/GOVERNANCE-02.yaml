@@ -1,0 +1,204 @@
+schema_version: 3
+packet:
+  id: "GOVERNANCE-02"
+  title: "Replace human review gates with automated verification"
+  type: "governance"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "1444044123c6d8768a6949cc8036b6cc8455f522"
+  required_base_checkpoint: "checkpoint/governance-01-owner-approved"
+  target_branch: "codex/governance-automated-verification"
+  worktree_required: true
+  sequential_after:
+    - "GOVERNANCE-01"
+  one_time_authority: "The repository owner explicitly authorized GOVERNANCE-02 as a governance-only replacement of human and device review gates."
+
+authority:
+  allowed_paths:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/GOVERNANCE-02.yaml"
+    - "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/adr/0021-automated-verification-governance.md"
+  candidate_paths:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/GOVERNANCE-02.yaml"
+    - "docs/adr/0021-automated-verification-governance.md"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "scripts/**"
+    - "tests/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - "vite.config.ts"
+    - "docs/ai/packets/FOUNDATION-*.yaml"
+    - "docs/ai/packets/GOVERNANCE-01.yaml"
+    - "docs/ai/packets/ANIMATION-PILOT-01*.yaml"
+    - "docs/ai/reviews/FOUNDATION-*.yaml"
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/adr/0001-*.md through docs/adr/0020-*.md"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  generated_binary_assets_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/GOVERNANCE-02.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/reviews/GOVERNANCE-01-handoff.yaml"
+    - "docs/adr/0020-owner-verification-governance.md"
+    - "docs/code-review.md"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+  accepted_adrs:
+    - "docs/adr/0020-owner-verification-governance.md as superseded governance history"
+  assumptions:
+    - "Existing cold-review, owner-verification, device-review, and verdict records remain immutable historical evidence."
+    - "Existing product contract field names containing review terminology remain compatibility data, not human merge requirements."
+    - "ANIMATION-PILOT-01 and ANIMATION-PILOT-01-REV-01 remain untouched; a separate task will create ANIMATION-PILOT-01-REV-02."
+
+outcome:
+  objective: "Make reproducible automated verification the only completion and merge gate for coordinate packets."
+  user_visible_result: "None; governance documentation and audit metadata only."
+  deliverables:
+    - "Root guidance, master plan, review procedure, and packet template consistently remove human and physical-device review from completion and merge gates."
+    - "Automated-verification schema version 1 contains the exact required fields and authorization rule."
+    - "ADR 0021 supersedes human-gate portions of earlier ADRs without rewriting their historical text."
+    - "A candidate commit is followed by a distinct handoff/checkpoint commit with AUTOMATED_PASS ledger evidence."
+    - "Local main is fast-forwarded and tagged checkpoint/governance-02-automated-verification after every required automated check passes."
+  non_goals:
+    - "No product code, content, contract, storage, product test, dependency, build configuration, historical packet, or historical review change."
+    - "No claim that cold review, owner verification, manual review, VoiceOver review, visual review, or a physical-device run occurred."
+    - "No animation pilot continuation or packet revision in this task."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "clean_local_main_and_checkpoint_identity"
+    - "created_target_branch"
+    - "allowed_and_forbidden_paths"
+    - "required_reads"
+    - "stop_gates"
+  required_conditions:
+    clean_worktree: true
+    head_matches_base_commit: true
+    checkpoint_matches_base_commit: true
+    instructions_read: true
+    required_inputs_present: true
+    exact_model_available: true
+
+decisions:
+  contract_or_schema_change: "governance_schema_only"
+  version_decisions:
+    - "Coordinate packet template advances to schema version 3."
+    - "Automated verification starts at schema version 1."
+    - "Existing packet, handoff, owner-verification, cold-review, device evidence, and ledger records remain valid historical artifacts without migration."
+  migration_or_rollback: "Revert the two GOVERNANCE-02 commits and remove the GOVERNANCE-02 checkpoint tag before any dependent packet; never rewrite historical evidence."
+  source_or_license_impact: "metadata_policy_only"
+
+acceptance_tests:
+  - id: "G02-AC-01"
+    requirement: "Packet completion and merge require only an immutable candidate, in-scope diff, schema-valid handoff, passing required automated commands, and no triggered safety stop gate."
+    evidence: "AGENTS.md, master-plan.md, review-procedure.md, and coordinate-packet-template.yaml."
+  - id: "G02-AC-02"
+    requirement: "No active policy requires cold review, owner review, independent or named reviewers, manual review, or physical-device evidence as a candidate or merge gate."
+    evidence: "Repository-wide policy search with active-policy classification; historical matches remain unchanged and are superseded for governance by ADR 0021."
+  - id: "G02-AC-03"
+    requirement: "The automated-verification schema has schema_version, packet_id, candidate_commit, status, checks, optional_manual_evidence, and merge_authorized."
+    evidence: "Coordinate packet template and automated verification procedure schema examples."
+  - id: "G02-AC-04"
+    requirement: "Only automated PASS with every required command passed may set merge_authorized true."
+    evidence: "Automated verification procedure and packet template authorization rule."
+  - id: "G02-AC-05"
+    requirement: "Automated source/license/provenance, deterministic checksum, exact variant, personal-data, offline, rollback, backup isolation, lint, typecheck, architecture, unit, production build, and precache protections remain required when applicable."
+    evidence: "Master plan required automated release evidence and pilot gate."
+  - id: "G02-AC-06"
+    requirement: "Optional manual/device evidence is empty and no unperformed optional review is reported as PASS."
+    evidence: "GOVERNANCE-02 handoff automated_verification and optional evidence sections."
+  - id: "G02-AC-07"
+    requirement: "Historical artifacts and all product paths are byte-identical to the base commit."
+    evidence: "Exact Git path audits over candidate and handoff ranges."
+
+required_checks:
+  automated_commands:
+    - "parse every YAML file under docs/ai"
+    - "git diff --check"
+    - "pnpm run verify:affected"
+    - "assert the exact candidate and post-candidate path sets and zero product-path changes"
+    - "search the repository and assert no active policy makes human or physical-device review a candidate, completion, or merge gate"
+  evidence_paths:
+    - "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "G02-STOP-01"
+    condition: "Any changed path is outside authority.allowed_paths, or any product, pilot, historical packet, or historical review file changes."
+    action: "Stop, remove the unauthorized edit, and do not widen scope."
+  - id: "G02-STOP-02"
+    condition: "Any required automated command fails or is not run."
+    action: "Set automated verification to FAIL or BLOCKED with merge_authorized false; do not merge or tag."
+  - id: "G02-STOP-03"
+    condition: "Source/license/provenance is missing or unclear, scraped or unauthorized assets are introduced, a module boundary is violated, tests fail, or code/data safety cannot be established."
+    action: "Block merge until a scoped packet resolves the defect and all required commands pass."
+  - id: "G02-STOP-04"
+    condition: "The new active policy weakens deterministic build/checksum, exact variant, personal-data, offline, rollback, backup isolation, lint, typecheck, architecture, unit, production build, or service-worker precache protections."
+    action: "Stop and restore the automated protection before creating the candidate."
+  - id: "G02-STOP-05"
+    condition: "A review or device check that was not run would be described as PASS."
+    action: "Stop and record it only as not_run or omit it from required automated checks."
+
+handoff:
+  report_path: "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+  candidate_commit_excludes_handoff_and_checkpoint_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/GOVERNANCE-02-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+  metadata_commit_rule: "After candidate_commit, only declared post_candidate_metadata_paths may change in the distinct handoff/checkpoint commit."
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/GOVERNANCE-02-handoff.yaml#automated_verification"
+  schema_version: 1
+  allowed_statuses:
+    - "PASS"
+    - "FAIL"
+    - "BLOCKED"
+  authorization_rule: "Only status PASS with every required automated command recorded as pass may set merge_authorized true."
+
+optional_evidence:
+  cold_review: "optional; no gate effect"
+  owner_review: "optional; no gate effect"
+  manual_review: "optional; no gate effect"
+  physical_device_review: "optional; no gate effect"
+  reporting_rule: "Never infer execution or PASS for optional evidence that is absent or not_run."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS and every required automated command result == pass and automated_verification.merge_authorized == true"
+  method: "fast-forward local main"
+  checkpoint_tag: "checkpoint/governance-02-automated-verification"
+  external_push_allowed: false
+  squash_policy: "preserve candidate and handoff/checkpoint commits"
