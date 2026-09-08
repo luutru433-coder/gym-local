@@ -169,3 +169,10 @@ export function mediaFallback(locale: "vi" | "en") {
     ? "Media cần Internet. Hãy dùng hướng dẫn chữ và các cue kỹ thuật ở trên."
     : "Media needs an Internet connection. Use the written steps and form cues above.";
 }
+
+export {
+  createGltfAnimationRenderer,
+  createGltfRendererDiagnostics,
+  type GltfRendererDiagnostics,
+  type GltfRendererOptions
+} from "./gltf-renderer";

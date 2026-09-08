@@ -16,6 +16,8 @@ import type {
 } from "@gym/contracts";
 import videoGuideManifest from "../../../content/exercise-video-guides.json";
 
+export { ANIMATION_CATALOG, getAnimationCatalogRecord, type AnimationCatalogRecord } from "./animation-catalog";
+
 type Pattern = Movement["pattern"];
 
 export type {

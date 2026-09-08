@@ -1,0 +1,52 @@
+{
+  "buildsPerRelease": 2,
+  "differencePolicy": "semantic version plus declared release sentinel/provenance metadata only",
+  "differencePolicyValidated": true,
+  "packetId": "ANIMATION-PILOT-01-REV-02",
+  "releases": [
+    {
+      "artifacts": {
+        "animation-pack-manifest.json": {
+          "byteSize": 19021,
+          "sha256": "646ec2883c233dbf35ac6588d083d4670168aa3ce3ea0dea2edf79e1a35ad52e"
+        },
+        "animation-pack-release.json": {
+          "byteSize": 629,
+          "sha256": "ebe8d166a26745a27412076adffa543606fd2b731a1ce7f40494bf55946b4011"
+        },
+        "animation-pack.zip": {
+          "byteSize": 36021,
+          "sha256": "621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc"
+        }
+      },
+      "assets": 12,
+      "entries": 12,
+      "sentinel": "pilot-baseline",
+      "totalAssetBytes": 15212,
+      "version": "1.0.0"
+    },
+    {
+      "artifacts": {
+        "animation-pack-manifest.json": {
+          "byteSize": 19069,
+          "sha256": "7d06a67e15b9fa0f4ae2bbb5a4ad65bd5d406e0b7b19f168d4fdbd126b36d67a"
+        },
+        "animation-pack-release.json": {
+          "byteSize": 629,
+          "sha256": "de2937190f16cc7b7399ff7e9147e9e5208a0fba929902afaef9ab3eeb5864b0"
+        },
+        "animation-pack.zip": {
+          "byteSize": 36045,
+          "sha256": "8ee05644133a33e17db53b664dec680a47885bbbf2e1889de4ffba93435d0794"
+        }
+      },
+      "assets": 12,
+      "entries": 12,
+      "sentinel": "pilot-update",
+      "totalAssetBytes": 15188,
+      "version": "1.0.1"
+    }
+  ],
+  "schemaVersion": 1,
+  "status": "pass"
+}

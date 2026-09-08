@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "packetId": "ANIMATION-PILOT-01-REV-02",
+  "status": "pass",
+  "optionalManualEvidence": [],
+  "scope": "automated in-memory/OPFS-compatible lifecycle and pilot PWA assertions",
+  "releases": [
+    "1.0.0",
+    "1.0.1"
+  ],
+  "phases": [
+    "install",
+    "failed-update",
+    "update",
+    "offline-relaunch",
+    "rollback",
+    "remove"
+  ],
+  "exactIdentityRequired": true,
+  "networkRequestAttempts": 0,
+  "textFallbackPreserved": true
+}

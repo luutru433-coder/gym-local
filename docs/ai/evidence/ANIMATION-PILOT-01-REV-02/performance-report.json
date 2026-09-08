@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packetId": "ANIMATION-PILOT-01-REV-02",
+  "status": "pass",
+  "optionalManualEvidence": [],
+  "environment": "automated desktop build and deterministic renderer counters",
+  "physicalDeviceClaimed": false,
+  "budgets": {
+    "assetBytesMaximum": 4194304,
+    "totalAssetBytesMaximum": 25165824,
+    "retainedArchiveMultiplierMaximum": 3,
+    "resourceLeaksMaximum": 0
+  },
+  "measured": {
+    "variants": 12,
+    "releaseCount": 2,
+    "retainedArchiveMultiplier": 3,
+    "resourceLeaks": 0
+  },
+  "pilotPwa": {
+    "files": 44,
+    "precacheBytes": 3978370,
+    "maximumJavascriptBytes": 623238,
+    "releasePayloadFiles": 0
+  },
+  "defaultPwa": {
+    "entryChunkBytes": 208458,
+    "initialGraphBytes": 625567,
+    "precacheBytes": 3284814,
+    "precacheEntries": 34,
+    "pilotModules": 0,
+    "pilotIdentityPresent": false,
+    "animationPackPrecachePresent": false
+  }
+}

@@ -1,0 +1,48 @@
+.animation-pilot {
+  box-sizing: border-box;
+  width: min(100%, 72rem);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: #f4f1e8;
+  color: #11120f;
+}
+
+.animation-pilot *,
+.animation-pilot *::before,
+.animation-pilot *::after { box-sizing: inherit; }
+
+.animation-pilot__eyebrow { font: 700 0.75rem/1.3 ui-monospace, monospace; letter-spacing: 0.08em; }
+
+.animation-pilot__panel {
+  display: grid;
+  gap: 0.8rem;
+  margin-block: 1rem;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid #22251f;
+  border-radius: 0.75rem;
+  background: #fffdf6;
+}
+
+.animation-pilot label { display: grid; gap: 0.35rem; font-weight: 650; }
+.animation-pilot input,
+.animation-pilot select,
+.animation-pilot button { min-height: 44px; max-width: 100%; font: inherit; }
+.animation-pilot input:focus-visible,
+.animation-pilot select:focus-visible,
+.animation-pilot button:focus-visible { outline: 3px solid #1f6f55; outline-offset: 2px; }
+.animation-pilot__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.animation-pilot__actions button { flex: 1 1 9rem; }
+
+@media (max-width: 390px) {
+  .animation-pilot { padding: 0.75rem; }
+  .animation-pilot__panel { padding: 0.75rem; }
+  .animation-pilot__actions { display: grid; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animation-pilot *,
+  .animation-pilot *::before,
+  .animation-pilot *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}

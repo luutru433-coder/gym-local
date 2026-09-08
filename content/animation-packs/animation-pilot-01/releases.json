@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "sourcePath": "content/animation-packs/animation-pilot-01/releases.json",
+  "author": "Gym Local contributors",
+  "licenseId": "license.mit-gym-local",
+  "redistributionScope": "offline",
+  "attribution": "Copyright (c) 2026 Gym Local contributors",
+  "automationId": "automation.animation-pilot-01-rev-02",
+  "reviewedAt": "2026-09-05",
+  "releases": [
+    { "version": "1.0.0", "releaseDate": "2026-09-05", "sentinel": "pilot-baseline", "modifications": "Initial deterministic pilot materialization." },
+    { "version": "1.0.1", "releaseDate": "2026-09-05", "sentinel": "pilot-update", "modifications": "Release sentinel and version metadata update only." }
+  ]
+}

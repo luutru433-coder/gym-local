@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "packetId": "ANIMATION-PILOT-01-REV-02",
+  "status": "pass",
+  "environment": {
+    "scope": "automated desktop Node workload",
+    "physicalDeviceClaimed": false
+  },
+  "selectionRule": "highest deterministic score among hard-gate passers; tie selects smaller closure",
+  "selected": "three-direct",
+  "candidates": [
+    {
+      "id": "three-direct",
+      "packages": [
+        "three@0.185.1"
+      ],
+      "closureBytes": 23172772,
+      "closurePinned": true,
+      "license": "MIT",
+      "workload": {
+        "releases": 2,
+        "variants": 12,
+        "cycles": 10,
+        "parsedAssets": 240,
+        "operations": [
+          "mount",
+          "static-frame",
+          "play",
+          "pause",
+          "seek",
+          "loop",
+          "speed",
+          "camera",
+          "mirror",
+          "reduced-motion",
+          "resize",
+          "failure",
+          "dispose"
+        ]
+      },
+      "hardGates": {
+        "metadataAndLicense": true,
+        "offlineBlobParsing": true,
+        "controllerOperations": true,
+        "disposalAfterTenCycles": true
+      },
+      "ownedResourceLeaks": {
+        "raf": 0,
+        "observer": 0,
+        "listener": 0,
+        "canvas": 0,
+        "objectUrl": 0,
+        "scene": 0,
+        "mixer": 0,
+        "gpuResource": 0,
+        "webglContext": 0
+      },
+      "score": 77370
+    },
+    {
+      "id": "babylon-modular",
+      "packages": [
+        "@babylonjs/core@9.23.0",
+        "@babylonjs/loaders@9.23.0",
+        "babylonjs-gltf2interface@9.23.0"
+      ],
+      "closureBytes": 75440598,
+      "closurePinned": true,
+      "license": "Apache-2.0",
+      "workload": {
+        "releases": 2,
+        "variants": 12,
+        "cycles": 10,
+        "parsedAssets": 240,
+        "operations": [
+          "mount",
+          "static-frame",
+          "play",
+          "pause",
+          "seek",
+          "loop",
+          "speed",
+          "camera",
+          "mirror",
+          "reduced-motion",
+          "resize",
+          "failure",
+          "dispose"
+        ]
+      },
+      "hardGates": {
+        "metadataAndLicense": true,
+        "offlineBlobParsing": true,
+        "controllerOperations": true,
+        "disposalAfterTenCycles": true
+      },
+      "ownedResourceLeaks": {
+        "raf": 0,
+        "observer": 0,
+        "listener": 0,
+        "canvas": 0,
+        "objectUrl": 0,
+        "scene": 0,
+        "mixer": 0,
+        "gpuResource": 0,
+        "webglContext": 0
+      },
+      "score": 26328
+    },
+    {
+      "id": "google-model-viewer",
+      "packages": [
+        "@google/model-viewer@4.3.1",
+        "three@0.185.1"
+      ],
+      "closureBytes": 70232667,
+      "closurePinned": false,
+      "license": "Apache-2.0 + MIT",
+      "workload": {
+        "releases": 2,
+        "variants": 12,
+        "cycles": 10,
+        "parsedAssets": 240,
+        "operations": [
+          "mount",
+          "static-frame",
+          "play",
+          "pause",
+          "seek",
+          "loop",
+          "speed",
+          "camera",
+          "mirror",
+          "reduced-motion",
+          "resize",
+          "failure",
+          "dispose"
+        ]
+      },
+      "hardGates": {
+        "metadataAndLicense": false,
+        "offlineBlobParsing": true,
+        "controllerOperations": true,
+        "disposalAfterTenCycles": true
+      },
+      "ownedResourceLeaks": {
+        "raf": 0,
+        "observer": 0,
+        "listener": 0,
+        "canvas": 0,
+        "objectUrl": 0,
+        "scene": 0,
+        "mixer": 0,
+        "gpuResource": 0,
+        "webglContext": 0
+      },
+      "score": 0
+    }
+  ]
+}

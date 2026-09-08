@@ -8,10 +8,12 @@ import {
   AnimationPackStore,
   type AnimationPackAssetRequest,
   type AnimationPackByteSource,
+  type AnimationPackExactSource,
+  type AnimationPackExactSourceRequest,
   type AnimationPackStoreStatus
 } from "./store";
 
-export type { AnimationPackAssetRequest, AnimationPackByteSource, AnimationPackStoreStatus } from "./store";
+export type { AnimationPackAssetRequest, AnimationPackByteSource, AnimationPackExactSource, AnimationPackExactSourceRequest, AnimationPackStoreStatus } from "./store";
 export { AnimationPackStoreError } from "./store";
 
 let store: AnimationPackStore | undefined;
@@ -35,6 +37,10 @@ export function installAnimationPack(descriptor: unknown, archive: AnimationPack
 
 export function readAnimationPackAsset(request: AnimationPackAssetRequest): Promise<Blob> {
   return animationPackStore().readAsset(request);
+}
+
+export function readExactAnimationSource(request: AnimationPackExactSourceRequest): Promise<AnimationPackExactSource> {
+  return animationPackStore().readExactSource(request);
 }
 
 export function rollbackAnimationPack(): Promise<AnimationPackStoreStatus> {

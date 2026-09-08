@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packId": "gym-local.animation-pilot-01",
+  "rigId": "rig.gym-local-pilot-v1",
+  "author": "Gym Local contributors",
+  "licenseId": "license.mit-gym-local",
+  "sourcePath": "content/animation-packs/animation-pilot-01/source.json",
+  "automationId": "automation.animation-pilot-01-rev-02",
+  "reviewedAt": "2026-09-05",
+  "variants": [
+    { "exerciseVariantId": "push_up__bodyweight", "animationId": "animation.pilot-01.push-up.bodyweight", "clipName": "PushUpBodyweightLoop", "camera": "side", "props": [], "durationSeconds": 2, "motion": [0, -0.32, 0] },
+    { "exerciseVariantId": "plank__bodyweight", "animationId": "animation.pilot-01.plank.bodyweight", "clipName": "PlankBodyweightHold", "camera": "side", "props": [], "durationSeconds": 2, "motion": [0, 0.02, 0] },
+    { "exerciseVariantId": "one_arm_row__dumbbell", "animationId": "animation.pilot-01.one-arm-row.dumbbell", "clipName": "OneArmRowDumbbellLoop", "camera": "three_quarter", "props": ["prop.dumbbell"], "durationSeconds": 2.2, "motion": [0.18, 0.22, 0] },
+    { "exerciseVariantId": "squat__barbell", "animationId": "animation.pilot-01.squat.barbell", "clipName": "SquatBarbellLoop", "camera": "side", "props": ["prop.barbell"], "durationSeconds": 2.4, "motion": [0, -0.48, 0] },
+    { "exerciseVariantId": "face_pull__cable", "animationId": "animation.pilot-01.face-pull.cable", "clipName": "FacePullCableLoop", "camera": "three_quarter", "props": ["prop.cable-station", "prop.rope-handle"], "durationSeconds": 2, "motion": [0, 0, 0.3] },
+    { "exerciseVariantId": "leg_press__machine", "animationId": "animation.pilot-01.leg-press.machine", "clipName": "LegPressMachineLoop", "camera": "side", "props": ["prop.leg-press-machine"], "durationSeconds": 2.4, "motion": [0.32, 0.08, 0] },
+    { "exerciseVariantId": "leg_extension__machine", "animationId": "animation.pilot-01.leg-extension.machine", "clipName": "LegExtensionMachineLoop", "camera": "side", "props": ["prop.leg-extension-machine"], "durationSeconds": 2, "motion": [0.2, 0.18, 0] },
+    { "exerciseVariantId": "split_squat__smith", "animationId": "animation.pilot-01.split-squat.smith", "clipName": "SplitSquatSmithLoop", "camera": "three_quarter", "props": ["prop.smith-machine", "prop.smith-bar"], "durationSeconds": 2.4, "motion": [0, -0.42, 0] },
+    { "exerciseVariantId": "anti_rotation__resistance_band", "animationId": "animation.pilot-01.anti-rotation.resistance-band", "clipName": "AntiRotationBandLoop", "camera": "front", "props": ["prop.resistance-band", "prop.band-anchor"], "durationSeconds": 2, "motion": [0.24, 0, 0] },
+    { "exerciseVariantId": "lateral_raise__dumbbell", "animationId": "animation.pilot-01.lateral-raise.dumbbell", "clipName": "LateralRaiseDumbbellLoop", "camera": "front", "props": ["prop.dumbbell-pair"], "durationSeconds": 2, "motion": [0, 0.3, 0] },
+    { "exerciseVariantId": "hip_thrust__barbell", "animationId": "animation.pilot-01.hip-thrust.barbell", "clipName": "HipThrustBarbellLoop", "camera": "side", "props": ["prop.barbell", "prop.bench"], "durationSeconds": 2.4, "motion": [0, 0.38, 0] },
+    { "exerciseVariantId": "farmer_carry__kettlebell", "animationId": "animation.pilot-01.farmer-carry.kettlebell", "clipName": "FarmerCarryKettlebellLoop", "camera": "three_quarter", "props": ["prop.kettlebell-pair"], "durationSeconds": 2, "motion": [0, 0.05, 0.3] }
+  ]
+}

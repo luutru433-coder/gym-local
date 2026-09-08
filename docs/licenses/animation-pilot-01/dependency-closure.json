@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "metadataAsOf": "2026-08-31",
+  "selected": "three-direct",
+  "packages": [
+    {
+      "name": "three",
+      "version": "0.185.1",
+      "integrity": "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg==",
+      "license": "MIT",
+      "dependencies": []
+    }
+  ],
+  "redistribution": "Allowed under MIT with copyright and permission notice retained.",
+  "noticePath": "THIRD_PARTY_NOTICES.md"
+}

@@ -5,6 +5,8 @@
 
 import {
   APP_VERSIONS,
+  type AnimationAssetDescriptor,
+  type AnimationPackEntry,
   type AnimationPackError,
   type AnimationPackErrorCode,
   type AnimationPackManifest,
@@ -63,6 +65,20 @@ export interface AnimationPackAssetRequest {
   version: string;
   assetId: string;
   path: string;
+}
+
+export interface AnimationPackExactSourceRequest {
+  packId: string;
+  version: string;
+  exerciseVariantId: string;
+  animationId: string;
+  signal?: AbortSignal;
+}
+
+export interface AnimationPackExactSource {
+  entry: AnimationPackEntry;
+  asset: AnimationAssetDescriptor;
+  blob: Blob;
 }
 
 export type AnimationPackStoreStatus =
@@ -580,6 +596,39 @@ export class AnimationPackStore {
       const entry = object.archive.entry(asset.path);
       if (entry === undefined) fail("missing_asset", "Requested active asset is missing.");
       return entry.blob();
+    });
+  }
+
+  readExactSource(request: AnimationPackExactSourceRequest): Promise<AnimationPackExactSource> {
+    return this.#serialized(async () => {
+      if (request.signal?.aborted) fail("activation_failed", "Animation source read was cancelled.");
+      const selected = await selectJournal(this.#backend);
+      if (selected.record.active === null
+        || selected.record.active.packId !== request.packId
+        || selected.record.active.version !== request.version) {
+        fail("missing_variant", "Requested animation pack is not the exact active release.");
+      }
+      const object = await verifyObject(this.#backend, selected.record.active, this.#currentAppVersion)
+        .catch((error) => { throw mapError(error, "missing_asset"); });
+      if (request.signal?.aborted) fail("activation_failed", "Animation source read was cancelled.");
+      const entry = object.manifest.entries.find((candidate) => candidate.primary
+        && candidate.exerciseVariantId === request.exerciseVariantId
+        && candidate.animationId === request.animationId);
+      if (entry === undefined) fail("missing_variant", "Requested exact exercise variant and animation are not active.");
+      const asset = object.manifest.assets.find((candidate) => candidate.id === entry.assetId);
+      if (asset === undefined
+        || asset.path !== entry.assetPath
+        || asset.sourceId !== entry.sourceId
+        || asset.licenseId !== entry.licenseId
+        || asset.durationSeconds !== entry.durationSeconds) {
+        fail("missing_asset", "Active animation entry and asset identity do not match.");
+      }
+      const archiveEntry = object.archive.entry(asset.path);
+      if (archiveEntry === undefined || archiveEntry.byteSize !== asset.byteSize) fail("missing_asset", "Active animation asset is missing or has the wrong size.");
+      const blob = archiveEntry.blob();
+      if (await hashBlob(blob) !== asset.sha256) fail("asset_checksum_mismatch", "Active animation asset checksum changed.");
+      if (request.signal?.aborted) fail("activation_failed", "Animation source read was cancelled.");
+      return { entry, asset, blob };
     });
   }
 

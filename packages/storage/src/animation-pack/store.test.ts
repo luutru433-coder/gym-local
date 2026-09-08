@@ -6,7 +6,7 @@
 import { resolve } from "node:path";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { parseAnimationPackManifest, parseAnimationPackReleaseDescriptor, type AnimationPackManifest, type AnimationPackReleaseDescriptor } from "@gym/contracts";
 import { sha256 } from "@noble/hashes/sha2.js";
 import JSZip from "jszip";
@@ -34,6 +34,9 @@ interface Fixture {
 let fixture: Fixture;
 let updateFixture: Fixture;
 let thirdFixture: Fixture;
+let pilotFixture: Fixture;
+let pilotUpdateFixture: Fixture;
+let pilotEntries: Array<{ exerciseVariantId: string; animationId: string }>;
 const fixtureDirectories: string[] = [];
 
 beforeAll(async () => {
@@ -61,6 +64,23 @@ beforeAll(async () => {
   updateFixture = await build("1.0.1");
   thirdFixture = await build("1.0.2");
   expect(fixture.descriptor.archiveSha256).toBe("1a84c3bf84ee03444c568608e31c58fe0081d44d6fb54fb226e1751459761bcb");
+
+  // @ts-expect-error The packet-owned deterministic pilot materializer is an untyped ESM module.
+  const pilot = await import("../../../../scripts/animation-pilot-assets.mjs") as {
+    readPilotDeclarations(): Promise<{ source: { variants: Array<{ exerciseVariantId: string; animationId: string }> }; releases: { releases: Array<{ version: string }> } }>;
+    materializeReleaseSource(root: string, source: unknown, release: unknown): Promise<unknown>;
+  };
+  const declarations = await pilot.readPilotDeclarations();
+  pilotEntries = declarations.source.variants.map(({ exerciseVariantId, animationId }) => ({ exerciseVariantId, animationId }));
+  const buildPilot = async (release: unknown): Promise<Fixture> => {
+    const directory = await mkdtemp(resolve(tmpdir(), "gym-local-pilot-store-"));
+    fixtureDirectories.push(directory);
+    await pilot.materializeReleaseSource(directory, declarations.source, release);
+    const built = await builder.createAnimationPackArtifacts(await builder.validateAnimationPackSource(directory));
+    return { descriptor: built.descriptor, descriptorBytes: Uint8Array.from(built.artifacts.get("animation-pack-release.json") ?? []), archive: Uint8Array.from(built.artifacts.get("animation-pack.zip") ?? []) };
+  };
+  pilotFixture = await buildPilot(declarations.releases.releases[0]);
+  pilotUpdateFixture = await buildPilot(declarations.releases.releases[1]);
 });
 
 afterAll(async () => {
@@ -298,6 +318,51 @@ describe("animation pack lifecycle store", () => {
     expect(bytes.length).toBe(48);
     await expect(target.store.readAsset({ packId: fixture.descriptor.packId, version: "1.0.1", assetId: "asset.foundation-03-minimal-glb", path: "assets/synthetic-minimal.glb" })).rejects.toMatchObject({ error: { code: "missing_asset" } });
     await expect(target.store.readAsset({ packId: fixture.descriptor.packId, version: "1.0.0", assetId: "asset.foundation-03-minimal-glb", path: "manifest/animation-pack.json" })).rejects.toMatchObject({ error: { code: "missing_asset" } });
+  });
+
+  it("returns the exact active entry, descriptor and verified Blob as one source", async () => {
+    const target = store();
+    await install(target.store);
+    const source = await target.store.readExactSource({
+      packId: fixture.descriptor.packId,
+      version: "1.0.0",
+      exerciseVariantId: "fixture_movement__bodyweight",
+      animationId: "animation.foundation-03-synthetic"
+    });
+    expect(source.entry).toMatchObject({ exerciseVariantId: "fixture_movement__bodyweight", animationId: "animation.foundation-03-synthetic" });
+    expect(source.asset).toMatchObject({ id: "asset.foundation-03-minimal-glb", path: "assets/synthetic-minimal.glb" });
+    expect(new Uint8Array(await source.blob.arrayBuffer())).toHaveLength(source.asset.byteSize);
+  });
+
+  it.each([
+    { exerciseVariantId: "Fixture_movement__bodyweight", animationId: "animation.foundation-03-synthetic" },
+    { exerciseVariantId: "fixture_movement__dumbbell", animationId: "animation.foundation-03-synthetic" },
+    { exerciseVariantId: "fixture_movement__bodyweight", animationId: "animation.foundation-03-synthetic-neighbor" }
+  ])("rejects exact-source neighbors without mutating the journal: $exerciseVariantId", async ({ exerciseVariantId, animationId }) => {
+    const target = store();
+    await install(target.store);
+    const history = [...target.backend.journalHistory];
+    await expect(target.store.readExactSource({ packId: fixture.descriptor.packId, version: "1.0.0", exerciseVariantId, animationId }))
+      .rejects.toMatchObject({ error: { code: "missing_variant" } });
+    expect(target.backend.journalHistory).toEqual(history);
+  });
+
+  it("rejects exact-source cancellation before storage access and journal mutation", async () => {
+    const target = store();
+    await install(target.store);
+    const controller = new AbortController();
+    controller.abort();
+    const calls = target.backend.calls.length;
+    const history = [...target.backend.journalHistory];
+    await expect(target.store.readExactSource({
+      packId: fixture.descriptor.packId,
+      version: "1.0.0",
+      exerciseVariantId: "fixture_movement__bodyweight",
+      animationId: "animation.foundation-03-synthetic",
+      signal: controller.signal
+    })).rejects.toMatchObject({ error: { code: "activation_failed" } });
+    expect(target.backend.calls).toHaveLength(calls);
+    expect(target.backend.journalHistory).toEqual(history);
   });
 
   it.each(["empty", "short", "long", "wrong checksum"])("rejects %s staging bytes without a journal commit", async (name) => {
@@ -571,4 +636,31 @@ describe("animation pack lifecycle store", () => {
     expect(personalSnapshot).toEqual(before);
     expect(Object.keys(target.backend)).not.toContain("database");
   });
+
+  it("runs the 12-variant pilot install, offline relaunch, update, rollback and remove lifecycle", async () => {
+    const target = store();
+    const personalSnapshot = encoder.encode('{"profile":{"id":"local"},"sessions":[{"id":"history"}],"backupVersion":5}');
+    const personalBefore = personalSnapshot.slice();
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    await install(target.store, pilotFixture.descriptorBytes, pilotFixture.archive);
+    for (const exact of pilotEntries) {
+      const source = await target.store.readExactSource({ packId: "gym-local.animation-pilot-01", version: "1.0.0", ...exact });
+      expect(source.blob.size).toBe(source.asset.byteSize);
+      expect(source.entry.exerciseVariantId).toBe(exact.exerciseVariantId);
+    }
+    const relaunched = new AnimationPackStore({ backend: target.backend, now: () => "2026-09-05T12:00:00Z" });
+    expect(await relaunched.status()).toMatchObject({ state: "available", active: { version: "1.0.0" } });
+    for (const exact of pilotEntries) {
+      await expect(relaunched.readExactSource({ packId: "gym-local.animation-pilot-01", version: "1.0.0", ...exact })).resolves.toMatchObject({ entry: exact });
+    }
+    expect(await install(relaunched, pilotUpdateFixture.descriptorBytes, pilotUpdateFixture.archive)).toMatchObject({ state: "available", active: { version: "1.0.1" }, previous: { version: "1.0.0" } });
+    const history = [...target.backend.journalHistory];
+    await expect(relaunched.readExactSource({ packId: "gym-local.animation-pilot-01", version: "1.0.1", exerciseVariantId: "squat__dumbbell", animationId: "animation.pilot-01.squat.barbell" })).rejects.toMatchObject({ error: { code: "missing_variant" } });
+    expect(target.backend.journalHistory).toEqual(history);
+    expect(await relaunched.rollback()).toMatchObject({ state: "available", active: { version: "1.0.0" }, previous: { version: "1.0.1" } });
+    expect(await relaunched.remove()).toEqual({ state: "unavailable", warnings: [] });
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(personalSnapshot).toEqual(personalBefore);
+    fetchSpy.mockRestore();
+  }, 30_000);
 });

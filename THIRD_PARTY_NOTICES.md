@@ -2,6 +2,14 @@
 
 Gym Local's own code and authored content are distributed under `LICENSE`. The following external services, data, and media remain subject to their own terms.
 
+## three.js
+
+- Package: `three@0.185.1`
+- License: MIT
+- Copyright: 2010-2026 three.js authors
+- Source: https://github.com/mrdoob/three.js
+- Use: offline glTF/GLB pilot rendering
+
 ## USDA FoodData Central
 
 The optional nutrition pack includes normalized records from Foundation Foods 04/2026, SR Legacy 04/2018, and FNDDS 2021–2023. The source manifest records retrieval dates and identifiers. USDA FoodData Central data are published as CC0/public-domain data.

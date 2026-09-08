@@ -14,8 +14,17 @@ const NutritionPage = lazy(() => import("./features/nutrition/NutritionPage").th
 const ProgressPage = lazy(() => import("./features/progress/ProgressPage").then((module) => ({ default: module.ProgressPage })));
 const SettingsPage = lazy(() => import("./features/settings/SettingsPage").then((module) => ({ default: module.SettingsPage })));
 const WorkoutPage = lazy(() => import("./features/workout/WorkoutPage").then((module) => ({ default: module.WorkoutPage })));
+declare const __ANIMATION_PILOT__: boolean;
+const AnimationPilotApp = __ANIMATION_PILOT__
+  ? lazy(() => import("./pilot/AnimationPilotApp").then((module) => ({ default: module.AnimationPilotApp })))
+  : undefined;
 
 export function App() {
+  if (__ANIMATION_PILOT__ && AnimationPilotApp) return <Suspense fallback={<RouteLoader />}><AnimationPilotApp /></Suspense>;
+  return <ProductionApp />;
+}
+
+function ProductionApp() {
   const ready = useGymStore((state) => state.ready);
   const busy = useGymStore((state) => state.busy);
   const profile = useGymStore((state) => state.profile);

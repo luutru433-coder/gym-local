@@ -52,6 +52,8 @@ describe("application onboarding", () => {
     const user = userEvent.setup();
     render(<App />);
 
+    expect(screen.queryByTestId("animation-pilot-app")).not.toBeInTheDocument();
+
     expect(await screen.findByRole("heading", { name: "Tập thông minh hơn. Dữ liệu vẫn là của bạn." })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tăng cơ" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: "Tăng sức mạnh" })).toHaveAttribute("aria-pressed", "false");

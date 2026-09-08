@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "packetId": "ANIMATION-PILOT-01-REV-02",
+  "status": "pass",
+  "optionalManualEvidence": [],
+  "widthsCssPx": [
+    320,
+    390
+  ],
+  "nativeKeyboardControls": true,
+  "politeAtomicStatus": true,
+  "writtenFallbackAlwaysPresent": true,
+  "reducedMotionStaticFrame": true,
+  "humanVoiceOverClaimed": false
+}

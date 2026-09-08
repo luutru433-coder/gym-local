@@ -56,6 +56,9 @@ const requiredOfflineFiles = [...new Set(Object.values(manifest)
   .flatMap((entry) => [entry.file, ...(entry.css ?? [])]))];
 const missingOfflineFiles = requiredOfflineFiles.filter((file) => !precachePaths.includes(file));
 const failures = [];
+const defaultPilotModules = Object.keys(manifest).filter((key) => /(?:src[\\/]pilot|gltf-renderer)/i.test(key));
+const defaultJavascript = await Promise.all(assetEntries.filter((file) => file.endsWith(".js")).map((file) => readFile(join(distRoot, "assets", file), "utf8")));
+const defaultPilotIdentityPresent = defaultJavascript.some((source) => source.includes("gym-local.animation-pilot-01") || source.includes("ANIMATION-PILOT-01-REV-02"));
 
 function enforce(label, actual, maximum) {
   if (actual > maximum) failures.push(`${label}: ${actual} bytes exceeds ${maximum}`);
@@ -71,6 +74,8 @@ if (assetEntries.some((file) => file.endsWith(".map"))) failures.push("Productio
 if (/gym-local-nutrition.*\.sqlite3/i.test(serviceWorker)) failures.push("Nutrition SQLite pack entered the PWA precache");
 if (/youtube(?:-nocookie)?\.com|youtu\.be/i.test(serviceWorker)) failures.push("Remote video URL entered the PWA precache");
 if (precachePaths.includes("og-gym-local.png")) failures.push("Social preview image entered the PWA precache");
+if (defaultPilotModules.length || defaultPilotIdentityPresent) failures.push("Pilot or renderer code entered the default production build");
+if (/\.glb|animation-pack\.zip|gym-local\.animation-pilot-01/.test(serviceWorker)) failures.push("Animation pack bytes entered the PWA precache");
 for (const file of missingOfflineFiles) failures.push(`Core route asset is missing from the PWA precache: ${file}`);
 
 const report = {
@@ -92,12 +97,28 @@ const report = {
     remoteVideoExcluded: !/youtube(?:-nocookie)?\.com|youtu\.be/i.test(serviceWorker),
     socialPreviewExcluded: !precachePaths.includes("og-gym-local.png"),
     coreRoutesPrecached: missingOfflineFiles.length === 0
+    , animationPilotExcludedFromDefaultBuild: defaultPilotModules.length === 0 && !defaultPilotIdentityPresent
+    , animationPackExcludedFromPrecache: !/\.glb|animation-pack\.zip|gym-local\.animation-pilot-01/.test(serviceWorker)
   },
   failures
 };
 
 await mkdir(join(distRoot, "reports"), { recursive: true });
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+const pilotEvidencePath = resolve("docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json");
+const pilotEvidence = await readFile(pilotEvidencePath, "utf8").then(JSON.parse).catch(() => undefined);
+if (pilotEvidence?.packetId === "ANIMATION-PILOT-01-REV-02") {
+  pilotEvidence.defaultPwa = {
+    entryChunkBytes: report.measurements.entryChunk.bytes,
+    initialGraphBytes,
+    precacheBytes,
+    precacheEntries: precachePaths.length,
+    pilotModules: defaultPilotModules.length,
+    pilotIdentityPresent: defaultPilotIdentityPresent,
+    animationPackPrecachePresent: !report.safeguards.animationPackExcludedFromPrecache
+  };
+  await writeFile(pilotEvidencePath, `${JSON.stringify(pilotEvidence, null, 2)}\n`, "utf8");
+}
 console.log(`${report.status.toUpperCase()} performance: entry ${(report.measurements.entryChunk.bytes / KIB).toFixed(1)} KiB, initial graph ${(initialGraphBytes / KIB).toFixed(1)} KiB, precache ${(precacheBytes / KIB).toFixed(1)} KiB`);
 console.log(`Report: ${reportPath}`);
 if (failures.length) {

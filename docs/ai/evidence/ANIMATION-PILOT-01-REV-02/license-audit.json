@@ -1,0 +1,20 @@
+{
+  "attribution": "Copyright (c) 2026 Gym Local contributors",
+  "author": "Gym Local contributors",
+  "authoredAssets": 24,
+  "automationId": "automation.animation-pilot-01-rev-02",
+  "license": "MIT",
+  "optionalHumanReviewClaimed": false,
+  "packetId": "ANIMATION-PILOT-01-REV-02",
+  "redistributionScope": "offline",
+  "schemaVersion": 1,
+  "selectedDependency": {
+    "dependencyCount": 0,
+    "integrity": "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg==",
+    "license": "MIT",
+    "name": "three",
+    "version": "0.185.1"
+  },
+  "sourcePath": "content/animation-packs/animation-pilot-01/source.json",
+  "status": "pass"
+}

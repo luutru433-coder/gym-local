@@ -5,10 +5,28 @@ import { fileURLToPath } from "node:url";
 
 const fromRoot = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
+const animationPackNodeTestBridge = {
+  name: "animation-pack-node-test-bridge",
+  enforce: "pre" as const,
+  transform(_source: string, id: string) {
+    if (!id.replaceAll("\\", "/").endsWith("/scripts/animation-pack-v1.test.mjs")) return undefined;
+    return `
+      import { spawnSync } from "node:child_process";
+      import { fileURLToPath } from "node:url";
+      import { it } from "vitest";
+      it("passes the immutable FOUNDATION-03 Node test suite", () => {
+        const result = spawnSync(process.execPath, ["--test", fileURLToPath(import.meta.url)], { encoding: "utf8", env: { ...process.env, CI: "true" } });
+        if (result.status !== 0 || result.signal !== null) throw new Error(result.stderr || result.stdout || "FOUNDATION-03 Node test suite failed");
+      }, 120000);
+    `;
+  }
+};
+
 export default defineConfig(({ mode }) => ({
   root: "apps/web",
   publicDir: "../../public",
   base: mode === "production" ? "./" : "/",
+  define: { __ANIMATION_PILOT__: JSON.stringify(mode === "animation-pilot") },
   resolve: {
     alias: {
       "@gym/contracts": fromRoot("./packages/contracts/src/index.ts"),
@@ -23,6 +41,7 @@ export default defineConfig(({ mode }) => ({
     }
   },
   plugins: [
+    mode === "test" ? animationPackNodeTestBridge : undefined,
     react(),
     VitePWA({
       registerType: "prompt",
@@ -97,6 +116,6 @@ export default defineConfig(({ mode }) => ({
   test: {
     environment: "jsdom",
     setupFiles: [fromRoot("./tests/setup.ts")],
-    include: ["src/**/*.test.{ts,tsx}", "../../packages/**/*.test.{ts,tsx}"]
+    include: ["src/**/*.test.{ts,tsx}", "../../packages/**/*.test.{ts,tsx}", "../../scripts/**/*.test.mjs"]
   }
 }));
