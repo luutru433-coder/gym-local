@@ -1,0 +1,308 @@
+schema_version: 3
+packet_id: "ANIMATION-PILOT-01-REV-02"
+status: "automated_fail"
+producer_model: "gpt-5.6-sol"
+subagents_used: false
+
+base_commit: "5e02b61c551954c9633b57473dab96a795cf95e2"
+coordinator_commit: "d61759245c8a2c86a7659dfb12164fe962d515b4"
+candidate_commit: "9d9c87e0c6a832421c4f395468481f7147fc476a"
+branch: "codex/animation-pilot-01-rev-02"
+
+changed_paths:
+  candidate:
+    - "THIRD_PARTY_NOTICES.md"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/App.tsx"
+    - "apps/web/src/pilot/AnimationPilotApp.test.tsx"
+    - "apps/web/src/pilot/AnimationPilotApp.tsx"
+    - "apps/web/src/pilot/animation-pilot.css"
+    - "content/animation-packs/animation-pilot-01/LICENSE.md"
+    - "content/animation-packs/animation-pilot-01/PROVENANCE.md"
+    - "content/animation-packs/animation-pilot-01/releases.json"
+    - "content/animation-packs/animation-pilot-01/source.json"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/accessibility-automation.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/license-audit.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/offline-rollback.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/personal-data-isolation.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/release-reproducibility.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "docs/licenses/animation-pilot-01/NOTICE.md"
+    - "docs/licenses/animation-pilot-01/dependency-closure.json"
+    - "package.json"
+    - "packages/catalog/src/animation-catalog.test.ts"
+    - "packages/catalog/src/animation-catalog.ts"
+    - "packages/catalog/src/index.ts"
+    - "packages/media/src/gltf-renderer.test.ts"
+    - "packages/media/src/gltf-renderer.ts"
+    - "packages/media/src/index.ts"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "pnpm-lock.yaml"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/content-audit.mjs"
+    - "scripts/content-validate.mjs"
+    - "scripts/performance-report.mjs"
+    - "vite.config.ts"
+  post_candidate_metadata:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-handoff.yaml"
+
+versions:
+  app: "0.7.0"
+  database: 5
+  backup: 5
+  catalog: 3
+  nutrition_pack_schema: 3
+  animation_pack_schema: 1
+  animation_player_protocol: 1
+  animation_catalog: 1
+  animation_pack_id: "gym-local.animation-pilot-01"
+  releases:
+    - "1.0.0"
+    - "1.0.1"
+
+variant_matrix:
+  catalog_variants: 199
+  mapped_variants: 12
+  unmapped_variants: 187
+  exact_ids:
+    - "push_up__bodyweight"
+    - "plank__bodyweight"
+    - "one_arm_row__dumbbell"
+    - "squat__barbell"
+    - "face_pull__cable"
+    - "leg_press__machine"
+    - "leg_extension__machine"
+    - "split_squat__smith"
+    - "anti_rotation__resistance_band"
+    - "lateral_raise__dumbbell"
+    - "hip_thrust__barbell"
+    - "farmer_carry__kettlebell"
+  result: "pass"
+  evidence: "The focused catalog suite dynamically passed exact 12/199/187 mapping and case/equipment-neighbor rejection assertions."
+
+release_artifacts:
+  reproducibility_digest: "b39954ed334d5800c87d83f748a44fbf70629200a4402fa3d23d30f43de9bda0"
+  builds_per_release: 2
+  releases:
+    - version: "1.0.0"
+      sentinel: "pilot-baseline"
+      assets: 12
+      entries: 12
+      total_asset_bytes: 15212
+      manifest_sha256: "646ec2883c233dbf35ac6588d083d4670168aa3ce3ea0dea2edf79e1a35ad52e"
+      descriptor_sha256: "ebe8d166a26745a27412076adffa543606fd2b731a1ce7f40494bf55946b4011"
+      archive_sha256: "621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc"
+    - version: "1.0.1"
+      sentinel: "pilot-update"
+      assets: 12
+      entries: 12
+      total_asset_bytes: 15188
+      manifest_sha256: "7d06a67e15b9fa0f4ae2bbb5a4ad65bd5d406e0b7b19f168d4fdbd126b36d67a"
+      descriptor_sha256: "de2937190f16cc7b7399ff7e9147e9e5208a0fba929902afaef9ab3eeb5864b0"
+      archive_sha256: "8ee05644133a33e17db53b664dec680a47885bbbf2e1889de4ffba93435d0794"
+  result: "pass"
+  evidence: "Both clean builds per release were byte-identical, GLBs were self-contained and bounded, and generated release artifacts remained ignored."
+
+renderer_selection:
+  reported_selection: "three-direct"
+  verified_selection: null
+  result: "fail"
+  evidence:
+    - "scripts/animation-pilot-benchmark.mjs parses the same generated GLBs for each named candidate, but it does not load or execute the three candidate renderer implementations."
+    - "controllerOperations and disposalAfterTenCycles are literal true values; every ownedResourceLeaks counter is a literal zero; closure sizes and pin status are literal inputs."
+    - "The resulting candidate scores do not prove the packet-required comparable mount/play/pause/seek/loop/speed/camera/mirror/reduced-motion/resize/failure/dispose workload."
+  triggered_stop_gate: "AP01R2-STOP-05"
+
+dependency_and_license_evidence:
+  result: "pass"
+  selected_package: "three@0.185.1"
+  integrity: "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg=="
+  license: "MIT"
+  runtime_dependency_count: 0
+  evidence: "Exact lock integrity, zero runtime dependency closure, source provenance, redistribution metadata, NOTICE, and root third-party notice all validated. Rejected candidates are absent from package.json and pnpm-lock.yaml."
+
+acceptance_evidence:
+  - id: "AP01R2-AC-01"
+    result: "pass"
+    evidence: "Base -> packet-only coordinator -> one candidate lineage is exact; the candidate changes 40 authorized paths and this handoff is the sole post-candidate path."
+  - id: "AP01R2-AC-02"
+    result: "pass"
+    evidence: "Catalog tests passed exactly 12 mappings over 199 variants, 187 unmapped variants, and near/case/equipment rejection."
+  - id: "AP01R2-AC-03"
+    result: "pass"
+    evidence: "Asset validation passed 12 entries and 12 self-contained GLBs in each of two releases with exact clips, props, sources, licenses, sizes, and hashes."
+  - id: "AP01R2-AC-04"
+    result: "pass"
+    evidence: "Project-authored assets and selected dependency have machine-valid provenance, license, redistribution, attribution, integrity, and NOTICE records."
+  - id: "AP01R2-AC-05"
+    result: "pass"
+    evidence: "Two clean builds per release are byte-identical; the cross-release difference policy validation passed."
+  - id: "AP01R2-AC-06"
+    result: "fail"
+    evidence: "The benchmark does not execute the candidate renderers or measured controller/disposal workloads; its decisive hard gates, leak counts, and closure inputs are literals."
+  - id: "AP01R2-AC-07"
+    result: "pass"
+    evidence: "The implemented Three adapter unit suite covers static frame, play/pause/seek, reduced motion, context loss, idempotent disposal, ten cycles, size rejection, and one real generated GLB parse."
+  - id: "AP01R2-AC-08"
+    result: "pass"
+    evidence: "Storage tests cover exact active identity, neighbor/case/cancellation rejection, verified blobs, checksum enforcement, and unchanged journal state."
+  - id: "AP01R2-AC-09"
+    result: "pass"
+    evidence: "Storage suites cover install, failed mutations, update, in-memory backend relaunch, rollback, and remove identities."
+  - id: "AP01R2-AC-10"
+    result: "fail"
+    evidence: "The lifecycle test reads all 12 verified blobs after recreating AnimationPackStore over MemoryAnimationPackBackend with zero fetch calls, but it neither uses the OPFS backend nor mounts and plays all 12 blobs through the renderer."
+  - id: "AP01R2-AC-11"
+    result: "fail"
+    evidence: "The pilot lifecycle compares a detached Uint8Array sentinel and existing generic backup tests pass, but no lifecycle-phase personal-table hash/count capture or backup-v5 export assertion derives the committed JSON claims."
+  - id: "AP01R2-AC-12"
+    result: "fail"
+    evidence: "The DOM test sets innerWidth to 320 only. The 390 value exists in CSS and a generated report, but no DOM/browser test executes at 390 CSS px."
+  - id: "AP01R2-AC-13"
+    result: "fail"
+    evidence: "Bundle and asset-size gates are measured, and renderer unit diagnostics reach zero, but the benchmark report hard-codes frame/controller/disposal results and the performance report hard-codes retainedArchiveMultiplier and resourceLeaks."
+  - id: "AP01R2-AC-14"
+    result: "pass"
+    evidence: "Protected object diff, regression suites, locked versions, default production build, and service-worker audit passed with zero pilot module/identity and zero animation-pack precache presence."
+  - id: "AP01R2-AC-15"
+    result: "fail"
+    evidence: "All required command processes exited 0, but invalid/circular evidence triggers AP01R2-STOP-05 and AP01R2-STOP-07, so automated PASS and merge authorization are forbidden."
+
+checks:
+  required_commands_run: 21
+  command_processes_passed: 21
+  immutable_candidate_unchanged_after_commands: true
+  acceptance_audit: "fail"
+  triggered_stop_gates:
+    - "AP01R2-STOP-05"
+    - "AP01R2-STOP-07"
+  result: "fail"
+  evidence: "Commands, builds, and tests exited 0, but source-to-evidence auditing found unmeasured literal benchmark/lifecycle/accessibility claims."
+
+protected_path_audit:
+  result: "pass"
+  candidate_path_count: 40
+  unauthorized_paths: []
+  forbidden_paths_changed: []
+  locked_versions_changed: false
+  protected_contracts_changed: false
+  database_or_migration_changed: false
+  backup_implementation_changed: false
+  feature_pages_changed: false
+  pwa_update_logic_changed: false
+  public_assets_changed: false
+  tracked_release_binaries: []
+  runtime_network_primitives: []
+  default_build_pilot_modules: 0
+  default_build_pilot_identity_present: false
+  animation_pack_precache_present: false
+
+known_risks:
+  - "Renderer selection is not authorized because the three candidates were not run through the claimed comparable workload."
+  - "Offline relaunch/playback is not proven with the real OPFS backend and all 12 assets through the selected renderer."
+  - "The committed accessibility report claims 320 and 390 CSS px, but automated DOM coverage runs only 320 px."
+  - "Personal-data, backup, retained-archive, resource-leak, and portions of benchmark evidence are asserted as literals instead of derived from the tested operations."
+  - "No cold, owner, independent, named, visual, VoiceOver, biomechanics, legal, or physical-device review ran; none is claimed as passed."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  rights_review: "not_run"
+  motion_review: "not_run"
+  equipment_review: "not_run"
+  visual_review: "not_run"
+  voiceover_review: "not_run"
+  physical_device_review: "not_run"
+  battery_thermal_memory_measurement: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "ANIMATION-PILOT-01-REV-02"
+  candidate_commit: "9d9c87e0c6a832421c4f395468481f7147fc476a"
+  status: "FAIL"
+  checks:
+    - command: "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+      result: "pass"
+      evidence: "Preflight completed offline with a clean worktree; candidate rerun reported all 10 workspace projects already up to date in 265 ms and left the immutable candidate clean."
+    - command: "pnpm animation:pilot:validate"
+      result: "pass"
+      evidence: "VALID 2 releases, 12 exact variants, deterministic self-contained GLB."
+    - command: "pnpm animation:pilot:repro"
+      result: "pass"
+      evidence: "PASS reproducibility b39954ed334d5800c87d83f748a44fbf70629200a4402fa3d23d30f43de9bda0."
+    - command: "pnpm animation:pilot:evidence:validate"
+      result: "pass"
+      evidence: "PASS evidence schema: 7 reports. This validates shape/finiteness, not whether every reported value was derived."
+    - command: "pnpm exec vitest run packages/catalog/src/animation-catalog.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts apps/web/src/pilot/AnimationPilotApp.test.tsx"
+      result: "pass"
+      evidence: "4 files and 74 tests passed, 0 failed."
+    - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx packages/storage/src/animation-pack/archive.test.ts packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts"
+      result: "pass"
+      evidence: "10 files and 366 tests passed, 0 failed."
+    - command: "pnpm exec vitest run scripts/animation-pilot-assets.test.mjs scripts/animation-pilot-evidence.test.mjs scripts/animation-pack-v1.test.mjs"
+      result: "pass"
+      evidence: "3 files and 6 tests passed, 0 failed; the immutable FOUNDATION-03 Node suite passed through the test bridge."
+    - command: "pnpm run content:validate"
+      result: "pass"
+      evidence: "3 files and 14 tests passed, including exact pilot source/catalog validation."
+    - command: "pnpm run content:audit"
+      result: "pass"
+      evidence: "All content, provenance, sentinel, pinned renderer closure, lock integrity, NOTICE, nutrition, pack, and placeholder audits printed PASS."
+    - command: "pnpm exec eslint packages/catalog/src/animation-catalog.ts packages/catalog/src/animation-catalog.test.ts packages/catalog/src/index.ts packages/storage/src/animation-pack/store.ts packages/storage/src/animation-pack/store.test.ts packages/storage/src/animation-pack/index.ts packages/media/src/gltf-renderer.ts packages/media/src/gltf-renderer.test.ts packages/media/src/index.ts apps/web/src/pilot apps/web/src/App.tsx apps/web/src/App.test.tsx scripts/animation-pilot-assets.mjs scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/content-validate.mjs scripts/content-audit.mjs scripts/performance-report.mjs --max-warnings=0"
+      result: "pass"
+      evidence: "Exited 0 with no warning or diagnostic."
+    - command: "pnpm run typecheck"
+      result: "pass"
+      evidence: "TypeScript project references exited 0 with no diagnostic."
+    - command: "pnpm run architecture:audit"
+      result: "pass"
+      evidence: "Architecture boundaries verified."
+    - command: "pnpm animation:pilot:benchmark:desktop"
+      result: "pass"
+      evidence: "Process exited 0 and reported three-direct, but audit found that the renderer operations, disposal gates, resource counters, closure sizes, and pin decisions are literal rather than measured; AP01R2-STOP-05 therefore applies."
+    - command: "pnpm animation:pilot:build-pwa"
+      result: "pass"
+      evidence: "Pilot mode built 2765 modules; 41 PWA precache entries totaled 3884.38 KiB and the maximum JavaScript asset was 623238 bytes."
+    - command: "pnpm animation:pilot:audit-pwa"
+      result: "pass"
+      evidence: "PASS pilot PWA audit: 44 files, 3978370 precache bytes, zero release/precache payload."
+    - command: "pnpm run build"
+      result: "pass"
+      evidence: "Production built 2761 modules; PWA generation reported 38 entries and 3207.08 KiB."
+    - command: "pnpm run performance:report"
+      result: "pass"
+      evidence: "PASS performance: entry 203.6 KiB, initial graph 610.9 KiB, precache 3207.8 KiB; zero pilot module/identity and zero pack precache presence."
+    - command: "pnpm run verify:affected"
+      result: "pass"
+      evidence: "Exited 0 on the clean candidate with architecture verified and a documentation-only message; this script inspects dirty paths, so focused suites and full verify provide candidate coverage."
+    - command: "pnpm run verify"
+      result: "pass"
+      evidence: "Architecture, full lint, typecheck, content validation/audit, 30 Vitest files with 536 tests, production build, PWA generation, and performance budgets passed."
+    - command: "git diff --check coordinator_commit..candidate_commit"
+      result: "pass"
+      evidence: "Resolved d61759245c8a2c86a7659dfb12164fe962d515b4..9d9c87e0c6a832421c4f395468481f7147fc476a; exited 0 with no output."
+    - command: "assert lineage, authorized paths, exact 12/199 mappings, two releases, source/license relations, dependency integrities, locked versions, no tracked release binary, no runtime network, no default-build pilot/rejected-renderer code, no pack/precache byte, and unchanged protected objects"
+      result: "pass"
+      evidence: "Read-only candidate assertions passed exact lineage, 40 authorized paths, focused 12/199 catalog test, releases/provenance/integrity/versions, no tracked release binary/runtime network/rejected dependency/default pilot or pack precache, isolation fields, and unchanged protected objects."
+    - command: "audit benchmark and acceptance evidence against the implementation"
+      result: "fail"
+      evidence: "Source audit found literal non-derived benchmark/leak metrics, no all-12 OPFS renderer playback, no lifecycle-derived personal/backup evidence, and no 390 px DOM/browser execution; AP01R2-STOP-05 and AP01R2-STOP-07 are active."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-PILOT-01-REV-02.yaml"
+  coordinator_range: "5e02b61c551954c9633b57473dab96a795cf95e2..d61759245c8a2c86a7659dfb12164fe962d515b4"
+  candidate_range: "d61759245c8a2c86a7659dfb12164fe962d515b4..9d9c87e0c6a832421c4f395468481f7147fc476a"
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-handoff.yaml"
+  next_task: "Coordinator must treat this candidate as failed and issue a separate bounded fixer packet for the failed automated evidence; do not merge this candidate."
