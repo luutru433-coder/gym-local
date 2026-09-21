@@ -1,0 +1,228 @@
+schema_version: 3
+packet_id: "ANIMATION-PILOT-01-REV-02-FIX-02"
+status: "automated_fail"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "Implementation and automated verification used gpt-5.6-sol."
+subagents_used: false
+
+base_commit: "d6f44707b757ed4294a2d6ba29ac781745709938"
+failed_candidate_commit: "b5b8a321b60e3bb7f07c0c50c72597724ce1185a"
+failed_metadata_commit: "d6f44707b757ed4294a2d6ba29ac781745709938"
+producer_start_commit: "a0f7f96dc71867e7bcbface825576aaef2133844"
+candidate_parent_commit: "a0f7f96dc71867e7bcbface825576aaef2133844"
+candidate_commit: "d966f4bfe5ebbfd959198c3865f3c6f17926249a"
+branch: "codex/animation-pilot-01-rev-02-fix-02"
+
+changed_paths:
+  candidate:
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+  post_candidate_metadata:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml"
+
+finding_resolution:
+  - id: "AP01R2-FIX-02-F01"
+    result: "implemented_but_not_fully_verified"
+    evidence: "Candidate removes wall-clock timing from committed JSON and score/selection while continuing to measure real elapsed time through a noncommitted diagnostic callback. The standalone candidate benchmark passed and left the tracked report unchanged."
+  - id: "AP01R2-FIX-02-F02"
+    result: "fail"
+    evidence: "The required multi-file Vitest command exposed a shared-output race: the new two-rerun test and animation-pilot-assets.test.mjs concurrently invoked reproducePilot(), causing ENOENT, staging_identity_mismatch, and source_changed failures."
+
+workload_preservation_evidence:
+  result: "pass_for_executed_standalone_benchmark"
+  evidence: "Candidate check 4 executed all three pinned candidates over two releases, 12 variants, and ten cycles with 240 parses, 240 mounts, 130 trace entries, failure/disposal coverage, measured dependency closure, and zero remote requests per candidate; three-direct remained selected."
+
+deterministic_score_and_selection_evidence:
+  result: "pass_for_executed_standalone_benchmark"
+  selected: "three-direct"
+  scores:
+    three-direct: 3981390
+    babylon-modular: 2929347
+    google-model-viewer: 3934825
+  evidence: "Committed score operands are operation counters and package metadata only. Candidate check 4 regenerated renderer-benchmark.json with the exact HEAD blob cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd."
+
+timing_diagnostic_policy:
+  result: "implemented"
+  evidence: "performance.now() measures the unchanged real workload, but timing is passed only to onTimingDiagnostic and CLI diagnostic output. Timing is absent from committed evidence, hard gates, score, sorting, tie-break, and selection."
+
+benchmark_rerun_evidence:
+  result: "not_completed"
+  expected_head_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  candidate_check_4_worktree_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  evidence: "The standalone candidate benchmark was byte-identical and Git-clean. The two packet-required immutable-candidate rerun commands were not run after stop gate AP01R2-FIX-02-STOP-08 triggered."
+
+regression_test_evidence:
+  result: "fail"
+  test_name: "keeps committed renderer benchmark bytes and scores stable across reruns"
+  evidence: "The test executes real reruns and asserts HEAD bytes, score vectors, three-direct selection, timing diagnostics, and Git cleanliness, but it is not concurrency-safe with the existing asset test because both mutate the same ignored output root."
+
+acceptance_evidence:
+  - id: "AP01R2-FIX-02-AC-01"
+    result: "pass"
+    evidence: "Candidate d966f4bf is the single direct child of packet-only coordinator a0f7f96d; FIX-01 remains unmerged, untagged, and absent from the coordinator ledger."
+  - id: "AP01R2-FIX-02-AC-02"
+    result: "pass_for_executed_standalone_benchmark"
+    evidence: "Candidate check 4 retained the full three-candidate real workload and operation-derived evidence."
+  - id: "AP01R2-FIX-02-AC-03"
+    result: "pass_for_executed_standalone_benchmark"
+    evidence: "Source and report show wall-clock timing only in noncommitted diagnostics and no timing operand in hard gates, score, ordering, tie-break, or selection."
+  - id: "AP01R2-FIX-02-AC-04"
+    result: "not_completed"
+    evidence: "Standalone selection and scores were stable, but the required repeated candidate regression command failed before completing both reruns."
+  - id: "AP01R2-FIX-02-AC-05"
+    result: "fail"
+    evidence: "The execution-based regression test conflicts with the concurrently executed asset test over outputs/animation-pilot."
+  - id: "AP01R2-FIX-02-AC-06"
+    result: "not_run"
+    evidence: "Both dedicated immutable-candidate rerun commands were skipped after the mandatory stop gate."
+  - id: "AP01R2-FIX-02-AC-07"
+    result: "fail"
+    evidence: "Required check 7 failed; checks 8 through 27 were not run under the packet stop rule."
+  - id: "AP01R2-FIX-02-AC-08"
+    result: "fail"
+    evidence: "This schema-valid handoff records automated FAIL and merge_authorized false because not all required commands passed."
+
+checks:
+  required_commands: 27
+  required_commands_run: 7
+  required_commands_passed: 6
+  required_commands_failed: 1
+  required_commands_not_run: 20
+  immutable_candidate_unchanged_after_commands: true
+  triggered_stop_gates:
+    - "AP01R2-FIX-02-STOP-08"
+  result: "fail"
+  evidence: "Verification stopped immediately after the first required command failure. Candidate HEAD and the renderer benchmark HEAD blob remained unchanged and Git was clean before this handoff was written."
+
+protected_path_audit:
+  result: "pass"
+  candidate_path_count: 5
+  unauthorized_paths: []
+  forbidden_paths_changed: []
+  locked_versions_changed: false
+  product_behavior_changed: false
+  renderer_production_changed: false
+  storage_or_contract_changed: false
+  database_or_backup_changed: false
+  catalog_mapping_changed: false
+  animation_assets_changed: false
+  route_or_pwa_changed: false
+  package_or_lockfile_changed: false
+
+known_risks:
+  - "Candidate d966f4bf is invalidated by a required automated test failure and must not be amended, replaced, merged, pushed, checkpointed, or entered in the ledger as passing."
+  - "The regression test needs a separately authorized retry candidate that serializes or isolates shared output generation without weakening the real workload or its Git-clean assertions."
+  - "Checks 8 through 27 are unexecuted and must not be inferred as passing."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  named_reviewers: "not_run"
+  manual_review: "not_run"
+  physical_device_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "ANIMATION-PILOT-01-REV-02-FIX-02"
+  candidate_commit: "d966f4bfe5ebbfd959198c3865f3c6f17926249a"
+  status: "FAIL"
+  checks:
+    - command: "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+      result: "pass"
+      evidence: "Offline frozen install exited 0 on candidate d966f4bf; HEAD stayed unchanged and Git status was empty."
+    - command: "pnpm animation:pilot:validate"
+      result: "pass"
+      evidence: "VALID 2 releases, 12 exact variants, deterministic self-contained GLB."
+    - command: "pnpm animation:pilot:repro"
+      result: "pass"
+      evidence: "PASS reproducibility b39954ed334d5800c87d83f748a44fbf70629200a4402fa3d23d30f43de9bda0."
+    - command: "pnpm animation:pilot:benchmark:desktop"
+      result: "pass"
+      evidence: "PASS renderer benchmark: three-direct; real diagnostic timings were emitted for all three candidates, the HEAD evidence blob remained cbc85c6e, and Git stayed clean."
+    - command: "pnpm animation:pilot:evidence:validate"
+      result: "pass"
+      evidence: "PASS evidence schema: 7 reports; Git stayed clean."
+    - command: "pnpm exec vitest run packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts apps/web/src/pilot/AnimationPilotApp.test.tsx"
+      result: "pass"
+      evidence: "4 test files and 88 tests passed."
+    - command: "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs"
+      result: "fail"
+      evidence: "2 of 3 files failed: concurrent reproducePilot() calls raced on outputs/animation-pilot, producing ENOENT for source-a/1.0.1/assets, staging_identity_mismatch for build-a/.1.0.1.animation-pack-v1.staging, and source_changed for pack-source.json."
+    - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx packages/storage/src/animation-pack/archive.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run content:validate"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run content:audit"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm exec eslint apps/web/src/pilot/AnimationPilotApp.test.tsx packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/animation-pilot-evidence.test.mjs scripts/performance-report.mjs --max-warnings=0"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run typecheck"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run architecture:audit"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm animation:pilot:build-pwa"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm animation:pilot:audit-pwa"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run build"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run performance:report"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run verify:affected"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm run verify"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "assert exact parentage, one-file coordinator delta, candidate changed paths subset, metadata-only handoff delta, locked versions, exact 12/199 mappings, unchanged protected objects, no tracked release binary, no runtime network, no default-build pilot/rejected-renderer code, no pack/precache byte, and no merge of failed candidate as-is"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "audit benchmark and evidence source/reports: reject literal pass booleans, zero leak literals, dependency closure literals, score literals, detached personal sentinels, in-memory-only lifecycle, missing OPFS backend, missing all-12 renderer playback, missing 390 CSS px execution, or retained-archive/resource-leak metrics not derived from operations"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern \"keeps committed renderer benchmark bytes and scores stable across reruns\""
+      result: "not_run"
+      evidence: "Not run as the dedicated command after AP01R2-FIX-02-STOP-08; the same test failed within required check 7 because of the shared-output race."
+    - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $actual = (git hash-object -- $path).Trim(); if ($actual -ne $expected) { Write-Error "benchmark rerun 1 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 1 left Git dirty"; exit 1 }'
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $actual = (git hash-object -- $path).Trim(); if ($actual -ne $expected) { Write-Error "benchmark rerun 2 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 2 left Git dirty"; exit 1 }'
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "audit benchmark determinism: reject raw performance.now(), Date.now(), process.hrtime(), elapsed duration, randomized values, host load, or scheduler variation in any committed field, hard gate, score operand, sort key, tie-break, or selected renderer; prove any real timing is noncommitted/nonselection diagnostic or reproducibly encoded"
+      result: "not_run"
+      evidence: "Not run after AP01R2-FIX-02-STOP-08."
+    - command: "assert HEAD equals candidate_commit before and after all required commands, git status --porcelain is empty, renderer-benchmark.json at HEAD equals the working-tree bytes, and the candidate commit was not amended or replaced"
+      result: "not_run"
+      evidence: "Not run as a final packet check after AP01R2-FIX-02-STOP-08; immediately after failure, HEAD was still d966f4bf, the evidence blob matched HEAD, and Git was clean."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-02.yaml"
+  finding_scoped_candidate_range: "a0f7f96dc71867e7bcbface825576aaef2133844..d966f4bfe5ebbfd959198c3865f3c6f17926249a"
+  complete_updated_pilot_range: "d61759245c8a2c86a7659dfb12164fe962d515b4..d966f4bfe5ebbfd959198c3865f3c6f17926249a"
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml"
+  next_task: "Create a new bounded fixer packet for the shared-output concurrency failure. Do not merge, push, update the ledger, or create a checkpoint from this failed candidate."
