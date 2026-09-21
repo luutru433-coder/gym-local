@@ -257,3 +257,74 @@ checkpoints:
       - "No optional human or device evidence was collected for GOVERNANCE-02."
       - "Historical superseded language remains unchanged and must be interpreted under ADR 0021."
     next_packet: "ANIMATION-PILOT-01-REV-02 in a separate task"
+
+  - id: "ANIMATION-PILOT-01-REV-02-FIX-03"
+    status: "merged_automated_pass"
+    recorded_at: "2026-09-21T23:15:55.0330938+07:00"
+    target_branch: "main"
+    merge_mode: "fast_forward"
+    lineage_base_commit: "3b593af37993760a35966d29b2c97a841792f5e7"
+    coordinator_packet_commit: "647cb70175813f198099ccf3fb0141a10fb4e022"
+    failed_fix_02_candidate_commit: "d966f4bfe5ebbfd959198c3865f3c6f17926249a"
+    failed_fix_02_handoff_commit: "3b593af37993760a35966d29b2c97a841792f5e7"
+    candidate_commit: "d7949341de14761f1abff80314272932eee0809d"
+    handoff_commit: "89dd9f28ef098d25e936c01b55ef612459c8ed1b"
+    handoff_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-03-handoff.yaml"
+    merged_head: "89dd9f28ef098d25e936c01b55ef612459c8ed1b"
+    checkpoint_commit_resolution: "The non-self-referential coordinator checkpoint commit is resolved by checkpoint/animation-pilot-01-rev-02-fix-03-automated-pass."
+    verdict: "AUTOMATED_PASS"
+    merge_authorized: true
+    required_checks:
+      total: 30
+      passed: 30
+      failed: 0
+      not_run: 0
+      triggered_stop_gates: []
+    automated_verification:
+      schema_version: 1
+      status: "PASS"
+      record: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-03-handoff.yaml#automated_verification"
+      candidate_commit: "d7949341de14761f1abff80314272932eee0809d"
+      merge_authorized: true
+    independent_coordinator_audit:
+      model: "gpt-5.6-sol"
+      subagents_used: false
+      status: "PASS"
+      candidate_immutable: true
+      candidate_paths_authorized: true
+      handoff_commit_metadata_only: true
+      handoff_schema_valid: true
+      exact_required_command_records: 30
+      benchmark_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+      selected_renderer: "three-direct"
+      deterministic_scores:
+        three-direct: 3981390
+        babylon-modular: 2929347
+        google-model-viewer: 3934825
+      concurrency_stress_iterations: 5
+      concurrency_stress_passed: 5
+      invocation_state_leaks: 0
+    verification:
+      - command: "Independent exact lineage, allowed-path, handoff-only, YAML schema, 30-command record, locked-version, benchmark-byte, selection, score, and optional-review-gate audit"
+        result: "pass"
+        evidence: "Lineage is exactly 3b593af3 -> 647cb701 -> d7949341 -> 89dd9f28; the candidate changed six authorized paths; the direct-child handoff commit added only its declared report; all 30 exact records are pass; optional manual evidence is empty/not_run and supplies no gate; benchmark blob is cbc85c6e with three-direct and scores 3981390/2929347/3934825."
+      - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $candidate = (git rev-parse HEAD).Trim(); $expected = (git rev-parse "HEAD:$path").Trim(); 1..5 | ForEach-Object { pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs --pool=threads --fileParallelism --maxWorkers=3; if ($LASTEXITCODE -ne 0) { Write-Error "parallel stress iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during parallel stress"; exit 1 }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "parallel stress changed tracked renderer evidence"; exit 1 }; if (git status --porcelain) { Write-Error "parallel stress left Git dirty"; exit 1 }'
+        result: "pass"
+        evidence: "Independent candidate rerun passed all five iterations; each iteration passed the exact three files and eight tests in the explicit threads/file-parallel pool. Candidate d7949341, benchmark blob cbc85c6e, and Git cleanliness remained unchanged."
+      - command: "Independent output-isolation, cleanup, source-state, workload, score derivation, selection derivation, candidate immutability, and foreign-sentinel assertions"
+        result: "pass"
+        evidence: "Nine reproducePilot consumers hold canonical invocation ownership through their last read; no retry, sleep, failure swallowing, or disabled file parallelism exists; no invocation/staging/lock artifact leaked; the foreign sentinel remained byte-identical; the 2-release/12-variant/10-cycle workload, operation traces, closure bytes, gates, scores, and three-direct selection were re-derived from committed source/evidence."
+      - command: "Parse every YAML file under docs/ai, validate the FIX-03 packet/handoff/ledger records, and run git diff --check"
+        result: "pass"
+        evidence: "All active docs/ai YAML parses successfully; FIX-03 retains 27 inherited plus 3 additional exact commands, the handoff has 30 passing records and merge_authorized true, and the checkpoint delta is ledger-only with no whitespace errors."
+    optional_evidence:
+      cold_review: "not_run"
+      owner_review: "not_run"
+      independent_or_named_review: "not_run"
+      manual_or_device_review: "not_run"
+      pass_claimed: false
+    checkpoint_tag: "checkpoint/animation-pilot-01-rev-02-fix-03-automated-pass"
+    known_risks:
+      - "No optional visual, biomechanics, equipment-fidelity, legal, VoiceOver, battery, thermal, memory, or physical-device evidence was collected or reported as passed."
+      - "The generated-output regression intentionally preserves an ignored foreign sentinel to prove invocation cleanup does not delete state it does not own."
+    next_packet: "ANIMATION-WAVE-01 coordinate packet in a separate task after this checkpoint tag exists"
