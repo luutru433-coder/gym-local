@@ -596,11 +596,14 @@ export async function validateEvidence({ regenerate = true } = {}) {
     || candidate.workload.mountedAssets !== 240
     || candidate.workload.operationTrace.length !== 130
     || candidate.workload.remoteRequestAttempts !== 0
-    || !(candidate.workload.timing.durationMs > 0)
+    || "timing" in candidate.workload
     || !(candidate.closureBytes > 0)
     || candidate.packages.some((item) => !item.versionMatches || !item.integrityMatches || !item.licenseMatches)
   ))) {
     throw new Error("Renderer benchmark did not record the comparable measured workload.");
+  }
+  if (benchmark.environment.timingPolicy !== "wall-clock timing is emitted only as a noncommitted, nonselection diagnostic") {
+    throw new Error("Renderer benchmark does not declare the noncommitted timing policy.");
   }
   const lifecycle = JSON.parse(await readFile(join(PILOT_EVIDENCE_ROOT, "offline-rollback.json"), "utf8"));
   if (

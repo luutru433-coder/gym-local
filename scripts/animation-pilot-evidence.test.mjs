@@ -3,11 +3,19 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PILOT_EVIDENCE_ROOT } from "./animation-pilot-assets.mjs";
+import { runRendererBenchmark } from "./animation-pilot-benchmark.mjs";
 import { validateEvidence } from "./animation-pilot-evidence.mjs";
+
+const benchmarkRelativePath = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json";
+
+function gitStatus() {
+  return execFileSync("git", ["status", "--porcelain"], { encoding: "utf8" });
+}
 
 describe("animation pilot evidence", () => {
   it("materializes seven finite schema-valid reports without optional review claims", async () => {
@@ -32,7 +40,7 @@ describe("animation pilot evidence", () => {
         remoteRequestAttempts: 0
       });
       expect(candidate.workload.operationTrace).toHaveLength(130);
-      expect(candidate.workload.timing.durationMs).toBeGreaterThan(0);
+      expect(candidate.workload).not.toHaveProperty("timing");
       expect(candidate.closureBytes).toBeGreaterThan(0);
       expect(candidate.packages.every((item) => item.versionMatches && item.integrityMatches && item.licenseMatches)).toBe(true);
       expect(Object.values(candidate.ownedResourceLeaks).every((count) => count === 0)).toBe(true);
@@ -86,4 +94,25 @@ describe("animation pilot evidence", () => {
     expect(performance.resourceDerivation.rendererDiagnostics).toMatchObject({ mounts: 12, disposals: 12 });
     expect(performance.resourceDerivation.objectStates.at(-1)).toMatchObject({ phase: "remove", archiveBytes: 0 });
   }, 30_000);
+
+  it("keeps committed renderer benchmark bytes and scores stable across reruns", async () => {
+    const benchmarkPath = join(process.cwd(), benchmarkRelativePath);
+    const committedBytes = execFileSync("git", ["show", `HEAD:${benchmarkRelativePath}`]);
+    const committed = JSON.parse(committedBytes.toString("utf8"));
+    const expectedScores = committed.candidates.map(({ id, score }) => ({ id, score }));
+
+    for (let rerun = 1; rerun <= 2; rerun += 1) {
+      const timingDiagnostics = [];
+      const report = await runRendererBenchmark({ onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic) });
+      const rerunBytes = await readFile(benchmarkPath);
+
+      expect(rerunBytes, `rerun ${rerun} changed committed benchmark bytes`).toEqual(committedBytes);
+      expect(report.candidates.map(({ id, score }) => ({ id, score }))).toEqual(expectedScores);
+      expect(report.selected).toBe("three-direct");
+      expect(timingDiagnostics).toHaveLength(3);
+      expect(timingDiagnostics.every(({ durationMs, averageAssetMs }) => durationMs > 0 && averageAssetMs > 0)).toBe(true);
+      expect(JSON.stringify(report)).not.toContain('"timing"');
+      expect(gitStatus(), `rerun ${rerun} left Git dirty`).toBe("");
+    }
+  }, 60_000);
 });

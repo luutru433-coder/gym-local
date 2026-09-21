@@ -4,7 +4,8 @@
   "status": "pass",
   "environment": {
     "scope": "automated desktop Node workload",
-    "physicalDeviceClaimed": false
+    "physicalDeviceClaimed": false,
+    "timingPolicy": "wall-clock timing is emitted only as a noncommitted, nonselection diagnostic"
   },
   "selectionRule": "highest deterministic score among hard-gate passers; tie selects smaller closure",
   "selected": "three-direct",
@@ -861,11 +862,7 @@
           }
         ],
         "measuredFailures": [],
-        "remoteRequestAttempts": 0,
-        "timing": {
-          "durationMs": 173.508,
-          "averageAssetMs": 0.722949
-        }
+        "remoteRequestAttempts": 0
       },
       "hardGates": {
         "metadataAndLicense": true,
@@ -1782,11 +1779,7 @@
         "measuredFailures": [
           "resize"
         ],
-        "remoteRequestAttempts": 0,
-        "timing": {
-          "durationMs": 700.399,
-          "averageAssetMs": 2.91833
-        }
+        "remoteRequestAttempts": 0
       },
       "hardGates": {
         "metadataAndLicense": true,
@@ -1798,7 +1791,7 @@
         "scene": 0,
         "webglContext": 0
       },
-      "score": 2929346
+      "score": 2929347
     },
     {
       "id": "google-model-viewer",
@@ -2762,11 +2755,7 @@
           }
         ],
         "measuredFailures": [],
-        "remoteRequestAttempts": 0,
-        "timing": {
-          "durationMs": 182.801,
-          "averageAssetMs": 0.761673
-        }
+        "remoteRequestAttempts": 0
       },
       "hardGates": {
         "metadataAndLicense": true,

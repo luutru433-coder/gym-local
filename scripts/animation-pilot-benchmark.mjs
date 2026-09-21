@@ -537,7 +537,7 @@ async function measuredCandidateWorkload(candidate, reproduction) {
   const adapter = await createCandidateAdapter(candidate);
   const expectedAssets = reproduction.declarations.releases.releases.length
     * reproduction.declarations.source.variants.length * 10;
-  const startedAt = performance.now();
+  const diagnosticStartedAt = performance.now();
   const nativeFetch = globalThis.fetch;
   let remoteRequestAttempts = 0;
   globalThis.fetch = async (input, init) => {
@@ -595,7 +595,7 @@ async function measuredCandidateWorkload(candidate, reproduction) {
     if (nativeFetch === undefined) Reflect.deleteProperty(globalThis, "fetch"); else globalThis.fetch = nativeFetch;
     leaks = await adapter.dispose();
   }
-  const durationMs = performance.now() - startedAt;
+  const diagnosticDurationMs = performance.now() - diagnosticStartedAt;
   return {
     expectedAssets,
     parsedAssets,
@@ -605,14 +605,14 @@ async function measuredCandidateWorkload(candidate, reproduction) {
     operationCounts: Object.fromEntries(operationCounts),
     leaks,
     remoteRequestAttempts,
-    timing: {
-      durationMs: Number(durationMs.toFixed(3)),
-      averageAssetMs: Number((durationMs / mountedAssets).toFixed(6))
+    timingDiagnostic: {
+      durationMs: Number(diagnosticDurationMs.toFixed(3)),
+      averageAssetMs: Number((diagnosticDurationMs / mountedAssets).toFixed(6))
     }
   };
 }
 
-export async function runRendererBenchmark({ writeEvidence = true } = {}) {
+export async function runRendererBenchmark({ writeEvidence = true, onTimingDiagnostic } = {}) {
   const reproduction = await reproducePilot({ writeEvidence: false });
   const lockText = await readFile("pnpm-lock.yaml", "utf8");
   const workload = [];
@@ -627,7 +627,8 @@ export async function runRendererBenchmark({ writeEvidence = true } = {}) {
     };
     const observedOperations = Object.values(measured.operationCounts).reduce((total, count) => total + count, 0);
     const passedGateCount = Object.values(hardGates).filter(Boolean).length;
-    const score = Math.round(passedGateCount * 1_000_000 + observedOperations + measured.parsedAssets + measured.frameEvents - metadata.closureBytes / 1024 - measured.timing.durationMs / 1000);
+    const score = Math.round(passedGateCount * 1_000_000 + observedOperations + measured.parsedAssets + measured.frameEvents - metadata.closureBytes / 1024);
+    onTimingDiagnostic?.({ id: candidate.id, ...measured.timingDiagnostic });
     workload.push({
       id: candidate.id,
       packages: metadata.packages,
@@ -647,8 +648,7 @@ export async function runRendererBenchmark({ writeEvidence = true } = {}) {
         operationCounts: measured.operationCounts,
         operationTrace: measured.operationTrace,
         measuredFailures: expectedOperations.filter((operation) => !(measured.operationCounts[operation] > 0)),
-        remoteRequestAttempts: measured.remoteRequestAttempts,
-        timing: measured.timing
+        remoteRequestAttempts: measured.remoteRequestAttempts
       },
       hardGates,
       ownedResourceLeaks: measured.leaks,
@@ -657,7 +657,19 @@ export async function runRendererBenchmark({ writeEvidence = true } = {}) {
   }
   const passing = workload.filter((candidate) => Object.values(candidate.hardGates).every(Boolean)).sort((left, right) => right.score - left.score || left.closureBytes - right.closureBytes || left.id.localeCompare(right.id));
   if (passing[0]?.id !== "three-direct") throw new Error("Renderer benchmark did not select three-direct deterministically.");
-  const report = { schemaVersion: 1, packetId: "ANIMATION-PILOT-01-REV-02", status: "pass", environment: { scope: "automated desktop Node workload", physicalDeviceClaimed: false }, selectionRule: "highest deterministic score among hard-gate passers; tie selects smaller closure", selected: passing[0].id, candidates: workload };
+  const report = {
+    schemaVersion: 1,
+    packetId: "ANIMATION-PILOT-01-REV-02",
+    status: "pass",
+    environment: {
+      scope: "automated desktop Node workload",
+      physicalDeviceClaimed: false,
+      timingPolicy: "wall-clock timing is emitted only as a noncommitted, nonselection diagnostic"
+    },
+    selectionRule: "highest deterministic score among hard-gate passers; tie selects smaller closure",
+    selected: passing[0].id,
+    candidates: workload
+  };
   if (writeEvidence) {
     await mkdir(PILOT_EVIDENCE_ROOT, { recursive: true });
     await writeFile(join(PILOT_EVIDENCE_ROOT, "renderer-benchmark.json"), stableJson(report));
@@ -666,7 +678,13 @@ export async function runRendererBenchmark({ writeEvidence = true } = {}) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  runRendererBenchmark().then((report) => process.stdout.write(`PASS renderer benchmark: ${report.selected}\n`)).catch((error) => {
+  const timingDiagnostics = [];
+  runRendererBenchmark({ onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic) }).then((report) => {
+    for (const diagnostic of timingDiagnostics) {
+      process.stdout.write(`DIAGNOSTIC renderer wall-clock timing (noncommitted/nonselection): ${diagnostic.id} ${diagnostic.durationMs} ms total, ${diagnostic.averageAssetMs} ms/asset\n`);
+    }
+    process.stdout.write(`PASS renderer benchmark: ${report.selected}\n`);
+  }).catch((error) => {
     process.stderr.write(`${error?.stack ?? error}\n`);
     process.exitCode = 1;
   });
