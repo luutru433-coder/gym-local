@@ -1,0 +1,338 @@
+schema_version: 3
+packet_id: "ANIMATION-PILOT-01-REV-02-FIX-01"
+status: "automated_pass"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "The fixer implementation and all automated verification were completed in this task with gpt-5.6-sol."
+subagents_used: false
+
+base_commit: "33f8454f99411d40e0518e6e64e3dcb6fe2b443b"
+failed_candidate_commit: "9d9c87e0c6a832421c4f395468481f7147fc476a"
+failed_metadata_commit: "33f8454f99411d40e0518e6e64e3dcb6fe2b443b"
+producer_start_commit: "21e801f1068b6d19472359b4c2f648c5462e8ab2"
+candidate_parent_commit: "21e801f1068b6d19472359b4c2f648c5462e8ab2"
+candidate_commit: "b5b8a321b60e3bb7f07c0c50c72597724ce1185a"
+branch: "codex/animation-pilot-01-rev-02-fix-01"
+
+changed_paths:
+  candidate:
+    - "THIRD_PARTY_NOTICES.md"
+    - "apps/web/src/pilot/AnimationPilotApp.test.tsx"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/accessibility-automation.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/offline-rollback.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/personal-data-isolation.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "docs/licenses/animation-pilot-01/NOTICE.md"
+    - "docs/licenses/animation-pilot-01/dependency-closure.json"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+  post_candidate_metadata:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-01-handoff.yaml"
+
+finding_resolution:
+  - id: "AP01R2-FIX-01-F01"
+    closes_acceptance: "AP01R2-AC-06"
+    result: "pass"
+    stop_gate_cleared: "AP01R2-STOP-05"
+    evidence: "All three exact pinned renderer candidates executed the same two-release, 12-variant, ten-cycle workload; operation traces, hard gates, dependency closure, timing, leaks, and scores derive from observed operations and installed metadata."
+  - id: "AP01R2-FIX-01-F02"
+    closes_acceptance: "AP01R2-AC-10"
+    result: "pass"
+    stop_gate_cleared: "AP01R2-STOP-07"
+    evidence: "The network-disabled lifecycle used OpfsAnimationPackBackend, relaunched through persisted state, exact-read 12 variants, and mounted and played all 12 SHA-256-verified Blob sources."
+  - id: "AP01R2-FIX-01-F03"
+    closes_acceptance: "AP01R2-AC-11"
+    result: "pass"
+    stop_gate_cleared: "AP01R2-STOP-07"
+    evidence: "All six lifecycle phases captured equal before/after personal-table hashes and counts; a real backup-v5 archive excluded all 30 checked descriptors, manifests, archives, and GLB artifacts plus pack identities."
+  - id: "AP01R2-FIX-01-F04"
+    closes_acceptance: "AP01R2-AC-12"
+    result: "pass"
+    stop_gate_cleared: "AP01R2-STOP-07"
+    evidence: "The DOM suite executed at 320 and 390 CSS px and retained keyboard, semantic status, reduced-motion static-frame, failure, and written-fallback assertions."
+  - id: "AP01R2-FIX-01-F05"
+    closes_acceptance: "AP01R2-AC-13"
+    result: "pass"
+    stop_gate_cleared: "AP01R2-STOP-07"
+    evidence: "The retained archive multiplier was recomputed from OPFS object byte state and resourceLeaks from post-lifecycle renderer active diagnostics, with 12 mounts and 12 disposals."
+
+renderer_benchmark_evidence:
+  result: "pass"
+  selected: "three-direct"
+  selection_rule: "highest deterministic score among hard-gate passers; ties select the smaller measured closure"
+  workload:
+    releases: 2
+    variants: 12
+    cycles: 10
+    parsed_assets_per_candidate: 240
+    mounted_assets_per_candidate: 240
+    operation_trace_entries_per_candidate: 130
+    remote_request_attempts_per_candidate: 0
+  candidates:
+    - id: "three-direct"
+      closure_packages: 1
+      closure_bytes: 23172772
+      measured_failures: []
+      owned_resource_leaks: 0
+      all_hard_gates_passed: true
+      score: 3981390
+    - id: "babylon-modular"
+      closure_packages: 3
+      closure_bytes: 75441598
+      measured_failures:
+        - "resize"
+      owned_resource_leaks: 0
+      all_hard_gates_passed: false
+      score: 2929346
+    - id: "google-model-viewer"
+      closure_packages: 13
+      closure_bytes: 69954415
+      measured_failures: []
+      owned_resource_leaks: 0
+      all_hard_gates_passed: true
+      score: 3934825
+  evidence_path: "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+
+opfs_lifecycle_evidence:
+  result: "pass"
+  backend: "OpfsAnimationPackBackend"
+  phases:
+    - "install"
+    - "offline-relaunch"
+    - "failed-update"
+    - "update"
+    - "rollback"
+    - "remove"
+  exact_variant_count: 12
+  verified_blob_count: 12
+  played_blob_count: 12
+  renderer_frame_events: 12
+  network_request_attempts: 0
+  text_fallback_preserved: true
+  final_archive_object_count: 0
+  evidence_path: "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/offline-rollback.json"
+
+personal_backup_isolation_evidence:
+  result: "pass"
+  lifecycle_phases_measured: 6
+  personal_table_hash_mismatches: 0
+  personal_table_count_mismatches: 0
+  personal_record_count_delta: 0
+  backup_version: 5
+  checked_pack_artifacts: 30
+  forbidden_string_matches: 0
+  forbidden_artifact_matches: 0
+  forbidden_byte_matches: 0
+  pack_bytes_in_backup: false
+  evidence_path: "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/personal-data-isolation.json"
+
+responsive_evidence:
+  result: "pass"
+  widths_css_px:
+    - 320
+    - 390
+  native_keyboard_controls: true
+  polite_atomic_status: true
+  written_fallback_always_present: true
+  reduced_motion_static_frame: true
+  failure_fallback: true
+  human_voiceover_claimed: false
+  evidence_path: "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/accessibility-automation.json"
+
+retained_archive_and_resource_evidence:
+  result: "pass"
+  retained_archive_multiplier: 1.9993341656263004
+  retained_archive_source: "Maximum measured archiveBytes divided by the largest measured retained archive file after install/update/rollback/remove."
+  resource_leaks: 0
+  renderer_diagnostics:
+    mounts: 12
+    static_frames: 12
+    disposals: 12
+    active_raf: 0
+    active_observers: 0
+    active_listeners: 0
+    active_canvases: 0
+    active_scenes: 0
+    active_mixers: 0
+    active_gpu_resources: 0
+    active_webgl_contexts: 0
+  evidence_path: "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+
+acceptance_evidence:
+  - id: "AP01R2-FIX-01-AC-01"
+    result: "pass"
+    evidence: "Exact lineage is failed candidate 9d9c87e0 -> failed metadata 33f8454f -> packet-only coordinator 21e801f1 -> fixer candidate b5b8a321; the candidate has one parent and 16 authorized changed paths."
+  - id: "AP01R2-FIX-01-AC-02"
+    result: "pass"
+    evidence: "Three renderer candidates produced actual 130-entry operation traces, measured closures, failures, counters, timing, gates, and scores; source audit found no legacy literal substitutes."
+  - id: "AP01R2-FIX-01-AC-03"
+    result: "pass"
+    evidence: "OPFS relaunch exact-read, rendered, and played all 12 verified Blobs with zero network attempts and preserved fallback text."
+  - id: "AP01R2-FIX-01-AC-04"
+    result: "pass"
+    evidence: "Six real lifecycle phases preserved all personal hashes/counts, and backup v5 excluded 30 complete pack artifacts and all identities."
+  - id: "AP01R2-FIX-01-AC-05"
+    result: "pass"
+    evidence: "Responsive DOM automation passed at both required widths with keyboard, semantics, reduced motion, failure, and written fallback behavior."
+  - id: "AP01R2-FIX-01-AC-06"
+    result: "pass"
+    evidence: "Bundle budgets, retained archive state, and zero active renderer resources were recomputed and cross-checked by evidence and performance validators."
+  - id: "AP01R2-FIX-01-AC-07"
+    result: "pass"
+    evidence: "The original protected implementation stayed unchanged; exact 12/199 mapping, releases, provenance, storage rejection, default-build exclusion, PWA deferral, nutrition separation, and locked versions passed full verification."
+  - id: "AP01R2-FIX-01-AC-08"
+    result: "pass"
+    evidence: "All 22 packet-required automated checks passed, no safety stop gate remains active, optional manual evidence is empty, and automated merge authorization is true."
+
+checks:
+  required_commands_run: 22
+  required_commands_passed: 22
+  immutable_candidate_unchanged_after_commands: true
+  acceptance_audit: "pass"
+  triggered_stop_gates: []
+  result: "pass"
+  evidence: "Every packet command passed before candidate creation; post-commit checks were read-only and confirmed exact lineage, scope, protected objects, and source-to-evidence derivation."
+
+protected_path_audit:
+  result: "pass"
+  candidate_path_count: 16
+  unauthorized_paths: []
+  forbidden_paths_changed: []
+  locked_versions_changed: false
+  protected_contracts_changed: false
+  database_or_migration_changed: false
+  backup_implementation_changed: false
+  normal_app_routes_changed: false
+  pwa_update_logic_changed: false
+  public_assets_changed: false
+  tracked_release_binaries: []
+  runtime_network_primitives: []
+  catalog_variants: 199
+  mapped_animation_variants: 12
+  unmapped_animation_variants: 187
+  default_build_pilot_modules: 0
+  default_build_pilot_identity_present: false
+  animation_pack_precache_present: false
+  pilot_pwa_release_payload_files: 0
+
+dependency_and_license_evidence:
+  result: "pass"
+  selected_package: "three@0.185.1"
+  selected_integrity: "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg=="
+  selected_license: "MIT"
+  selected_closure_packages: 1
+  benchmark_only_packages:
+    - "@babylonjs/core@9.23.0"
+    - "@babylonjs/loaders@9.23.0"
+    - "babylonjs-gltf2interface@9.23.0"
+    - "@google/model-viewer@4.3.1"
+  evidence: "Exact package versions, lock integrities, installed metadata, source URLs, recursive closures, NOTICE records, and root third-party notices passed content audit. Benchmark-only candidates are imported only by scripts/animation-pilot-benchmark.mjs and are absent from the default production graph."
+
+known_risks:
+  - "The comparable renderer benchmark is automated desktop Node evidence; it does not claim physical-device, thermal, battery, visual-quality, biomechanics, or legal review."
+  - "Babylon's measured NullEngine workload did not satisfy resize, so it remains rejected; this measured failure does not affect the selected Three adapter."
+  - "No cold, owner, independent, named, manual, VoiceOver, visual, biomechanics, legal, or physical-device review ran, and none is claimed as passed."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  rights_review: "not_run"
+  motion_review: "not_run"
+  equipment_review: "not_run"
+  visual_review: "not_run"
+  voiceover_review: "not_run"
+  physical_device_review: "not_run"
+  battery_thermal_memory_measurement: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "ANIMATION-PILOT-01-REV-02-FIX-01"
+  candidate_commit: "b5b8a321b60e3bb7f07c0c50c72597724ce1185a"
+  status: "PASS"
+  checks:
+    - command: "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+      result: "pass"
+      evidence: "Offline frozen install exited 0 before implementation and git status remained empty at producer start 21e801f1068b6d19472359b4c2f648c5462e8ab2."
+    - command: "pnpm animation:pilot:validate"
+      result: "pass"
+      evidence: "VALID 2 releases, 12 exact variants, deterministic self-contained GLB."
+    - command: "pnpm animation:pilot:repro"
+      result: "pass"
+      evidence: "PASS reproducibility b39954ed334d5800c87d83f748a44fbf70629200a4402fa3d23d30f43de9bda0."
+    - command: "pnpm animation:pilot:benchmark:desktop"
+      result: "pass"
+      evidence: "PASS renderer benchmark: three-direct; all three candidates executed 240 parses, 240 mounts, ten cycles, 130 trace entries, measured closure/gates/leaks/timing/score, and zero remote requests."
+    - command: "pnpm animation:pilot:evidence:validate"
+      result: "pass"
+      evidence: "PASS evidence schema: 7 reports; lifecycle generation executed real OPFS, database, backup-v5, and renderer operations before validation."
+    - command: "pnpm exec vitest run packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts apps/web/src/pilot/AnimationPilotApp.test.tsx"
+      result: "pass"
+      evidence: "4 test files and 88 tests passed, including 320/390 responsive cases."
+    - command: "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs"
+      result: "pass"
+      evidence: "3 test files and 6 tests passed; evidence schema validation printed PASS."
+    - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx packages/storage/src/animation-pack/archive.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts"
+      result: "pass"
+      evidence: "9 test files and 350 tests passed, including backup, storage, workout, app, and PWA update deferral coverage."
+    - command: "pnpm run content:validate"
+      result: "pass"
+      evidence: "3 test files and 14 tests passed plus content validation."
+    - command: "pnpm run content:audit"
+      result: "pass"
+      evidence: "All source, license, exact matrix, release sentinel, pinned closure, lock integrity, NOTICE, nutrition, pack, and placeholder checks printed PASS."
+    - command: "pnpm exec eslint apps/web/src/pilot/AnimationPilotApp.test.tsx packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/animation-pilot-evidence.test.mjs scripts/performance-report.mjs --max-warnings=0"
+      result: "pass"
+      evidence: "Exited 0 with no warning or diagnostic after the final source changes."
+    - command: "pnpm run typecheck"
+      result: "pass"
+      evidence: "TypeScript project references exited 0 with no diagnostic."
+    - command: "pnpm run architecture:audit"
+      result: "pass"
+      evidence: "Architecture boundaries verified."
+    - command: "pnpm animation:pilot:build-pwa"
+      result: "pass"
+      evidence: "Pilot mode built 2765 modules; PWA precached 41 entries at 3884.38 KiB and reproducibility passed."
+    - command: "pnpm animation:pilot:audit-pwa"
+      result: "pass"
+      evidence: "PASS pilot PWA audit: 44 files, 3978370 precache bytes, zero release/precache payload."
+    - command: "pnpm run build"
+      result: "pass"
+      evidence: "Typecheck and production build passed; Vite built 2761 modules and generated 38 PWA files with measured performance budgets passing."
+    - command: "pnpm run performance:report"
+      result: "pass"
+      evidence: "PASS performance: entry 203.6 KiB, initial graph 610.9 KiB, precache 3207.8 KiB; retained multiplier and renderer leak diagnostics recomputed without mismatch."
+    - command: "pnpm run verify:affected"
+      result: "pass"
+      evidence: "Architecture and typecheck passed; 30 test files and 537 tests passed."
+    - command: "pnpm run verify"
+      result: "pass"
+      evidence: "Architecture, full lint, typecheck, content validation/audit, 30 test files with 537 tests, production build, PWA generation, and performance report passed."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "pass"
+      evidence: "Resolved 21e801f1068b6d19472359b4c2f648c5462e8ab2..b5b8a321b60e3bb7f07c0c50c72597724ce1185a; exited 0 with no output."
+    - command: "assert exact parentage, one-file coordinator delta, candidate changed paths subset, metadata-only handoff delta, locked versions, exact 12/199 mappings, unchanged protected objects, no tracked release binary, no runtime network, no default-build pilot/rejected-renderer code, no pack/precache byte, and no merge of failed candidate as-is"
+      result: "pass"
+      evidence: "Read-only committed audit passed exact single-parent lineage, packet-only coordinator delta, 16 allowed candidate files, protected objects, locked 0.7.0/5/5/3/1/1/1 versions, protected 199-variant catalog with 12 mappings, and zero binary/network/default-build/precache leakage. The fixer changes the failed candidate rather than merging it as-is."
+    - command: "audit benchmark and evidence source/reports: reject literal pass booleans, zero leak literals, dependency closure literals, score literals, detached personal sentinels, in-memory-only lifecycle, missing OPFS backend, missing all-12 renderer playback, missing 390 CSS px execution, or retained-archive/resource-leak metrics not derived from operations"
+      result: "pass"
+      evidence: "Source scan found none of the legacy literal patterns; recomputation passed 3 real candidate workloads, 12 OPFS verified/playback Blobs, 6 personal-data phases, 30 backup artifacts, widths 320/390, retained multiplier 1.999334, and zero leaks derived from active diagnostics."
+  optional_manual_evidence: []
+  merge_authorized: true
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-01.yaml"
+  finding_scoped_candidate_range: "21e801f1068b6d19472359b4c2f648c5462e8ab2..b5b8a321b60e3bb7f07c0c50c72597724ce1185a"
+  complete_updated_pilot_range: "d61759245c8a2c86a7659dfb12164fe962d515b4..b5b8a321b60e3bb7f07c0c50c72597724ce1185a"
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-01-handoff.yaml"
+  next_task: "Coordinator may verify this direct-child handoff and fast-forward the complete updated pilot range under the packet merge rule; this producer did not merge or create a checkpoint."
