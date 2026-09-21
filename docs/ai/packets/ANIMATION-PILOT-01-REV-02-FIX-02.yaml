@@ -1,0 +1,354 @@
+schema_version: 3
+packet:
+  id: "ANIMATION-PILOT-01-REV-02-FIX-02"
+  title: "Make renderer benchmark evidence reproducible across reruns"
+  type: "review-fix"
+  status: "ready"
+
+supersession:
+  fixes_packet: "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-01.yaml"
+  failed_handoff: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-01-handoff.yaml"
+  failed_candidate_commit: "b5b8a321b60e3bb7f07c0c50c72597724ce1185a"
+  failed_metadata_commit: "d6f44707b757ed4294a2d6ba29ac781745709938"
+  failed_acceptance_ids:
+    - "AP01R2-FIX-01-AC-02"
+    - "AP01R2-FIX-01-AC-07"
+    - "AP01R2-FIX-01-AC-08"
+  triggered_stop_gates:
+    - "AP01R2-FIX-01-STOP-09"
+  audit_observation:
+    command: "pnpm animation:pilot:benchmark:desktop"
+    exit_code: 0
+    changed_tracked_path: "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    unstable_values:
+      - candidate: "babylon-modular"
+        committed_score: 2929346
+        rerun_score: 2929344
+      - candidate: "google-model-viewer"
+        committed_score: 3934825
+        rerun_score: 3934824
+    cause: "Raw performance.now() duration contributes directly to the committed score, so scheduler and wall-clock variation changes tracked evidence even when the executed workload and result are otherwise unchanged."
+  rule: "FIX-01 is not mergeable, its automated PASS is invalidated, and no ledger update or checkpoint may be created from it. This packet may repair only benchmark/evidence reproducibility."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "d6f44707b757ed4294a2d6ba29ac781745709938"
+  target_branch: "codex/animation-pilot-01-rev-02-fix-02"
+  worktree_required: true
+  sequential_after:
+    - "ANIMATION-PILOT-01-REV-02-FIX-01 invalidated by AP01R2-FIX-01-STOP-09"
+  producer_start_rule:
+    start_commit: "The committed ANIMATION-PILOT-01-REV-02-FIX-02 coordinator packet HEAD supplied to the producer."
+    required_parent: "The producer start commit's first parent must be exactly d6f44707b757ed4294a2d6ba29ac781745709938."
+    required_coordinator_delta:
+      - "git diff --name-only d6f44707b757ed4294a2d6ba29ac781745709938..HEAD must print only docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-02.yaml before producer edits."
+      - "The producer must not amend, delete, rewrite, or relabel FIX-01's packet, candidate, handoff, automated result, or audit history."
+    single_candidate_commit_rule: "The FIX-02 implementation is one immutable commit whose first parent is the producer start commit. All required automated commands run against that immutable candidate before the handoff commit is created."
+    handoff_commit_rule: "After automated verification, create one direct-child commit containing only the FIX-02 handoff."
+    review_range_rule: "The finding-scoped FIX-02 diff is producer_start_commit..candidate_commit. The complete updated pilot candidate range remains d61759245c8a2c86a7659dfb12164fe962d515b4..candidate_commit."
+
+authority:
+  allowed_paths:
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+  candidate_paths:
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "docs/ai/master-plan.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02.yaml"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-01.yaml"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-handoff.yaml"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "apps/**"
+    - "content/**"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/accessibility-automation.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/license-audit.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/offline-rollback.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/personal-data-isolation.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/release-reproducibility.json"
+    - "docs/licenses/**"
+    - "package.json"
+    - "packages/**"
+    - "pnpm-lock.yaml"
+    - "public/**"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "tests/**"
+    - "THIRD_PARTY_NOTICES.md"
+    - "vite.config.ts"
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  contract_or_schema_changes_allowed: false
+  database_or_backup_changes_allowed: false
+  catalog_mapping_changes_allowed: false
+  product_behavior_changes_allowed: false
+  renderer_production_changes_allowed: false
+  generated_binary_release_artifacts_allowed: false
+  tracked_production_binary_assets_allowed: false
+  tracked_binary_evidence_allowed: false
+  network_read_policy: "No new network reads. Benchmark, tests, evidence generation, and all verification must use the already installed exact pinned candidate packages and must preserve zero runtime remote-request attempts."
+  network_write_policy: "No upload, publication, telemetry, analytics, or external service mutation."
+  scraping_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-01.yaml"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-01-handoff.yaml"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-02.yaml"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "package.json"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+  accepted_adrs:
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+  locked_versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+    renderer_candidates:
+      - "three@0.185.1"
+      - "@babylonjs/core@9.23.0 + @babylonjs/loaders@9.23.0 + babylonjs-gltf2interface@9.23.0"
+      - "@google/model-viewer@4.3.1 + three@0.185.1"
+
+outcome:
+  objective: "Resolve only AP01R2-FIX-01-STOP-09 by making committed renderer benchmark evidence, deterministic score, and three-direct selection byte-stable across repeated execution of the real three-candidate workload."
+  user_visible_result: "None. Product behavior, routes, renderer production code, storage, contracts, database, backup, catalog mappings, and animation assets remain unchanged."
+  deliverables:
+    - "The same real two-release, 12-variant, ten-cycle workload still executes for all three exact pinned renderer candidates and still derives traces, controller observations, failures, leaks, closure, hard gates, and score from actual operations and package metadata."
+    - "Committed benchmark bytes and deterministic selection/score do not depend directly on performance.now(), wall-clock elapsed duration, process scheduling, CPU load, or another run-variable timing value."
+    - "If real elapsed timing is retained, it is either an explicitly noncommitted, nonselection diagnostic or uses a mechanism whose committed representation is proven byte-reproducible without weakening the executed workload."
+    - "An automated regression test fails if a benchmark rerun changes tracked renderer-benchmark.json, changes a deterministic score, or selects anything other than three-direct under the unchanged workload."
+    - "Two benchmark reruns from the same immutable candidate each reproduce the candidate's tracked renderer-benchmark.json byte-for-byte and leave Git clean."
+    - "All 22 FIX-01 required commands plus the additional FIX-02 reproducibility commands pass against the immutable candidate."
+    - "One immutable candidate commit followed by one direct-child FIX-02 handoff-only commit."
+  non_goals:
+    - "No literal or synthetic pass, trace, controller, disposal, leak, closure, timing, or score substitute."
+    - "No reduction of releases, variants, cycles, parsed assets, mounted assets, operation coverage, dependency-closure inspection, offline enforcement, failure exercise, disposal exercise, or hard gates."
+    - "No product behavior, renderer production, storage, contract, schema, version, database, backup, catalog mapping, animation asset, pack release, PWA route, service-worker, or normal app change."
+    - "No optional human, cold, owner, independent, named, manual, VoiceOver, visual, biomechanics, legal, or physical-device review is required or may substitute for automated evidence."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "branch_parent_start_commit_cleanliness_and_one_file_coordinator_delta"
+    - "fix_01_candidate_and_handoff_are_immutable_unmerged_and_invalidated"
+    - "allowed_candidate_paths_post_candidate_path_and_all_unlisted_paths_forbidden"
+    - "required_reads_and_locked_versions"
+    - "current_timing_to_score_and_timing_to_committed_bytes_derivation"
+    - "real_workload_preservation_and_reproducibility_test_plan"
+    - "applicable_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_producer_start_commit: true
+    producer_start_parent_is_failed_metadata_commit: true
+    only_coordinator_delta_is_fix_02_packet: true
+    instructions_read: true
+    exact_model_available: true
+    subagents_unused: true
+    required_inputs_present: true
+    no_required_human_or_device_input: true
+
+finding_scope:
+  - id: "AP01R2-FIX-02-F01"
+    triggered_stop_gate: "AP01R2-FIX-01-STOP-09"
+    requirement: "Remove direct wall-clock variability from committed benchmark bytes and deterministic scoring/selection while preserving the actual workload and operation-derived evidence for all three pinned candidates."
+  - id: "AP01R2-FIX-02-F02"
+    triggered_stop_gate: "AP01R2-FIX-01-STOP-09"
+    requirement: "Add automated regression coverage and two immutable-candidate reruns that prove renderer-benchmark.json and every candidate score are reproducible and Git-clean."
+
+acceptance_tests:
+  - id: "AP01R2-FIX-02-AC-01"
+    requirement: "Lineage is exact: invalidated FIX-01 handoff d6f44707 -> packet-only FIX-02 coordinator -> one FIX-02 candidate -> one direct-child handoff-only commit; FIX-01 is not merged, checkpointed, or entered in the ledger."
+    evidence: "Git parent, range, name-only, diff, tag, ledger, and clean-worktree assertions."
+  - id: "AP01R2-FIX-02-AC-02"
+    requirement: "All three exact pinned renderer candidates still execute the same two-release, 12-variant, ten-cycle Blob workload with 240 parsed assets, 240 mounted assets, 130 trace entries, failure coverage, disposal coverage, measured closure metadata, and zero remote requests per candidate."
+    evidence: "Benchmark source, regression test, renderer-benchmark.json, and source-to-evidence derivation audit; no literal or synthetic substitute is accepted."
+  - id: "AP01R2-FIX-02-AC-03"
+    requirement: "Every field committed to renderer-benchmark.json and every value used by score ordering or selection is independent of raw wall-clock variation. Real timing, if measured, is diagnostic only and cannot decide committed bytes, score, hard gates, or selection unless its committed encoding is proven reproducible."
+    evidence: "Source audit tracing every committed field and score operand to stable operation counters/package metadata, plus regression tests that perturb or vary timing without changing scores or selected renderer."
+  - id: "AP01R2-FIX-02-AC-04"
+    requirement: "The selected renderer remains three-direct, its selection comes from the documented deterministic rule among real hard-gate passers, and all candidate scores remain identical across repeated runs from one immutable candidate."
+    evidence: "Byte-identical tracked report, score vector comparison, selected ID comparison, ADR 0019, and two benchmark rerun records."
+  - id: "AP01R2-FIX-02-AC-05"
+    requirement: "An automated regression test executes the benchmark repeatedly and fails if either rerun changes the tracked renderer-benchmark.json bytes, changes any deterministic candidate score, or changes the three-direct selection."
+    evidence: "scripts/animation-pilot-evidence.test.mjs test name/output and a source audit confirming the assertion is execution-based rather than comparing literals to literals."
+  - id: "AP01R2-FIX-02-AC-06"
+    requirement: "From the same immutable candidate, benchmark rerun 1 and rerun 2 each exit 0, hash to the exact renderer-benchmark.json blob committed at HEAD, and leave git status --porcelain empty immediately after the run."
+    evidence: "Exact output and HEAD/evidence blob hashes from both additional reproducibility commands."
+  - id: "AP01R2-FIX-02-AC-07"
+    requirement: "All 22 FIX-01 commands pass unchanged, all additional FIX-02 reproducibility commands pass, the candidate remains immutable and Git-clean, and previously accepted source-to-evidence, lifecycle, product, license, mapping, offline, backup, PWA, and safety assertions remain passing without edits outside candidate_paths."
+    evidence: "Complete exact command records, candidate SHA before and after verification, clean status, and in-scope diff."
+  - id: "AP01R2-FIX-02-AC-08"
+    requirement: "The handoff is schema-valid, records every required command exactly, contains optional_manual_evidence, and sets automated PASS and merge_authorized true only when all commands passed and no stop gate is active."
+    evidence: "FIX-02 handoff at docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml."
+
+required_checks:
+  original_fix_01_automated_commands:
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+    - "pnpm animation:pilot:validate"
+    - "pnpm animation:pilot:repro"
+    - "pnpm animation:pilot:benchmark:desktop"
+    - "pnpm animation:pilot:evidence:validate"
+    - "pnpm exec vitest run packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts apps/web/src/pilot/AnimationPilotApp.test.tsx"
+    - "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs"
+    - "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx packages/storage/src/animation-pack/archive.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts"
+    - "pnpm run content:validate"
+    - "pnpm run content:audit"
+    - "pnpm exec eslint apps/web/src/pilot/AnimationPilotApp.test.tsx packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/animation-pilot-evidence.test.mjs scripts/performance-report.mjs --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm animation:pilot:build-pwa"
+    - "pnpm animation:pilot:audit-pwa"
+    - "pnpm run build"
+    - "pnpm run performance:report"
+    - "pnpm run verify:affected"
+    - "pnpm run verify"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "assert exact parentage, one-file coordinator delta, candidate changed paths subset, metadata-only handoff delta, locked versions, exact 12/199 mappings, unchanged protected objects, no tracked release binary, no runtime network, no default-build pilot/rejected-renderer code, no pack/precache byte, and no merge of failed candidate as-is"
+    - "audit benchmark and evidence source/reports: reject literal pass booleans, zero leak literals, dependency closure literals, score literals, detached personal sentinels, in-memory-only lifecycle, missing OPFS backend, missing all-12 renderer playback, missing 390 CSS px execution, or retained-archive/resource-leak metrics not derived from operations"
+  additional_reproducibility_commands:
+    - 'pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern "keeps committed renderer benchmark bytes and scores stable across reruns"'
+    - '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $actual = (git hash-object -- $path).Trim(); if ($actual -ne $expected) { Write-Error "benchmark rerun 1 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 1 left Git dirty"; exit 1 }'
+    - '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $actual = (git hash-object -- $path).Trim(); if ($actual -ne $expected) { Write-Error "benchmark rerun 2 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 2 left Git dirty"; exit 1 }'
+    - "audit benchmark determinism: reject raw performance.now(), Date.now(), process.hrtime(), elapsed duration, randomized values, host load, or scheduler variation in any committed field, hard gate, score operand, sort key, tie-break, or selected renderer; prove any real timing is noncommitted/nonselection diagnostic or reproducibly encoded"
+    - "assert HEAD equals candidate_commit before and after all required commands, git status --porcelain is empty, renderer-benchmark.json at HEAD equals the working-tree bytes, and the candidate commit was not amended or replaced"
+  execution_rule: "Create the single candidate first, then run all 22 original FIX-01 commands and all 5 additional FIX-02 commands against that exact candidate. A command that changes tracked or untracked repository state must be cleaned only by the command's normal ignored outputs; any tracked diff or non-ignored file triggers FAIL and the candidate must not be amended."
+  evidence_paths:
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "AP01R2-FIX-02-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, required reads are incomplete, branch/parent/coordinator delta is wrong, or the worktree is dirty before implementation."
+    action: "Stop before implementation and write a BLOCKED handoff at the FIX-02 report path only if that is the sole safe metadata change."
+  - id: "AP01R2-FIX-02-STOP-02"
+    condition: "A repair requires a path outside authority.candidate_paths or any product behavior, renderer production, storage, contract, schema, version, database, backup, catalog mapping, animation asset, pack release, route, PWA, dependency, package, or lockfile change."
+    action: "Stop without widening scope and identify the separate owning packet required."
+  - id: "AP01R2-FIX-02-STOP-03"
+    condition: "Any of the three pinned candidates no longer executes the real comparable two-release, 12-variant, ten-cycle workload, or pass/trace/controller/disposal/leak/closure/timing/score evidence is replaced by a literal, mock-only, synthetic, detached, or reduced-workload substitute."
+    action: "Stop with FAIL; do not trade benchmark validity for byte stability."
+  - id: "AP01R2-FIX-02-STOP-04"
+    condition: "A committed field, hard gate, score, ordering key, tie-break, or renderer selection depends directly on raw wall-clock timing, scheduler variation, host load, random data, current time, or another value that is not proven reproducible."
+    action: "Stop with FAIL and keep AP01R2-FIX-01-STOP-09 active."
+  - id: "AP01R2-FIX-02-STOP-05"
+    condition: "Real timing is presented as deterministic benchmark evidence while being dropped from the workload without an explicit diagnostic policy, or timing is normalized/fabricated in a way that weakens or misrepresents the benchmark."
+    action: "Stop with FAIL; timing may be a truthful noncommitted/nonselection diagnostic or use a proven reproducible representation, but it must not be invented."
+  - id: "AP01R2-FIX-02-STOP-06"
+    condition: "The regression test does not execute reruns, can pass while tracked renderer-benchmark.json or a candidate score changes, compares literals to literals, or does not assert three-direct selection."
+    action: "Stop with FAIL and preserve the audit finding."
+  - id: "AP01R2-FIX-02-STOP-07"
+    condition: "Either immutable-candidate benchmark rerun changes the HEAD blob hash, changes any candidate score or selection, leaves Git dirty, or cannot prove byte identity immediately after the run."
+    action: "Stop with FAIL, record both expected and actual hashes plus the exact diff, do not amend the candidate, and do not create an automated-pass handoff."
+  - id: "AP01R2-FIX-02-STOP-08"
+    condition: "Any of the 22 original FIX-01 commands or 5 additional FIX-02 commands fails or is not run, an unexpected path changes, source-to-evidence derivation is weakened, candidate/handoff lineage cannot be preserved, or the handoff cannot satisfy the automated-verification schema."
+    action: "Record FAIL or BLOCKED with merge_authorized false; do not invent evidence, amend or replace the candidate, merge, update the ledger, or create a checkpoint."
+
+handoff:
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml"
+  metadata_commit_rule: "After the single immutable candidate passes every command, add and commit only the FIX-02 handoff as its direct child. Do not amend or replace the candidate and do not name the handoff's own metadata commit inside the handoff."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "failed_candidate_commit"
+    - "failed_metadata_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "finding_resolution"
+    - "workload_preservation_evidence"
+    - "deterministic_score_and_selection_evidence"
+    - "timing_diagnostic_policy"
+    - "benchmark_rerun_evidence"
+    - "regression_test_evidence"
+    - "acceptance_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "known_risks"
+    - "optional_evidence"
+    - "automated_verification"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-02-handoff.yaml#automated_verification"
+  schema:
+    schema_version: 1
+    packet_id: "ANIMATION-PILOT-01-REV-02-FIX-02"
+    candidate_commit: "40-character SHA"
+    status: "PASS|FAIL|BLOCKED"
+    checks:
+      - command: "exact required command"
+        result: "pass|fail|not_run"
+        evidence: "exact output or immutable artifact"
+    optional_manual_evidence: []
+    merge_authorized: false
+  authorization_rule: "Only PASS with all 27 required commands recorded pass, the immutable candidate and byte-identical reruns proven, Git clean, and no active stop gate may set merge_authorized true."
+
+optional_evidence:
+  cold_review: "optional; no gate effect"
+  owner_review: "optional; no gate effect"
+  independent_review: "optional; no gate effect"
+  named_reviewers: "optional; no gate effect"
+  manual_review: "optional; no gate effect"
+  physical_device_review: "optional; no gate effect"
+  reporting_rule: "Keep optional_manual_evidence empty unless evidence was actually supplied. Never infer or claim PASS for unperformed human, cold, owner, independent, named, manual, VoiceOver, visual, biomechanics, legal, or physical-device checks."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS and all 27 required command results == pass and automated_verification.merge_authorized == true and both benchmark reruns are byte-identical and Git-clean"
+  target: "main"
+  method: "fast-forward"
+  squash_policy: "forbidden"
+  checkpoint_tag_after_merge: "checkpoint/animation-pilot-01-rev-02-fix-02-automated-pass"
+  automated_checkpoint_rule: "Only after a PASS fast-forward merge, record the FIX-02 lineage and automated result in docs/ai/reviews/coordinator-ledger.yaml in a separate coordinator checkpoint commit, then create the checkpoint tag. Do not update the ledger or create any checkpoint for FIX-01, FAIL, BLOCKED, or optional-only evidence."
+  next_packet_gate: "No ANIMATION-WAVE packet may start until the FIX-02 automated PASS checkpoint exists."
