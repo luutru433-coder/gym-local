@@ -363,6 +363,7 @@ async function renderSource(source, diagnostics) {
 }
 
 export async function runPilotLifecycleEvidence() {
+  return reproducePilot({ writeEvidence: false, consume: async (reproduction) => {
   const [storage, animationStore, opfs, media, backupModule] = await Promise.all([
     import(pathToFileURL(resolve("packages/storage/src/index.ts")).href),
     import(pathToFileURL(resolve("packages/storage/src/animation-pack/store.ts")).href),
@@ -370,7 +371,6 @@ export async function runPilotLifecycleEvidence() {
     import(pathToFileURL(resolve("packages/media/src/gltf-renderer.ts")).href),
     import(pathToFileURL(resolve("packages/backup/src/index.ts")).href)
   ]);
-  const reproduction = await reproducePilot({ writeEvidence: false });
   const root = new FakeDirectory("");
   const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, "navigator");
   Object.defineProperty(globalThis, "navigator", {
@@ -523,12 +523,15 @@ export async function runPilotLifecycleEvidence() {
       objectStates
     }
   };
+  } });
 }
 
 export async function generateEvidence() {
   const { source } = await readPilotDeclarations();
   await mkdir(PILOT_EVIDENCE_ROOT, { recursive: true });
-  if (!(await readFile(join(PILOT_EVIDENCE_ROOT, "release-reproducibility.json"), "utf8").catch(() => ""))) await reproducePilot();
+  if (!(await readFile(join(PILOT_EVIDENCE_ROOT, "release-reproducibility.json"), "utf8").catch(() => ""))) {
+    await reproducePilot({ consume: (result) => result.report });
+  }
   const rendererBenchmark = await runRendererBenchmark();
   const lifecycleEvidence = await runPilotLifecycleEvidence();
   const responsiveEvidence = await responsiveAutomationEvidence();

@@ -4,7 +4,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { lstat, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PILOT_EVIDENCE_ROOT } from "./animation-pilot-assets.mjs";
@@ -103,7 +103,14 @@ describe("animation pilot evidence", () => {
 
     for (let rerun = 1; rerun <= 2; rerun += 1) {
       const timingDiagnostics = [];
-      const report = await runRendererBenchmark({ onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic) });
+      let invocationRoot;
+      const report = await runRendererBenchmark({
+        onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic),
+        async onReproductionReady(_reproduction, invocation) {
+          invocationRoot = invocation.outputRoot;
+          await expect(lstat(invocationRoot)).resolves.toMatchObject({});
+        }
+      });
       const rerunBytes = await readFile(benchmarkPath);
 
       expect(rerunBytes, `rerun ${rerun} changed committed benchmark bytes`).toEqual(committedBytes);
@@ -113,6 +120,7 @@ describe("animation pilot evidence", () => {
       expect(timingDiagnostics.every(({ durationMs, averageAssetMs }) => durationMs > 0 && averageAssetMs > 0)).toBe(true);
       expect(JSON.stringify(report)).not.toContain('"timing"');
       expect(gitStatus(), `rerun ${rerun} left Git dirty`).toBe("");
+      await expect(lstat(invocationRoot), `rerun ${rerun} leaked its invocation output root`).rejects.toMatchObject({ code: "ENOENT" });
     }
   }, 60_000);
 });

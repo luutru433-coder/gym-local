@@ -612,8 +612,12 @@ async function measuredCandidateWorkload(candidate, reproduction) {
   };
 }
 
-export async function runRendererBenchmark({ writeEvidence = true, onTimingDiagnostic } = {}) {
-  const reproduction = await reproducePilot({ writeEvidence: false });
+export async function runRendererBenchmark({ writeEvidence = true, onTimingDiagnostic, onReproductionReady, reproductionHooks } = {}) {
+  return reproducePilot({
+    writeEvidence: false,
+    hooks: reproductionHooks,
+    consume: async (reproduction, invocation) => {
+      await onReproductionReady?.(reproduction, invocation);
   const lockText = await readFile("pnpm-lock.yaml", "utf8");
   const workload = [];
   for (const candidate of candidates) {
@@ -675,6 +679,8 @@ export async function runRendererBenchmark({ writeEvidence = true, onTimingDiagn
     await writeFile(join(PILOT_EVIDENCE_ROOT, "renderer-benchmark.json"), stableJson(report));
   }
   return report;
+    }
+  });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

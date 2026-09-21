@@ -4,8 +4,8 @@
  */
 
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { lstat, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   OUTPUT_FILES,
@@ -22,6 +22,9 @@ export const EXPECTED_VARIANT_COUNT = 12;
 export const MAX_ASSET_BYTES = 4 * 1024 * 1024;
 export const MAX_TOTAL_ASSET_BYTES = 24 * 1024 * 1024;
 
+const PILOT_INVOCATION_OWNER_FILE = ".animation-pilot-invocation-owner";
+const PILOT_INVOCATION_OWNER_BYTES = Buffer.from("Gym Local animation pilot invocation ownership\n", "utf8");
+
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", { fatal: true });
 const cameraByPreset = {
@@ -32,6 +35,68 @@ const cameraByPreset = {
 
 function fail(message) {
   throw new Error(`animation-pilot: ${message}`);
+}
+
+function normalizedPhysicalPath(path) {
+  const resolved = resolve(path);
+  return process.platform === "win32" ? resolved.toLowerCase() : resolved;
+}
+
+function objectIdentity(info) {
+  return [info.dev, info.ino, info.mode].join(":");
+}
+
+function isStrictChild(root, candidate) {
+  const rel = relative(root, candidate);
+  return rel !== "" && rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+}
+
+async function pilotOutputBoundary() {
+  const boundary = resolve(PILOT_OUTPUT_ROOT);
+  if (boundary !== resolve("outputs/animation-pilot")) fail("unsafe output boundary");
+  await mkdir(boundary, { recursive: true });
+  const info = await lstat(boundary, { bigint: true });
+  if (!info.isDirectory() || info.isSymbolicLink()) fail("output boundary must be a real directory");
+  const physical = await realpath(boundary);
+  if (normalizedPhysicalPath(physical) !== normalizedPhysicalPath(boundary)) fail("output boundary alias is forbidden");
+  return { path: boundary, physical, identity: objectIdentity(info) };
+}
+
+async function createPilotInvocation() {
+  const boundary = await pilotOutputBoundary();
+  const root = await mkdtemp(join(boundary.path, "invocation-"));
+  const info = await lstat(root, { bigint: true });
+  const physical = await realpath(root);
+  if (!info.isDirectory() || info.isSymbolicLink() || !isStrictChild(boundary.physical, physical)) fail("unsafe invocation output root");
+  await writeFile(join(root, PILOT_INVOCATION_OWNER_FILE), PILOT_INVOCATION_OWNER_BYTES, { flag: "wx" });
+  return { root, physical, identity: objectIdentity(info), boundary };
+}
+
+async function assertOwnedPilotInvocation(invocation) {
+  const boundaryInfo = await lstat(invocation.boundary.path, { bigint: true }).catch(() => fail("output boundary changed"));
+  const boundaryPhysical = await realpath(invocation.boundary.path).catch(() => fail("output boundary changed"));
+  if (
+    !boundaryInfo.isDirectory()
+    || boundaryInfo.isSymbolicLink()
+    || objectIdentity(boundaryInfo) !== invocation.boundary.identity
+    || normalizedPhysicalPath(boundaryPhysical) !== normalizedPhysicalPath(invocation.boundary.physical)
+  ) fail("output boundary changed");
+  const info = await lstat(invocation.root, { bigint: true }).catch(() => fail("invocation output ownership changed"));
+  const physical = await realpath(invocation.root).catch(() => fail("invocation output ownership changed"));
+  if (
+    !info.isDirectory()
+    || info.isSymbolicLink()
+    || objectIdentity(info) !== invocation.identity
+    || normalizedPhysicalPath(physical) !== normalizedPhysicalPath(invocation.physical)
+    || !isStrictChild(boundaryPhysical, physical)
+  ) fail("invocation output ownership changed");
+  const owner = await readFile(join(invocation.root, PILOT_INVOCATION_OWNER_FILE)).catch(() => fail("invocation output owner marker changed"));
+  if (!owner.equals(PILOT_INVOCATION_OWNER_BYTES)) fail("invocation output owner marker changed");
+}
+
+async function cleanupPilotInvocation(invocation) {
+  await assertOwnedPilotInvocation(invocation);
+  await rm(invocation.root, { recursive: true });
 }
 
 function canonical(value) {
@@ -206,17 +271,17 @@ export async function materializeReleaseSource(root, source, release) {
   return packSource;
 }
 
-async function buildPass(pass, declarations) {
+async function buildPass(pass, declarations, outputRoot) {
   const result = new Map();
   for (const release of declarations.releases.releases) {
-    const sourceRoot = join(PILOT_OUTPUT_ROOT, `source-${pass}`, release.version);
-    const outputRoot = join(PILOT_OUTPUT_ROOT, `build-${pass}`, release.version);
+    const sourceRoot = join(outputRoot, `source-${pass}`, release.version);
+    const releaseOutputRoot = join(outputRoot, `build-${pass}`, release.version);
     await materializeReleaseSource(sourceRoot, declarations.source, release);
     await validateAnimationPackSource(sourceRoot);
-    await mkdir(dirname(outputRoot), { recursive: true });
-    await publishAnimationPack(sourceRoot, outputRoot);
-    const artifacts = await readOutputArtifacts(outputRoot);
-    result.set(release.version, { sourceRoot, outputRoot, artifacts });
+    await mkdir(dirname(releaseOutputRoot), { recursive: true });
+    await publishAnimationPack(sourceRoot, releaseOutputRoot);
+    const artifacts = await readOutputArtifacts(releaseOutputRoot);
+    result.set(release.version, { sourceRoot, outputRoot: releaseOutputRoot, artifacts });
   }
   return result;
 }
@@ -228,14 +293,10 @@ function artifactSummary(artifacts) {
   }));
 }
 
-export async function reproducePilot({ writeEvidence = true } = {}) {
+async function materializePilot(outputRoot, { writeEvidence }) {
   const declarations = await readPilotDeclarations();
-  const resolvedOutput = resolve(PILOT_OUTPUT_ROOT);
-  if (resolvedOutput !== resolve("outputs/animation-pilot")) fail("unsafe output root");
-  await rm(resolvedOutput, { recursive: true, force: true });
-  await mkdir(resolvedOutput, { recursive: true });
-  const first = await buildPass("a", declarations);
-  const second = await buildPass("b", declarations);
+  const first = await buildPass("a", declarations, outputRoot);
+  const second = await buildPass("b", declarations, outputRoot);
   const releases = [];
   const semantics = new Map();
   for (const release of declarations.releases.releases) {
@@ -303,17 +364,29 @@ export async function reproducePilot({ writeEvidence = true } = {}) {
   return { declarations, first, second, report };
 }
 
+export async function reproducePilot({ writeEvidence = true, hooks, consume } = {}) {
+  if (typeof consume !== "function") fail("reproduction consumer callback is required");
+  const invocation = await createPilotInvocation();
+  try {
+    await hooks?.afterOutputPrepared?.(invocation.root);
+    const reproduction = await materializePilot(invocation.root, { writeEvidence });
+    return await consume(reproduction, { outputRoot: invocation.root });
+  } finally {
+    await cleanupPilotInvocation(invocation);
+  }
+}
+
 export async function validatePilot() {
-  const result = await reproducePilot({ writeEvidence: false });
-  process.stdout.write(`VALID ${result.report.releases.length} releases, ${EXPECTED_VARIANT_COUNT} exact variants, deterministic self-contained GLB\n`);
+  const report = await reproducePilot({ writeEvidence: false, consume: (result) => result.report });
+  process.stdout.write(`VALID ${report.releases.length} releases, ${EXPECTED_VARIANT_COUNT} exact variants, deterministic self-contained GLB\n`);
 }
 
 async function main(argv = process.argv.slice(2)) {
   const [command] = argv;
   if (command === "validate") return validatePilot();
   if (command === "repro") {
-    const result = await reproducePilot();
-    process.stdout.write(`PASS reproducibility ${createHash("sha256").update(JSON.stringify(result.report)).digest("hex")}\n`);
+    const report = await reproducePilot({ consume: (result) => result.report });
+    process.stdout.write(`PASS reproducibility ${createHash("sha256").update(JSON.stringify(report)).digest("hex")}\n`);
     return;
   }
   fail("usage: animation-pilot-assets.mjs <validate|repro>");
