@@ -1,0 +1,279 @@
+schema_version: 3
+packet_id: "ANIMATION-PILOT-01-REV-02-FIX-03"
+status: "automated_pass"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "Implementation and all 30 required automated checks used gpt-5.6-sol."
+subagents_used: false
+
+base_commit: "3b593af37993760a35966d29b2c97a841792f5e7"
+failed_candidate_commit: "d966f4bfe5ebbfd959198c3865f3c6f17926249a"
+failed_metadata_commit: "3b593af37993760a35966d29b2c97a841792f5e7"
+producer_start_commit: "647cb70175813f198099ccf3fb0141a10fb4e022"
+candidate_parent_commit: "647cb70175813f198099ccf3fb0141a10fb4e022"
+candidate_commit: "d7949341de14761f1abff80314272932eee0809d"
+branch: "codex/animation-pilot-01-rev-02-fix-03"
+
+changed_paths:
+  candidate:
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+  post_candidate_metadata:
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-03-handoff.yaml"
+
+finding_resolution:
+  - id: "AP01R2-FIX-03-F01"
+    result: "pass"
+    evidence: "reproducePilot creates an invocation-owned mkdtemp child under the canonical outputs/animation-pilot boundary; all source, build, and publication staging paths derive from that child and no invocation removes the shared boundary."
+  - id: "AP01R2-FIX-03-F02"
+    result: "pass"
+    evidence: "The exact three-file group passed once in inherited check 7 and five consecutive times in explicit threads/fileParallelism/maxWorkers=3 stress check 28; every run left HEAD, tracked benchmark evidence, and Git status unchanged."
+  - id: "AP01R2-FIX-03-F03"
+    result: "pass"
+    evidence: "The FIX-02 timing callback, deterministic score formula, score vector, three-direct selection, and full two-release/12-variant/ten-cycle workload remain unchanged and operation-derived."
+
+output_isolation_design:
+  result: "pass"
+  boundary: "outputs/animation-pilot"
+  allocation: "Each reproducePilot invocation uses mkdtemp with an invocation- prefix under the validated real boundary; the root is never supplied by a caller and is unique across workers."
+  path_validation: "Boundary and invocation paths are resolved and realpathed, aliases/symlinks are rejected, the invocation root must be a strict child of the physical boundary, and boundary/root filesystem identities are retained."
+  lifetime: "reproducePilot materializes both release passes and awaits the consumer callback inside one try block; cleanup occurs only in finally after the callback's final read or failure. Benchmark and lifecycle consumers therefore cannot outlive their root ownership."
+  propagation: "buildPass receives the invocation root explicitly; benchmark, lifecycle evidence, CLI validation/reproduction, and asset tests consume generated paths only inside the callback."
+
+destructive_cleanup_safety:
+  result: "pass"
+  evidence: "Before recursive removal, cleanup revalidates boundary identity/realpath, invocation identity/realpath/strict containment, and an exclusive owner marker. A failed proof throws before rm. The only recursive removal added by FIX-03 is rm(invocation.root, { recursive: true }); the shared boundary and foreign/pre-existing siblings are never removed."
+
+parallel_stress_evidence:
+  result: "pass"
+  iterations: 5
+  command_mode: "Vitest threads pool with fileParallelism enabled and maxWorkers=3"
+  per_iteration: "Each iteration passed 3 files and 8 tests, including the real benchmark reruns, overlap regression, and animation-pack publication suite."
+  candidate_before_after: "d7949341de14761f1abff80314272932eee0809d"
+  expected_benchmark_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  actual_benchmark_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  git_clean_after_stress: true
+
+state_leak_and_cleanup_evidence:
+  result: "pass"
+  regression_test: "isolates overlapping reproduction consumers and cleans only their owned roots"
+  evidence: "The test uses a two-party barrier after two distinct roots are allocated, then runs both real two-pass/12-variant materializations concurrently, compares artifact and reproduction-report hashes plus the tracked renderer score/selection vector, performs a final asset read inside each lease, and proves both roots are absent afterward. A fully materialized invocation then throws after its final descriptor read and is also cleaned. A pre-existing sentinel remains byte-identical."
+  leaked_invocation_roots: 0
+  leaked_staging_directories: 0
+  leaked_lock_or_owner_artifacts: 0
+  audit_harness_note: "A preliminary read-only audit regex counted the reproducePilot function declaration as a call site; the corrected declaration-excluding audit proved nine call sites and nine consumer callbacks without any candidate change."
+
+workload_preservation_evidence:
+  result: "pass"
+  renderer_candidates: 3
+  releases_per_candidate: 2
+  variants_per_candidate: 12
+  cycles_per_candidate: 10
+  parsed_assets_per_candidate: 240
+  mounted_assets_per_candidate: 240
+  operation_trace_entries_per_candidate: 130
+  remote_request_attempts_per_candidate: 0
+  selected_renderer: "three-direct"
+  scores:
+    three-direct: 3981390
+    babylon-modular: 2929347
+    google-model-viewer: 3934825
+  evidence: "Check 22 recomputed every operation count from traces, every closure byte total from installed package roots, every hard gate, every deterministic score, and the selected renderer from the committed report. Failure/disposal coverage and zero owned-resource leaks remained operation-derived."
+
+timing_reproducibility_evidence:
+  result: "pass"
+  policy: "performance.now() surrounds the real candidate workload and emits durationMs/averageAssetMs only through onTimingDiagnostic; neither value enters committed JSON, hard gates, score, sorting, tie-break, or selection."
+  evidence: "Checks 4, 23, 24, 25, and the five stress iterations emitted truthful varying timings while all generated benchmark bytes, scores, and selection stayed stable."
+
+benchmark_rerun_evidence:
+  result: "pass"
+  expected_head_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  rerun_1_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  rerun_2_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  stress_blob: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  selected_renderer: "three-direct"
+  git_clean_after_each_rerun: true
+
+acceptance_evidence:
+  - id: "AP01R2-FIX-03-AC-01"
+    result: "pass"
+    evidence: "Lineage is 3b593af3 failed FIX-02 metadata -> 647cb701 packet-only coordinator -> d7949341 single candidate; FIX-01/FIX-02 remain unmerged on main, untagged as passing, and absent from the ledger."
+  - id: "AP01R2-FIX-03-AC-02"
+    result: "pass"
+    evidence: "Canonical invocation roots, strict boundary containment, filesystem identity, exclusive marker, callback lifetime, and finally cleanup prevent cross-invocation deletion or partial reads."
+  - id: "AP01R2-FIX-03-AC-03"
+    result: "pass"
+    evidence: "Source audit found no retry, sleep/backoff, swallowed materialization failure, removed assertion, suite serialization, disabled file parallelism, or dependency on pre-existing output."
+  - id: "AP01R2-FIX-03-AC-04"
+    result: "pass"
+    evidence: "All three pinned candidates retained the real 2x12x10 Blob workload, 240 parses/mounts, 130 trace entries, measured closure, failure/disposal coverage, and zero network attempts."
+  - id: "AP01R2-FIX-03-AC-05"
+    result: "pass"
+    evidence: "The named regression forces two real reproduction consumers to overlap, compares deterministic hashes and renderer decision data, preserves a foreign sentinel, and proves success/failure cleanup."
+  - id: "AP01R2-FIX-03-AC-06"
+    result: "pass"
+    evidence: "Five consecutive explicit file-parallel threads/maxWorkers=3 executions passed with 3 files and 8 tests each and no ENOENT, source_changed, staging identity, dirty-state, or leak failure."
+  - id: "AP01R2-FIX-03-AC-07"
+    result: "pass"
+    evidence: "Both dedicated reruns and every stress iteration retained blob cbc85c6e, scores 3981390/2929347/3934825, three-direct selection, candidate HEAD, and Git cleanliness."
+  - id: "AP01R2-FIX-03-AC-08"
+    result: "pass"
+    evidence: "All 27 inherited FIX-02 checks and all 3 additional FIX-03 checks passed against immutable candidate d7949341; no protected path changed and no stop gate is active."
+  - id: "AP01R2-FIX-03-AC-09"
+    result: "pass"
+    evidence: "This handoff contains every required field and exact command record, optional_manual_evidence is empty, and automated PASS/merge authorization follows only from 30 passing checks."
+
+checks:
+  required_commands: 30
+  required_commands_run: 30
+  required_commands_passed: 30
+  required_commands_failed: 0
+  required_commands_not_run: 0
+  inherited_fix_02_passed: 27
+  additional_fix_03_passed: 3
+  immutable_candidate_unchanged_after_commands: true
+  triggered_stop_gates: []
+  result: "pass"
+  evidence: "Candidate d7949341, its parent, tracked benchmark blob cbc85c6e, and a clean Git status were asserted before/after inherited checks and after five stress iterations."
+
+protected_path_audit:
+  result: "pass"
+  candidate_path_count: 6
+  unauthorized_paths: []
+  forbidden_paths_changed: []
+  locked_versions_changed: false
+  product_behavior_changed: false
+  renderer_production_changed: false
+  storage_or_contract_changed: false
+  database_or_backup_changed: false
+  catalog_mapping_changed: false
+  animation_assets_changed: false
+  route_or_pwa_changed: false
+  package_or_lockfile_changed: false
+  benchmark_evidence_changed: false
+
+known_risks:
+  - "Optional visual, biomechanics, legal, VoiceOver, battery, thermal, memory, and physical-device review did not run and no PASS is claimed for them."
+  - "The generated output boundary intentionally preserves the ignored foreign sentinel used by the regression; invocation cleanup never owns or removes it."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  named_reviewers: "not_run"
+  manual_review: "not_run"
+  physical_device_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "ANIMATION-PILOT-01-REV-02-FIX-03"
+  candidate_commit: "d7949341de14761f1abff80314272932eee0809d"
+  status: "PASS"
+  checks:
+    - command: "pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation"
+      result: "pass"
+      evidence: "Offline frozen install was already up to date, exited 0, and Git status was empty on candidate d7949341."
+    - command: "pnpm animation:pilot:validate"
+      result: "pass"
+      evidence: "VALID 2 releases, 12 exact variants, deterministic self-contained GLB."
+    - command: "pnpm animation:pilot:repro"
+      result: "pass"
+      evidence: "PASS reproducibility b39954ed334d5800c87d83f748a44fbf70629200a4402fa3d23d30f43de9bda0."
+    - command: "pnpm animation:pilot:benchmark:desktop"
+      result: "pass"
+      evidence: "All three real candidate workloads ran, emitted noncommitted timing diagnostics, selected three-direct, and retained benchmark blob cbc85c6e."
+    - command: "pnpm animation:pilot:evidence:validate"
+      result: "pass"
+      evidence: "PASS evidence schema: 7 reports."
+    - command: "pnpm exec vitest run packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts apps/web/src/pilot/AnimationPilotApp.test.tsx"
+      result: "pass"
+      evidence: "4 test files and 88 tests passed."
+    - command: "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs"
+      result: "pass"
+      evidence: "The formerly failing exact group passed 3 files and 8 tests with no shared-output collision."
+    - command: "pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/media/src/animation-player.test.ts apps/web/src/components/ExerciseAnimationPlayer.test.tsx packages/storage/src/animation-pack/archive.test.ts packages/storage/src/storage.test.ts packages/backup/src/backup.test.ts apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts"
+      result: "pass"
+      evidence: "9 test files and 350 tests passed."
+    - command: "pnpm run content:validate"
+      result: "pass"
+      evidence: "3 test files and 15 content-validation tests passed."
+    - command: "pnpm run content:audit"
+      result: "pass"
+      evidence: "All source, license, provenance, pilot mapping, renderer pin, nutrition, and manifest audits passed."
+    - command: "pnpm exec eslint apps/web/src/pilot/AnimationPilotApp.test.tsx packages/storage/src/animation-pack/opfs.test.ts packages/storage/src/animation-pack/store.test.ts packages/media/src/gltf-renderer.test.ts scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/animation-pilot-evidence.test.mjs scripts/performance-report.mjs --max-warnings=0"
+      result: "pass"
+      evidence: "Exact ESLint command exited 0 with zero warnings."
+    - command: "pnpm run typecheck"
+      result: "pass"
+      evidence: "tsc -b --pretty false exited 0."
+    - command: "pnpm run architecture:audit"
+      result: "pass"
+      evidence: "Architecture boundaries verified."
+    - command: "pnpm animation:pilot:build-pwa"
+      result: "pass"
+      evidence: "Pilot reproducibility passed and Vite animation-pilot build completed with 41 precache entries."
+    - command: "pnpm animation:pilot:audit-pwa"
+      result: "pass"
+      evidence: "PASS pilot PWA audit: 44 files, 3978370 precache bytes, zero release/precache payload."
+    - command: "pnpm run build"
+      result: "pass"
+      evidence: "Production typecheck/build/PWA generation passed; performance report passed."
+    - command: "pnpm run performance:report"
+      result: "pass"
+      evidence: "PASS performance: entry 203.6 KiB, initial graph 610.9 KiB, precache 3207.8 KiB."
+    - command: "pnpm run verify:affected"
+      result: "pass"
+      evidence: "Architecture boundaries verified and scoped verification completed."
+    - command: "pnpm run verify"
+      result: "pass"
+      evidence: "Full verify passed architecture, lint, typecheck, content checks, 30 test files/539 tests, production build, and performance budgets."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "pass"
+      evidence: "git diff --check 647cb701..d7949341 exited 0."
+    - command: "assert exact parentage, one-file coordinator delta, candidate changed paths subset, metadata-only handoff delta, locked versions, exact 12/199 mappings, unchanged protected objects, no tracked release binary, no runtime network, no default-build pilot/rejected-renderer code, no pack/precache byte, and no merge of failed candidate as-is"
+      result: "pass"
+      evidence: "Read-only lineage/scope/build audit and the exact catalog mapping test passed; the handoff path was absent during candidate verification and is the sole post-candidate metadata path."
+    - command: "audit benchmark and evidence source/reports: reject literal pass booleans, zero leak literals, dependency closure literals, score literals, detached personal sentinels, in-memory-only lifecycle, missing OPFS backend, missing all-12 renderer playback, missing 390 CSS px execution, or retained-archive/resource-leak metrics not derived from operations"
+      result: "pass"
+      evidence: "Audit recomputed traces, closures, gates, scores, selection, OPFS lifecycle, all-12 playback, personal/backup immutability, 390px coverage, archive multiplier, and leak metrics from operations."
+    - command: 'pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern "keeps committed renderer benchmark bytes and scores stable across reruns"'
+      result: "pass"
+      evidence: "1 matching test passed, 1 nonmatching test skipped; both internal real reruns retained bytes, scores, selection, cleanup, and Git cleanliness."
+    - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $actual = (git hash-object -- $path).Trim(); if ($actual -ne $expected) { Write-Error "benchmark rerun 1 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 1 left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "Expected and actual blob were cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd; three-direct selected; Git clean."
+    - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $actual = (git hash-object -- $path).Trim(); if ($actual -ne $expected) { Write-Error "benchmark rerun 2 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 2 left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "Expected and actual blob were cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd; three-direct selected; Git clean."
+    - command: "audit benchmark determinism: reject raw performance.now(), Date.now(), process.hrtime(), elapsed duration, randomized values, host load, or scheduler variation in any committed field, hard gate, score operand, sort key, tie-break, or selected renderer; prove any real timing is noncommitted/nonselection diagnostic or reproducibly encoded"
+      result: "pass"
+      evidence: "Source/report audit proved performance.now is confined to callback-only diagnostics and deterministic operations/package metadata drive committed bytes, gates, scores, ordering, tie-break, and selection."
+    - command: "assert HEAD equals candidate_commit before and after all required commands, git status --porcelain is empty, renderer-benchmark.json at HEAD equals the working-tree bytes, and the candidate commit was not amended or replaced"
+      result: "pass"
+      evidence: "HEAD remained d7949341 with parent 647cb701; Git clean; HEAD and working-tree benchmark blob both cbc85c6e; candidate commit object remained present and unchanged."
+    - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $candidate = (git rev-parse HEAD).Trim(); $expected = (git rev-parse "HEAD:$path").Trim(); 1..5 | ForEach-Object { pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs --pool=threads --fileParallelism --maxWorkers=3; if ($LASTEXITCODE -ne 0) { Write-Error "parallel stress iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during parallel stress"; exit 1 }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "parallel stress changed tracked renderer evidence"; exit 1 }; if (git status --porcelain) { Write-Error "parallel stress left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "All five iterations passed 3 files/8 tests; candidate d7949341, benchmark blob cbc85c6e, and clean Git status remained unchanged."
+    - command: "audit output isolation and cleanup: prove overlapping reproducePilot consumers cannot share a deletable source/build/staging tree; every injected output root is canonicalized and constrained to the generated-output boundary; ownership or serialization spans materialization through the consumer's last read; cleanup is invocation-owned and guaranteed only after that last read on success/failure; any lock alternative has exclusive creation, owner proof, bounded timeout, stale-owner safety, and finally cleanup; reject reproducePilot-only locking that exposes returned paths after unlock, retry, sleep, swallowed errors, removed assertions, global suite serialization, fileParallelism disablement, and dependence on pre-existing output"
+      result: "pass"
+      evidence: "Corrected declaration-excluding source/state audit found 9 call sites/9 callbacks, unique canonical roots, identity/owner proof, callback-through-finally lifetime, no bypass mechanism, preserved sentinel, and zero leaked invocation roots."
+    - command: "assert concurrency regression starts from absent invocation-test output, overlaps at least two real reproduction consumers, compares deterministic artifact/report hashes and renderer score/selection, preserves a foreign sentinel, leaves no invocation temporary root, staging directory, or lock artifact, preserves the HEAD renderer-benchmark blob, leaves git status --porcelain empty, and leaves HEAD equal to candidate_commit"
+      result: "pass"
+      evidence: "Regression/source/state audit verified fresh unique roots, forced two-party overlap, hash and renderer-decision comparisons, success/failure cleanup, sentinel preservation, zero root/stage/lock artifacts, HEAD d7949341, blob cbc85c6e, and Git clean after stress."
+  optional_manual_evidence: []
+  merge_authorized: true
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-03.yaml"
+  finding_scoped_candidate_range: "647cb70175813f198099ccf3fb0141a10fb4e022..d7949341de14761f1abff80314272932eee0809d"
+  complete_updated_pilot_range: "d61759245c8a2c86a7659dfb12164fe962d515b4..d7949341de14761f1abff80314272932eee0809d"
+  report_path: "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-03-handoff.yaml"
+  next_task: "Coordinator should verify the candidate plus this direct-child handoff-only commit, then fast-forward main only if the committed handoff matches candidate d7949341 and all automated PASS evidence; afterward update the ledger in a separate coordinator checkpoint commit and create the authorized checkpoint tag."
