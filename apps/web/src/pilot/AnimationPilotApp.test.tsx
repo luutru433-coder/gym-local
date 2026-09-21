@@ -25,7 +25,10 @@ describe("AnimationPilotApp", () => {
     storage.installAnimationPack.mockResolvedValue({ state: "unavailable", warnings: [] });
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
 
   it("exposes local-only inputs, exact status and all 12 mappings", async () => {
     render(<AnimationPilotApp />);
@@ -52,13 +55,35 @@ describe("AnimationPilotApp", () => {
     expect(storage.installAnimationPack).toHaveBeenCalledWith("{}", archive);
   });
 
-  it("keeps native controls and written guidance at 320px without network use", async () => {
-    Object.defineProperty(window, "innerWidth", { configurable: true, value: 320 });
+  it.each([320, 390] as const)("keeps keyboard controls, status, reduced motion, and written fallback at %ipx without network use", async (width) => {
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
+    vi.stubGlobal("matchMedia", vi.fn(() => ({
+      matches: true,
+      media: "(prefers-reduced-motion: reduce)",
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(() => true)
+    })));
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     render(<AnimationPilotApp />);
-    expect(screen.getByRole("group", { name: /exercise animation/ })).toBeInTheDocument();
+    const group = screen.getByRole("group", { name: /exercise animation/ });
+    expect(group).toBeInTheDocument();
     expect(screen.getByText("Hướng dẫn bằng chữ")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Phát" })).toBeDisabled();
+    const play = screen.getByRole("button", { name: "Phát" });
+    expect(play.tagName).toBe("BUTTON");
+    const selector = screen.getByLabelText("Exercise variant");
+    selector.focus();
+    expect(document.activeElement).toBe(selector);
+    expect(play).toBeDisabled();
+    expect(play).toHaveAttribute("title", expect.stringMatching(/giảm chuyển động/));
+    const status = within(group).getByRole("status");
+    expect(status).toHaveAttribute("aria-live", "polite");
+    expect(status).toHaveAttribute("aria-atomic", "true");
+    await waitFor(() => expect(status).toHaveTextContent(/Không mở được hoạt ảnh/));
+    expect(group.querySelector(".exercise-animation__fallback--emphasized")).toBeInTheDocument();
     expect(fetchSpy).not.toHaveBeenCalled();
     fetchSpy.mockRestore();
   });

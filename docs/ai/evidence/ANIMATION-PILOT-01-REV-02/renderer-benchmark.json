@@ -12,9 +12,33 @@
     {
       "id": "three-direct",
       "packages": [
-        "three@0.185.1"
+        {
+          "name": "three",
+          "version": "0.185.1",
+          "expectedVersion": "0.185.1",
+          "integrity": "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg==",
+          "license": "MIT",
+          "expectedLicense": "MIT",
+          "source": "https://github.com/mrdoob/three.js",
+          "homepage": "https://threejs.org/",
+          "rootBytes": 23172772,
+          "versionMatches": true,
+          "integrityMatches": true,
+          "licenseMatches": true
+        }
+      ],
+      "closurePackages": [
+        {
+          "name": "three",
+          "version": "0.185.1",
+          "license": "MIT",
+          "source": "https://github.com/mrdoob/three.js",
+          "rootBytes": 23172772,
+          "lockEntryPresent": true
+        }
       ],
       "closureBytes": 23172772,
+      "closurePackageRoots": 1,
       "closurePinned": true,
       "license": "MIT",
       "workload": {
@@ -22,6 +46,8 @@
         "variants": 12,
         "cycles": 10,
         "parsedAssets": 240,
+        "mountedAssets": 240,
+        "frameEvents": 1160,
         "operations": [
           "mount",
           "static-frame",
@@ -36,7 +62,810 @@
           "resize",
           "failure",
           "dispose"
-        ]
+        ],
+        "operationCounts": {
+          "mount": 240,
+          "static-frame": 240,
+          "mirror": 240,
+          "camera": 240,
+          "resize": 240,
+          "play": 230,
+          "speed": 230,
+          "seek": 230,
+          "loop": 230,
+          "pause": 240,
+          "dispose": 240,
+          "reduced-motion": 10,
+          "failure": 10
+        },
+        "operationTrace": [
+          {
+            "cycle": 0,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "play",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "seek",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "loop",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "speed",
+            "observations": 23,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          }
+        ],
+        "measuredFailures": [],
+        "remoteRequestAttempts": 0,
+        "timing": {
+          "durationMs": 173.508,
+          "averageAssetMs": 0.722949
+        }
       },
       "hardGates": {
         "metadataAndLicense": true,
@@ -49,22 +878,87 @@
         "observer": 0,
         "listener": 0,
         "canvas": 0,
-        "objectUrl": 0,
         "scene": 0,
         "mixer": 0,
         "gpuResource": 0,
         "webglContext": 0
       },
-      "score": 77370
+      "score": 3981390
     },
     {
       "id": "babylon-modular",
       "packages": [
-        "@babylonjs/core@9.23.0",
-        "@babylonjs/loaders@9.23.0",
-        "babylonjs-gltf2interface@9.23.0"
+        {
+          "name": "@babylonjs/core",
+          "version": "9.23.0",
+          "expectedVersion": "9.23.0",
+          "integrity": "sha512-FpDaTPx485J1H0AEJpoJ785Z1CwCkEPNnZFu7WzHTy0ByGCy75bkZZILh4QFU4LLnzK1iuHwUfecCguATIeKSA==",
+          "license": "Apache-2.0",
+          "expectedLicense": "Apache-2.0",
+          "source": "https://github.com/BabylonJS/Babylon.js.git",
+          "homepage": "https://www.babylonjs.com",
+          "rootBytes": 70045811,
+          "versionMatches": true,
+          "integrityMatches": true,
+          "licenseMatches": true
+        },
+        {
+          "name": "@babylonjs/loaders",
+          "version": "9.23.0",
+          "expectedVersion": "9.23.0",
+          "integrity": "sha512-4qNxiHmi2udyZmTsVL3iUUfVF4BKecgmFpp1//wBoZ6RhTWlkbBT4CIJLVPeibXZeJliZ5vII8rvZqDPgGiotw==",
+          "license": "Apache-2.0",
+          "expectedLicense": "Apache-2.0",
+          "source": "https://github.com/BabylonJS/Babylon.js.git",
+          "homepage": "https://www.babylonjs.com",
+          "rootBytes": 5338134,
+          "versionMatches": true,
+          "integrityMatches": true,
+          "licenseMatches": true
+        },
+        {
+          "name": "babylonjs-gltf2interface",
+          "version": "9.23.0",
+          "expectedVersion": "9.23.0",
+          "integrity": "sha512-oD9rkfCafvGACikVWhVVl1Iy9bDuBVlI7zmeiDXI8y5gw7UOmQMffpvrl/ujoiw5agcsEAaQuF6Dbjfb+Cpaiw==",
+          "license": "Apache-2.0",
+          "expectedLicense": "Apache-2.0",
+          "source": "https://github.com/BabylonJS/Babylon.js.git",
+          "homepage": "https://www.babylonjs.com",
+          "rootBytes": 57653,
+          "versionMatches": true,
+          "integrityMatches": true,
+          "licenseMatches": true
+        }
       ],
-      "closureBytes": 75440598,
+      "closurePackages": [
+        {
+          "name": "@babylonjs/core",
+          "version": "9.23.0",
+          "license": "Apache-2.0",
+          "source": "https://github.com/BabylonJS/Babylon.js.git",
+          "rootBytes": 70045811,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "@babylonjs/loaders",
+          "version": "9.23.0",
+          "license": "Apache-2.0",
+          "source": "https://github.com/BabylonJS/Babylon.js.git",
+          "rootBytes": 5338134,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "babylonjs-gltf2interface",
+          "version": "9.23.0",
+          "license": "Apache-2.0",
+          "source": "https://github.com/BabylonJS/Babylon.js.git",
+          "rootBytes": 57653,
+          "lockEntryPresent": true
+        }
+      ],
+      "closureBytes": 75441598,
+      "closurePackageRoots": 3,
       "closurePinned": true,
       "license": "Apache-2.0",
       "workload": {
@@ -72,6 +966,8 @@
         "variants": 12,
         "cycles": 10,
         "parsedAssets": 240,
+        "mountedAssets": 240,
+        "frameEvents": 480,
         "operations": [
           "mount",
           "static-frame",
@@ -86,7 +982,1791 @@
           "resize",
           "failure",
           "dispose"
-        ]
+        ],
+        "operationCounts": {
+          "mount": 240,
+          "mirror": 240,
+          "camera": 240,
+          "static-frame": 240,
+          "play": 240,
+          "loop": 240,
+          "speed": 120,
+          "seek": 240,
+          "pause": 240,
+          "dispose": 240,
+          "reduced-motion": 10,
+          "failure": 10
+        },
+        "operationTrace": [
+          {
+            "cycle": 0,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 0,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "speed",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 1,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 1,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 2,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "speed",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 3,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 3,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 4,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "speed",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 5,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 5,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 6,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "speed",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 7,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 7,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 8,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "speed",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 9,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "resize",
+            "observations": 0,
+            "satisfied": false
+          },
+          {
+            "cycle": 9,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          }
+        ],
+        "measuredFailures": [
+          "resize"
+        ],
+        "remoteRequestAttempts": 0,
+        "timing": {
+          "durationMs": 700.399,
+          "averageAssetMs": 2.91833
+        }
+      },
+      "hardGates": {
+        "metadataAndLicense": true,
+        "offlineBlobParsing": true,
+        "controllerOperations": false,
+        "disposalAfterTenCycles": true
+      },
+      "ownedResourceLeaks": {
+        "scene": 0,
+        "webglContext": 0
+      },
+      "score": 2929346
+    },
+    {
+      "id": "google-model-viewer",
+      "packages": [
+        {
+          "name": "@google/model-viewer",
+          "version": "4.3.1",
+          "expectedVersion": "4.3.1",
+          "integrity": "sha512-GP+inXhAtY31E8rILVmByA6z8CZZjdlNajddppyI1/j1eIaSQiZcMRaUqTFe7+jv4mzRzwKIOiKBud0apiv+WQ==",
+          "license": "Apache-2.0",
+          "expectedLicense": "Apache-2.0",
+          "source": "https://github.com/google/model-viewer",
+          "homepage": "https://github.com/google/model-viewer#readme",
+          "rootBytes": 43076145,
+          "versionMatches": true,
+          "integrityMatches": true,
+          "licenseMatches": true
+        },
+        {
+          "name": "three",
+          "version": "0.185.1",
+          "expectedVersion": "0.185.1",
+          "integrity": "sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg==",
+          "license": "MIT",
+          "expectedLicense": "MIT",
+          "source": "https://github.com/mrdoob/three.js",
+          "homepage": "https://threejs.org/",
+          "rootBytes": 23172772,
+          "versionMatches": true,
+          "integrityMatches": true,
+          "licenseMatches": true
+        }
+      ],
+      "closurePackages": [
+        {
+          "name": "@google/model-viewer",
+          "version": "4.3.1",
+          "license": "Apache-2.0",
+          "source": "https://github.com/google/model-viewer",
+          "rootBytes": 43076145,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "@lit-labs/ssr-dom-shim",
+          "version": "1.6.0",
+          "license": "BSD-3-Clause",
+          "source": "git+https://github.com/lit/lit.git",
+          "rootBytes": 140913,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "@lit/reactive-element",
+          "version": "2.1.2",
+          "license": "BSD-3-Clause",
+          "source": "git+https://github.com/lit/lit.git",
+          "rootBytes": 864888,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "@monogrid/gainmap-js",
+          "version": "3.4.0",
+          "license": "MIT",
+          "source": "git+ssh://git@github.com/MONOGRID/gainmap-js.git",
+          "rootBytes": 627288,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "@types/trusted-types",
+          "version": "2.0.7",
+          "license": "MIT",
+          "source": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+          "rootBytes": 8577,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "immediate",
+          "version": "3.0.6",
+          "license": "MIT",
+          "source": "git://github.com/calvinmetcalf/immediate.git",
+          "rootBytes": 14646,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "is-promise",
+          "version": "2.2.2",
+          "license": "MIT",
+          "source": "https://github.com/then/is-promise.git",
+          "rootBytes": 2745,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "lie",
+          "version": "3.3.0",
+          "license": "MIT",
+          "source": "https://github.com/calvinmetcalf/lie.git",
+          "rootBytes": 59145,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "lit",
+          "version": "3.3.3",
+          "license": "BSD-3-Clause",
+          "source": "git+https://github.com/lit/lit.git",
+          "rootBytes": 106390,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "lit-element",
+          "version": "4.2.2",
+          "license": "BSD-3-Clause",
+          "source": "git+https://github.com/lit/lit.git",
+          "rootBytes": 123676,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "lit-html",
+          "version": "3.3.3",
+          "license": "BSD-3-Clause",
+          "source": "git+https://github.com/lit/lit.git",
+          "rootBytes": 1708368,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "promise-worker-transferable",
+          "version": "1.0.4",
+          "license": "Apache-2.0",
+          "source": "git+https://github.com/terikon/promise-worker-transferable.git",
+          "rootBytes": 48862,
+          "lockEntryPresent": true
+        },
+        {
+          "name": "three",
+          "version": "0.185.1",
+          "license": "MIT",
+          "source": "https://github.com/mrdoob/three.js",
+          "rootBytes": 23172772,
+          "lockEntryPresent": true
+        }
+      ],
+      "closureBytes": 69954415,
+      "closurePackageRoots": 13,
+      "closurePinned": true,
+      "license": "Apache-2.0 + MIT",
+      "workload": {
+        "releases": 2,
+        "variants": 12,
+        "cycles": 10,
+        "parsedAssets": 240,
+        "mountedAssets": 240,
+        "frameEvents": 240,
+        "operations": [
+          "mount",
+          "static-frame",
+          "play",
+          "pause",
+          "seek",
+          "loop",
+          "speed",
+          "camera",
+          "mirror",
+          "reduced-motion",
+          "resize",
+          "failure",
+          "dispose"
+        ],
+        "operationCounts": {
+          "mount": 240,
+          "static-frame": 240,
+          "mirror": 240,
+          "camera": 240,
+          "resize": 240,
+          "play": 240,
+          "loop": 240,
+          "speed": 240,
+          "seek": 240,
+          "pause": 240,
+          "dispose": 240,
+          "reduced-motion": 10,
+          "failure": 10
+        },
+        "operationTrace": [
+          {
+            "cycle": 0,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 0,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 1,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 2,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 3,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 4,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 5,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 6,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 7,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 8,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "mount",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "static-frame",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "play",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "pause",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "seek",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "loop",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "speed",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "camera",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "mirror",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "reduced-motion",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "resize",
+            "observations": 24,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "failure",
+            "observations": 1,
+            "satisfied": true
+          },
+          {
+            "cycle": 9,
+            "operation": "dispose",
+            "observations": 24,
+            "satisfied": true
+          }
+        ],
+        "measuredFailures": [],
+        "remoteRequestAttempts": 0,
+        "timing": {
+          "durationMs": 182.801,
+          "averageAssetMs": 0.761673
+        }
       },
       "hardGates": {
         "metadataAndLicense": true,
@@ -95,66 +2775,9 @@
         "disposalAfterTenCycles": true
       },
       "ownedResourceLeaks": {
-        "raf": 0,
-        "observer": 0,
-        "listener": 0,
-        "canvas": 0,
-        "objectUrl": 0,
-        "scene": 0,
-        "mixer": 0,
-        "gpuResource": 0,
-        "webglContext": 0
+        "modelCache": 0
       },
-      "score": 26328
-    },
-    {
-      "id": "google-model-viewer",
-      "packages": [
-        "@google/model-viewer@4.3.1",
-        "three@0.185.1"
-      ],
-      "closureBytes": 70232667,
-      "closurePinned": false,
-      "license": "Apache-2.0 + MIT",
-      "workload": {
-        "releases": 2,
-        "variants": 12,
-        "cycles": 10,
-        "parsedAssets": 240,
-        "operations": [
-          "mount",
-          "static-frame",
-          "play",
-          "pause",
-          "seek",
-          "loop",
-          "speed",
-          "camera",
-          "mirror",
-          "reduced-motion",
-          "resize",
-          "failure",
-          "dispose"
-        ]
-      },
-      "hardGates": {
-        "metadataAndLicense": false,
-        "offlineBlobParsing": true,
-        "controllerOperations": true,
-        "disposalAfterTenCycles": true
-      },
-      "ownedResourceLeaks": {
-        "raf": 0,
-        "observer": 0,
-        "listener": 0,
-        "canvas": 0,
-        "objectUrl": 0,
-        "scene": 0,
-        "mixer": 0,
-        "gpuResource": 0,
-        "webglContext": 0
-      },
-      "score": 0
+      "score": 3934825
     }
   ]
 }

@@ -12,5 +12,36 @@
     }
   ],
   "redistribution": "Allowed under MIT with copyright and permission notice retained.",
-  "noticePath": "THIRD_PARTY_NOTICES.md"
+  "noticePath": "THIRD_PARTY_NOTICES.md",
+  "benchmarkEvidence": "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json",
+  "benchmarkOnlyInputs": [
+    {
+      "name": "@babylonjs/core",
+      "version": "9.23.0",
+      "integrity": "sha512-FpDaTPx485J1H0AEJpoJ785Z1CwCkEPNnZFu7WzHTy0ByGCy75bkZZILh4QFU4LLnzK1iuHwUfecCguATIeKSA==",
+      "license": "Apache-2.0",
+      "source": "https://github.com/BabylonJS/Babylon.js"
+    },
+    {
+      "name": "@babylonjs/loaders",
+      "version": "9.23.0",
+      "integrity": "sha512-4qNxiHmi2udyZmTsVL3iUUfVF4BKecgmFpp1//wBoZ6RhTWlkbBT4CIJLVPeibXZeJliZ5vII8rvZqDPgGiotw==",
+      "license": "Apache-2.0",
+      "source": "https://github.com/BabylonJS/Babylon.js"
+    },
+    {
+      "name": "babylonjs-gltf2interface",
+      "version": "9.23.0",
+      "integrity": "sha512-oD9rkfCafvGACikVWhVVl1Iy9bDuBVlI7zmeiDXI8y5gw7UOmQMffpvrl/ujoiw5agcsEAaQuF6Dbjfb+Cpaiw==",
+      "license": "Apache-2.0",
+      "source": "https://github.com/BabylonJS/Babylon.js"
+    },
+    {
+      "name": "@google/model-viewer",
+      "version": "4.3.1",
+      "integrity": "sha512-GP+inXhAtY31E8rILVmByA6z8CZZjdlNajddppyI1/j1eIaSQiZcMRaUqTFe7+jv4mzRzwKIOiKBud0apiv+WQ==",
+      "license": "Apache-2.0",
+      "source": "https://github.com/google/model-viewer"
+    }
+  ]
 }

@@ -14,8 +14,115 @@
   "measured": {
     "variants": 12,
     "releaseCount": 2,
-    "retainedArchiveMultiplier": 3,
-    "resourceLeaks": 0
+    "retainedArchiveMultiplier": 1.9993341656263004,
+    "resourceLeaks": 0,
+    "rendererSelected": "three-direct"
+  },
+  "resourceDerivation": {
+    "retainedArchiveMultiplier": 1.9993341656263004,
+    "resourceLeaks": 0,
+    "rendererDiagnostics": {
+      "mounts": 12,
+      "staticFrames": 12,
+      "activeRaf": 0,
+      "activeObservers": 0,
+      "activeListeners": 0,
+      "activeCanvases": 0,
+      "activeScenes": 0,
+      "activeMixers": 0,
+      "activeGpuResources": 0,
+      "activeWebglContexts": 0,
+      "disposals": 12
+    },
+    "objectStates": [
+      {
+        "phase": "install",
+        "state": "available",
+        "activeVersion": "1.0.0",
+        "previousVersion": null,
+        "archiveObjectCount": 1,
+        "archiveBytes": 36021,
+        "archiveFiles": [
+          {
+            "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+            "bytes": 36021
+          }
+        ]
+      },
+      {
+        "phase": "offline-relaunch",
+        "state": "available",
+        "activeVersion": "1.0.0",
+        "previousVersion": null,
+        "archiveObjectCount": 1,
+        "archiveBytes": 36021,
+        "archiveFiles": [
+          {
+            "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+            "bytes": 36021
+          }
+        ]
+      },
+      {
+        "phase": "failed-update",
+        "state": "available",
+        "activeVersion": "1.0.0",
+        "previousVersion": null,
+        "archiveObjectCount": 1,
+        "archiveBytes": 36021,
+        "archiveFiles": [
+          {
+            "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+            "bytes": 36021
+          }
+        ]
+      },
+      {
+        "phase": "update",
+        "state": "available",
+        "activeVersion": "1.0.1",
+        "previousVersion": "1.0.0",
+        "archiveObjectCount": 2,
+        "archiveBytes": 72066,
+        "archiveFiles": [
+          {
+            "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+            "bytes": 36021
+          },
+          {
+            "path": "gym-local.animation-pilot-01/1.0.1/8ee05644133a33e17db53b664dec680a47885bbbf2e1889de4ffba93435d0794/animation-pack.zip",
+            "bytes": 36045
+          }
+        ]
+      },
+      {
+        "phase": "rollback",
+        "state": "available",
+        "activeVersion": "1.0.0",
+        "previousVersion": "1.0.1",
+        "archiveObjectCount": 2,
+        "archiveBytes": 72066,
+        "archiveFiles": [
+          {
+            "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+            "bytes": 36021
+          },
+          {
+            "path": "gym-local.animation-pilot-01/1.0.1/8ee05644133a33e17db53b664dec680a47885bbbf2e1889de4ffba93435d0794/animation-pack.zip",
+            "bytes": 36045
+          }
+        ]
+      },
+      {
+        "phase": "remove",
+        "state": "unavailable",
+        "activeVersion": null,
+        "previousVersion": null,
+        "archiveObjectCount": 0,
+        "archiveBytes": 0,
+        "archiveFiles": []
+      }
+    ]
   },
   "pilotPwa": {
     "files": 44,

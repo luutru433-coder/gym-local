@@ -108,6 +108,22 @@ await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 const pilotEvidencePath = resolve("docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json");
 const pilotEvidence = await readFile(pilotEvidencePath, "utf8").then(JSON.parse).catch(() => undefined);
 if (pilotEvidence?.packetId === "ANIMATION-PILOT-01-REV-02") {
+  const archiveStates = pilotEvidence.resourceDerivation?.objectStates ?? [];
+  const archiveSizes = archiveStates.flatMap((state) => state.archiveFiles?.map((file) => file.bytes) ?? []);
+  const largestArchive = Math.max(...archiveSizes);
+  const retainedArchiveMultiplier = Math.max(...archiveStates.map((state) => state.archiveBytes / largestArchive));
+  const diagnostics = pilotEvidence.resourceDerivation?.rendererDiagnostics ?? {};
+  const resourceLeaks = Object.entries(diagnostics)
+    .filter(([key]) => key.startsWith("active"))
+    .reduce((total, [, value]) => total + value, 0);
+  if (
+    !Number.isFinite(retainedArchiveMultiplier)
+    || Math.abs(retainedArchiveMultiplier - pilotEvidence.measured?.retainedArchiveMultiplier) > Number.EPSILON
+    || resourceLeaks !== pilotEvidence.measured?.resourceLeaks
+    || diagnostics.mounts !== diagnostics.disposals
+  ) {
+    throw new Error("Pilot retained-archive or renderer-resource evidence is not operation-derived.");
+  }
   pilotEvidence.defaultPwa = {
     entryChunkBytes: report.measurements.entryChunk.bytes,
     initialGraphBytes,

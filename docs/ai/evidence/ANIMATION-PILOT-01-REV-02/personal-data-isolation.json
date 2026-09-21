@@ -4,15 +4,400 @@
   "status": "pass",
   "optionalManualEvidence": [],
   "phases": [
-    "install",
-    "failure",
-    "update",
-    "relaunch",
-    "rollback",
-    "remove"
+    {
+      "name": "install",
+      "beforeHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "afterHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "beforeCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "afterCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "personalDataMutated": false
+    },
+    {
+      "name": "offline-relaunch",
+      "beforeHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "afterHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "beforeCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "afterCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "personalDataMutated": false
+    },
+    {
+      "name": "failed-update",
+      "beforeHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "afterHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "beforeCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "afterCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "personalDataMutated": false
+    },
+    {
+      "name": "update",
+      "beforeHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "afterHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "beforeCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "afterCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "personalDataMutated": false
+    },
+    {
+      "name": "rollback",
+      "beforeHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "afterHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "beforeCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "afterCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "personalDataMutated": false
+    },
+    {
+      "name": "remove",
+      "beforeHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "afterHash": "2c8f835e05ed20d9edd4f91e9d83a11980f7ef3c3c5ab0a63a0ac507b5e3d017",
+      "beforeCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "afterCounts": {
+        "profile": 0,
+        "routines": 0,
+        "programs": 0,
+        "sessions": 1,
+        "foods": 0,
+        "meals": 0,
+        "recipes": 0,
+        "waterEntries": 0,
+        "foodPreferences": 0,
+        "pantryItems": 0,
+        "mealPlans": 0,
+        "bodyMetrics": 0,
+        "customVariants": 0,
+        "settings": 1
+      },
+      "personalDataMutated": false
+    }
   ],
   "personalTablesChanged": 0,
   "personalRecordCountDelta": 0,
   "backupVersion": 5,
-  "packBytesInBackup": false
+  "packBytesInBackup": false,
+  "backupAudit": {
+    "backupVersion": 5,
+    "entries": [
+      "README.txt",
+      "data.json",
+      "manifest.json"
+    ],
+    "forbiddenStringMatches": [],
+    "forbiddenArtifactMatches": [],
+    "forbiddenByteMatches": 0,
+    "checkedArtifacts": [
+      {
+        "label": "1.0.0:descriptor",
+        "byteSize": 629,
+        "sha256": "ebe8d166a26745a27412076adffa543606fd2b731a1ce7f40494bf55946b4011"
+      },
+      {
+        "label": "1.0.0:manifest",
+        "byteSize": 19021,
+        "sha256": "646ec2883c233dbf35ac6588d083d4670168aa3ce3ea0dea2edf79e1a35ad52e"
+      },
+      {
+        "label": "1.0.0:archive",
+        "byteSize": 36021,
+        "sha256": "621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc"
+      },
+      {
+        "label": "1.0.0:assets/anti-rotation.resistance-band.glb",
+        "byteSize": 1376,
+        "sha256": "dcaaff2819adfcfe350bc1448d6a4b817909bbb667043f3adfd563f96b54c9ff"
+      },
+      {
+        "label": "1.0.0:assets/face-pull.cable.glb",
+        "byteSize": 1368,
+        "sha256": "dc415c1071a762ac74a7c00f78abae7f13d22c57262e46d079c84a88d3868711"
+      },
+      {
+        "label": "1.0.0:assets/farmer-carry.kettlebell.glb",
+        "byteSize": 1256,
+        "sha256": "a8a9d5ce140609314efce948e18616d6ad7f379b56d36c034ebf28badde1d48f"
+      },
+      {
+        "label": "1.0.0:assets/hip-thrust.barbell.glb",
+        "byteSize": 1348,
+        "sha256": "3aaed420b88208884508f1cc3ba6cfa288222f15b5c8e5fe7415ed5df8eeb331"
+      },
+      {
+        "label": "1.0.0:assets/lateral-raise.dumbbell.glb",
+        "byteSize": 1252,
+        "sha256": "c2327c093a2a1eb72f1416ce0641b5df03920fdaf8d3bb52facef8c82633c01d"
+      },
+      {
+        "label": "1.0.0:assets/leg-extension.machine.glb",
+        "byteSize": 1268,
+        "sha256": "5d7a02baed78496b806a311e8323c5844045cf4f09823c405ff4231f02767a1e"
+      },
+      {
+        "label": "1.0.0:assets/leg-press.machine.glb",
+        "byteSize": 1256,
+        "sha256": "85c31ac71809c2b7d414d03a0fc8d51ae9bf75deae31a563fb22607d3234ec9f"
+      },
+      {
+        "label": "1.0.0:assets/one-arm-row.dumbbell.glb",
+        "byteSize": 1240,
+        "sha256": "5ca0ee29d62cb70363cacacd2ad6e4ef77a02354c6c51ee404a40b918cce5ca0"
+      },
+      {
+        "label": "1.0.0:assets/plank.bodyweight.glb",
+        "byteSize": 1120,
+        "sha256": "3493d79c1976adb66533683ceff37e5fa3c5a5cad787db512cd22939eec91d0a"
+      },
+      {
+        "label": "1.0.0:assets/push-up.bodyweight.glb",
+        "byteSize": 1124,
+        "sha256": "8fb45111617e64fc1820a1551999449ea2c969a6e61918a47e1f2f39e9a65455"
+      },
+      {
+        "label": "1.0.0:assets/split-squat.smith.glb",
+        "byteSize": 1368,
+        "sha256": "492dcf7cb34da490e9ba71699ed0a74c0bc633bb2d7dc7e358bf106e2a3b5838"
+      },
+      {
+        "label": "1.0.0:assets/squat.barbell.glb",
+        "byteSize": 1236,
+        "sha256": "33d8613667aba62cc3c88f97475ebcb7e3a8743e1dabd574355787a3ace64182"
+      },
+      {
+        "label": "1.0.1:descriptor",
+        "byteSize": 629,
+        "sha256": "de2937190f16cc7b7399ff7e9147e9e5208a0fba929902afaef9ab3eeb5864b0"
+      },
+      {
+        "label": "1.0.1:manifest",
+        "byteSize": 19069,
+        "sha256": "7d06a67e15b9fa0f4ae2bbb5a4ad65bd5d406e0b7b19f168d4fdbd126b36d67a"
+      },
+      {
+        "label": "1.0.1:archive",
+        "byteSize": 36045,
+        "sha256": "8ee05644133a33e17db53b664dec680a47885bbbf2e1889de4ffba93435d0794"
+      },
+      {
+        "label": "1.0.1:assets/anti-rotation.resistance-band.glb",
+        "byteSize": 1372,
+        "sha256": "8e98cf7368aa32b57cf531c03fcf861e4cd708651acfa871bdf496fa45bcce21"
+      },
+      {
+        "label": "1.0.1:assets/face-pull.cable.glb",
+        "byteSize": 1364,
+        "sha256": "f1061cc8368088c37950300ce56cead623d7f293f2b744e62bdb7c4b98fe85a6"
+      },
+      {
+        "label": "1.0.1:assets/farmer-carry.kettlebell.glb",
+        "byteSize": 1256,
+        "sha256": "4fe59414954ff2133821f462f5478204cc5fe0886a77c3b59e989c43a96ed0e5"
+      },
+      {
+        "label": "1.0.1:assets/hip-thrust.barbell.glb",
+        "byteSize": 1348,
+        "sha256": "5ab812ee21a12804b737d237144e523c9b6bfe985f8a8be4570d8d0facd72752"
+      },
+      {
+        "label": "1.0.1:assets/lateral-raise.dumbbell.glb",
+        "byteSize": 1252,
+        "sha256": "d2a4a0220e83440fbf0f26cf2d6ce47386c8234fedab86efc238500f0f723edd"
+      },
+      {
+        "label": "1.0.1:assets/leg-extension.machine.glb",
+        "byteSize": 1264,
+        "sha256": "9cd82bfe8fbd61760749214bc80a86ba73f7b1cf69fd1ea5eaba2f4ba025fbcc"
+      },
+      {
+        "label": "1.0.1:assets/leg-press.machine.glb",
+        "byteSize": 1256,
+        "sha256": "e371d51f923555d86a0dc47b87bb72e61339246c682050edce0a3f031b61a375"
+      },
+      {
+        "label": "1.0.1:assets/one-arm-row.dumbbell.glb",
+        "byteSize": 1240,
+        "sha256": "0afb1d7d17538a7e7bbea49790e7b79051a5a6090776e987a93e3eabedf4652f"
+      },
+      {
+        "label": "1.0.1:assets/plank.bodyweight.glb",
+        "byteSize": 1120,
+        "sha256": "8f6995257a68801ccfded11a08315fc569a9e80b469ffda955c576b17fabfbc9"
+      },
+      {
+        "label": "1.0.1:assets/push-up.bodyweight.glb",
+        "byteSize": 1120,
+        "sha256": "9a642195c5b30ebe01fc521ea25ffb47ef6c5660ca20f1a393f340817f5b72bd"
+      },
+      {
+        "label": "1.0.1:assets/split-squat.smith.glb",
+        "byteSize": 1364,
+        "sha256": "9c4b287d2517585a856bd9937981f8001186d7d67510599f1d0a784d936a4a0a"
+      },
+      {
+        "label": "1.0.1:assets/squat.barbell.glb",
+        "byteSize": 1232,
+        "sha256": "f10bbd3337ee16510f17af78a5b0b8e773b12491b7184162da45d059821687fd"
+      }
+    ]
+  }
 }

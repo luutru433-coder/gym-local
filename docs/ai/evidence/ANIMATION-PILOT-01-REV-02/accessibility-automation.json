@@ -11,5 +11,6 @@
   "politeAtomicStatus": true,
   "writtenFallbackAlwaysPresent": true,
   "reducedMotionStaticFrame": true,
+  "failureFallback": true,
   "humanVoiceOverClaimed": false
 }

@@ -10,6 +10,15 @@ Gym Local's own code and authored content are distributed under `LICENSE`. The f
 - Source: https://github.com/mrdoob/three.js
 - Use: offline glTF/GLB pilot rendering
 
+## Animation pilot benchmark candidates
+
+The following exact packages are development-only inputs to the automated renderer comparison and are not selected for production rendering:
+
+- `@babylonjs/core@9.23.0`, Apache-2.0, https://github.com/BabylonJS/Babylon.js
+- `@babylonjs/loaders@9.23.0`, Apache-2.0, https://github.com/BabylonJS/Babylon.js
+- `babylonjs-gltf2interface@9.23.0`, Apache-2.0, https://github.com/BabylonJS/Babylon.js
+- `@google/model-viewer@4.3.1`, Apache-2.0, https://github.com/google/model-viewer
+
 ## USDA FoodData Central
 
 The optional nutrition pack includes normalized records from Foundation Foods 04/2026, SR Legacy 04/2018, and FNDDS 2021–2023. The source manifest records retrieval dates and identifiers. USDA FoodData Central data are published as CC0/public-domain data.

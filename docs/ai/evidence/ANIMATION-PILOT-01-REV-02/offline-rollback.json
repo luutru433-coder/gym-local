@@ -3,18 +3,125 @@
   "packetId": "ANIMATION-PILOT-01-REV-02",
   "status": "pass",
   "optionalManualEvidence": [],
-  "scope": "automated in-memory/OPFS-compatible lifecycle and pilot PWA assertions",
+  "scope": "automated OPFS lifecycle with relaunch and all exact Blob sources rendered through the media boundary",
+  "backendKind": "OpfsAnimationPackBackend",
   "releases": [
     "1.0.0",
     "1.0.1"
   ],
   "phases": [
     "install",
+    "offline-relaunch",
     "failed-update",
     "update",
-    "offline-relaunch",
     "rollback",
     "remove"
+  ],
+  "exactVariantIds": [
+    "anti_rotation__resistance_band",
+    "face_pull__cable",
+    "farmer_carry__kettlebell",
+    "hip_thrust__barbell",
+    "lateral_raise__dumbbell",
+    "leg_extension__machine",
+    "leg_press__machine",
+    "one_arm_row__dumbbell",
+    "plank__bodyweight",
+    "push_up__bodyweight",
+    "split_squat__smith",
+    "squat__barbell"
+  ],
+  "verifiedBlobCount": 12,
+  "playedBlobCount": 12,
+  "rendererFrameEvents": 12,
+  "objectStates": [
+    {
+      "phase": "install",
+      "state": "available",
+      "activeVersion": "1.0.0",
+      "previousVersion": null,
+      "archiveObjectCount": 1,
+      "archiveBytes": 36021,
+      "archiveFiles": [
+        {
+          "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+          "bytes": 36021
+        }
+      ]
+    },
+    {
+      "phase": "offline-relaunch",
+      "state": "available",
+      "activeVersion": "1.0.0",
+      "previousVersion": null,
+      "archiveObjectCount": 1,
+      "archiveBytes": 36021,
+      "archiveFiles": [
+        {
+          "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+          "bytes": 36021
+        }
+      ]
+    },
+    {
+      "phase": "failed-update",
+      "state": "available",
+      "activeVersion": "1.0.0",
+      "previousVersion": null,
+      "archiveObjectCount": 1,
+      "archiveBytes": 36021,
+      "archiveFiles": [
+        {
+          "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+          "bytes": 36021
+        }
+      ]
+    },
+    {
+      "phase": "update",
+      "state": "available",
+      "activeVersion": "1.0.1",
+      "previousVersion": "1.0.0",
+      "archiveObjectCount": 2,
+      "archiveBytes": 72066,
+      "archiveFiles": [
+        {
+          "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+          "bytes": 36021
+        },
+        {
+          "path": "gym-local.animation-pilot-01/1.0.1/8ee05644133a33e17db53b664dec680a47885bbbf2e1889de4ffba93435d0794/animation-pack.zip",
+          "bytes": 36045
+        }
+      ]
+    },
+    {
+      "phase": "rollback",
+      "state": "available",
+      "activeVersion": "1.0.0",
+      "previousVersion": "1.0.1",
+      "archiveObjectCount": 2,
+      "archiveBytes": 72066,
+      "archiveFiles": [
+        {
+          "path": "gym-local.animation-pilot-01/1.0.0/621f709d7f5c3f05ef0f2cb7869a8ec6e4835d2c7b3eafd008a6c6c06b37dfcc/animation-pack.zip",
+          "bytes": 36021
+        },
+        {
+          "path": "gym-local.animation-pilot-01/1.0.1/8ee05644133a33e17db53b664dec680a47885bbbf2e1889de4ffba93435d0794/animation-pack.zip",
+          "bytes": 36045
+        }
+      ]
+    },
+    {
+      "phase": "remove",
+      "state": "unavailable",
+      "activeVersion": null,
+      "previousVersion": null,
+      "archiveObjectCount": 0,
+      "archiveBytes": 0,
+      "archiveFiles": []
+    }
   ],
   "exactIdentityRequired": true,
   "networkRequestAttempts": 0,
