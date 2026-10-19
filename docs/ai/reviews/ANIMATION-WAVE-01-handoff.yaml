@@ -1,0 +1,378 @@
+schema_version: 3
+packet_id: "ANIMATION-WAVE-01"
+status: "BLOCKED"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "This producer task was explicitly created for gpt-5.6-sol; no model substitution or subagent was used."
+subagents_used: false
+
+base_commit: "bbbd0dd40dd2c6554dd7f37be8655c7eb3d93633"
+base_checkpoint: "checkpoint/animation-pilot-01-rev-02-fix-03-automated-pass"
+producer_start_commit: "c8842142aafe34bb5d2e5b50ee4b452226e4007d"
+candidate_parent_commit: null
+candidate_commit: null
+branch: "codex/animation-wave-01"
+
+changed_paths:
+  candidate: []
+  post_candidate_metadata:
+    - "docs/ai/reviews/ANIMATION-WAVE-01-handoff.yaml"
+
+versions:
+  app: "0.7.0"
+  database: 5
+  backup: 5
+  catalog: 3
+  animation_pack_schema: 1
+  animation_player_protocol: 1
+  animation_catalog: 1
+  renderer: "three@0.185.1"
+  storage_layout: 1
+
+variant_matrix:
+  catalog_variants: 199
+  pilot_variants: 12
+  wave_01_variants: 18
+  remaining_outside_pilot_and_wave_01: 169
+  pack_id: "gym-local.animation-production"
+  releases:
+    - "1.0.0"
+    - "1.0.1"
+  exact_ids:
+    - "chest_press__dumbbell"
+    - "chest_press__barbell"
+    - "incline_chest_press__dumbbell"
+    - "dip__bodyweight"
+    - "lat_pulldown__cable"
+    - "pull_up__bodyweight"
+    - "horizontal_row__cable"
+    - "overhead_press__dumbbell"
+    - "biceps_curl__dumbbell"
+    - "triceps_pushdown__cable"
+    - "squat__bodyweight"
+    - "lunge__dumbbell"
+    - "step_up__bodyweight"
+    - "romanian_deadlift__barbell"
+    - "leg_curl__machine"
+    - "deadlift__trap_bar"
+    - "standing_calf_raise__bodyweight"
+    - "crunch__bodyweight"
+  result: "blocked_before_candidate"
+  evidence: "The packet declares the exact 199/12/18/169 matrix. Required post-candidate matrix command 19 was not run after the source-rights stop gate."
+
+source_license_and_provenance_evidence:
+  result: "blocked"
+  stop_gate: "AW01-STOP-02"
+  local_repository_audit:
+    tracked_wave_01_input_paths: 0
+    tracked_glb_files_repository_wide: 0
+    exact_source_urls_declared_for_wave_01: 0
+    exact_license_or_terms_urls_declared_for_wave_01: 0
+    source_content_hashes_declared_for_wave_01: 0
+    final_asset_hashes_declared_for_wave_01: 0
+    complete_rights_records: 0
+    network_reads_attempted: 0
+    evidence:
+      - "git ls-tree -r --name-only HEAD found no path under content/animation-packs/animation-wave-01, docs/licenses/animation-wave-01, docs/ai/evidence/ANIMATION-WAVE-01, no Wave 01 script, and no prior Wave 01 handoff."
+      - "git ls-tree -r --name-only HEAD found zero tracked files ending in .glb."
+      - "Exact Wave 01 variant IDs occur only in existing catalog, workout, progress, app-test, or online-video metadata; those records do not declare Wave 01 animation bytes or a source-rights matrix."
+      - "No network read was authorized or attempted because the repository supplies no exact declared HTTPS source/license URL to read, and the packet forbids crawling, search-result harvesting, scraping, and substitution."
+  common_missing_fields_for_every_asset:
+    - "committed production GLB bytes"
+    - "exact machine-valid HTTPS source URL"
+    - "exact machine-valid HTTPS license or terms URL"
+    - "retrieved source byte size"
+    - "retrieved source SHA-256"
+    - "final GLB byte size"
+    - "final GLB SHA-256"
+    - "attributable author or rightsholder"
+    - "explicit offline redistribution permission"
+    - "explicit derivative or modification permission"
+    - "required attribution and notice text"
+    - "modification, conversion, or retargeting history"
+    - "hash-linked provenance record"
+    - "resolvable source/license/asset/variant/animation/review relation"
+  exact_asset_gaps:
+    - exercise_variant_id: "chest_press__dumbbell"
+      animation_id: "animation.production.chest-press.dumbbell"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "chest_press__barbell"
+      animation_id: "animation.production.chest-press.barbell"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "incline_chest_press__dumbbell"
+      animation_id: "animation.production.incline-chest-press.dumbbell"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "dip__bodyweight"
+      animation_id: "animation.production.dip.bodyweight"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "lat_pulldown__cable"
+      animation_id: "animation.production.lat-pulldown.cable"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "pull_up__bodyweight"
+      animation_id: "animation.production.pull-up.bodyweight"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "horizontal_row__cable"
+      animation_id: "animation.production.horizontal-row.cable"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "overhead_press__dumbbell"
+      animation_id: "animation.production.overhead-press.dumbbell"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "biceps_curl__dumbbell"
+      animation_id: "animation.production.biceps-curl.dumbbell"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "triceps_pushdown__cable"
+      animation_id: "animation.production.triceps-pushdown.cable"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "squat__bodyweight"
+      animation_id: "animation.production.squat.bodyweight"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "lunge__dumbbell"
+      animation_id: "animation.production.lunge.dumbbell"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "step_up__bodyweight"
+      animation_id: "animation.production.step-up.bodyweight"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "romanian_deadlift__barbell"
+      animation_id: "animation.production.romanian-deadlift.barbell"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "leg_curl__machine"
+      animation_id: "animation.production.leg-curl.machine"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "deadlift__trap_bar"
+      animation_id: "animation.production.deadlift.trap-bar"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "standing_calf_raise__bodyweight"
+      animation_id: "animation.production.standing-calf-raise.bodyweight"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+    - exercise_variant_id: "crunch__bodyweight"
+      animation_id: "animation.production.crunch.bodyweight"
+      local_asset_bytes: "missing"
+      source_rights_record: "missing_all_common_fields"
+  required_resolution:
+    - "Supply repository-authorized exact source and license/terms URLs plus the complete rights and attribution matrix for all 18 exact assets."
+    - "Supply the corresponding non-placeholder, non-synthetic, production GLB source bytes with source/final byte sizes and SHA-256 values."
+    - "Commit those prerequisites through an authorized coordinate lineage, then issue a new bounded producer attempt from the newest safe coordinator commit."
+
+production_suitability_and_equipment_fidelity_evidence:
+  result: "not_run"
+  evidence: "No production GLB bytes exist to inspect for clips, rig compatibility, finite tracks, self-containment, exact props, forbidden neighbor props, or inequality from pilot fixtures. AW01-STOP-02 forbids placeholder or substitute generation."
+
+release_artifacts_and_reproducibility:
+  result: "not_run"
+  evidence: "No source bytes or complete rights matrix exist, so no manifest, descriptor, archive, staging root, clean build, or reproducibility output was created."
+
+exact_mapping_evidence:
+  result: "not_run"
+  evidence: "No Wave 01 manifest or asset relation exists. Required command 19 was not run after the stop gate."
+
+offline_lifecycle_evidence:
+  result: "not_run"
+  evidence: "No Wave 01 release exists to install, relaunch, update, roll back, remove, render, or test offline."
+
+personal_backup_isolation_evidence:
+  result: "not_run"
+  evidence: "No Wave 01 lifecycle ran; no personal-table or backup-v5 result is claimed. Existing protected implementation remains unchanged."
+
+performance_size_and_pwa_evidence:
+  result: "not_run"
+  evidence: "No Wave 01 bytes or release outputs exist, so no Wave 01 size, renderer-cycle, storage-multiplier, PWA, or zero-leak budget was measured."
+
+acceptance_evidence:
+  - id: "AW01-AC-01"
+    result: "blocked"
+    evidence: "Checkpoint -> packet-only coordinator lineage is exact, but no implementation candidate was created after the stop gates."
+  - id: "AW01-AC-02"
+    result: "not_run"
+    evidence: "The packet declares the exact matrix; the required post-candidate exhaustive command was not run."
+  - id: "AW01-AC-03"
+    result: "blocked"
+    evidence: "All 18 exact records lack source/license URLs, hashes, rights, attribution, provenance, and review relations."
+  - id: "AW01-AC-04"
+    result: "blocked"
+    evidence: "There are no production bytes from which to reject scraped, restricted, placeholder, synthetic, pilot-derived, or cross-variant content."
+  - id: "AW01-AC-05"
+    result: "blocked"
+    evidence: "There are no GLBs to validate."
+  - id: "AW01-AC-06"
+    result: "not_run"
+    evidence: "No candidate exists; protected paths were not edited."
+  - id: "AW01-AC-07"
+    result: "blocked"
+    evidence: "No releases exist for clean-build comparison."
+  - id: "AW01-AC-08"
+    result: "not_run"
+    evidence: "No Wave 01 descriptor or manifest exists."
+  - id: "AW01-AC-09"
+    result: "not_run"
+    evidence: "No Wave 01 entries exist."
+  - id: "AW01-AC-10"
+    result: "not_run"
+    evidence: "No Wave 01 release lifecycle exists."
+  - id: "AW01-AC-11"
+    result: "not_run"
+    evidence: "No Wave 01 lifecycle or backup was produced."
+  - id: "AW01-AC-12"
+    result: "not_run"
+    evidence: "No Wave 01 payload or operations exist for budget measurement."
+  - id: "AW01-AC-13"
+    result: "not_run"
+    evidence: "No candidate build or PWA audit ran."
+  - id: "AW01-AC-14"
+    result: "blocked"
+    evidence: "Required command 1 failed and commands 2 through 26 were not run under the stop rule."
+  - id: "AW01-AC-15"
+    result: "blocked"
+    evidence: "This handoff correctly records BLOCKED with merge_authorized false; no candidate or PASS is claimed."
+
+checks:
+  required_commands: 26
+  required_commands_run: 1
+  required_commands_passed: 0
+  required_commands_failed: 1
+  required_commands_not_run: 25
+  immutable_candidate_created: false
+  triggered_stop_gates:
+    - "AW01-STOP-02"
+    - "AW01-STOP-10"
+  result: "blocked"
+  evidence: "Preflight command 1 failed because the local offline pnpm metadata mirror lacks electron-to-chromium. Independently, the local repository contains zero Wave 01 inputs and zero complete rights records, so AW01-STOP-02 requires stopping before asset inclusion."
+
+protected_path_audit:
+  result: "pass"
+  candidate_paths_changed: []
+  unauthorized_paths_changed: []
+  forbidden_paths_changed: []
+  coordinator_commit_unchanged: true
+  candidate_created: false
+  handoff_is_sole_metadata_change: true
+  evidence: "Before this report Git status was empty at c8842142; no implementation, source asset, package, lockfile, config, contract, storage, backup, catalog, UI, public, pilot, ledger, or tag path changed."
+
+known_risks:
+  - "Wave 01 cannot begin until all 18 production assets and their complete machine-valid source-rights-provenance matrix are supplied through authorized repository state."
+  - "The offline dependency mirror also needs electron-to-chromium metadata before required command 1 can pass."
+  - "No production suitability, equipment fidelity, deterministic release, lifecycle, personal-data, backup, performance, or PWA evidence exists for Wave 01."
+  - "No optional human, legal, visual, biomechanics, VoiceOver, or physical-device evidence ran; none is claimed as passed."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  rights_or_legal_review: "not_run"
+  visual_or_biomechanics_review: "not_run"
+  manual_or_voiceover_review: "not_run"
+  physical_device_battery_thermal_memory_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "ANIMATION-WAVE-01"
+  candidate_commit: null
+  status: "BLOCKED"
+  checks:
+    - command: 'pnpm install --offline --frozen-lockfile; git status --short must remain empty before implementation'
+      result: "fail"
+      evidence: "pnpm exited nonzero with ERR_PNPM_NO_OFFLINE_META because electron-to-chromium metadata was absent from C:/Users/Q/AppData/Local/pnpm-cache/v11/metadata-full/registry.npmjs.org/electron-to-chromium.jsonl; a subsequent Git check confirmed status remained empty."
+    - command: 'node scripts/animation-wave-01-assets.mjs validate'
+      result: "not_run"
+      evidence: "Not run after AW01-STOP-02 and AW01-STOP-10; the script and all Wave 01 inputs are absent."
+    - command: 'node scripts/animation-wave-01-assets.mjs repro'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'node scripts/animation-wave-01-evidence.mjs validate'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm exec vitest run scripts/animation-wave-01-assets.test.mjs scripts/animation-wave-01-evidence.test.mjs scripts/animation-pack-v1.test.mjs'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm exec vitest run packages/contracts/src/animation-pack.test.ts packages/catalog/src/animation-catalog.test.ts packages/storage/src/animation-pack/archive.test.ts packages/storage/src/animation-pack/store.test.ts packages/storage/src/animation-pack/opfs.test.ts packages/media/src/gltf-renderer.test.ts packages/media/src/animation-player.test.ts packages/backup/src/backup.test.ts apps/web/src/pwa/install.test.ts'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run content:validate'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run content:audit'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm exec eslint scripts/animation-wave-01-assets.mjs scripts/animation-wave-01-assets.test.mjs scripts/animation-wave-01-evidence.mjs scripts/animation-wave-01-evidence.test.mjs scripts/content-validate.mjs scripts/content-audit.mjs --max-warnings=0'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run typecheck'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run architecture:audit'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run build'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run performance:report'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'node scripts/animation-wave-01-evidence.mjs audit-pwa'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run verify:affected'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'pnpm run verify'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'git diff --check producer_start_commit..candidate_commit'
+      result: "not_run"
+      evidence: "No candidate commit exists."
+    - command: 'assert exact checkpoint/coordinator/candidate/handoff parentage, packet-only coordinator delta, candidate changed-path subset, handoff-only delta, immutable candidate HEAD, and clean Git status'
+      result: "not_run"
+      evidence: "No candidate exists; final blocker-commit lineage is audited separately after this handoff is committed."
+    - command: 'assert catalog-derived 199/12/18/169 counts, exact Wave 01 IDs and animation IDs, complete disjointness, case-sensitive lookups, and no cross-variant/equipment fallback'
+      result: "not_run"
+      evidence: "Not run after the stop gates."
+    - command: 'audit all 18 exact source and terms URLs, retrieval records, source/final SHA-256 values, authors, rights, redistribution, modification permission, attribution, provenance links, review records, NOTICE closure, and reject scraped/unclear/restricted bytes'
+      result: "not_run"
+      evidence: "The preflight local-input audit found zero declared URL/hash/rights records; the required candidate audit cannot run without inputs."
+    - command: 'audit all 18 GLBs for self-containment, exact clips, rig compatibility, finite monotonic tracks, declared and forbidden neighbor props, production-suitability records, non-placeholder/non-synthetic status, and inequality from every pilot fixture/payload hash'
+      result: "not_run"
+      evidence: "No Wave 01 GLB exists."
+    - command: 'recompute both clean builds for releases 1.0.0 and 1.0.1, compare tracked manifest/descriptor bytes, archive/manifest/asset hashes, and prove no generated release archive or staging output is tracked'
+      result: "not_run"
+      evidence: "No Wave 01 release inputs exist."
+    - command: 'audit operation-derived OPFS install/failure/quota/update/relaunch/rollback/remove identities, retained and staged multipliers, owned/foreign cleanup, all-18 offline playback, zero network attempts, personal-table hash/count equality, and backup-v5 exclusion'
+      result: "not_run"
+      evidence: "No Wave 01 release exists."
+    - command: 'assert locked versions and protected checkpoint objects for apps, packages, public, ADRs, configs, package/lock files, pilot content/evidence/scripts, video metadata, database/migrations, backup, catalog IDs/mappings, runtime, and service-worker policy are unchanged'
+      result: "not_run"
+      evidence: "No candidate exists; the blocker report records a separate read-only protected-path audit."
+    - command: 'assert default dist and service worker contain zero Wave 01 GLB/GLTF/ZIP/manifest/descriptor/pack-identity/source/provenance bytes, existing PWA budgets pass, and active-workout update deferral remains tested'
+      result: "not_run"
+      evidence: "No candidate build was run after the stop gates."
+    - command: 'assert candidate_commit remains unchanged before and after all candidate commands, every generated output is ignored/owned/cleaned, tracked evidence equals regenerated evidence, and git status --porcelain is empty'
+      result: "not_run"
+      evidence: "No candidate commit or generated Wave 01 output exists."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-WAVE-01.yaml"
+  producer_start_commit: "c8842142aafe34bb5d2e5b50ee4b452226e4007d"
+  candidate_range: null
+  report_path: "docs/ai/reviews/ANIMATION-WAVE-01-handoff.yaml"
+  next_task: "Resolve all 18 source-rights/asset-byte gaps and the offline pnpm metadata gap, then issue a new authorized producer attempt; do not merge this blocker commit as a Wave 01 candidate."
