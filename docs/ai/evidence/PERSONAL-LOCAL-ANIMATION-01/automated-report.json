@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packetId": "PERSONAL-LOCAL-ANIMATION-01",
+  "generatedBy": "scripts/personal-local-animation-evidence.mjs",
+  "trustDomains": {
+    "releasePack": "unchanged_strict",
+    "personalLocal": "device_only_non_distributable"
+  },
+  "personalLocalSchemaVersion": 1,
+  "personalLocalStorageLayoutVersion": 1,
+  "networkOperations": 0,
+  "cacheStorageWrites": 0,
+  "egressApis": 0,
+  "backupIncluded": false,
+  "buildIncluded": false,
+  "precacheIncluded": false,
+  "trackedAnimationBytes": 0
+}

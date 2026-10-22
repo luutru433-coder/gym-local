@@ -10,6 +10,7 @@ import {
   type MealEntry,
   type NutritionPackRecord,
   type PantryItem,
+  type PersonalLocalAnimationRecord,
   type PersonalDataSnapshot,
   type Profile,
   type Program,
@@ -23,6 +24,42 @@ import {
 
 export * from "./nutrition-pack-client";
 export * from "./animation-pack";
+export type {
+  PersonalLocalAnimationImportRequest,
+  PersonalLocalAnimationListItem,
+  PersonalLocalAnimationReadRequest,
+  PersonalLocalAnimationSource
+} from "./personal-local-animation";
+import type {
+  PersonalLocalAnimationImportRequest,
+  PersonalLocalAnimationListItem,
+  PersonalLocalAnimationReadRequest,
+  PersonalLocalAnimationSource
+} from "./personal-local-animation";
+
+export async function importPersonalLocalAnimation(request: PersonalLocalAnimationImportRequest): Promise<PersonalLocalAnimationRecord> {
+  return (await import("./personal-local-animation")).importPersonalLocalAnimation(request);
+}
+
+export async function listPersonalLocalAnimations(): Promise<PersonalLocalAnimationListItem[]> {
+  return (await import("./personal-local-animation")).listPersonalLocalAnimations();
+}
+
+export async function activatePersonalLocalAnimation(personalLocalAnimationId: string, exerciseVariantId: string): Promise<PersonalLocalAnimationListItem[]> {
+  return (await import("./personal-local-animation")).activatePersonalLocalAnimation(personalLocalAnimationId, exerciseVariantId);
+}
+
+export async function readPersonalLocalAnimationSource(request: PersonalLocalAnimationReadRequest): Promise<PersonalLocalAnimationSource> {
+  return (await import("./personal-local-animation")).readPersonalLocalAnimationSource(request);
+}
+
+export async function removePersonalLocalAnimation(personalLocalAnimationId: string, exerciseVariantId: string): Promise<PersonalLocalAnimationListItem[]> {
+  return (await import("./personal-local-animation")).removePersonalLocalAnimation(personalLocalAnimationId, exerciseVariantId);
+}
+
+export async function recoverPersonalLocalAnimations(): Promise<PersonalLocalAnimationListItem[]> {
+  return (await import("./personal-local-animation")).recoverPersonalLocalAnimations();
+}
 
 function assertFiniteRecord(value: unknown, path = "record"): void {
   if (typeof value === "number") {

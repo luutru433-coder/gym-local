@@ -119,6 +119,10 @@ Physical iPhone or other device runs, human VoiceOver use, visual-quality inspec
 
 The pilot's automated verification must pass before any 199-variant production wave begins. It must include 10–12 variants and automated evidence for valid source/license/provenance metadata, deterministic build reproduction and checksums, atomic rollback, offline relaunch, exact equipment-variant mapping with no cross-variant fallback, personal-data safety, backup isolation, required lint/typecheck/architecture/unit/build checks, configured performance budgets, and exclusion of pack binaries from the service-worker precache. Missing or unclear rights, a failed test, a module-boundary violation, or another safety stop gate blocks the pilot. Human or named reviewers and physical iPhone, VoiceOver, visual, battery, thermal, memory, motion, equipment, or other device-run evidence are optional and have no candidate or merge-gate effect.
 
+## Personal-local animation trust domain
+
+ADR 0022 adds a second, non-interchangeable animation trust domain: personal-local GLB imports are unreviewed device-only material in a separate `@gym/storage` OPFS namespace. They use exact immutable local ID plus case-sensitive variant binding, remain absent from backup, transfer, build, precache, and network paths, and can never satisfy or relax release-pack source, license, provenance, catalog, or review gates. Active-workout consumption remains deferred to a later packet.
+
 ## Packet completion rule
 
 A packet is complete and mergeable only when an immutable candidate commit exists, its diff is within `allowed_paths`, a schema-valid handoff exists, every required automated command records `pass`, no safety stop gate is triggered, and automated verification records `status: PASS` with `merge_authorized: true`. No `APPROVED`, cold-review `PASS`, `OWNER_APPROVED`, named reviewer, owner verification, manual review, or device evidence is required. Optional evidence never substitutes for required automated results and is never inferred to have run.

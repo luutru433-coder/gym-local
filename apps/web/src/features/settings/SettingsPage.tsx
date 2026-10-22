@@ -9,6 +9,7 @@ import { exportAllData, persistentStorageStatus, requestPersistentStorage, stora
 import { formatDate, formatNumber } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { PwaInstallCard } from "./PwaInstallCard";
+import { PersonalLocalAnimationCard } from "./PersonalLocalAnimationCard";
 
 const goalLabels: Record<Goal, { vi: string; en: string }> = {
   hypertrophy: { vi: "Tăng cơ", en: "Build muscle" }, strength: { vi: "Sức mạnh", en: "Strength" }, fat_loss: { vi: "Giảm mỡ", en: "Fat loss" }, general: { vi: "Sức khỏe chung", en: "General fitness" }
@@ -242,6 +243,11 @@ export function SettingsPage() {
               <input ref={fileRef} type="file" accept=".zip,application/zip" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importBackup(file); }} />
               {backupMessage ? <Notice tone={backupMessage.tone}>{backupMessage.text}</Notice> : null}
             </Card>
+          </section>
+
+          <section>
+            <SectionTitle eyebrow={locale === "vi" ? "Chỉ trên thiết bị" : "Device only"} title={locale === "vi" ? "Hoạt ảnh cá nhân" : "Personal animations"} />
+            <PersonalLocalAnimationCard locale={locale} />
           </section>
         </div>
 

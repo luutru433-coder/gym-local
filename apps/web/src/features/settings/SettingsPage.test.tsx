@@ -7,6 +7,8 @@ import { defaultSettings } from "@gym/storage";
 import { useGymStore } from "../../store/useGymStore";
 import { SettingsPage } from "./SettingsPage";
 
+vi.mock("./PersonalLocalAnimationCard", () => ({ PersonalLocalAnimationCard: ({ locale }: { locale: string }) => <div data-testid="personal-local-card">{locale}</div> }));
+
 const timestamp = "2026-08-13T10:00:00.000Z";
 
 function profile(): Profile {
@@ -40,6 +42,11 @@ afterEach(() => {
 });
 
 describe("nutrition target confirmation", () => {
+  it("includes the personal-local device-only settings lane", () => {
+    useGymStore.setState({ profile: profile(), settings: defaultSettings, activeSession: undefined, recoveryAvailable: false });
+    render(<SettingsPage />);
+    expect(screen.getByTestId("personal-local-card")).toHaveTextContent("vi");
+  });
   it("does not replace a target after body details change until the estimate is confirmed", async () => {
     const user = userEvent.setup();
     const storedProfile = profile();

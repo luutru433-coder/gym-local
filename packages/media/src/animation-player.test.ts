@@ -16,6 +16,7 @@ import {
   createAnimationPlayerController,
   type AnimationPlayerAssetLoader,
   type AnimationPlayerController,
+  type AnimationPlayerReleaseSource,
   type AnimationPlayerSource
 } from "./animation-player";
 import { createTestAnimationRenderer, type TestAnimationRenderer } from "./animation-player.test-renderer";
@@ -93,7 +94,7 @@ function deferred<T>(): Deferred<T> {
   return { promise, resolve, reject };
 }
 
-function sourceFor(request: AnimationPlayerRequest = REQUEST): AnimationPlayerSource {
+function sourceFor(request: AnimationPlayerRequest = REQUEST): AnimationPlayerReleaseSource {
   const asset = structuredClone(ASSET);
   const entry = structuredClone(ENTRY);
   entry.exerciseVariantId = request.exerciseVariantId;
@@ -218,14 +219,14 @@ describe("animation player controller", () => {
   });
 
   it.each([
-    ["variant", (source: AnimationPlayerSource) => { source.entry.exerciseVariantId = "squat__smith"; }, "missing_variant"],
-    ["animation", (source: AnimationPlayerSource) => { source.entry.animationId = "animation.squat-smith"; }, "missing_asset"],
-    ["asset ID", (source: AnimationPlayerSource) => { source.entry.assetId = "asset.other"; }, "missing_asset"],
-    ["asset path", (source: AnimationPlayerSource) => { source.entry.assetPath = "assets/other.glb"; }, "missing_asset"],
-    ["duration", (source: AnimationPlayerSource) => { source.asset.durationSeconds = 5; }, "missing_asset"],
-    ["media type", (source: AnimationPlayerSource) => { source.asset.mediaType = "model/gltf+json"; }, "missing_asset"],
-    ["blob bytes", (source: AnimationPlayerSource) => { source.asset.byteSize = 5; }, "missing_asset"],
-    ["malformed descriptor", (source: AnimationPlayerSource) => { source.asset.id = "Asset.Invalid"; }, "missing_asset"]
+    ["variant", (source: AnimationPlayerReleaseSource) => { source.entry.exerciseVariantId = "squat__smith"; }, "missing_variant"],
+    ["animation", (source: AnimationPlayerReleaseSource) => { source.entry.animationId = "animation.squat-smith"; }, "missing_asset"],
+    ["asset ID", (source: AnimationPlayerReleaseSource) => { source.entry.assetId = "asset.other"; }, "missing_asset"],
+    ["asset path", (source: AnimationPlayerReleaseSource) => { source.entry.assetPath = "assets/other.glb"; }, "missing_asset"],
+    ["duration", (source: AnimationPlayerReleaseSource) => { source.asset.durationSeconds = 5; }, "missing_asset"],
+    ["media type", (source: AnimationPlayerReleaseSource) => { source.asset.mediaType = "model/gltf+json"; }, "missing_asset"],
+    ["blob bytes", (source: AnimationPlayerReleaseSource) => { source.asset.byteSize = 5; }, "missing_asset"],
+    ["malformed descriptor", (source: AnimationPlayerReleaseSource) => { source.asset.id = "Asset.Invalid"; }, "missing_asset"]
   ] as const)("rejects an exact-source %s mismatch before renderer mount", async (_name, mutate, errorCode) => {
     const { controller, loader, testRenderer } = createHarness();
     controller.attach(document.createElement("div"));

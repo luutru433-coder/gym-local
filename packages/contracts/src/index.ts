@@ -685,3 +685,4 @@ export function createId(prefix: string): Id {
 }
 
 export * from "./animation-pack";
+export * from "./personal-local-animation";

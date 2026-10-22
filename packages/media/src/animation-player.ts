@@ -7,6 +7,7 @@ import {
   parseAnimationAssetDescriptor,
   parseAnimationPackEntry,
   parseAnimationPackError,
+  parsePersonalLocalAnimationRecord,
   parseAnimationPlayerRequest,
   parseAnimationPlayerState,
   type AnimationAssetDescriptor,
@@ -17,11 +18,26 @@ import {
   type AnimationPlayerState
 } from "@gym/contracts";
 
-export interface AnimationPlayerSource {
+export interface AnimationPlayerReleaseSource {
+  kind?: "release_pack";
   entry: AnimationPackEntry;
   asset: AnimationAssetDescriptor;
   blob: Blob;
 }
+
+export interface AnimationPlayerPersonalLocalSource {
+  kind: "personal_local";
+  record: import("@gym/contracts").PersonalLocalAnimationRecord;
+  blob: Blob;
+}
+
+export type AnimationPlayerSource = AnimationPlayerReleaseSource | AnimationPlayerPersonalLocalSource;
+
+export type AnimationPlayerRenderableEntry = Pick<AnimationPackEntry,
+  "animationId" | "exerciseVariantId" | "clipName" | "durationSeconds" | "loop" | "defaultCamera"
+>;
+
+export type AnimationPlayerRenderableAsset = Pick<AnimationAssetDescriptor, "mediaType" | "byteSize">;
 
 export interface AnimationPlayerAssetLoader {
   load(request: Readonly<AnimationPlayerRequest>, signal: AbortSignal): Promise<AnimationPlayerSource>;
@@ -36,8 +52,8 @@ export interface AnimationPlayerRendererEvents {
 export interface AnimationPlayerRendererMount {
   viewport: HTMLElement;
   blob: Blob;
-  entry: AnimationPackEntry;
-  asset: AnimationAssetDescriptor;
+  entry: AnimationPlayerRenderableEntry;
+  asset: AnimationPlayerRenderableAsset;
   request: Readonly<AnimationPlayerRequest>;
   events: AnimationPlayerRendererEvents;
 }
@@ -146,12 +162,35 @@ function publicPackError(value: unknown): AnimationPackError | undefined {
 }
 
 type SourceValidation =
-  | { success: true; source: AnimationPlayerSource }
+  | { success: true; source: { entry: AnimationPlayerRenderableEntry; asset: AnimationPlayerRenderableAsset; blob: Blob } }
   | { success: false; error: AnimationPackError };
 
 function validateSource(source: unknown, request: Readonly<AnimationPlayerRequest>): SourceValidation {
   if (typeof source !== "object" || source === null) return { success: false, error: { code: "missing_asset" } };
-  const candidate = source as { entry?: unknown; asset?: unknown; blob?: unknown };
+  const candidate = source as { kind?: unknown; entry?: unknown; asset?: unknown; record?: unknown; blob?: unknown };
+  if (candidate.kind === "personal_local") {
+    const recordResult = parsePersonalLocalAnimationRecord(candidate.record);
+    if (!recordResult.success || !(candidate.blob instanceof Blob)) return { success: false, error: { code: "missing_asset" } };
+    const record = recordResult.data;
+    if (record.exerciseVariantId !== request.exerciseVariantId) return { success: false, error: { code: "missing_variant" } };
+    if (record.personalLocalAnimationId !== request.animationId || candidate.blob.size !== record.byteSize) return { success: false, error: { code: "missing_asset" } };
+    if (candidate.blob.type !== "" && candidate.blob.type !== record.mediaType) return { success: false, error: { code: "missing_asset" } };
+    return {
+      success: true,
+      source: {
+        entry: {
+          animationId: record.personalLocalAnimationId,
+          exerciseVariantId: record.exerciseVariantId,
+          clipName: record.clipName,
+          durationSeconds: record.durationSeconds,
+          loop: record.loop,
+          defaultCamera: record.defaultCamera
+        },
+        asset: { mediaType: record.mediaType, byteSize: record.byteSize },
+        blob: candidate.blob
+      }
+    };
+  }
   const entryResult = parseAnimationPackEntry(candidate.entry);
   const assetResult = parseAnimationAssetDescriptor(candidate.asset);
   if (!entryResult.success || !assetResult.success || !(candidate.blob instanceof Blob)) {

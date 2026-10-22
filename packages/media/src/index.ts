@@ -1,6 +1,7 @@
 import type { ContentSource, ExerciseVariant, ExerciseVideoGuide, MediaAsset } from "@gym/contracts";
 
 export * from "./animation-player";
+export * from "./personal-local-animation";
 
 export interface MediaAuditIssue {
   code:
