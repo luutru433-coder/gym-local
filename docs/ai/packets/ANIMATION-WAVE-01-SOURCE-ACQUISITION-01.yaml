@@ -1,0 +1,503 @@
+schema_version: 3
+packet:
+  id: "ANIMATION-WAVE-01-SOURCE-ACQUISITION-01"
+  title: "Acquire verified source inputs for the fixed Wave 01 matrix"
+  type: "content"
+  status: "ready"
+
+prerequisite:
+  pilot_checkpoint_tag: "checkpoint/animation-pilot-01-rev-02-fix-03-automated-pass"
+  pilot_checkpoint_commit: "bbbd0dd40dd2c6554dd7f37be8655c7eb3d93633"
+  wave_01_coordinator_commit: "c8842142aafe34bb5d2e5b50ee4b452226e4007d"
+  wave_01_blocked_handoff_commit: "33471f11b64e0089423aaa227b5f91825f6e8f98"
+  wave_01_blocked_handoff_path: "docs/ai/reviews/ANIMATION-WAVE-01-handoff.yaml"
+  wave_01_result: "BLOCKED with no candidate because all 18 source-rights records and production asset inputs were missing; the offline pnpm metadata mirror also lacked electron-to-chromium metadata."
+  lineage_rule: "This prerequisite packet starts from the immutable Wave 01 BLOCKED handoff. It resolves only the 18 source-rights and asset-input gaps and does not retry or implement ANIMATION-WAVE-01."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "33471f11b64e0089423aaa227b5f91825f6e8f98"
+  base_checkpoint: "checkpoint/animation-pilot-01-rev-02-fix-03-automated-pass"
+  target_branch: "codex/animation-wave-01-source-acquisition-01"
+  worktree_required: true
+  sequential_after:
+    - "ANIMATION-WAVE-01 BLOCKED handoff at 33471f11b64e0089423aaa227b5f91825f6e8f98"
+  producer_start_rule:
+    start_commit: "The committed ANIMATION-WAVE-01-SOURCE-ACQUISITION-01 coordinator packet HEAD supplied to the producer."
+    required_parent: "The producer start commit's first parent must be exactly 33471f11b64e0089423aaa227b5f91825f6e8f98."
+    required_coordinator_delta:
+      - "git diff --name-only 33471f11b64e0089423aaa227b5f91825f6e8f98..HEAD must print only docs/ai/packets/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01.yaml before producer edits."
+      - "The producer must not amend, replace, or add to the coordinator commit."
+    pass_candidate_rule: "A successful implementation is one immutable candidate commit whose first parent is the producer start commit. It contains all 18 qualified records, all authorized asset inputs, acquisition tooling, and machine evidence."
+    pass_handoff_rule: "After the immutable candidate passes every required automated command, create one direct-child commit containing only docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml."
+    blocked_handoff_rule: "If a stop gate triggers before a complete candidate exists, create no partial candidate. A BLOCKED handoff may be the sole direct-child metadata commit from the producer start commit, with candidate_commit null, exact gaps, automated_verification.status BLOCKED, and merge_authorized false."
+    review_range_rule: "For PASS, the candidate range is producer_start_commit..candidate_commit and the handoff range is candidate_commit..handoff_commit. For pre-candidate BLOCKED, the sole allowed range is producer_start_commit..blocked_handoff_commit and contains only the declared handoff path."
+
+authority:
+  allowed_paths:
+    - "content/animation-packs/animation-wave-01/source-acquisition/**"
+    - "docs/licenses/animation-wave-01/source-acquisition/**"
+    - "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/**"
+    - "scripts/animation-wave-01-source-acquisition.mjs"
+    - "scripts/animation-wave-01-source-acquisition.test.mjs"
+    - "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml"
+  candidate_paths:
+    - "content/animation-packs/animation-wave-01/source-acquisition/**"
+    - "docs/licenses/animation-wave-01/source-acquisition/**"
+    - "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/**"
+    - "scripts/animation-wave-01-source-acquisition.mjs"
+    - "scripts/animation-wave-01-source-acquisition.test.mjs"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "apps/**"
+    - "packages/**"
+    - "public/**"
+    - "content/animation-packs/animation-pilot-01/**"
+    - "content/animation-packs/animation-wave-01/assets/**"
+    - "content/animation-packs/animation-wave-01/release-metadata/**"
+    - "content/animation-packs/animation-wave-01/releases.json"
+    - "content/animation-packs/animation-wave-01/PROVENANCE.md"
+    - "content/exercise-video-guides.json"
+    - "content/nutrition-*/**"
+    - "content/nutrition-recipes/**"
+    - "docs/licenses/animation-pilot-01/**"
+    - "docs/licenses/animation-wave-01/NOTICE.md"
+    - "docs/licenses/animation-wave-01/dependency-closure.json"
+    - "docs/ai/evidence/ANIMATION-WAVE-01/**"
+    - "docs/adr/**"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/**"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/reviews/ANIMATION-WAVE-01-handoff.yaml"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "scripts/animation-pilot-*.mjs"
+    - "scripts/animation-wave-01-assets.mjs"
+    - "scripts/animation-wave-01-assets.test.mjs"
+    - "scripts/animation-wave-01-evidence.mjs"
+    - "scripts/animation-wave-01-evidence.test.mjs"
+    - "scripts/content-validate.mjs"
+    - "scripts/content-audit.mjs"
+    - "scripts/verify-affected.mjs"
+    - "THIRD_PARTY_NOTICES.md"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - ".github/**"
+    - "LICENSE"
+  external_reads_allowed: true
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  contract_or_schema_changes_allowed: false
+  database_or_migration_changes_allowed: false
+  backup_changes_allowed: false
+  catalog_id_or_mapping_changes_allowed: false
+  product_ui_or_route_changes_allowed: false
+  runtime_renderer_storage_or_player_changes_allowed: false
+  service_worker_or_pwa_changes_allowed: false
+  wave_pack_build_or_release_changes_allowed: false
+  tracked_acquisition_metadata_allowed: true
+  tracked_license_and_terms_evidence_allowed: true
+  tracked_asset_inputs_allowed: true
+  tracked_release_archives_allowed: false
+  generated_placeholder_or_synthetic_assets_allowed: false
+  network_read_policy:
+    allowed:
+      - "Targeted, human-directed search queries for one of the 18 declared variants, followed only by reads of candidate author/rightsholder pages, official repository pages, exact asset landing pages, exact license/terms pages, and exact asset download URLs."
+      - "HTTPS HEAD or GET requests needed to verify reachability, record a bounded redirect chain, retrieve rights-cleared bytes, and capture response status, media type, content length, ETag or Last-Modified when supplied, retrieval time, byte size, and SHA-256."
+      - "Official provider APIs only when their published terms expressly allow this use and the exact API URL, terms URL, response identity, and downloaded byte provenance are recorded."
+      - "A bounded retry of a declared exact URL for transient transport failure. Discovery and retrieval are limited to the fixed 18-record matrix."
+    forbidden:
+      - "Automated crawling, bulk enumeration, search-result harvesting, scraping, mirroring, robots or rate-limit bypass, anti-bot bypass, paywall or access-control bypass, credential reuse, session-cookie capture, undocumented endpoints, or unrelated network reads."
+      - "Account creation, sign-in, purchase, checkout, click-through acceptance on the user's behalf, upload, publication, push, release creation, telemetry, analytics, comments, messages, or any other external mutation."
+      - "Treating a search result, thumbnail, embedded preview, streaming URL, social-media repost, provider-generated derivative, or runtime CDN response as source or rights evidence."
+    redirect_rule: "Record every redirect hop. Reject login, search, expiring-token-only, viewer-only, terms-unknown, unrelated-domain, or provider-restricted destinations. A stable exact landing URL, stable exact license/terms URL, and content-addressed retrieved bytes are mandatory."
+    post_acquisition_rule: "After the network acquisition audit passes and the candidate is committed, all remaining validation must run with network disabled against tracked bytes and records."
+  network_write_policy: "No external writes of any kind are authorized."
+  scraping_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "content/AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/ANIMATION-WAVE-01.yaml"
+    - "docs/ai/reviews/ANIMATION-WAVE-01-handoff.yaml"
+    - "docs/ai/packets/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01.yaml"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02.yaml"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-03-handoff.yaml"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0021-automated-verification-governance.md"
+    - "content/animation-packs/animation-pilot-01/source.json"
+    - "content/animation-packs/animation-pilot-01/PROVENANCE.md"
+    - "content/animation-packs/animation-pilot-01/LICENSE.md"
+    - "docs/licenses/animation-pilot-01/NOTICE.md"
+    - "docs/licenses/animation-pilot-01/dependency-closure.json"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/catalog/src/animation-catalog.ts"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/content-validate.mjs"
+    - "scripts/content-audit.mjs"
+    - "package.json"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0021-automated-verification-governance.md"
+  locked_versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+    renderer: "three@0.185.1"
+    storage_layout: 1
+  assumptions:
+    - "The fixed 18-record matrix in ANIMATION-WAVE-01 remains authoritative and must not be reduced, expanded, reordered semantically, or replaced by neighboring equipment variants."
+    - "This packet records eligibility evidence and asset-input bytes only. It creates no pack manifest, release descriptor, archive, runtime mapping, or product integration."
+    - "A packet declaration is not proof of permission. Only records and bytes that pass every required machine check may be eligible inputs to a later Wave 01 retry."
+
+outcome:
+  objective: "Find, evaluate, retrieve, normalize when permitted, and automatically verify source-rights-provenance records plus usable asset-input bytes for exactly the 18 fixed ANIMATION-WAVE-01 variants, without implementing the Wave 01 pack."
+  user_visible_result: "None in the app. This prerequisite produces a verified, content-addressed acquisition set that a separately coordinated Wave 01 retry may consume."
+  deliverables:
+    - "Exactly 18 qualified acquisition records, one for each fixed Wave 01 variant and animation ID, with no pilot or out-of-wave substitution."
+    - "For every record: stable exact source landing URL, exact download URL and resolved URL, exact license/terms URL and resolved URL, author/rightsholder, source title/version, required attribution and notices, explicit offline redistribution permission, explicit modification permission, retrieval status, media type, byte size, and lowercase SHA-256."
+    - "Tracked retrieved source bytes and a tracked candidate GLB input for each record only when the evidenced rights permit repository storage, modification, and offline redistribution."
+    - "A complete content-hash-linked transformation history from retrieved bytes through every conversion, retarget, rename, optimization, or GLB normalization step to the candidate GLB."
+    - "Machine-readable retrieval, rights, provenance, attribution, and exact movement/equipment suitability evidence for all 18 records."
+    - "A focused validator and tests for the acquisition schema, exact matrix, hashes, rights booleans, URL policy, provenance graph, disallowed origins, pilot inequality, and asset-input suitability."
+    - "One immutable candidate commit followed by one handoff-only direct-child commit with complete automated PASS evidence, or a pre-candidate BLOCKED handoff identifying every unresolved record without partial eligibility claims."
+  non_goals:
+    - "No Wave 01 manifest, release descriptor, ZIP archive, release version, production pack build, install, playback, update, rollback, performance, PWA, or service-worker work."
+    - "No app, runtime, contract, schema, catalog, storage, database, backup, UI, route, dependency, package, lockfile, configuration, ADR, or existing shared validator change."
+    - "No acquisition for pilot variants, Wave 02, or any of the other 181 catalog variants."
+    - "No generated, generative, synthetic, placeholder, pilot-derived, generic stand-in, or cross-variant asset used to fill a missing record."
+    - "No scraping, provider-restricted media, ownership-unclear media, marketplace-only redistribution restriction, editorial-only asset, personal-use-only asset, no-derivatives asset requiring modification, or URL whose rights cannot be tied to the exact bytes."
+    - "No assertion that optional legal, owner, cold, visual, biomechanics, manual, named-reviewer, VoiceOver, or physical-device review ran or passed."
+
+decisions:
+  contract_or_schema_change: "none"
+  catalog_change: "none"
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "bundled asset-input candidates and machine-readable rights evidence"
+  pack_implementation: "forbidden; deferred to a new ANIMATION-WAVE-01 retry packet after this acquisition packet has automated PASS"
+  acceptance_basis:
+    allowed_rights_basis:
+      - "An exact public-domain or permissive asset license whose text clearly permits the intended offline redistribution and every performed modification, with all attribution, notice, source-offer, share-alike, or other applicable obligations represented and satisfiable without changing protected product paths."
+      - "An exact first-party author/rightsholder grant that identifies the covered bytes or asset version and explicitly permits repository storage, modification, and offline redistribution in the Gym Local animation pack."
+      - "A provider record only when the provider is authorized to license the exact bytes and its exact terms grant the same required rights without provider-only runtime, account, geographic, expiry, seat, marketplace, or end-product restrictions that conflict with redistribution."
+    rejected_rights_basis:
+      - "Unknown, inferred, oral-only, contradictory, revoked, expired, unverifiable, or unattributable permission."
+      - "Editorial, preview-only, streaming-only, personal-use, noncommercial-ambiguous, no-derivatives-when-modified, marketplace-standard restrictions that prohibit raw or substantially similar redistribution, or provider terms that require runtime hosting or account access."
+      - "A license attached to a page, repository, collection, author, or similarly named asset but not resolvably bound to the exact retrieved bytes."
+  qualification_rule: "All 18 records must independently qualify. One unresolved record blocks the packet; the producer must not shrink the matrix, mark a partial set PASS, or substitute another variant."
+
+wave_variant_matrix:
+  catalog_variant_count: 199
+  pilot_variant_count: 12
+  wave_01_exact_count: 18
+  remaining_outside_pilot_and_wave_01: 169
+  records:
+    - { exercise_variant_id: "chest_press__dumbbell", animation_id: "animation.production.chest-press.dumbbell", clip_name: "ChestPressDumbbellLoop", expected_equipment_props: ["prop.bench", "prop.dumbbell-pair"], movement_requirement: "horizontal dumbbell chest press on a bench" }
+    - { exercise_variant_id: "chest_press__barbell", animation_id: "animation.production.chest-press.barbell", clip_name: "ChestPressBarbellLoop", expected_equipment_props: ["prop.bench", "prop.barbell", "prop.rack"], movement_requirement: "horizontal barbell chest press with bench and rack" }
+    - { exercise_variant_id: "incline_chest_press__dumbbell", animation_id: "animation.production.incline-chest-press.dumbbell", clip_name: "InclineChestPressDumbbellLoop", expected_equipment_props: ["prop.incline-bench", "prop.dumbbell-pair"], movement_requirement: "incline dumbbell chest press with visible incline geometry" }
+    - { exercise_variant_id: "dip__bodyweight", animation_id: "animation.production.dip.bodyweight", clip_name: "DipBodyweightLoop", expected_equipment_props: ["prop.parallel-bars"], movement_requirement: "bodyweight dip on parallel bars" }
+    - { exercise_variant_id: "lat_pulldown__cable", animation_id: "animation.production.lat-pulldown.cable", clip_name: "LatPulldownCableLoop", expected_equipment_props: ["prop.lat-pulldown-station", "prop.pulldown-bar"], movement_requirement: "seated cable lat pulldown with station and bar" }
+    - { exercise_variant_id: "pull_up__bodyweight", animation_id: "animation.production.pull-up.bodyweight", clip_name: "PullUpBodyweightLoop", expected_equipment_props: ["prop.pullup-bar"], movement_requirement: "bodyweight pull-up on a fixed overhead bar" }
+    - { exercise_variant_id: "horizontal_row__cable", animation_id: "animation.production.horizontal-row.cable", clip_name: "HorizontalRowCableLoop", expected_equipment_props: ["prop.cable-row-station", "prop.row-handle"], movement_requirement: "seated horizontal cable row with station and handle" }
+    - { exercise_variant_id: "overhead_press__dumbbell", animation_id: "animation.production.overhead-press.dumbbell", clip_name: "OverheadPressDumbbellLoop", expected_equipment_props: ["prop.dumbbell-pair"], movement_requirement: "dumbbell overhead press" }
+    - { exercise_variant_id: "biceps_curl__dumbbell", animation_id: "animation.production.biceps-curl.dumbbell", clip_name: "BicepsCurlDumbbellLoop", expected_equipment_props: ["prop.dumbbell-pair"], movement_requirement: "dumbbell biceps curl" }
+    - { exercise_variant_id: "triceps_pushdown__cable", animation_id: "animation.production.triceps-pushdown.cable", clip_name: "TricepsPushdownCableLoop", expected_equipment_props: ["prop.cable-station", "prop.pushdown-handle"], movement_requirement: "cable triceps pushdown with correct attachment" }
+    - { exercise_variant_id: "squat__bodyweight", animation_id: "animation.production.squat.bodyweight", clip_name: "SquatBodyweightLoop", expected_equipment_props: [], movement_requirement: "unloaded bodyweight squat with no barbell or machine" }
+    - { exercise_variant_id: "lunge__dumbbell", animation_id: "animation.production.lunge.dumbbell", clip_name: "LungeDumbbellLoop", expected_equipment_props: ["prop.dumbbell-pair"], movement_requirement: "dynamic unilateral lunge carrying dumbbells" }
+    - { exercise_variant_id: "step_up__bodyweight", animation_id: "animation.production.step-up.bodyweight", clip_name: "StepUpBodyweightLoop", expected_equipment_props: ["prop.step-platform"], movement_requirement: "bodyweight step-up onto a platform" }
+    - { exercise_variant_id: "romanian_deadlift__barbell", animation_id: "animation.production.romanian-deadlift.barbell", clip_name: "RomanianDeadliftBarbellLoop", expected_equipment_props: ["prop.barbell"], movement_requirement: "barbell Romanian deadlift with the correct hinge and bar path" }
+    - { exercise_variant_id: "leg_curl__machine", animation_id: "animation.production.leg-curl.machine", clip_name: "LegCurlMachineLoop", expected_equipment_props: ["prop.leg-curl-machine"], movement_requirement: "machine leg curl with the correct guided axis" }
+    - { exercise_variant_id: "deadlift__trap_bar", animation_id: "animation.production.deadlift.trap-bar", clip_name: "DeadliftTrapBarLoop", expected_equipment_props: ["prop.trap-bar"], movement_requirement: "trap-bar deadlift with trap-bar geometry; no straight-bar fallback" }
+    - { exercise_variant_id: "standing_calf_raise__bodyweight", animation_id: "animation.production.standing-calf-raise.bodyweight", clip_name: "StandingCalfRaiseBodyweightLoop", expected_equipment_props: [], movement_requirement: "unloaded standing calf raise" }
+    - { exercise_variant_id: "crunch__bodyweight", animation_id: "animation.production.crunch.bodyweight", clip_name: "CrunchBodyweightLoop", expected_equipment_props: [], movement_requirement: "bodyweight floor crunch with dynamic trunk flexion" }
+  invariants:
+    - "The exact 18 exercise_variant_id and animation_id pairs are copied from ANIMATION-WAVE-01 and are case-sensitive."
+    - "Every source and candidate byte set belongs to exactly one declared record. Similar movement, same body part, or reusable rig does not authorize cross-variant substitution."
+    - "The 12 pilot variants and their asset hashes are forbidden as acquisition outputs or transformation inputs."
+
+artifact_layout:
+  canonical_index: "content/animation-packs/animation-wave-01/source-acquisition/source-acquisition.json"
+  retrieved_bytes: "content/animation-packs/animation-wave-01/source-acquisition/retrieved/<record-id>/<source-file>"
+  candidate_glbs: "content/animation-packs/animation-wave-01/source-acquisition/candidates/<exercise-variant-id>.glb"
+  transformation_records: "content/animation-packs/animation-wave-01/source-acquisition/transformations/<exercise-variant-id>.json"
+  rights_ledger: "docs/licenses/animation-wave-01/source-acquisition/rights-ledger.json"
+  attribution_notice: "docs/licenses/animation-wave-01/source-acquisition/NOTICE.md"
+  terms_evidence: "docs/licenses/animation-wave-01/source-acquisition/terms/**"
+  retrieval_audit: "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/retrieval-audit.json"
+  rights_audit: "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/rights-audit.json"
+  asset_input_audit: "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/asset-input-audit.json"
+  network_activity: "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/network-activity.json"
+  policy:
+    - "Every path in the index is repository-relative, normalized with forward slashes, unique, and under an authorized source-acquisition root."
+    - "Terms evidence may be an exact redistributable license text or a machine record containing the exact URL, retrieval metadata, content hash, and the minimum necessary rights excerpt. Never copy a full restricted webpage merely to create evidence."
+    - "Secrets, credentials, cookies, signed query tokens, personal data, machine-local absolute paths, and transient cache files are forbidden in tracked artifacts."
+
+source_acquisition_record_schema:
+  index:
+    required_fields:
+      - "schemaVersion == 1"
+      - "packetId == ANIMATION-WAVE-01-SOURCE-ACQUISITION-01"
+      - "matrixCount == 18"
+      - "records is an array of exactly 18 unique records in the packet-declared matrix order"
+  record:
+    required_fields:
+      - "recordId: immutable unique string"
+      - "exerciseVariantId: exact packet-declared ID"
+      - "animationId: exact packet-declared ID"
+      - "qualification: qualified"
+      - "movement.clipName and movement.requirement"
+      - "movement.expectedEquipmentProps and movement.forbiddenSubstitutions"
+      - "source.title, source.version, source.author, and source.rightsholder"
+      - "source.landingPageUrl, source.downloadUrl, and source.resolvedDownloadUrl as absolute HTTPS URLs"
+      - "source.retrievedAtUtc, source.httpStatus, source.mediaType, source.fileName, source.byteSize, and source.sha256"
+      - "source.retrievedPath pointing to the tracked content-hash-matched bytes"
+      - "license.licenseId, license.name, license.version, and license.spdxExpression when applicable"
+      - "license.termsUrl and license.resolvedTermsUrl as absolute HTTPS URLs"
+      - "license.retrievedAtUtc, license.httpStatus, license.evidencePath, license.evidenceByteSize, and license.evidenceSha256"
+      - "license.offlineRedistributionAllowed == true"
+      - "license.modificationAllowed == true"
+      - "license.repositoryStorageAllowed == true"
+      - "license.providerRuntimeRequired == false"
+      - "license.restrictions and license.obligations as explicit arrays"
+      - "attribution.required, attribution.text, attribution.placement, and attribution.noticeLines"
+      - "transformations: ordered array covering the complete retrieved-to-candidate hash chain; an unchanged source still has one identity step"
+      - "candidate.path, candidate.mediaType == model/gltf-binary, candidate.byteSize, and candidate.sha256"
+      - "provenance.sourceRecordId, provenance.licenseRecordId, provenance.retrievalAuditRecordId, provenance.rightsAuditRecordId, and provenance.assetAuditRecordId"
+      - "suitability.exactMovement == true, suitability.exactEquipment == true, suitability.crossVariantSubstitution == false"
+      - "suitability.pilotDerived == false, suitability.placeholder == false, suitability.generative == false, and suitability.synthetic == false"
+      - "suitability.selfContainedGlb == true and suitability.externalUris is an empty array"
+      - "validation.recordId, validation.validatedAtUtc, validation.method == automated, and validation.result == pass"
+  transformation_step:
+    required_fields:
+      - "sequence: contiguous integer beginning at 1"
+      - "operation, tool, toolVersion, parameters, and purpose"
+      - "inputPath, inputByteSize, and inputSha256"
+      - "outputPath, outputByteSize, and outputSha256"
+      - "rightsBasisLicenseId and deterministic == true"
+    rules:
+      - "Each step input hash equals the previous step output hash; the first input equals source.sha256 and the last output equals candidate.sha256."
+      - "Record commands or normalized parameters without secrets or unstable machine-local paths."
+  retrieval_event:
+    required_fields:
+      - "eventId, purpose, requestedUrl, method, startedAtUtc, completedAtUtc, httpStatus, resolvedUrl, redirectChain, mediaType, byteSize, sha256, and result"
+    rules:
+      - "result is pass only for an exact authorized URL with a bounded recorded redirect chain and content-hash-matched tracked evidence or bytes."
+      - "Search discovery events may be logged but never satisfy source, license, or byte evidence fields."
+
+evidence_schema:
+  common_required_fields:
+    - "schemaVersion == 1"
+    - "packetId == ANIMATION-WAVE-01-SOURCE-ACQUISITION-01"
+    - "result: PASS|FAIL|BLOCKED"
+    - "recordCount == 18 for PASS"
+    - "records: exactly the 18 recordId/exerciseVariantId/animationId triples"
+    - "failures: array, empty only for PASS"
+  retrieval_audit_required_per_record:
+    - "source and terms retrieval event IDs"
+    - "requested, resolved, and redirect URLs"
+    - "HTTP statuses, media types, retrieval timestamps, byte sizes, and lowercase SHA-256 values"
+    - "tracked path hash recomputation results"
+  rights_audit_required_per_record:
+    - "rightsholder resolution and exact license-to-byte binding"
+    - "offline redistribution, modification, repository storage, attribution, notices, restrictions, and obligations decisions"
+    - "provider restriction, revocation, expiry, login, paywall, and runtime dependency checks"
+    - "decision == qualified and reasons for PASS"
+  asset_input_audit_required_per_record:
+    - "retrieved-to-candidate transformation-chain verification"
+    - "candidate byte size and SHA-256 recomputation"
+    - "GLB header, glTF version, self-containment, external URI, clip, motion, rig, and equipment inspection results"
+    - "exact-movement, exact-equipment, cross-variant, pilot-derived, placeholder, generative, and synthetic decisions"
+  network_activity_required_fields:
+    - "ordered retrieval events, bounded retry counts, allowed-host decisions, forbidden-action count == 0, and external-write count == 0"
+    - "a declaration that no crawling, scraping, bulk harvesting, access-control bypass, credential capture, upload, or publication occurred"
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "pilot_checkpoint_wave_coordinator_blocked_handoff_packet_parent_and_clean_worktree"
+    - "allowed_candidate_paths_post_candidate_path_and_all_unlisted_paths_forbidden"
+    - "required_reads_locked_versions_and_no_pack_implementation_scope"
+    - "exact_199_12_18_169_counts_and_all_18_pairs"
+    - "targeted_network_read_plan_and_zero_external_write_plan"
+    - "per_record_source_rights_attribution_retrieval_hash_transformation_and_suitability_plan"
+    - "applicable_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_packet_only_producer_start_commit: true
+    producer_start_parent_matches_base_commit: true
+    instructions_read: true
+    exact_model_available: true
+    subagents_unused: true
+    required_inputs_present: true
+    network_policy_accepted: true
+    no_required_human_or_device_input: true
+
+acceptance_tests:
+  - { id: "AWSA01-AC-01", requirement: "Lineage is exact: Wave 01 blocked handoff -> packet-only coordinator -> one immutable candidate -> handoff-only direct child, or a pre-candidate BLOCKED handoff-only direct child.", evidence: "Git parent, range, name-only, object, and clean-worktree assertions." }
+  - { id: "AWSA01-AC-02", requirement: "The acquisition matrix contains exactly the fixed 18 unique Wave 01 pairs, is disjoint from all 12 pilot variants, leaves 169 other variants, and has no partial PASS or substitution.", evidence: "Catalog-derived exhaustive matrix assertion and acquisition index." }
+  - { id: "AWSA01-AC-03", requirement: "Every exact source landing, download, resolved-download, terms, and resolved-terms URL is machine-readable HTTPS, reachable during the bounded audit, and bound to content-hash-matched evidence or bytes.", evidence: "retrieval-audit.json, network-activity.json, and remote-audit command output." }
+  - { id: "AWSA01-AC-04", requirement: "Every record resolves an author/rightsholder and exact rights that permit repository storage, modification, attribution-compliant offline redistribution, and use without provider runtime restrictions.", evidence: "rights-ledger.json, rights-audit.json, terms evidence, NOTICE, and automated rights checks." }
+  - { id: "AWSA01-AC-05", requirement: "Every retrieved source and candidate GLB has a recomputed byte size and lowercase SHA-256, and every transformation step forms an unbroken content-hash chain.", evidence: "source-acquisition.json, transformation records, tracked bytes, and offline hash recomputation." }
+  - { id: "AWSA01-AC-06", requirement: "Every candidate GLB matches the declared movement and equipment, is self-contained and structurally usable, and is neither cross-variant, pilot-derived, placeholder, generative, nor synthetic.", evidence: "asset-input-audit.json and semantic GLB tests." }
+  - { id: "AWSA01-AC-07", requirement: "No scraping, bulk harvesting, access-control bypass, provider-restricted media, credential capture, or external write occurred.", evidence: "network-activity.json policy audit with zero forbidden actions and zero external writes." }
+  - { id: "AWSA01-AC-08", requirement: "No Wave 01 pack, manifest, descriptor, archive, release, app, runtime, contract, storage, catalog, database, backup, UI, dependency, config, PWA, or shared-validator path changed.", evidence: "Exact candidate path subset and protected-path object audit." }
+  - { id: "AWSA01-AC-09", requirement: "All required content, lint, test, affected-verification, YAML, scope, evidence, and immutability checks pass against the exact candidate.", evidence: "Exact command records in the handoff." }
+  - { id: "AWSA01-AC-10", requirement: "The schema-valid handoff names the exact immutable candidate, records all required commands as pass, contains no active stop gate, sets automated_verification.status PASS, and sets merge_authorized true; optional evidence remains empty unless actually supplied.", evidence: "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml." }
+  - { id: "AWSA01-AC-11", requirement: "The packet and handoff explicitly state that their existence alone proves no usage right and authorizes no Wave 01 retry; only the verified 18-record evidence and exact candidate bytes are eligible inputs for a separately coordinated retry.", evidence: "Packet assumptions, handoff eligibility statement, and automated schema assertion." }
+
+required_checks:
+  automated_commands:
+    - "git status --short"
+    - "assert producer start commit parent is 33471f11b64e0089423aaa227b5f91825f6e8f98 and its delta contains only docs/ai/packets/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01.yaml"
+    - "node scripts/animation-wave-01-source-acquisition.mjs audit-remote"
+    - "node scripts/animation-wave-01-source-acquisition.mjs validate --offline"
+    - "pnpm exec vitest run scripts/animation-wave-01-source-acquisition.test.mjs"
+    - "pnpm exec eslint scripts/animation-wave-01-source-acquisition.mjs scripts/animation-wave-01-source-acquisition.test.mjs --max-warnings=0"
+    - "pnpm run content:validate"
+    - "pnpm run content:audit"
+    - "pnpm run verify:affected"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "assert candidate changed paths are a subset of authority.candidate_paths and every protected or forbidden path is byte-identical to 33471f11b64e0089423aaa227b5f91825f6e8f98"
+    - "assert catalog-derived 199/12/18/169 counts, exact Wave 01 pairs, unique acquisition records, pilot disjointness, and zero cross-variant substitution"
+    - "recompute all tracked retrieved, terms-evidence, transformation, and candidate byte sizes and SHA-256 values; validate every provenance edge and reject untracked or orphan bytes"
+    - "audit all 18 exact source/download/terms URLs, redirect chains, authors/rightsholders, license-to-byte bindings, offline redistribution and modification rights, attribution, notices, provider restrictions, and network-policy records"
+    - "audit all 18 candidate GLBs for exact movement/equipment, self-containment, clip and finite-motion suitability, pilot-hash inequality, and non-placeholder/non-generative/non-synthetic status"
+    - "parse every YAML file under docs/ai and validate the handoff required fields, exact command records, candidate SHA, optional_manual_evidence, status, and merge_authorized consistency"
+    - "assert candidate_commit remains unchanged before and after all post-candidate commands, all post-candidate checks are network-disabled, and git status --porcelain is empty"
+  execution_rule: "Run commands 1 and 2 at preflight. Run command 3 only after all 18 proposed records and bytes exist and before candidate creation; it is the sole network-enabled required command and must not mutate external state. Create the immutable candidate only if commands 1 through 3 pass and no stop gate is active. Then run commands 4 through 17 in order against the exact candidate with network disabled. Any failure, not_run result, candidate mutation, unexpected path, or unresolved record prevents PASS."
+  evidence_paths:
+    - "content/animation-packs/animation-wave-01/source-acquisition/source-acquisition.json"
+    - "content/animation-packs/animation-wave-01/source-acquisition/retrieved/**"
+    - "content/animation-packs/animation-wave-01/source-acquisition/candidates/*.glb"
+    - "content/animation-packs/animation-wave-01/source-acquisition/transformations/*.json"
+    - "docs/licenses/animation-wave-01/source-acquisition/rights-ledger.json"
+    - "docs/licenses/animation-wave-01/source-acquisition/NOTICE.md"
+    - "docs/licenses/animation-wave-01/source-acquisition/terms/**"
+    - "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/retrieval-audit.json"
+    - "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/rights-audit.json"
+    - "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/asset-input-audit.json"
+    - "docs/ai/evidence/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01/network-activity.json"
+    - "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "AWSA01-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, the base/branch/parent/coordinator delta is wrong, required reads are incomplete, locked versions differ, or the worktree is dirty before implementation."
+    action: "Stop before acquisition and write a BLOCKED handoff only if the report path is the sole safe metadata change. Do not widen scope."
+  - id: "AWSA01-STOP-02"
+    condition: "Any of the 18 records is missing, cannot be resolved without reducing or changing the matrix, or would require a pilot asset, another variant, a generic stand-in, or the same bytes reused across materially different equipment variants."
+    action: "Stop BLOCKED and enumerate every missing or conflicting pair. Do not shrink the matrix or claim partial PASS."
+  - id: "AWSA01-STOP-03"
+    condition: "Any exact source, download, license/terms, or resolved URL is unreachable, unstable without content-hash evidence, redirected to login/search/viewer/unknown terms, or cannot be bound to the exact retrieved bytes."
+    action: "Exclude the bytes and stop BLOCKED for the exact record, URL, status, and redirect chain. Do not replace it silently."
+  - id: "AWSA01-STOP-04"
+    condition: "Any author/rightsholder or license is unknown, ambiguous, revoked, contradictory, expired, provider-restricted, marketplace-restricted, editorial-only, personal-use-only, no-derivatives when modification is needed, or does not explicitly permit repository storage, modification, and offline redistribution with satisfiable attribution and notices."
+    action: "Exclude the bytes and stop BLOCKED with the exact missing right or conflicting term. Packet text, a search result, or optional human opinion cannot substitute for the required record."
+  - id: "AWSA01-STOP-05"
+    condition: "Acquisition would require crawling, scraping, bulk harvesting, access-control or anti-bot bypass, credentials, purchase, click-through acceptance, undocumented APIs, external writes, uploads, publication, telemetry, or provider-runtime access."
+    action: "Stop BLOCKED without performing the action and record the exact blocked source."
+  - id: "AWSA01-STOP-06"
+    condition: "Any asset is generative, synthetic, placeholder, pilot-derived, a preview or thumbnail, a generic equipment stand-in, a cross-variant substitution, mismatched to the declared movement/equipment, structurally unusable, externally dependent, or cannot form a complete retrieved-to-candidate hash chain."
+    action: "Stop FAIL or BLOCKED for that record and retain exact hashes and suitability findings. Do not relabel or repair it by substitution."
+  - id: "AWSA01-STOP-07"
+    condition: "Correctness requires changing any contract, schema, stable ID, catalog mapping, runtime, renderer, storage, database, migration, backup, app, UI, route, dependency, package, lockfile, configuration, ADR, shared content validator, service worker, PWA policy, Wave 01 pack/release file, or any other unlisted path."
+    action: "Stop BLOCKED and request a separate coordinate packet. Do not expand allowed paths in place."
+  - id: "AWSA01-STOP-08"
+    condition: "Any required automated command fails or is not run, an evidence file is missing or schema-invalid, a byte size or SHA-256 does not recompute, candidate or handoff lineage is wrong, an unexpected path changes, or the candidate changes during verification."
+    action: "Record FAIL or BLOCKED with merge_authorized false. Do not amend or replace the immutable candidate, invent evidence, merge, push, update the ledger, or create a tag."
+
+handoff:
+  report_path: "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml"
+  metadata_commit_rule: "For PASS, add and commit only the handoff as the immutable candidate's direct child. For pre-candidate BLOCKED, add and commit only the handoff as the producer start commit's direct child. Never amend or replace the coordinator or candidate, and never put the handoff commit's own SHA in the handoff."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "variant_matrix"
+    - "network_activity_summary"
+    - "source_retrieval_evidence"
+    - "license_rights_and_attribution_evidence"
+    - "transformation_and_provenance_evidence"
+    - "asset_input_suitability_evidence"
+    - "acceptance_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "eligibility_statement"
+    - "known_risks"
+    - "optional_evidence"
+    - "automated_verification"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  eligibility_statement_rule: "State verbatim that the packet and handoff do not themselves prove rights or authorize Wave 01 implementation; only the exact candidate bytes and all 18 records after automated PASS are eligible inputs to a separately coordinated Wave 01 retry."
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml#automated_verification"
+  schema:
+    schema_version: 1
+    packet_id: "ANIMATION-WAVE-01-SOURCE-ACQUISITION-01"
+    candidate_commit: "40-character SHA or null only for pre-candidate BLOCKED"
+    status: "PASS|FAIL|BLOCKED"
+    checks:
+      - command: "exact required command"
+        result: "pass|fail|not_run"
+        evidence: "exact output or immutable artifact"
+    optional_manual_evidence: []
+    merge_authorized: false
+  authorization_rule: "Only PASS with all 17 required commands recorded exactly once as pass, all 18 records qualified, the exact immutable candidate, a schema-valid handoff, and no active stop gate may set merge_authorized true. FAIL or BLOCKED always sets merge_authorized false."
+  optional_evidence_rule: "Cold, owner, independent, legal, visual, biomechanics, manual, named-reviewer, VoiceOver, and physical-device review are optional evidence only. They never complete, block, or authorize the candidate, and an unperformed optional check is never reported as passed."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS, every one of the 17 exact automated command records is pass, the 18-record acquisition set is complete, no stop gate is active, and automated_verification.merge_authorized == true"
+  target: "main"
+  method: "fast-forward"
+  squash_policy: "forbidden"
+  checkpoint_tag_after_merge: "checkpoint/animation-wave-01-source-acquisition-01-automated-pass"
+  next_packet_rule: "Only after the acquisition candidate is merged and checkpointed may a separate coordinator create a bounded ANIMATION-WAVE-01 retry packet that consumes the exact verified candidate bytes and records. This acquisition packet never authorizes pack implementation by itself."
+  current_coordinator_task_prohibitions:
+    - "Do not search for, evaluate, retrieve, download, convert, or add any asset or license byte."
+    - "Do not implement or retry ANIMATION-WAVE-01."
+    - "Do not merge main."
+    - "Do not push."
+    - "Do not update docs/ai/reviews/coordinator-ledger.yaml."
+    - "Do not create any checkpoint tag."
