@@ -1,0 +1,423 @@
+schema_version: 3
+packet:
+  id: "PERSONAL-LOCAL-ANIMATION-01"
+  title: "Add a device-only personal animation import lane"
+  type: "implementation"
+  status: "ready"
+
+prerequisite:
+  pilot_checkpoint_tag: "checkpoint/animation-pilot-01-rev-02-fix-03-automated-pass"
+  pilot_checkpoint_commit: "bbbd0dd40dd2c6554dd7f37be8655c7eb3d93633"
+  wave_01_coordinator_commit: "c8842142aafe34bb5d2e5b50ee4b452226e4007d"
+  wave_01_blocked_handoff_commit: "33471f11b64e0089423aaa227b5f91825f6e8f98"
+  source_acquisition_coordinator_commit: "e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+  source_acquisition_handoff: "not_created_at_coordination_time"
+  lineage_rule: "This lane starts from the current source-acquisition coordinator commit but is independent of production Wave 01 qualification. It neither consumes those candidate assets nor resolves, bypasses, relaxes, retries, or authorizes any committed or distributable animation pack."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+  target_branch: "codex/personal-local-animation-01"
+  worktree_required: true
+  sequential_after:
+    - "ANIMATION-WAVE-01-SOURCE-ACQUISITION-01 coordinator commit e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+  producer_start_rule:
+    start_commit: "The committed PERSONAL-LOCAL-ANIMATION-01 coordinator packet HEAD supplied to the producer."
+    required_parent: "The producer start commit's first parent must be exactly e51e2661f5ea8562a84fedade5c31e0ef157e3a4."
+    required_coordinator_delta:
+      - "git diff --name-only e51e2661f5ea8562a84fedade5c31e0ef157e3a4..HEAD must print only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml before producer edits."
+      - "The producer must not amend, replace, or add to the coordinator commit."
+    pass_candidate_rule: "The implementation is one immutable candidate commit whose first parent is the producer start commit and whose changed paths are a subset of authority.candidate_paths."
+    pass_handoff_rule: "After every required command passes against the immutable candidate, create one direct-child commit containing only docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml."
+    blocked_handoff_rule: "If a stop gate triggers before a candidate exists, create no partial candidate. A BLOCKED handoff may be the sole direct-child metadata commit from the producer start commit, with candidate_commit null, exact gaps, automated_verification.status BLOCKED, and merge_authorized false."
+    failed_candidate_rule: "If a required command fails after candidate creation, do not amend or replace the candidate. Record FAIL in a handoff-only direct-child commit; any correction requires a separately coordinated fixer packet."
+    review_range_rule: "For PASS or FAIL, the candidate range is producer_start_commit..candidate_commit and the handoff range is candidate_commit..handoff_commit. For pre-candidate BLOCKED, the sole allowed range is producer_start_commit..blocked_handoff_commit and contains only the declared handoff path."
+
+authority:
+  allowed_paths:
+    - "docs/ai/master-plan.md"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+    - "packages/contracts/src/index.ts"
+    - "packages/contracts/src/personal-local-animation.ts"
+    - "packages/contracts/src/personal-local-animation.test.ts"
+    - "packages/storage/src/index.ts"
+    - "packages/storage/src/personal-local-animation/**"
+    - "packages/media/src/index.ts"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/personal-local-animation.ts"
+    - "packages/media/src/personal-local-animation.test.ts"
+    - "packages/backup/src/backup.test.ts"
+    - "apps/web/src/features/settings/SettingsPage.tsx"
+    - "apps/web/src/features/settings/SettingsPage.test.tsx"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.tsx"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.css"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "apps/web/src/pwa/install.test.ts"
+    - "scripts/personal-local-animation-evidence.mjs"
+    - "scripts/personal-local-animation-evidence.test.mjs"
+    - "docs/ai/evidence/PERSONAL-LOCAL-ANIMATION-01/**"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+  candidate_paths:
+    - "docs/ai/master-plan.md"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+    - "packages/contracts/src/index.ts"
+    - "packages/contracts/src/personal-local-animation.ts"
+    - "packages/contracts/src/personal-local-animation.test.ts"
+    - "packages/storage/src/index.ts"
+    - "packages/storage/src/personal-local-animation/**"
+    - "packages/media/src/index.ts"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/personal-local-animation.ts"
+    - "packages/media/src/personal-local-animation.test.ts"
+    - "packages/backup/src/backup.test.ts"
+    - "apps/web/src/features/settings/SettingsPage.tsx"
+    - "apps/web/src/features/settings/SettingsPage.test.tsx"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.tsx"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.css"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "apps/web/src/pwa/install.test.ts"
+    - "scripts/personal-local-animation-evidence.mjs"
+    - "scripts/personal-local-animation-evidence.test.mjs"
+    - "docs/ai/evidence/PERSONAL-LOCAL-ANIMATION-01/**"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "content/**"
+    - "public/**"
+    - "docs/licenses/**"
+    - "docs/ai/packets/**"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/reviews/ANIMATION-*-handoff.yaml"
+    - "docs/ai/evidence/ANIMATION-*/**"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/adr/0018-animation-player-controller.md"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0021-automated-verification-governance.md"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/catalog/**"
+    - "packages/storage/src/animation-pack/**"
+    - "packages/storage/src/nutrition-pack*"
+    - "packages/storage/src/providers/**"
+    - "packages/backup/src/index.ts"
+    - "packages/media/src/gltf-renderer.ts"
+    - "packages/media/src/gltf-renderer.test.ts"
+    - "packages/workouts/**"
+    - "packages/nutrition/**"
+    - "packages/progress/**"
+    - "packages/ui/**"
+    - "apps/web/src/features/workout/WorkoutPage.tsx"
+    - "apps/web/src/store/**"
+    - "apps/web/src/pilot/**"
+    - "apps/web/src/components/UpdatePrompt.tsx"
+    - "vite.config.ts"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - ".github/**"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+  external_reads_allowed: false
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  database_or_migration_changes_allowed: false
+  backup_format_or_payload_changes_allowed: false
+  catalog_id_or_mapping_changes_allowed: false
+  release_pack_contract_or_validator_changes_allowed: false
+  release_pack_storage_changes_allowed: false
+  production_asset_or_content_changes_allowed: false
+  service_worker_or_pwa_policy_changes_allowed: false
+  runtime_network_allowed: false
+  tracked_animation_bytes_allowed: false
+  persistent_generated_animation_bytes_allowed: false
+  ephemeral_test_bytes_allowed: "in-memory or ignored temporary outputs only; never committed, bundled, cached, backed up, or retained"
+  personal_local_schema_change_allowed: true
+  product_settings_ui_change_allowed: true
+  active_workout_ui_change_allowed: false
+  network_policy: "No fetch, XHR, WebSocket, EventSource, sendBeacon, background sync, upload, remote import, URL import, or external read/write is authorized. The only byte ingress is an explicit user-selected local File passed through app composition into public @gym/storage APIs."
+  binary_policy: "No GLB, glTF, ZIP, archive, base64 fixture, embedded binary payload, generated animation byte, or copied user file may enter Git, content, public, dist inputs, a release artifact, a service-worker cache, or an evidence directory. Tests must construct bounded synthetic bytes in memory or in an ignored temporary output and delete them."
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "content/AGENTS.md"
+    - "packages/storage/AGENTS.md"
+    - "packages/workouts/AGENTS.md"
+    - "packages/nutrition/AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/ANIMATION-WAVE-01.yaml"
+    - "docs/ai/reviews/ANIMATION-WAVE-01-handoff.yaml"
+    - "docs/ai/packets/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01.yaml"
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/adr/0018-animation-player-controller.md"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0021-automated-verification-governance.md"
+    - "packages/contracts/src/index.ts"
+    - "packages/contracts/src/animation-pack.ts"
+    - "packages/contracts/src/animation-pack.test.ts"
+    - "packages/catalog/src/index.ts"
+    - "packages/catalog/src/animation-catalog.ts"
+    - "packages/storage/src/index.ts"
+    - "packages/storage/src/animation-pack/index.ts"
+    - "packages/storage/src/animation-pack/store.ts"
+    - "packages/storage/src/animation-pack/opfs.ts"
+    - "packages/storage/src/animation-pack/store.test.ts"
+    - "packages/backup/src/index.ts"
+    - "packages/backup/src/backup.test.ts"
+    - "packages/media/src/index.ts"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/gltf-renderer.ts"
+    - "apps/web/src/pilot/AnimationPilotApp.tsx"
+    - "apps/web/src/components/ExerciseAnimationPlayer.tsx"
+    - "apps/web/src/features/settings/SettingsPage.tsx"
+    - "apps/web/src/features/settings/SettingsPage.test.tsx"
+    - "apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/pwa/install.test.ts"
+    - "vite.config.ts"
+    - "package.json"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/resources/HEADER_TEMPLATE.txt"
+  accepted_adrs:
+    - "docs/adr/0016-offline-animation-pack-foundation.md"
+    - "docs/adr/0017-animation-pack-opfs-storage.md"
+    - "docs/adr/0018-animation-player-controller.md"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0021-automated-verification-governance.md"
+  locked_versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+    renderer: "three@0.185.1"
+    release_pack_storage_layout: 1
+    personal_local_animation_schema: 1
+    personal_local_storage_layout: 1
+  assumptions:
+    - "Gym Local remains single-profile and account-free. Device/profile means the current browser origin storage for that one local profile; it is not a cloud, account, or cross-device identity."
+    - "A user's personal or non-commercial intent is not redistribution permission. Local import eligibility never makes bytes eligible for Git, a release pack, backup, export, sync, upload, or publication."
+    - "The producer may add a separate additive personal-local contract only. Existing release descriptor, manifest, source, license, provenance, review, checksum, and compatibility contracts remain byte-identical."
+    - "The lane accepts one explicitly selected self-contained GLB at a time. It does not fetch a URL, import a ZIP or release descriptor, convert media, or discover sources."
+
+outcome:
+  objective: "Implement an additive, device-only lane that lets the user explicitly import, validate, bind, preview, activate, list, and remove a bounded self-contained GLB for one exact existing exercise-equipment variant without creating any path for those bytes to leave local OPFS or qualify for distribution."
+  user_visible_result: "Settings provides bilingual controls for a user-selected local GLB, exact variant selection, local-only disclosure, structural validation, preview, activation, status, and removal. The lane remains separate from production packs and does not yet mount animations in the active workout."
+  deliverables:
+    - "ADR 0022 and a master-plan update defining two non-interchangeable trust domains: release-grade distributable packs and personal-local imports."
+    - "A new dependency-free personal-local schema v1 with strict parsing, stable immutable local IDs, exact variant binding, content SHA-256, byte size, clip/camera/loop metadata, origin assertion, personal_local_only scope, imported timestamp, and literal no-egress policy."
+    - "A separate @gym/storage OPFS namespace and atomic registry for staged import, verification, exact read, per-variant activation, listing, recovery, and removal; no IndexedDB table, migration, backup field, release-pack journal, or exported raw-byte/download API."
+    - "A player-source adapter or additive controller union that preserves all release-pack validation while accepting only a structurally verified personal-local source with the same exact request variant and immutable local animation ID."
+    - "A bilingual Settings card that requires explicit local file selection, exact catalog variant selection, user acknowledgement of local-only use, and origin classification as user-supplied or permissively sourced; it never accepts a URL or initiates network access."
+    - "A preview using the existing renderer, reduced-motion behavior, written fallback, accessible native controls, and clear labeling that local imports are unreviewed and are not part of backup or cross-device transfer."
+    - "Automated evidence for bounded GLB parsing, self-containment, content integrity, exact mapping, atomic crash/quota behavior, cleanup, backup exclusion, zero egress, build/precache exclusion, personal-data immutability, release-gate preservation, accessibility, and deferred PWA updates during an active workout."
+    - "One immutable candidate commit followed by one handoff-only direct-child commit with complete automated PASS evidence."
+  non_goals:
+    - "No committed, bundled, generated, copied, downloaded, transformed, or distributed animation asset."
+    - "No relaxation of source, license, attribution, provenance, checksum, deterministic-build, or redistribution evidence for any committed or distributable pack."
+    - "No retry or implementation of ANIMATION-WAVE-01 or its source-acquisition packet and no claim that a local import is eligible input to either packet."
+    - "No URL import, remote source discovery, provider integration, scraping, media conversion, ZIP import, release descriptor import, archive export, local-byte download, sharing, upload, sync, telemetry, analytics, or service-worker caching."
+    - "No catalog record, stable release pack ID, release animation ID, workout record, history, PR, routine, session, custom exercise, nutrition record, pantry item, saved plan, database schema, backup schema, package dependency, or renderer dependency change."
+    - "No automatic mapping, alias, fuzzy match, case normalization, equipment fallback, neighboring-variant reuse, or silent substitution."
+    - "No active-workout player integration; that remains a separately coordinated WORKOUT-INTEGRATION packet."
+
+decisions:
+  contract_or_schema_change: "additive personal-local schema v1 plus compatibility tests; release pack schema/protocol/catalog remain version 1 and byte-identical"
+  app_version_change: "none; retain 0.7.0 for this bounded lane"
+  database_or_migration: "none; personal-local bytes and metadata live only in a separate OPFS layout owned by @gym/storage"
+  backup_version_change: "none; backup v5 remains byte-identical and excludes all personal-local bytes and metadata"
+  catalog_change: "none; the UI selects an existing exact immutable variant ID and stores a separate local binding"
+  source_or_license_impact: "local origin assertion only; no release-grade rights claim and no distributable eligibility"
+  accepted_file_format: "Exactly one model/gltf-binary GLB no larger than 16 MiB, with valid GLB 2.0 structure, exactly one finite animation clip, bounded node/accessor/buffer/image counts, no external URI, no script or extension requiring remote execution, and no trailing or hidden payload."
+  identity_rule: "Generate an immutable personal-local animation ID at successful import. Replacement creates a new ID; it never reuses or mutates a release animation ID. Every read and playback request must match both that ID and its exact case-sensitive exerciseVariantId."
+  selection_rule: "At most one personal-local record is active for an exact variant. A local record may be activated or removed only explicitly. It does not overwrite an installed release pack; no source is selected for another variant and no fallback crosses equipment variants."
+  egress_rule: "Personal-local bytes and metadata are never committed, bundled, exported, downloaded by the app, backed up, restored from backup, uploaded, synced, telemetered, sent through fetch/XHR/beacon/socket, written to CacheStorage, copied to public, included in service-worker precache, or passed into release builders."
+  trust_domain_rule: "The personal-local parser and registry must not construct, impersonate, or satisfy AnimationPackReleaseDescriptor, AnimationPackManifest, AnimationLicenseRecord, AnimationSourceRecord, Wave 01 acquisition, or release provenance fields. Promotion to a release is impossible through this API and requires a future release-grade packet with the unchanged strict gates."
+  precedence_rule: "The Settings preview uses the explicitly selected local record. No default product or active-workout precedence over release packs is introduced in this packet."
+  privacy_rule: "Store only normalized local metadata required to replay the file; never store a full local filesystem path. Filename display is optional, sanitized, device-local, and excluded from backup and logs."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "base_branch_parent_coordinator_delta_and_clean_worktree"
+    - "allowed_candidate_paths_post_candidate_path_and_all_unlisted_paths_forbidden"
+    - "required_reads_accepted_adrs_locked_versions_and_module_boundaries"
+    - "two_trust_domains_and_release_gate_preservation_plan"
+    - "personal_local_contract_opfs_atomicity_exact_mapping_and_player_plan"
+    - "zero_egress_backup_build_precache_telemetry_and_network_test_plan"
+    - "app_accessibility_reduced_motion_text_fallback_and_pwa_deferral_plan"
+    - "applicable_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_packet_only_producer_start_commit: true
+    producer_start_parent_matches_base_commit: true
+    instructions_read: true
+    exact_model_available: true
+    subagents_unused: true
+    required_inputs_present: true
+    no_required_external_read_or_write: true
+    no_required_human_or_device_input: true
+
+acceptance_tests:
+  - { id: "PLA01-AC-01", requirement: "Lineage is exact: e51e2661 -> packet-only coordinator -> one immutable candidate -> handoff-only direct child, or a pre-candidate BLOCKED handoff-only direct child.", evidence: "Git parent, range, name-only, object, and clean-worktree assertions." }
+  - { id: "PLA01-AC-02", requirement: "ADR 0022 and the master plan define personal-local imports as a separate non-distributable trust domain and leave all production source/license/provenance gates strict.", evidence: "Policy assertions plus byte-identity audit of protected release files." }
+  - { id: "PLA01-AC-03", requirement: "The additive schema rejects unknown fields, malformed IDs/timestamps/hashes, non-local scope, mutable identity, missing no-egress literals, and any attempt to represent a release descriptor, manifest, source, license, or provenance approval.", evidence: "Contract parser positive, boundary, and adversarial tests." }
+  - { id: "PLA01-AC-04", requirement: "Import accepts only an explicitly selected bounded self-contained GLB 2.0 with one finite clip and rejects JSON glTF, ZIP, corrupt/truncated/oversized/trailing data, external URIs, unsafe extensions, unbounded structures, and hidden payloads.", evidence: "Storage parser tests using in-memory synthetic bytes only." }
+  - { id: "PLA01-AC-05", requirement: "OPFS staging, verification, activation, recovery, quota failure, interruption, concurrent operations, integrity recheck, and cleanup are atomic and cannot mutate release-pack storage or personal IndexedDB data.", evidence: "Deterministic backend and OPFS tests with before/after hashes and counts." }
+  - { id: "PLA01-AC-06", requirement: "Every local source read and player request matches the same immutable local ID and exact case-sensitive exercise-equipment variant; no alias, normalization, neighbor, fuzzy, or cross-variant fallback exists.", evidence: "Exhaustive exact/mismatch mapping tests." }
+  - { id: "PLA01-AC-07", requirement: "Import, list, preview, activate, read, recover, and remove perform zero fetch/XHR/beacon/socket/background-sync/CacheStorage operations and expose no export, share, upload, sync, or raw-byte download UI/API.", evidence: "Instrumented zero-egress tests and public-export/static-call-graph audit." }
+  - { id: "PLA01-AC-08", requirement: "A backup created after local import contains neither bytes, content hash, immutable local ID, exact local metadata, filename sentinel, nor OPFS registry state, and backup restore neither imports nor deletes the local lane.", evidence: "Real backup-v5 ZIP inspection and storage state comparison." }
+  - { id: "PLA01-AC-09", requirement: "Neither normal build output nor the service-worker precache contains a synthetic local-byte sentinel, local import record, raw asset, public asset, test fixture, or runtime caching route for the personal-local namespace.", evidence: "Production build and generated service-worker manifest audit." }
+  - { id: "PLA01-AC-10", requirement: "The bilingual Settings experience requires file, exact variant, origin assertion, and local-only acknowledgement; provides accessible status/preview/remove controls; preserves reduced motion and written fallback; and never implies rights review or distribution eligibility.", evidence: "RTL/jsdom semantic, keyboard, error, reduced-motion, and disclosure tests." }
+  - { id: "PLA01-AC-11", requirement: "Existing release-pack contracts, storage, builder, validators, content, source-acquisition packet, Wave 01 packet/handoff, database/backup versions, catalog mappings, renderer dependency, and PWA policy are byte-identical.", evidence: "Protected object and locked-version assertions." }
+  - { id: "PLA01-AC-12", requirement: "The complete automated suite passes, including the existing rule that a PWA update is not activated during an active workout.", evidence: "Exact required command records against the immutable candidate." }
+  - { id: "PLA01-AC-13", requirement: "The schema-valid handoff names the exact immutable candidate, records all commands as pass, contains no active stop gate, sets automated_verification.status PASS, and sets merge_authorized true.", evidence: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml." }
+
+required_checks:
+  automated_commands:
+    - "git status --short"
+    - "assert producer start commit parent is e51e2661f5ea8562a84fedade5c31e0ef157e3a4 and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+    - "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs"
+    - "pnpm exec eslint packages/contracts/src/index.ts packages/contracts/src/personal-local-animation.ts packages/contracts/src/personal-local-animation.test.ts packages/storage/src/index.ts packages/storage/src/personal-local-animation packages/media/src/index.ts packages/media/src/animation-player.ts packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.ts packages/media/src/personal-local-animation.test.ts apps/web/src/features/settings/SettingsPage.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/features/settings/PersonalLocalAnimationCard.tsx apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx scripts/personal-local-animation-evidence.mjs scripts/personal-local-animation-evidence.test.mjs --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run verify"
+    - "node scripts/personal-local-animation-evidence.mjs validate"
+    - "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "assert candidate changed paths are a subset of authority.candidate_paths and every forbidden or protected path is byte-identical to e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+    - "assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, and release storage layout 1 remain locked while personal-local schema/layout equal 1"
+    - "assert no candidate Git object, tracked file, public file, content file, build input, dist artifact, service-worker precache entry, CacheStorage route, backup entry, or evidence file contains a GLB/ZIP payload, base64 fixture, generated animation byte, or synthetic local-byte sentinel"
+    - "assert public exports and static call graph expose no personal-local export/download/share/upload/sync/telemetry/network API and instrumented lifecycle operations record zero fetch, XHR, sendBeacon, WebSocket, EventSource, background-sync, and CacheStorage writes"
+    - "assert exact case-sensitive variant/local-animation identity for every lifecycle and player path, no catalog mutation, no cross-variant fallback, and no workout/history/PR/routine/session mutation"
+    - "assert release pack contracts, validators, source/license/provenance gates, storage, builders, content, Wave 01 packet/handoff, source-acquisition packet, backup implementation, Vite PWA policy, and renderer implementation are byte-identical to e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+    - "parse every YAML file under docs/ai and validate the handoff required fields, exact command records, candidate SHA, optional_manual_evidence, status, and merge_authorized consistency"
+    - "assert candidate_commit remains unchanged before and after all post-candidate commands and git status --porcelain is empty"
+  execution_rule: "Run commands 1 and 2 at preflight. After implementation, generate only deterministic metadata evidence and create the immutable candidate. Run commands 3 through 18 in order against that exact candidate with external network disabled. A failure, not_run result, candidate mutation, unexpected path, egress attempt, asset byte in Git/build/backup/cache, or release-gate change prevents PASS."
+  evidence_paths:
+    - "docs/adr/0022-personal-local-animation-imports.md"
+    - "docs/ai/evidence/PERSONAL-LOCAL-ANIMATION-01/automated-report.json"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "PLA01-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, the base/branch/parent/coordinator delta is wrong, required reads are incomplete, locked versions differ, or the worktree is dirty before implementation."
+    action: "Stop before implementation and write a BLOCKED handoff only if the report path is the sole safe metadata change. Do not widen scope."
+  - id: "PLA01-STOP-02"
+    condition: "Correctness requires changing a release pack contract, source/license/provenance rule, production content, catalog mapping, stable release ID, release storage journal, builder, content validator, Wave 01 artifact, backup format, database schema, migration, renderer dependency, PWA policy, active-workout production UI, dependency, lockfile, configuration, or any unlisted path."
+    action: "Stop BLOCKED and request a separate packet. Do not alter or reinterpret the protected release trust domain."
+  - id: "PLA01-STOP-03"
+    condition: "Any implementation path can export, download, share, upload, sync, telemeter, fetch, remotely import, publish, cache in CacheStorage, include in backup, copy into public/content/dist inputs, feed a release builder, or otherwise move personal-local bytes or metadata off the current origin storage."
+    action: "Stop FAIL. Remove no evidence, do not claim a local-only lane, and do not authorize merge."
+  - id: "PLA01-STOP-04"
+    condition: "Any GLB is accepted without bounded structural validation, self-containment, byte-size and SHA-256 verification, exact one-clip metadata, atomic staging, or rejection of external URIs, unsafe extensions, corrupt/truncated/trailing payload, or quota/interruption failure."
+    action: "Stop FAIL and preserve the failing synthetic case in source-only test form. Do not add a binary fixture."
+  - id: "PLA01-STOP-05"
+    condition: "A local source can be selected through aliasing, normalization, fuzzy matching, a neighboring equipment variant, catalog mutation, release-ID reuse, implicit precedence, or any request whose local animation ID and exact variant do not both match."
+    action: "Stop FAIL. Do not substitute or weaken exact identity."
+  - id: "PLA01-STOP-06"
+    condition: "UI, media, contracts, or another module accesses IndexedDB or OPFS directly; storage imports catalog, media, UI, or app code; media imports storage; or modules bypass public @gym entry points."
+    action: "Stop FAIL for a module-boundary violation. Do not add an exception."
+  - id: "PLA01-STOP-07"
+    condition: "Import, activation, recovery, removal, backup, or update handling mutates personal data, an installed release pack, routine/session/history/PR data, or activates a PWA update during an active workout."
+    action: "Stop FAIL with before/after hashes, counts, and the exact failing phase."
+  - id: "PLA01-STOP-08"
+    condition: "Any required automated command fails or is not run, an evidence file is missing or schema-invalid, candidate/handoff lineage is wrong, an unexpected path changes, optional evidence is invented, or the candidate changes during verification."
+    action: "Record FAIL or BLOCKED with merge_authorized false. Do not amend or replace the immutable candidate, merge, push, tag, or update the coordinator ledger."
+
+handoff:
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+  metadata_commit_rule: "For PASS or FAIL, add and commit only the handoff as the immutable candidate's direct child. For pre-candidate BLOCKED, add and commit only the handoff as the producer start commit's direct child. Never amend or replace the coordinator or candidate, and never put the handoff commit's own SHA in the handoff."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "versions"
+    - "trust_domain_and_release_gate_evidence"
+    - "contract_and_compatibility_evidence"
+    - "opfs_atomicity_and_integrity_evidence"
+    - "exact_variant_mapping_evidence"
+    - "zero_egress_and_network_evidence"
+    - "backup_build_and_precache_exclusion_evidence"
+    - "personal_data_and_pwa_safety_evidence"
+    - "accessibility_and_fallback_evidence"
+    - "acceptance_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "known_risks"
+    - "optional_evidence"
+    - "automated_verification"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  disclosure_rule: "State that personal-local imports are unreviewed device-only material, are absent from backup and transfer, and never become eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte."
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml#automated_verification"
+  schema:
+    schema_version: 1
+    packet_id: "PERSONAL-LOCAL-ANIMATION-01"
+    candidate_commit: "40-character SHA or null only for pre-candidate BLOCKED"
+    status: "PASS|FAIL|BLOCKED"
+    checks:
+      - command: "exact required command"
+        result: "pass|fail|not_run"
+        evidence: "exact output or immutable artifact"
+    optional_manual_evidence: []
+    merge_authorized: false
+  authorization_rule: "Only PASS with all 18 required commands recorded exactly once as pass, the exact immutable candidate, a schema-valid handoff, byte-identical protected release gates, zero personal-local egress, and no active stop gate may set merge_authorized true. FAIL or BLOCKED always sets merge_authorized false."
+  optional_evidence_rule: "Cold, owner, independent, legal, visual, biomechanics, manual, named-reviewer, VoiceOver, and physical-device review are optional evidence only. They never complete, block, or authorize the candidate, and an unperformed optional check is never reported as passed."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS, every one of the 18 exact automated command records is pass, no stop gate is active, and automated_verification.merge_authorized == true"
+  target: "main"
+  method: "fast-forward"
+  squash_policy: "forbidden"
+  checkpoint_tag_after_merge: "checkpoint/personal-local-animation-01-automated-pass"
+  next_packet_rule: "A later WORKOUT-INTEGRATION packet may explicitly consume the public personal-local read API only after this checkpoint. It must preserve exact variant identity, release-pack separation, zero egress, backup exclusion, and active-workout PWA deferral."
+  current_coordinator_task_prohibitions:
+    - "Do not implement the personal-local lane."
+    - "Do not add or inspect user animation bytes."
+    - "Do not alter historical packets or handoffs."
+    - "Do not merge main."
+    - "Do not push."
+    - "Do not update docs/ai/reviews/coordinator-ledger.yaml."
+    - "Do not create any checkpoint tag."
