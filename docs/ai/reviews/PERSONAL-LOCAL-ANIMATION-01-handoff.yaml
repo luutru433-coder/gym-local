@@ -1,0 +1,243 @@
+schema_version: 3
+packet_id: "PERSONAL-LOCAL-ANIMATION-01"
+status: "automated_pass"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "Implementation and all required automated verification used gpt-5.6-sol."
+subagents_used: false
+
+base_commit: "e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+producer_start_commit: "ba79414b5aa988a9dbb9561f61af825a4778e11a"
+candidate_parent_commit: "ba79414b5aa988a9dbb9561f61af825a4778e11a"
+candidate_commit: "4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+branch: "codex/personal-local-animation-01"
+
+changed_paths:
+  candidate:
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.css"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx"
+    - "apps/web/src/features/settings/PersonalLocalAnimationCard.tsx"
+    - "apps/web/src/features/settings/SettingsPage.test.tsx"
+    - "apps/web/src/features/settings/SettingsPage.tsx"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+    - "docs/ai/evidence/PERSONAL-LOCAL-ANIMATION-01/automated-report.json"
+    - "docs/ai/master-plan.md"
+    - "packages/contracts/src/index.ts"
+    - "packages/contracts/src/personal-local-animation.test.ts"
+    - "packages/contracts/src/personal-local-animation.ts"
+    - "packages/media/src/animation-player.test.ts"
+    - "packages/media/src/animation-player.ts"
+    - "packages/media/src/index.ts"
+    - "packages/media/src/personal-local-animation.test.ts"
+    - "packages/media/src/personal-local-animation.ts"
+    - "packages/storage/src/index.ts"
+    - "packages/storage/src/personal-local-animation/glb.ts"
+    - "packages/storage/src/personal-local-animation/index.ts"
+    - "packages/storage/src/personal-local-animation/opfs.ts"
+    - "packages/storage/src/personal-local-animation/store.test.ts"
+    - "packages/storage/src/personal-local-animation/store.ts"
+    - "scripts/personal-local-animation-evidence.mjs"
+    - "scripts/personal-local-animation-evidence.test.mjs"
+  post_candidate_metadata:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+
+versions:
+  app: "0.7.0"
+  database: 5
+  backup: 5
+  catalog: 3
+  animation_pack_schema: 1
+  animation_player_protocol: 1
+  animation_catalog: 1
+  renderer_three: "0.185.1"
+  release_storage_layout: 1
+  personal_local_schema: 1
+  personal_local_storage_layout: 1
+
+trust_domain_and_release_gate_evidence:
+  result: "pass"
+  evidence: "ADR 0022, the master plan, strict additive parsing, and byte-identity audits preserve separate release and personal-local trust domains. Personal-local records contain no release descriptor, manifest, source, license, review, or provenance approval fields and can never become distribution-eligible through this API."
+
+contract_and_compatibility_evidence:
+  result: "pass"
+  evidence: "The dependency-free personal-local v1 parser accepts only exact fields and rejects malformed IDs, variants, hashes, timestamps, scopes, no-egress literals, unknown fields, and release-like provenance fields. Existing release schema/protocol/catalog contracts remain byte-identical."
+
+opfs_atomicity_and_integrity_evidence:
+  result: "pass"
+  evidence: "A separate v1 OPFS namespace, checksummed two-slot registry, serialized lifecycle queue, pre-commit reread, SHA-256/byte-size/GLB revalidation, ownership marker, quota handling, cleanup, interruption handling, concurrent-import tests, and recovery tests passed. No IndexedDB schema or migration changed."
+
+exact_variant_mapping_evidence:
+  result: "pass"
+  evidence: "Storage and player tests require the same immutable personal-local ID and exact case-sensitive exerciseVariantId for activation, read, removal, and playback; ID case changes and neighboring equipment variants fail without alias, normalization, fuzzy match, catalog mutation, or fallback."
+
+zero_egress_and_network_evidence:
+  result: "pass"
+  evidence: "Static public-API/call-graph audits found no export, download, share, upload, sync, telemetry, or network operation. Instrumented import/list/activate/read/recover/remove recorded zero fetch, XHR, sendBeacon, WebSocket, EventSource, background-sync, and CacheStorage calls."
+
+backup_build_and_precache_exclusion_evidence:
+  result: "pass"
+  evidence: "Backup v5 implementation and payload contract remain byte-identical and only serialize the existing personal-data snapshot. Production build and service-worker audits found no GLB/ZIP payload, personal-local byte sentinel, raw asset, local record, or personal-local runtime-cache route; normal build performance and precache budgets passed."
+
+personal_data_and_pwa_safety_evidence:
+  result: "pass"
+  evidence: "Catalog, workouts, history, PR, routine, session, app store, active-workout production UI, backup implementation, and PWA policy are unchanged. The required App, WorkoutPage, backup, and PWA install suites passed, including active-workout update deferral."
+
+accessibility_and_fallback_evidence:
+  result: "pass"
+  evidence: "The bilingual Settings card requires file, exact variant, origin assertion, and local-only acknowledgement; exposes semantic status, preview-selection, and removal controls; discloses unreviewed device-only/no-backup/no-transfer/no-distribution behavior; and preserves written fallback and reduced-motion behavior."
+
+acceptance_evidence:
+  - id: "PLA01-AC-01"
+    result: "pass"
+    evidence: "Lineage is e51e2661 base -> ba79414b packet-only coordinator -> 4b4e4f6a single immutable candidate -> handoff-only direct child."
+  - id: "PLA01-AC-02"
+    result: "pass"
+    evidence: "ADR 0022 and master-plan policy define non-interchangeable trust domains; protected release files are byte-identical."
+  - id: "PLA01-AC-03"
+    result: "pass"
+    evidence: "Contract positive, boundary, unknown-field, no-egress, and release-impersonation tests passed."
+  - id: "PLA01-AC-04"
+    result: "pass"
+    evidence: "In-memory GLB tests cover valid self-contained input and reject JSON glTF, ZIP, remote URI, extension, multiple clips, trailing bytes, and undeclared payload; production validation also enforces size and structural bounds."
+  - id: "PLA01-AC-05"
+    result: "pass"
+    evidence: "Deterministic backend tests cover verification, activation, recovery, quota failure, interruption cleanup, concurrency, integrity failure, and explicit removal against the isolated OPFS design."
+  - id: "PLA01-AC-06"
+    result: "pass"
+    evidence: "Exhaustive lifecycle and media-adapter mismatch tests preserve exact local ID plus case-sensitive equipment variant."
+  - id: "PLA01-AC-07"
+    result: "pass"
+    evidence: "Instrumented lifecycle and static public-export audits prove zero egress and no egress UI/API."
+  - id: "PLA01-AC-08"
+    result: "pass"
+    evidence: "Backup tests passed while byte-identical backup v5 remains limited to the existing snapshot; the separate OPFS lane is absent from backup creation and restore."
+  - id: "PLA01-AC-09"
+    result: "pass"
+    evidence: "Production build and generated service-worker audits found no personal-local payload, record, fixture, sentinel, or runtime caching route."
+  - id: "PLA01-AC-10"
+    result: "pass"
+    evidence: "RTL/jsdom Settings tests passed required-input, semantic-control, disclosure, fallback, and no-egress UI assertions."
+  - id: "PLA01-AC-11"
+    result: "pass"
+    evidence: "All declared release contracts, storage, builders, content, packets, backup implementation, renderer implementation/dependency, catalog, lockfile, and PWA policy are byte-identical to base."
+  - id: "PLA01-AC-12"
+    result: "pass"
+    evidence: "The full automated suite passed 35 test files and 563 tests plus production build/performance gates."
+  - id: "PLA01-AC-13"
+    result: "pass"
+    evidence: "The prospective handoff parsed as YAML with all 28 required fields, no prohibited fields, exact candidate SHA, 18 exact pass records, empty optional_manual_evidence, PASS status, and consistent merge authorization."
+
+checks:
+  required_commands: 18
+  required_commands_run: 18
+  required_commands_passed: 18
+  required_commands_failed: 0
+  required_commands_not_run: 0
+  immutable_candidate_unchanged_after_commands: true
+  triggered_stop_gates: []
+  result: "pass"
+  evidence: "Candidate 4b4e4f6a remained unchanged with parent ba79414b; final candidate-tree status was empty before the sole handoff metadata file was created."
+
+protected_path_audit:
+  result: "pass"
+  candidate_path_count: 24
+  unauthorized_paths: []
+  forbidden_paths_changed: []
+  locked_versions_changed: false
+  release_contract_or_validator_changed: false
+  release_storage_changed: false
+  release_builder_or_content_changed: false
+  database_or_backup_changed: false
+  catalog_mapping_changed: false
+  renderer_or_dependency_changed: false
+  pwa_policy_changed: false
+  active_workout_production_ui_changed: false
+  package_lock_or_configuration_changed: false
+
+known_risks:
+  - "Personal-local imports are intentionally unreviewed device-only material; loss of origin storage loses them because backup and transfer are forbidden."
+  - "Optional visual, biomechanics, legal, VoiceOver, battery, thermal, memory, manual, named-reviewer, and physical-device review did not run and no pass is claimed for them."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  named_reviewers: "not_run"
+  legal_review: "not_run"
+  visual_review: "not_run"
+  biomechanics_review: "not_run"
+  manual_review: "not_run"
+  physical_device_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "PERSONAL-LOCAL-ANIMATION-01"
+  candidate_commit: "4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+  status: "PASS"
+  checks:
+    - command: "git status --short"
+      result: "pass"
+      evidence: "Preflight producer-start worktree was clean."
+    - command: "assert producer start commit parent is e51e2661f5ea8562a84fedade5c31e0ef157e3a4 and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+      result: "pass"
+      evidence: "ba79414b parent is e51e2661 and its one-path delta is the target packet."
+    - command: "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs"
+      result: "pass"
+      evidence: "11 test files and 73 tests passed."
+    - command: "pnpm exec eslint packages/contracts/src/index.ts packages/contracts/src/personal-local-animation.ts packages/contracts/src/personal-local-animation.test.ts packages/storage/src/index.ts packages/storage/src/personal-local-animation packages/media/src/index.ts packages/media/src/animation-player.ts packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.ts packages/media/src/personal-local-animation.test.ts apps/web/src/features/settings/SettingsPage.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/features/settings/PersonalLocalAnimationCard.tsx apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx scripts/personal-local-animation-evidence.mjs scripts/personal-local-animation-evidence.test.mjs --max-warnings=0"
+      result: "pass"
+      evidence: "Exact scoped ESLint command exited 0 with zero warnings."
+    - command: "pnpm run typecheck"
+      result: "pass"
+      evidence: "tsc -b --pretty false exited 0."
+    - command: "pnpm run architecture:audit"
+      result: "pass"
+      evidence: "Architecture boundaries verified."
+    - command: "pnpm run verify"
+      result: "pass"
+      evidence: "Full verify passed architecture, lint, typecheck, content checks, 35 test files/563 tests, production build, PWA generation, and performance budgets."
+    - command: "node scripts/personal-local-animation-evidence.mjs validate"
+      result: "pass"
+      evidence: "PASS: 5 source files checked; zero network operations, CacheStorage writes, and egress APIs."
+    - command: "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+      result: "pass"
+      evidence: "PASS: 44 build files inspected with zero findings."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "pass"
+      evidence: "git diff --check ba79414b..4b4e4f6a exited 0."
+    - command: "assert candidate changed paths are a subset of authority.candidate_paths and every forbidden or protected path is byte-identical to e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+      result: "pass"
+      evidence: "24 candidate paths are authorized; protected path byte diff is zero."
+    - command: "assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, and release storage layout 1 remain locked while personal-local schema/layout equal 1"
+      result: "pass"
+      evidence: "All declared version and dependency locks matched exactly."
+    - command: "assert no candidate Git object, tracked file, public file, content file, build input, dist artifact, service-worker precache entry, CacheStorage route, backup entry, or evidence file contains a GLB/ZIP payload, base64 fixture, generated animation byte, or synthetic local-byte sentinel"
+      result: "pass"
+      evidence: "Candidate binary objects/tracked payloads and public/content/dist/precache/backup/evidence payloads were zero; source-only tests construct bounded bytes in memory."
+    - command: "assert public exports and static call graph expose no personal-local export/download/share/upload/sync/telemetry/network API and instrumented lifecycle operations record zero fetch, XHR, sendBeacon, WebSocket, EventSource, background-sync, and CacheStorage writes"
+      result: "pass"
+      evidence: "Public egress APIs were zero; the complete instrumented lifecycle recorded zero calls across every named egress surface."
+    - command: "assert exact case-sensitive variant/local-animation identity for every lifecycle and player path, no catalog mutation, no cross-variant fallback, and no workout/history/PR/routine/session mutation"
+      result: "pass"
+      evidence: "Storage/media exact-identity suites passed 7 tests; protected catalog, workout, and personal-data paths had zero changes."
+    - command: "assert release pack contracts, validators, source/license/provenance gates, storage, builders, content, Wave 01 packet/handoff, source-acquisition packet, backup implementation, Vite PWA policy, and renderer implementation are byte-identical to e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+      result: "pass"
+      evidence: "The complete protected release path comparison was byte-identical."
+    - command: "parse every YAML file under docs/ai and validate the handoff required fields, exact command records, candidate SHA, optional_manual_evidence, status, and merge_authorized consistency"
+      result: "pass"
+      evidence: "47 existing YAML files and the prospective handoff parsed; all 28 required fields, 18 exact pass records, exact candidate, empty optional_manual_evidence, PASS status, and merge_authorized consistency validated."
+    - command: "assert candidate_commit remains unchanged before and after all post-candidate commands and git status --porcelain is empty"
+      result: "pass"
+      evidence: "Candidate before/after was 4b4e4f6a, parent ba79414b, commit object present, and candidate-tree status empty before adding this sole handoff metadata file."
+  optional_manual_evidence: []
+  merge_authorized: true
+
+review_target:
+  packet_path: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+  candidate_range: "ba79414b5aa988a9dbb9561f61af825a4778e11a..4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+  next_task: "Coordinator should verify the immutable candidate plus this direct-child handoff-only commit, then fast-forward main only if the committed handoff matches candidate 4b4e4f6a and all automated PASS evidence. Ledger update and checkpoint tag remain separate coordinator actions."
