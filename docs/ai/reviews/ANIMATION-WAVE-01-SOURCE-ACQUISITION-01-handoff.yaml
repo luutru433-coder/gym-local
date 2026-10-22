@@ -1,0 +1,380 @@
+schema_version: 3
+packet_id: "ANIMATION-WAVE-01-SOURCE-ACQUISITION-01"
+status: "BLOCKED"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "This producer task was explicitly created for gpt-5.6-sol; no model substitution or subagent was used."
+subagents_used: false
+
+base_commit: "33471f11b64e0089423aaa227b5f91825f6e8f98"
+producer_start_commit: "e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+candidate_parent_commit: null
+candidate_commit: null
+branch: "codex/animation-wave-01-source-acquisition-01"
+
+changed_paths:
+  candidate: []
+  post_candidate_metadata:
+    - "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml"
+
+variant_matrix:
+  catalog_variants: 199
+  pilot_variants: 12
+  wave_01_variants: 18
+  remaining_outside_pilot_and_wave_01: 169
+  exact_records:
+    - { exercise_variant_id: "chest_press__dumbbell", animation_id: "animation.production.chest-press.dumbbell" }
+    - { exercise_variant_id: "chest_press__barbell", animation_id: "animation.production.chest-press.barbell" }
+    - { exercise_variant_id: "incline_chest_press__dumbbell", animation_id: "animation.production.incline-chest-press.dumbbell" }
+    - { exercise_variant_id: "dip__bodyweight", animation_id: "animation.production.dip.bodyweight" }
+    - { exercise_variant_id: "lat_pulldown__cable", animation_id: "animation.production.lat-pulldown.cable" }
+    - { exercise_variant_id: "pull_up__bodyweight", animation_id: "animation.production.pull-up.bodyweight" }
+    - { exercise_variant_id: "horizontal_row__cable", animation_id: "animation.production.horizontal-row.cable" }
+    - { exercise_variant_id: "overhead_press__dumbbell", animation_id: "animation.production.overhead-press.dumbbell" }
+    - { exercise_variant_id: "biceps_curl__dumbbell", animation_id: "animation.production.biceps-curl.dumbbell" }
+    - { exercise_variant_id: "triceps_pushdown__cable", animation_id: "animation.production.triceps-pushdown.cable" }
+    - { exercise_variant_id: "squat__bodyweight", animation_id: "animation.production.squat.bodyweight" }
+    - { exercise_variant_id: "lunge__dumbbell", animation_id: "animation.production.lunge.dumbbell" }
+    - { exercise_variant_id: "step_up__bodyweight", animation_id: "animation.production.step-up.bodyweight" }
+    - { exercise_variant_id: "romanian_deadlift__barbell", animation_id: "animation.production.romanian-deadlift.barbell" }
+    - { exercise_variant_id: "leg_curl__machine", animation_id: "animation.production.leg-curl.machine" }
+    - { exercise_variant_id: "deadlift__trap_bar", animation_id: "animation.production.deadlift.trap-bar" }
+    - { exercise_variant_id: "standing_calf_raise__bodyweight", animation_id: "animation.production.standing-calf-raise.bodyweight" }
+    - { exercise_variant_id: "crunch__bodyweight", animation_id: "animation.production.crunch.bodyweight" }
+  catalog_test_evidence: "packages/catalog/src/animation-catalog.test.ts passed its 199 total / 12 pilot assertions; source inspection confirmed all 18 packet IDs are exact catalog movement-equipment combinations and none is a pilot mapping."
+  result: "pass"
+
+network_activity_summary:
+  result: "blocked_before_retrieval"
+  started_at_utc: "2026-10-22T11:49:00Z"
+  completed_at_utc: "2026-10-22T11:57:50Z"
+  targeted_search_query_count: 18
+  query_scope: "One exact, human-directed GLB/3D-animation/license discovery query for each packet-declared variant."
+  exact_download_requests: 0
+  retrieved_asset_bytes: 0
+  retrieved_terms_bytes: 0
+  bounded_retry_count: 0
+  external_write_count: 0
+  forbidden_action_count: 0
+  accounts_created_or_used: 0
+  purchases_or_checkout_actions: 0
+  terms_accepted_on_user_behalf: 0
+  uploads_publications_or_messages: 0
+  crawling_scraping_bulk_harvesting_or_mirroring: false
+  access_control_or_anti_bot_bypass: false
+  credentials_cookies_or_signed_tokens_captured: false
+  provider_runtime_or_undocumented_api_used: false
+  candidate_pages_reviewed:
+    - "https://github.com/AssiamahS/opengym3d"
+    - "https://github.com/AssiamahS/opengym3d/blob/main/LICENSE"
+    - "https://movekit.com/exercises/dumbbell-bench-press"
+    - "https://movekit.com/exercise-video-library"
+    - "https://movekit.com/licensing"
+    - "https://movekit.com/exercises/machine-seated-cable-row"
+    - "https://www.fab.com/listings/5d09429e-3951-403b-badc-ead9aaddcdfa?lang=en"
+    - "https://www.innerscene.com/tools/library/3d-parts/bodyweight-squat-3d-person-sports-7cb987f5"
+    - "https://www.fab.com/listings/a3fcec93-4f98-430a-9707-5cdad2f86fbc"
+    - "https://movekit.com/exercises/trap-bar-deadlift"
+    - "https://www.exerciseanimatic.com/product-page/bodyweight-standing-calf-raise"
+    - "https://sketchfab.com/3d-models/bodyweight-crunch-3d-animation-4fe839f531d84931b040da504d755625"
+  declaration: "No crawling, scraping, bulk harvesting, access-control bypass, credential capture, upload, publication, or other external write occurred. Search results and previews were not treated as source, rights, or byte evidence."
+
+source_retrieval_evidence:
+  result: "blocked"
+  stop_gates:
+    - "AWSA01-STOP-02"
+    - "AWSA01-STOP-04"
+    - "AWSA01-STOP-05"
+  retrieval_events: []
+  common_missing_fields:
+    - "stable exact source landing URL accepted for the exact bytes"
+    - "stable exact download URL and resolved URL"
+    - "stable exact license or terms URL and resolved URL bound to the exact bytes"
+    - "author or rightsholder resolved for the exact bytes"
+    - "explicit repository-storage, modification, and offline raw-redistribution permission"
+    - "retrieval HTTP status, redirect chain, media type, timestamp, byte size, and SHA-256"
+    - "tracked retrieved source bytes"
+    - "tracked self-contained animated candidate GLB"
+  unresolved_records:
+    - record_id: "wave01.chest-press.dumbbell"
+      exercise_variant_id: "chest_press__dumbbell"
+      animation_id: "animation.production.chest-press.dumbbell"
+      discovery_query: '"dumbbell bench press" glb 3D animation download license'
+      result: "unresolved"
+      evidence: "The exact MoveKit result is a USD 4.99 commercial MP4 clip. Purchase is required, the delivered format is not GLB, and its public licensing summary does not grant repository distribution of raw source bytes. No qualifying downloadable animated GLB was found."
+    - record_id: "wave01.chest-press.barbell"
+      exercise_variant_id: "chest_press__barbell"
+      animation_id: "animation.production.chest-press.barbell"
+      discovery_query: '"barbell bench press" glb animation download license'
+      result: "unresolved"
+      evidence: "Results were commercial video or marketplace assets requiring purchase or provider-specific terms; no stable exact animated GLB download with offline raw-redistribution and modification rights was found."
+    - record_id: "wave01.incline-chest-press.dumbbell"
+      exercise_variant_id: "incline_chest_press__dumbbell"
+      animation_id: "animation.production.incline-chest-press.dumbbell"
+      discovery_query: '"incline dumbbell press" glb animation license'
+      result: "unresolved"
+      evidence: "Results were commercial MP4/Lottie media or static marketplace models, not a rights-cleared self-contained animated GLB with visible incline-bench geometry."
+    - record_id: "wave01.dip.bodyweight"
+      exercise_variant_id: "dip__bodyweight"
+      animation_id: "animation.production.dip.bodyweight"
+      discovery_query: '"bodyweight dip" glb animation 3D license'
+      result: "unresolved"
+      evidence: "Results were Lottie/video media under provider digital or commercial licenses; no exact animated GLB plus parallel-bar geometry and raw-byte redistribution grant was found."
+    - record_id: "wave01.lat-pulldown.cable"
+      exercise_variant_id: "lat_pulldown__cable"
+      animation_id: "animation.production.lat-pulldown.cable"
+      discovery_query: '"lat pulldown" GLB 3D animation download license'
+      result: "unresolved"
+      evidence: "MoveKit offered a purchasable MP4 and marketplace pages offered nonanimated equipment models. No exact seated animated GLB containing the station and pulldown bar with qualifying rights was found."
+    - record_id: "wave01.pull-up.bodyweight"
+      exercise_variant_id: "pull_up__bodyweight"
+      animation_id: "animation.production.pull-up.bodyweight"
+      discovery_query: '"pull up" GLB 3D animated model download license'
+      result: "unresolved"
+      evidence: "A Fab listing advertised animated GLB/FBX only after license selection and purchase; another marketplace result was editorial-only. Neither supplies a public exact byte/license binding or repository raw-redistribution grant."
+    - record_id: "wave01.horizontal-row.cable"
+      exercise_variant_id: "horizontal_row__cable"
+      animation_id: "animation.production.horizontal-row.cable"
+      discovery_query: '"seated cable row" GLB 3D animation download license'
+      result: "unresolved"
+      evidence: "The exact MoveKit result is a purchasable MP4. The separate machine-model result is noncommercial, nonanimated 3DS content. No qualifying combined animated GLB was found."
+    - record_id: "wave01.overhead-press.dumbbell"
+      exercise_variant_id: "overhead_press__dumbbell"
+      animation_id: "animation.production.overhead-press.dumbbell"
+      discovery_query: '"dumbbell overhead press" GLB animation download license'
+      result: "unresolved"
+      evidence: "The relevant results were premium Lottie/video formats under a provider digital license, not downloadable self-contained GLB bytes with raw offline redistribution rights."
+    - record_id: "wave01.biceps-curl.dumbbell"
+      exercise_variant_id: "biceps_curl__dumbbell"
+      animation_id: "animation.production.biceps-curl.dumbbell"
+      discovery_query: '"dumbbell biceps curl" GLB animation download license'
+      result: "unresolved"
+      evidence: "Results exposed licensed viewer animation or subscription video, not an exact GLB download and exact license-to-byte record permitting repository storage, modification, and redistribution."
+    - record_id: "wave01.triceps-pushdown.cable"
+      exercise_variant_id: "triceps_pushdown__cable"
+      animation_id: "animation.production.triceps-pushdown.cable"
+      discovery_query: '"cable triceps pushdown" GLB animation download license'
+      result: "unresolved"
+      evidence: "The bounded query produced no qualifying exact animated GLB with cable station and pushdown attachment, stable bytes, and complete rights evidence."
+    - record_id: "wave01.squat.bodyweight"
+      exercise_variant_id: "squat__bodyweight"
+      animation_id: "animation.production.squat.bodyweight"
+      discovery_query: '"bodyweight squat" GLB animation download license'
+      result: "unresolved"
+      evidence: "Innerscene exposes a 20.8 MB CC0 GLB, but its exact landing page states that it is a static mesh with no armature or animation. A separate Fab result was also static and AI-generated. Both fail the required animated, finite-motion, non-generative suitability gate."
+    - record_id: "wave01.lunge.dumbbell"
+      exercise_variant_id: "lunge__dumbbell"
+      animation_id: "animation.production.lunge.dumbbell"
+      discovery_query: '"dumbbell lunge" GLB animation download license'
+      result: "unresolved"
+      evidence: "Exercise Animatic offered a purchasable MP4 under a non-exclusive commercial license. It is not GLB source input and purchase or checkout was not authorized."
+    - record_id: "wave01.step-up.bodyweight"
+      exercise_variant_id: "step_up__bodyweight"
+      animation_id: "animation.production.step-up.bodyweight"
+      discovery_query: '"bodyweight step up" GLB animation download license'
+      result: "unresolved"
+      evidence: "The bounded query produced no qualifying animated GLB with exact platform geometry, stable download bytes, and complete rights evidence."
+    - record_id: "wave01.romanian-deadlift.barbell"
+      exercise_variant_id: "romanian_deadlift__barbell"
+      animation_id: "animation.production.romanian-deadlift.barbell"
+      discovery_query: '"barbell Romanian deadlift" GLB animation download license'
+      result: "unresolved"
+      evidence: "Results were Lottie/GIF/video media under provider digital licenses or instructional pages, not a self-contained animated GLB with a stable exact byte/license binding."
+    - record_id: "wave01.leg-curl.machine"
+      exercise_variant_id: "leg_curl__machine"
+      animation_id: "animation.production.leg-curl.machine"
+      discovery_query: '"leg curl machine" GLB animated model download license'
+      result: "unresolved"
+      evidence: "Fab and CGTrader results were purchasable equipment-only models described as ready for animation, not an exact animated human/machine exercise GLB with qualifying raw redistribution rights."
+    - record_id: "wave01.deadlift.trap-bar"
+      exercise_variant_id: "deadlift__trap_bar"
+      animation_id: "animation.production.deadlift.trap-bar"
+      discovery_query: '"trap bar deadlift" GLB animation download license'
+      result: "unresolved"
+      evidence: "Exact exercise results were purchasable MP4/GIF stock media. No exact animated GLB with trap-bar geometry, stable bytes, and repository/offline raw-redistribution rights was found."
+    - record_id: "wave01.standing-calf-raise.bodyweight"
+      exercise_variant_id: "standing_calf_raise__bodyweight"
+      animation_id: "animation.production.standing-calf-raise.bodyweight"
+      discovery_query: '"standing calf raise" bodyweight GLB animation download license'
+      result: "unresolved"
+      evidence: "Results were purchasable MP4 or 2D GIF assets. A CC BY-SA GIF is not a GLB input and does not satisfy the required asset structure or transformation provenance."
+    - record_id: "wave01.crunch.bodyweight"
+      exercise_variant_id: "crunch__bodyweight"
+      animation_id: "animation.production.crunch.bodyweight"
+      discovery_query: '"bodyweight crunch" GLB animation download license'
+      result: "unresolved"
+      evidence: "A downloadable Sketchfab model is described as a derivative of another exercise model and refers only to the original creator under an unspecified applicable Sketchfab license. That statement cannot bind the exact derivative bytes to an attributable rightsholder and complete modification/redistribution grant."
+  resolution_required: "Provide or identify all 18 exact non-generative animated source assets with stable public landing/download/terms URLs and explicit repository-storage, modification, and offline raw-redistribution permission; no record may depend on purchase, account access, marketplace-only terms, provider runtime, or cross-variant substitution."
+
+license_rights_and_attribution_evidence:
+  result: "blocked"
+  qualified_record_count: 0
+  partially_eligible_record_count: 0
+  unresolved_record_count: 18
+  evidence: "Search-result descriptions, previews, commercial-use summaries, and repository-level licenses were not treated as proof for exact bytes. Commercial providers required purchase or provider licenses that did not establish raw repository redistribution. Open-source leads did not provide an exact complete 18-record byte/license matrix; the exact CC0 bodyweight-squat lead was static, and the exact crunch derivative had ambiguous original-byte provenance."
+  missing_decisions:
+    - "rightsholder resolution for every exact byte set"
+    - "exact license-to-byte binding"
+    - "offline redistribution permission"
+    - "modification permission"
+    - "repository storage permission"
+    - "attribution and notice closure"
+    - "provider restriction, expiry, revocation, login, paywall, and runtime-dependency checks"
+
+transformation_and_provenance_evidence:
+  result: "not_run"
+  transformation_records: []
+  evidence: "No source was independently qualified, so no byte was retrieved, converted, retargeted, renamed, optimized, normalized, or committed. No hash chain was fabricated."
+
+asset_input_suitability_evidence:
+  result: "not_run"
+  candidate_glb_count: 0
+  evidence: "No qualified candidate bytes exist to inspect for GLB structure, self-containment, clips, motion, rig, exact equipment, pilot inequality, or non-placeholder/non-generative/non-synthetic status. Search previews and marketplace descriptions were not used as byte-level suitability evidence."
+
+acceptance_evidence:
+  - id: "AWSA01-AC-01"
+    result: "pass"
+    evidence: "The producer start is e51e2661 with first parent 33471f11; its delta is the single coordinator packet. No candidate exists, and this BLOCKED handoff is the sole authorized child change."
+  - id: "AWSA01-AC-02"
+    result: "pass"
+    evidence: "The fixed matrix is exactly 18 unique packet pairs, catalog-derived from 199 variants, disjoint from the 12 pilot mappings, leaving 169 outside pilot and Wave 01. No substitution or partial PASS is claimed."
+  - id: "AWSA01-AC-03"
+    result: "blocked"
+    evidence: "No record has all stable exact source/download/resolved/terms URLs plus content-hash-matched evidence or bytes."
+  - id: "AWSA01-AC-04"
+    result: "blocked"
+    evidence: "No record resolves exact-byte rights for repository storage, modification, and offline raw redistribution with complete attribution and notices."
+  - id: "AWSA01-AC-05"
+    result: "blocked"
+    evidence: "No retrieved source or candidate GLB exists, so byte-size, SHA-256, and transformation-chain evidence cannot be produced."
+  - id: "AWSA01-AC-06"
+    result: "blocked"
+    evidence: "No candidate GLB exists for exact movement/equipment, self-containment, motion, or origin inspection."
+  - id: "AWSA01-AC-07"
+    result: "pass"
+    evidence: "All activity was bounded read-only search/page review. No crawling, scraping, harvesting, bypass, credentials, provider runtime, purchase, acceptance, or external write occurred."
+  - id: "AWSA01-AC-08"
+    result: "pass"
+    evidence: "No Wave 01 pack, manifest, descriptor, archive, release, app, runtime, contract, storage, catalog, database, backup, UI, dependency, config, PWA, shared-validator, or other unlisted path changed."
+  - id: "AWSA01-AC-09"
+    result: "blocked"
+    evidence: "Commands 3 through 17 were not run after the pre-candidate stop gate; no immutable candidate exists."
+  - id: "AWSA01-AC-10"
+    result: "blocked"
+    evidence: "This schema-valid handoff records BLOCKED, candidate_commit null, unresolved records, and merge_authorized false; no PASS is claimed."
+  - id: "AWSA01-AC-11"
+    result: "pass"
+    evidence: "The required eligibility statement is present verbatim and authorizes neither rights nor Wave 01 implementation."
+
+checks:
+  required_commands: 17
+  required_commands_run: 2
+  required_commands_passed: 2
+  required_commands_failed: 0
+  required_commands_not_run: 15
+  immutable_candidate_created: false
+  triggered_stop_gates:
+    - "AWSA01-STOP-02"
+    - "AWSA01-STOP-04"
+    - "AWSA01-STOP-05"
+  result: "blocked"
+  evidence: "Preflight commands 1 and 2 passed. The complete 18-record matrix could not be independently qualified without forbidden purchase/account/provider restrictions or missing exact rights/bytes, so the packet stopped before remote audit and candidate creation."
+
+protected_path_audit:
+  result: "pass"
+  candidate_paths_changed: []
+  unauthorized_paths_changed: []
+  forbidden_paths_changed: []
+  coordinator_commit_unchanged: true
+  candidate_created: false
+  handoff_is_sole_metadata_change: true
+  protected_objects_match_base: true
+  evidence: "Before this report the worktree was clean at e51e2661. Only the declared BLOCKED handoff path is changed; no packet, ledger, tag, pack, asset, evidence, license, script, product, package, config, or protected object was modified."
+
+eligibility_statement: "The packet and handoff do not themselves prove rights or authorize Wave 01 implementation; only the exact candidate bytes and all 18 records after automated PASS are eligible inputs to a separately coordinated Wave 01 retry."
+
+known_risks:
+  - "All 18 exact records remain unresolved; no record is partially eligible and no source or candidate byte is retained."
+  - "Commercial video libraries appear to cover several movements but require purchase and provide MP4/Lottie rather than the required modifiable GLB source; their raw redistribution terms are not established for this repository."
+  - "Open-source leads did not establish a complete exact matrix, and repository-level licensing cannot replace exact asset-to-source-to-license binding."
+  - "No optional legal, rights, visual, biomechanics, equipment, manual, named-reviewer, VoiceOver, or physical-device review ran; none is claimed as passed."
+
+optional_evidence:
+  legal_or_rights_review: "not_run"
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  visual_or_biomechanics_review: "not_run"
+  manual_or_voiceover_review: "not_run"
+  physical_device_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "ANIMATION-WAVE-01-SOURCE-ACQUISITION-01"
+  candidate_commit: null
+  status: "BLOCKED"
+  checks:
+    - command: "git status --short"
+      result: "pass"
+      evidence: "The exact command produced no output before acquisition work on target branch codex/animation-wave-01-source-acquisition-01 at e51e2661."
+    - command: "assert producer start commit parent is 33471f11b64e0089423aaa227b5f91825f6e8f98 and its delta contains only docs/ai/packets/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01.yaml"
+      result: "pass"
+      evidence: "HEAD was e51e2661; git rev-parse HEAD^ returned 33471f11; the base-to-HEAD name-only delta was exactly docs/ai/packets/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01.yaml."
+    - command: "node scripts/animation-wave-01-source-acquisition.mjs audit-remote"
+      result: "not_run"
+      evidence: "Not run because no complete 18-record proposal or bytes exist and AWSA01-STOP-02/04/05 require stopping before candidate creation."
+    - command: "node scripts/animation-wave-01-source-acquisition.mjs validate --offline"
+      result: "not_run"
+      evidence: "Not run because the acquisition script and candidate set were not created after the pre-candidate stop gates."
+    - command: "pnpm exec vitest run scripts/animation-wave-01-source-acquisition.test.mjs"
+      result: "not_run"
+      evidence: "Not run after the pre-candidate stop gates; the focused test file does not exist."
+    - command: "pnpm exec eslint scripts/animation-wave-01-source-acquisition.mjs scripts/animation-wave-01-source-acquisition.test.mjs --max-warnings=0"
+      result: "not_run"
+      evidence: "Not run after the pre-candidate stop gates; the focused script files do not exist."
+    - command: "pnpm run content:validate"
+      result: "not_run"
+      evidence: "Not run because commands 4 through 17 are post-candidate checks and no candidate exists."
+    - command: "pnpm run content:audit"
+      result: "not_run"
+      evidence: "Not run because commands 4 through 17 are post-candidate checks and no candidate exists."
+    - command: "pnpm run verify:affected"
+      result: "not_run"
+      evidence: "Not run because commands 4 through 17 are post-candidate checks and no candidate exists."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "not_run"
+      evidence: "No candidate commit exists."
+    - command: "assert candidate changed paths are a subset of authority.candidate_paths and every protected or forbidden path is byte-identical to 33471f11b64e0089423aaa227b5f91825f6e8f98"
+      result: "not_run"
+      evidence: "No candidate exists; the top-level protected-path audit records the pre-candidate BLOCKED state."
+    - command: "assert catalog-derived 199/12/18/169 counts, exact Wave 01 pairs, unique acquisition records, pilot disjointness, and zero cross-variant substitution"
+      result: "not_run"
+      evidence: "No acquisition candidate exists; preflight separately confirmed the declared matrix and pilot disjointness without asserting candidate records."
+    - command: "recompute all tracked retrieved, terms-evidence, transformation, and candidate byte sizes and SHA-256 values; validate every provenance edge and reject untracked or orphan bytes"
+      result: "not_run"
+      evidence: "No tracked acquisition bytes, terms evidence, transformations, or candidate GLBs exist."
+    - command: "audit all 18 exact source/download/terms URLs, redirect chains, authors/rightsholders, license-to-byte bindings, offline redistribution and modification rights, attribution, notices, provider restrictions, and network-policy records"
+      result: "not_run"
+      evidence: "The bounded discovery found no complete 18-record set. Search pages were not promoted into source, rights, or byte evidence."
+    - command: "audit all 18 candidate GLBs for exact movement/equipment, self-containment, clip and finite-motion suitability, pilot-hash inequality, and non-placeholder/non-generative/non-synthetic status"
+      result: "not_run"
+      evidence: "No candidate GLB exists."
+    - command: "parse every YAML file under docs/ai and validate the handoff required fields, exact command records, candidate SHA, optional_manual_evidence, status, and merge_authorized consistency"
+      result: "not_run"
+      evidence: "This command is a post-candidate command and no candidate exists; the handoff is validated separately before its sole metadata commit."
+    - command: "assert candidate_commit remains unchanged before and after all post-candidate commands, all post-candidate checks are network-disabled, and git status --porcelain is empty"
+      result: "not_run"
+      evidence: "No candidate commit or post-candidate command sequence exists."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  packet_path: "docs/ai/packets/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01.yaml"
+  producer_start_commit: "e51e2661f5ea8562a84fedade5c31e0ef157e3a4"
+  candidate_range: null
+  report_path: "docs/ai/reviews/ANIMATION-WAVE-01-SOURCE-ACQUISITION-01-handoff.yaml"
+  next_task: "Resolve all 18 exact source-rights-and-asset gaps through an authorized first-party grant or stable public permissive sources, then create a new bounded acquisition fixer/retry from the latest safe coordinator lineage. Do not implement or retry ANIMATION-WAVE-01 from this BLOCKED handoff."
