@@ -124,16 +124,22 @@ if (pilotEvidence?.packetId === "ANIMATION-PILOT-01-REV-02") {
   ) {
     throw new Error("Pilot retained-archive or renderer-resource evidence is not operation-derived.");
   }
-  pilotEvidence.defaultPwa = {
-    entryChunkBytes: report.measurements.entryChunk.bytes,
-    initialGraphBytes,
-    precacheBytes,
-    precacheEntries: precachePaths.length,
-    pilotModules: defaultPilotModules.length,
-    pilotIdentityPresent: defaultPilotIdentityPresent,
-    animationPackPrecachePresent: !report.safeguards.animationPackExcludedFromPrecache
-  };
-  await writeFile(pilotEvidencePath, `${JSON.stringify(pilotEvidence, null, 2)}\n`, "utf8");
+  const historicalDefaultPwa = pilotEvidence.defaultPwa;
+  if (
+    !Number.isFinite(historicalDefaultPwa?.entryChunkBytes)
+    || historicalDefaultPwa.entryChunkBytes > budgets.entryChunkBytes
+    || !Number.isFinite(historicalDefaultPwa.initialGraphBytes)
+    || historicalDefaultPwa.initialGraphBytes > budgets.initialGraphBytes
+    || !Number.isFinite(historicalDefaultPwa.precacheBytes)
+    || historicalDefaultPwa.precacheBytes > budgets.precacheBytes
+    || !Number.isInteger(historicalDefaultPwa.precacheEntries)
+    || historicalDefaultPwa.precacheEntries < 1
+    || historicalDefaultPwa.pilotModules !== 0
+    || historicalDefaultPwa.pilotIdentityPresent !== false
+    || historicalDefaultPwa.animationPackPrecachePresent !== false
+  ) {
+    throw new Error("Historical pilot default-PWA evidence is missing or violates the current build safeguards.");
+  }
 }
 console.log(`${report.status.toUpperCase()} performance: entry ${(report.measurements.entryChunk.bytes / KIB).toFixed(1)} KiB, initial graph ${(initialGraphBytes / KIB).toFixed(1)} KiB, precache ${(precacheBytes / KIB).toFixed(1)} KiB`);
 console.log(`Report: ${reportPath}`);

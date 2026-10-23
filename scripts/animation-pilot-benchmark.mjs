@@ -4,8 +4,9 @@
  */
 
 import { createRequire, register } from "node:module";
-import { mkdir, readFile, readdir, realpath, stat, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { PILOT_EVIDENCE_ROOT, inspectPilotGlb, reproducePilot } from "./animation-pilot-assets.mjs";
 
@@ -76,6 +77,90 @@ const candidates = [
 ];
 
 const expectedOperations = ["mount", "static-frame", "play", "pause", "seek", "loop", "speed", "camera", "mirror", "reduced-motion", "resize", "failure", "dispose"];
+const benchmarkEvidenceOwners = new WeakSet();
+const BENCHMARK_EVIDENCE_OWNER_FILE = ".animation-pilot-benchmark-evidence-owner";
+const BENCHMARK_EVIDENCE_OWNER_BYTES = Buffer.from("Gym Local animation pilot benchmark evidence ownership\n", "utf8");
+
+function normalizedPhysicalPath(path) {
+  const resolved = resolve(path);
+  return process.platform === "win32" ? resolved.toLowerCase() : resolved;
+}
+
+function objectIdentity(info) {
+  return [info.dev, info.ino, info.mode].join(":");
+}
+
+function isStrictChild(root, candidate) {
+  const rel = relative(root, candidate);
+  return rel !== "" && rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+}
+
+async function temporaryEvidenceBoundary(path) {
+  const temporaryPhysical = await realpath(tmpdir());
+  const boundary = resolve(path);
+  const info = await lstat(boundary, { bigint: true });
+  const physical = await realpath(boundary);
+  if (
+    !info.isDirectory()
+    || info.isSymbolicLink()
+    || normalizedPhysicalPath(physical) !== normalizedPhysicalPath(boundary)
+    || !isStrictChild(temporaryPhysical, physical)
+  ) {
+    throw new Error("Renderer benchmark evidence boundary must be a canonical temporary child directory.");
+  }
+  return { path: boundary, physical, identity: objectIdentity(info), temporaryPhysical };
+}
+
+async function assertOwnedBenchmarkEvidenceRoot(invocation) {
+  if (!benchmarkEvidenceOwners.has(invocation)) throw new Error("Renderer benchmark evidence root is not invocation-owned.");
+  const boundaryInfo = await lstat(invocation.boundary.path, { bigint: true }).catch(() => undefined);
+  const boundaryPhysical = await realpath(invocation.boundary.path).catch(() => undefined);
+  if (
+    boundaryInfo === undefined
+    || !boundaryInfo.isDirectory()
+    || boundaryInfo.isSymbolicLink()
+    || objectIdentity(boundaryInfo) !== invocation.boundary.identity
+    || normalizedPhysicalPath(boundaryPhysical) !== normalizedPhysicalPath(invocation.boundary.physical)
+    || !isStrictChild(invocation.boundary.temporaryPhysical, boundaryPhysical)
+  ) {
+    throw new Error("Renderer benchmark evidence boundary ownership changed.");
+  }
+  const info = await lstat(invocation.root, { bigint: true }).catch(() => undefined);
+  const physical = await realpath(invocation.root).catch(() => undefined);
+  if (
+    info === undefined
+    || !info.isDirectory()
+    || info.isSymbolicLink()
+    || objectIdentity(info) !== invocation.identity
+    || normalizedPhysicalPath(physical) !== normalizedPhysicalPath(invocation.physical)
+    || !isStrictChild(boundaryPhysical, physical)
+  ) {
+    throw new Error("Renderer benchmark evidence root ownership changed.");
+  }
+  const owner = await readFile(join(invocation.root, BENCHMARK_EVIDENCE_OWNER_FILE)).catch(() => undefined);
+  if (!owner?.equals(BENCHMARK_EVIDENCE_OWNER_BYTES)) throw new Error("Renderer benchmark evidence owner marker changed.");
+}
+
+export async function withBenchmarkEvidenceOutputRoot(boundaryPath, consume) {
+  if (typeof consume !== "function") throw new Error("Renderer benchmark evidence consumer callback is required.");
+  const boundary = await temporaryEvidenceBoundary(boundaryPath);
+  const root = await mkdtemp(join(boundary.path, "invocation-"));
+  const info = await lstat(root, { bigint: true });
+  const physical = await realpath(root);
+  if (!info.isDirectory() || info.isSymbolicLink() || !isStrictChild(boundary.physical, physical)) {
+    throw new Error("Renderer benchmark evidence root is unsafe.");
+  }
+  await writeFile(join(root, BENCHMARK_EVIDENCE_OWNER_FILE), BENCHMARK_EVIDENCE_OWNER_BYTES, { flag: "wx" });
+  const invocation = { root, physical, identity: objectIdentity(info), boundary };
+  benchmarkEvidenceOwners.add(invocation);
+  try {
+    return await consume(invocation);
+  } finally {
+    await assertOwnedBenchmarkEvidenceRoot(invocation);
+    await rm(invocation.root, { recursive: true });
+    benchmarkEvidenceOwners.delete(invocation);
+  }
+}
 
 function stableJson(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
@@ -612,7 +697,7 @@ async function measuredCandidateWorkload(candidate, reproduction) {
   };
 }
 
-export async function runRendererBenchmark({ writeEvidence = true, onTimingDiagnostic, onReproductionReady, reproductionHooks } = {}) {
+export async function runRendererBenchmark({ writeEvidence = false, committedEvidence = false, evidenceOutputRoot, onTimingDiagnostic, onReproductionReady, reproductionHooks } = {}) {
   return reproducePilot({
     writeEvidence: false,
     hooks: reproductionHooks,
@@ -675,8 +760,15 @@ export async function runRendererBenchmark({ writeEvidence = true, onTimingDiagn
     candidates: workload
   };
   if (writeEvidence) {
-    await mkdir(PILOT_EVIDENCE_ROOT, { recursive: true });
-    await writeFile(join(PILOT_EVIDENCE_ROOT, "renderer-benchmark.json"), stableJson(report));
+    if (committedEvidence) {
+      if (evidenceOutputRoot !== undefined) throw new Error("Committed benchmark evidence cannot use a temporary output root.");
+      await mkdir(PILOT_EVIDENCE_ROOT, { recursive: true });
+      await writeFile(join(PILOT_EVIDENCE_ROOT, "renderer-benchmark.json"), stableJson(report));
+    } else {
+      if (evidenceOutputRoot === undefined) throw new Error("Test benchmark evidence requires an invocation-owned output root.");
+      await assertOwnedBenchmarkEvidenceRoot(evidenceOutputRoot);
+      await writeFile(join(evidenceOutputRoot.root, "renderer-benchmark.json"), stableJson(report), { flag: "wx" });
+    }
   }
   return report;
     }
@@ -685,7 +777,7 @@ export async function runRendererBenchmark({ writeEvidence = true, onTimingDiagn
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const timingDiagnostics = [];
-  runRendererBenchmark({ onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic) }).then((report) => {
+  runRendererBenchmark({ writeEvidence: true, committedEvidence: true, onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic) }).then((report) => {
     for (const diagnostic of timingDiagnostics) {
       process.stdout.write(`DIAGNOSTIC renderer wall-clock timing (noncommitted/nonselection): ${diagnostic.id} ${diagnostic.durationMs} ms total, ${diagnostic.averageAssetMs} ms/asset\n`);
     }

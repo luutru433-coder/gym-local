@@ -4,11 +4,12 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { lstat, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { lstat, mkdtemp, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { isAbsolute, join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PILOT_EVIDENCE_ROOT } from "./animation-pilot-assets.mjs";
-import { runRendererBenchmark } from "./animation-pilot-benchmark.mjs";
+import { runRendererBenchmark, withBenchmarkEvidenceOutputRoot } from "./animation-pilot-benchmark.mjs";
 import { validateEvidence } from "./animation-pilot-evidence.mjs";
 
 const benchmarkRelativePath = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json";
@@ -95,32 +96,64 @@ describe("animation pilot evidence", () => {
     expect(performance.resourceDerivation.objectStates.at(-1)).toMatchObject({ phase: "remove", archiveBytes: 0 });
   }, 30_000);
 
-  it("keeps committed renderer benchmark bytes and scores stable across reruns", async () => {
+  it("uses invocation-owned evidence output without mutating tracked evidence", async () => {
     const benchmarkPath = join(process.cwd(), benchmarkRelativePath);
     const committedBytes = execFileSync("git", ["show", `HEAD:${benchmarkRelativePath}`]);
     const committed = JSON.parse(committedBytes.toString("utf8"));
     const expectedScores = committed.candidates.map(({ id, score }) => ({ id, score }));
-
-    for (let rerun = 1; rerun <= 2; rerun += 1) {
-      const timingDiagnostics = [];
-      let invocationRoot;
-      const report = await runRendererBenchmark({
-        onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic),
-        async onReproductionReady(_reproduction, invocation) {
-          invocationRoot = invocation.outputRoot;
+    const trackedMtime = (await stat(benchmarkPath, { bigint: true })).mtimeNs;
+    const temporaryPhysical = await realpath(tmpdir());
+    const boundary = await mkdtemp(join(temporaryPhysical, "gym-local-animation-pilot-evidence-"));
+    const sentinelPath = join(boundary, "foreign-sentinel.txt");
+    await writeFile(sentinelPath, "foreign pre-existing sibling\n", { flag: "wx" });
+    const sentinel = await readFile(sentinelPath);
+    const invocationRoots = [];
+    try {
+      for (let rerun = 1; rerun <= 2; rerun += 1) {
+        const timingDiagnostics = [];
+        let invocationRoot;
+        await withBenchmarkEvidenceOutputRoot(boundary, async (evidenceOutputRoot) => {
+          invocationRoot = evidenceOutputRoot.root;
+          invocationRoots.push(invocationRoot);
+          const containment = relative(boundary, invocationRoot);
+          expect(containment).not.toBe("");
+          expect(containment).not.toBe("..");
+          expect(containment.startsWith(`..${sep}`)).toBe(false);
+          expect(isAbsolute(containment)).toBe(false);
+          const report = await runRendererBenchmark({
+            writeEvidence: true,
+            evidenceOutputRoot,
+            onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic)
+          });
+          const temporaryBytes = await readFile(join(invocationRoot, "renderer-benchmark.json"));
+          expect(temporaryBytes, `rerun ${rerun} changed benchmark bytes`).toEqual(committedBytes);
+          expect(report.candidates.map(({ id, score }) => ({ id, score }))).toEqual(expectedScores);
+          expect(report.selected).toBe("three-direct");
+          expect(timingDiagnostics).toHaveLength(3);
+          expect(timingDiagnostics.every(({ durationMs, averageAssetMs }) => durationMs > 0 && averageAssetMs > 0)).toBe(true);
+          expect(JSON.stringify(report)).not.toContain('"timing"');
           await expect(lstat(invocationRoot)).resolves.toMatchObject({});
-        }
-      });
-      const rerunBytes = await readFile(benchmarkPath);
+        });
+        await expect(lstat(invocationRoot), `rerun ${rerun} leaked its invocation output root`).rejects.toMatchObject({ code: "ENOENT" });
+      }
 
-      expect(rerunBytes, `rerun ${rerun} changed committed benchmark bytes`).toEqual(committedBytes);
-      expect(report.candidates.map(({ id, score }) => ({ id, score }))).toEqual(expectedScores);
-      expect(report.selected).toBe("three-direct");
-      expect(timingDiagnostics).toHaveLength(3);
-      expect(timingDiagnostics.every(({ durationMs, averageAssetMs }) => durationMs > 0 && averageAssetMs > 0)).toBe(true);
-      expect(JSON.stringify(report)).not.toContain('"timing"');
-      expect(gitStatus(), `rerun ${rerun} left Git dirty`).toBe("");
-      await expect(lstat(invocationRoot), `rerun ${rerun} leaked its invocation output root`).rejects.toMatchObject({ code: "ENOENT" });
+      let failedRoot;
+      await expect(withBenchmarkEvidenceOutputRoot(boundary, async (evidenceOutputRoot) => {
+        failedRoot = evidenceOutputRoot.root;
+        invocationRoots.push(failedRoot);
+        await runRendererBenchmark({ writeEvidence: true, evidenceOutputRoot });
+        expect(await readFile(join(failedRoot, "renderer-benchmark.json"))).toEqual(committedBytes);
+        throw new Error("injected failure after final benchmark report read");
+      })).rejects.toThrow("injected failure after final benchmark report read");
+      await expect(lstat(failedRoot), "injected failure leaked its invocation output root").rejects.toMatchObject({ code: "ENOENT" });
+
+      expect(new Set(invocationRoots).size).toBe(3);
+      expect(await readFile(sentinelPath)).toEqual(sentinel);
+      expect(await readFile(benchmarkPath)).toEqual(committedBytes);
+      expect((await stat(benchmarkPath, { bigint: true })).mtimeNs).toBe(trackedMtime);
+      expect(gitStatus()).toBe("");
+    } finally {
+      await rm(boundary, { recursive: true });
     }
   }, 60_000);
 });
