@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { IScannerControls } from "@zxing/browser";
 import { Barcode, Camera, Check, ChevronRight, CookingPot, Database, Download, Droplets, Flame, HardDrive, Heart, Pencil, Plus, Salad, ScanLine, Search, ShieldCheck, Trash2, Utensils } from "lucide-react";
 import { Button, Card, EmptyState, Field, MetricRing, Modal, Notice, ProgressBar, SectionTitle } from "@gym/ui";
@@ -9,6 +9,9 @@ import { useGymStore } from "../../store/useGymStore";
 import { PantryMenuSection } from "./PantryMenuSection";
 import { MealPlanSection } from "./meal-plan/MealPlanSection";
 import "./NutritionPage.css";
+
+const StablePantryMenuSection = memo(PantryMenuSection);
+const StableMealPlanSection = memo(MealPlanSection);
 
 const mealLabels: Record<MealEntry["meal"], { vi: string; en: string }> = {
   breakfast: { vi: "Bữa sáng", en: "Breakfast" },
@@ -405,8 +408,8 @@ export function NutritionPage() {
         </div>
       </Card>
 
-      <PantryMenuSection />
-      <MealPlanSection />
+      <StablePantryMenuSection />
+      <StableMealPlanSection />
 
       <div className="meal-layout">
         <section>

@@ -7,6 +7,32 @@ import { defaultSettings } from "@gym/storage";
 import { useGymStore } from "../../store/useGymStore";
 import { NutritionPage } from "./NutritionPage";
 
+const renderCounters = vi.hoisted(() => ({ pantryRenders: 0, mealPlanRenders: 0 }));
+
+vi.mock("./PantryMenuSection", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./PantryMenuSection")>();
+  const react = await import("react");
+  return {
+    ...actual,
+    PantryMenuSection: () => {
+      renderCounters.pantryRenders += 1;
+      return react.createElement(actual.PantryMenuSection);
+    }
+  };
+});
+
+vi.mock("./meal-plan/MealPlanSection", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./meal-plan/MealPlanSection")>();
+  const react = await import("react");
+  return {
+    ...actual,
+    MealPlanSection: () => {
+      renderCounters.mealPlanRenders += 1;
+      return react.createElement(actual.MealPlanSection);
+    }
+  };
+});
+
 const food: FoodItem = {
   id: "food-oats",
   name: { vi: "Yến mạch", en: "Oats" },
@@ -31,6 +57,8 @@ const profile: Profile = {
 };
 
 beforeEach(() => {
+  renderCounters.pantryRenders = 0;
+  renderCounters.mealPlanRenders = 0;
   useGymStore.setState({
     profile,
     foods: [food],
@@ -71,6 +99,8 @@ describe("nutrition recipe flows", () => {
     expect(saved?.name.vi).toBe("Cháo yến mạch");
     expect(saved?.yieldGrams).toBe(300);
     expect(saved?.ingredients[0]?.foodId).toBe(food.id);
+    expect(renderCounters.pantryRenders).toBe(1);
+    expect(renderCounters.mealPlanRenders).toBe(1);
   });
 
   it("logs one recipe serving without changing its ingredient snapshots", async () => {
