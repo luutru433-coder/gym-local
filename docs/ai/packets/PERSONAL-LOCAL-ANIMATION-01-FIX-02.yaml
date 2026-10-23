@@ -1,0 +1,437 @@
+schema_version: 3
+packet:
+  id: "PERSONAL-LOCAL-ANIMATION-01-FIX-02"
+  title: "Fix the reproduced NutritionPage full-verify timeout deterministically"
+  type: "review-fix"
+  status: "ready"
+
+supersession:
+  fixes_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-01.yaml"
+  original_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+  original_candidate_commit: "4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+  original_handoff_commit: "2852338e2a647fbe6884a237d7eed170d54993e9"
+  fix_01_coordinator_commit: "826403c31f85c2537e23cbf0c2efa224faf4deac"
+  fix_01_empty_candidate_commit: "f3652a8311fa57b85412d9d504d425b05b789f00"
+  fix_01_fail_handoff_commit: "636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+  triggered_stop_gates:
+    - "PLA01-FIX-01-STOP-04"
+    - "PLA01-FIX-01-STOP-05"
+    - "PLA01-FIX-01-STOP-08"
+  authoritative_failure_evidence:
+    candidate_mode: "verification_only"
+    candidate_tree_delta: "empty"
+    passed_before_full_verify:
+      - "The isolated one-worker NutritionPage baseline passed 1 file and 3 tests."
+      - "The original 11-file personal-local focused suite passed 73 tests."
+      - "Scoped ESLint, pnpm run typecheck, and pnpm run architecture:audit passed."
+      - "Ten isolated four-worker NutritionPage runs passed."
+      - "Five four-worker apps/web/src runs passed."
+      - "Three complete pnpm run test runs passed 35 files and 563 tests each."
+    failed_command: "pnpm run verify"
+    failure: "The first apps/web/src/features/nutrition/NutritionPage.test.tsx recipe test timed out after 5309ms against the unchanged 5000ms budget; 34/35 files and 562/563 tests passed."
+    unresolved_fact: "No deterministic in-scope cause was established. Commands 14 through 22 were not run, automated_verification.status was FAIL, and merge_authorized was false."
+  immutability_rule: "The original packet, FIX-01 packet, candidates, handoffs, and commits remain immutable historical evidence. FIX-02 neither amends nor retroactively relabels them."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+  target_branch: "codex/personal-local-animation-01-fix-02"
+  worktree_required: true
+  sequential_after:
+    - "PERSONAL-LOCAL-ANIMATION-01-FIX-01 FAIL handoff commit 636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+  producer_start_rule:
+    start_commit: "The committed PERSONAL-LOCAL-ANIMATION-01-FIX-02 coordinator packet HEAD supplied to the producer."
+    required_parent: "The producer start commit's first parent must be exactly 636d55ab5fe32de147528c5cdf8a2f7534ad60de."
+    required_coordinator_delta:
+      - "git diff --name-only 636d55ab5fe32de147528c5cdf8a2f7534ad60de..HEAD must print only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-02.yaml before producer work."
+      - "The producer must not amend, replace, delete, or add to any original or FIX-01 packet, candidate, handoff, or coordinator commit."
+    non_empty_candidate_rule: "Create exactly one non-empty immutable FIX-02 candidate commit whose first parent is the producer start commit and whose changed paths are a subset of authority.candidate_paths. An empty or verification-only candidate cannot pass this packet."
+    deterministic_fix_rule: "The candidate must correct a deterministic cause supported by profiling and diagnostic evidence and include a regression that fails for the proved base behavior and passes on the candidate without timing padding or weakened behavior coverage."
+    handoff_commit_rule: "After all required commands pass against the immutable candidate, create one direct-child commit containing only docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml. Never amend or replace the candidate, and never put the handoff commit's own SHA in the handoff."
+    failed_candidate_rule: "If a required command fails after candidate creation, do not amend or replace the candidate. Record FAIL in a handoff-only direct-child commit; any correction requires another separately coordinated fixer packet."
+    blocked_rule: "If no deterministic cause and regression can be established within authority.candidate_paths, stop BLOCKED before creating a candidate and write only the authorized handoff. Do not create another empty candidate."
+    review_range_rule: "For PASS or post-candidate FAIL, the FIX-02 candidate range is producer_start_commit..candidate_commit and the handoff range is candidate_commit..handoff_commit. For pre-candidate BLOCKED, the sole allowed range is producer_start_commit..blocked_handoff_commit and contains only the declared handoff path."
+
+authority:
+  allowed_paths:
+    - "apps/web/src/features/nutrition/NutritionPage.tsx"
+    - "apps/web/src/features/nutrition/NutritionPage.test.tsx"
+    - "apps/web/src/features/nutrition/NutritionPage.test-support.tsx"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+  candidate_paths:
+    - "apps/web/src/features/nutrition/NutritionPage.tsx"
+    - "apps/web/src/features/nutrition/NutritionPage.test.tsx"
+    - "apps/web/src/features/nutrition/NutritionPage.test-support.tsx"
+  conditionally_allowed_candidate_paths:
+    - path: "apps/web/src/features/nutrition/NutritionPage.tsx"
+      condition: "May change only when profiling proves a production render, async, lifecycle, or cleanup defect in NutritionPage. The smallest correction must preserve every Vietnamese-only nutrition behavior and data semantic."
+    - path: "apps/web/src/features/nutrition/NutritionPage.test.tsx"
+      condition: "May change only to add the deterministic regression, eliminate the proved worker/contention-sensitive test defect, or make setup, interaction, completion, and cleanup deterministic while retaining or strengthening every behavior assertion."
+    - path: "apps/web/src/features/nutrition/NutritionPage.test-support.tsx"
+      condition: "May be created only if diagnostics prove a colocated test-only fixture, renderer, profiler, or deterministic stub is necessary. It must be imported only by NutritionPage.test.tsx, contain no production export or behavior, and may not mock away the recipe, snapshot, pack-update, Vietnamese-copy, or cleanup behavior under test."
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+  empty_candidate_allowed: false
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/**"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/evidence/**"
+    - "docs/adr/**"
+    - "content/**"
+    - "public/**"
+    - "packages/**"
+    - "scripts/**"
+    - "apps/web/src/store/**"
+    - "apps/web/src/features/settings/**"
+    - "apps/web/src/features/workout/**"
+    - "apps/web/src/pwa/**"
+    - "apps/web/src/components/**"
+    - "apps/web/src/pilot/**"
+    - "apps/web/src/test/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - ".github/**"
+  external_reads_allowed: false
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  global_test_setup_or_runner_changes_allowed: false
+  contract_or_schema_changes_allowed: false
+  database_or_migration_changes_allowed: false
+  backup_format_or_payload_changes_allowed: false
+  catalog_id_or_mapping_changes_allowed: false
+  release_pack_contract_or_validator_changes_allowed: false
+  release_pack_storage_changes_allowed: false
+  personal_local_contract_or_storage_changes_allowed: false
+  service_worker_or_pwa_policy_changes_allowed: false
+  nutrition_formula_provider_pack_or_snapshot_changes_allowed: false
+  timeout_sleep_retry_skip_assertion_or_parallelism_changes_allowed: false
+  generated_binary_assets_allowed: false
+  temporary_diagnostic_outputs_allowed: "Ignored local text or JSON timing/profiling output only. Remove it before candidate creation; never commit profiler output, user data, binaries, or generated application artifacts."
+  network_policy: "No new network reads or writes. Diagnosis, tests, and verification use installed dependencies and deterministic local fixtures only."
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "packages/nutrition/AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-01.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-02.yaml"
+    - "PERSONAL-LOCAL-ANIMATION-01 candidate diff ba79414b5aa988a9dbb9561f61af825a4778e11a..4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+    - "FIX-01 coordinator diff 2852338e2a647fbe6884a237d7eed170d54993e9..826403c31f85c2537e23cbf0c2efa224faf4deac"
+    - "FIX-01 empty candidate f3652a8311fa57b85412d9d504d425b05b789f00 and FAIL handoff commit 636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+    - "apps/web/src/features/nutrition/NutritionPage.tsx"
+    - "apps/web/src/features/nutrition/NutritionPage.test.tsx"
+    - "apps/web/src/features/nutrition/PantryMenuSection.tsx"
+    - "apps/web/src/features/nutrition/meal-plan/MealPlanSection.tsx"
+    - "apps/web/src/store/useGymStore.ts"
+    - "packages/nutrition/src/index.ts"
+    - "packages/storage/src/index.ts"
+    - "packages/backup/src/backup.test.ts"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "apps/web/src/pwa/install.test.ts"
+    - "package.json"
+    - "vite.config.ts"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+  accepted_adrs:
+    - "docs/adr/0004-validated-nutrition-and-provider-boundaries.md"
+    - "docs/adr/0007-nutrition-workflows-and-release-gates.md"
+    - "docs/adr/0011-vietnamese-only-nutrition-ui.md"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+  locked_versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+    renderer: "three@0.185.1"
+    release_pack_storage_layout: 1
+    personal_local_animation_schema: 1
+    personal_local_storage_layout: 1
+  preserved_invariants:
+    - "Gym Local remains local-first, single-profile, account-free, and usable offline."
+    - "Nutrition presentation remains Vietnamese-only; nutrition guidance remains informational and editable; stored nutrient snapshots remain immutable; provider or formula semantics do not change."
+    - "Personal-local animation imports remain unreviewed device-only material in isolated OPFS, absent from backup and transfer, with zero egress and no distribution eligibility."
+    - "Release animation source, license, provenance, checksum, deterministic-build, exact-variant, storage, and review gates remain byte-identical and strict."
+    - "No personal-local or release animation byte enters Git, public assets, content, build inputs, service-worker precache, CacheStorage, backup, export, upload, sync, or telemetry."
+    - "Database 5, backup 5, catalog 3, stable IDs, exact equipment-variant identity, workout history, routines, sessions, PRs, custom exercises, nutrition history, pantry, and saved plans remain unchanged."
+    - "A PWA update is never activated during an active workout."
+
+outcome:
+  objective: "Establish a deterministic cause for the reproduced full-verify-only NutritionPage recipe timeout and implement the smallest regression-backed performance or stability correction within the component, its test, or one directly coupled colocated test helper."
+  user_visible_result: "Normally none. If a proved production render or lifecycle defect is corrected, the existing Vietnamese nutrition workflow becomes reliably responsive without changing features, copy, formulas, providers, persisted data, or animation behavior."
+  deliverables:
+    - "A pre-edit diagnostic and profiling record that attributes the recipe-flow delay to specific render, interaction, async, cleanup, store, or test-fixture work using repeatable measurements rather than elapsed-time inference alone."
+    - "A non-empty immutable candidate containing the smallest in-scope correction and a deterministic regression that fails for the proved base behavior and passes on the candidate."
+    - "Focused recipe-flow, cleanup, Vietnamese-copy, immutable-snapshot, and pack-update coverage with no removed or weakened assertion."
+    - "Repeated isolated, four-worker web-scope, complete-suite, verify:affected, and three uninterrupted full pnpm run verify passes without retrying a failed iteration."
+    - "The original personal-local focused suite, scoped lint, typecheck, architecture, zero-egress/build audits, production build, PWA generation, performance budgets, exact-variant, backup, and active-workout update-deferral gates remain passing."
+    - "One non-empty immutable candidate followed by one direct-child handoff-only commit."
+  non_goals:
+    - "No empty, verification-only, documentation-only, timing-only, or evidence-only candidate."
+    - "No timeout, testTimeout, hookTimeout, or performance-budget increase; no sleep, polling delay, retry, rerun-on-failure, skip, only, todo, swallowed error, assertion removal, assertion weakening, or fake pass."
+    - "No disabling file parallelism, lowering worker count, serializing the suite, splitting pnpm run verify to avoid its topology, changing pool selection globally, or changing Vitest/Vite/package configuration."
+    - "No wall-clock threshold committed as the sole regression proof. The regression must assert deterministic work, state, lifecycle, render, or cleanup behavior."
+    - "No mocking or stubbing away the recipe creation, ingredient snapshot, nutrition-pack update, Vietnamese presentation, store reset, or async completion behavior under test."
+    - "No nutrition feature, formula, provider, pack, schema, snapshot, database, backup, catalog, route, copy, or locale change."
+    - "No personal-local animation, release animation, storage, media, contracts, settings, active-workout, service-worker, dependency, lockfile, content, asset, source, license, provenance, or governance change."
+    - "No optional human, cold, owner, independent, manual, named-reviewer, VoiceOver, visual, legal, biomechanics, or physical-device review is required or may substitute for automated evidence."
+
+diagnostic_requirements:
+  baseline:
+    - "Start from the clean producer start commit after an offline frozen install."
+    - "Record the focused NutritionPage file with one worker and with four-worker repository settings, including file/test duration and the unchanged timeout configuration."
+    - "Treat the FIX-01 full-verify failure as authoritative reproduction; do not require repeated speculative full-verify failures before diagnosis."
+  profiling:
+    - "Measure the first recipe flow by named phase: initial render/effects, opening the editor, name entry, yield replacement, save interaction, saveUserRecipe observation, and cleanup."
+    - "Record render/commit counts, user-event or DOM-event counts, async promise settlement, store subscription/reset behavior, and relevant child-tree work when those measurements can distinguish the cause."
+    - "Compare isolated and four-worker contention conditions with the same assertions. Temporary instrumentation must be local, deterministic, removed before the candidate, and absent from Git."
+    - "A cause is proved only when a deterministic operation, render, lifecycle, cleanup, fixture, or interaction property explains the avoidable work and is captured by a regression. A single slow duration, CPU contention, or one successful rerun is not a cause."
+  regression:
+    - "Demonstrate the regression against the base behavior and candidate without rewriting history. Record the exact base/candidate method and output in the handoff."
+    - "Prefer deterministic assertions over timing thresholds: bounded render/effect/interaction work, exact promise settlement, isolated subtree setup, stable store cleanup, or equivalent cause-specific behavior."
+    - "Retain the original recipe result assertions and all other NutritionPage flow assertions; additive assertions are preferred."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "branch_parent_start_commit_cleanliness_and_one_file_coordinator_delta"
+    - "original_and_fix_01_packets_candidates_handoffs_are_immutable_unmerged_uncheckpointed_and_absent_from_the_ledger_as_merged"
+    - "allowed_candidate_paths_conditional_test_support_path_non_empty_candidate_rule_post_candidate_path_and_all_unlisted_paths_forbidden"
+    - "required_reads_locked_versions_module_boundaries_and_preserved_invariants"
+    - "exact_fix_01_pass_matrix_full_verify_failure_not_run_commands_and_false_merge_authorization"
+    - "diagnostic_profiling_base_candidate_regression_and_minimum_fix_plan"
+    - "focused_stress_verify_affected_three_full_verify_and_candidate_immutability_plan"
+    - "applicable_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_producer_start_commit: true
+    producer_start_parent_is_fix_01_fail_handoff_commit: true
+    only_coordinator_delta_is_fix_02_packet: true
+    instructions_read: true
+    exact_model_available: true
+    subagents_unused: true
+    required_inputs_present: true
+    original_and_fix_01_lineage_resolves: true
+    no_required_external_read_or_write: true
+    no_required_human_or_device_input: true
+
+finding_scope:
+  - id: "PLA01-FIX-02-F01"
+    triggered_stop_gates:
+      - "PLA01-FIX-01-STOP-04"
+      - "PLA01-FIX-01-STOP-08"
+    requirement: "Establish a deterministic, profiling-supported cause for the first NutritionPage recipe flow exceeding 5000ms only during the FIX-01 uninterrupted full verify."
+  - id: "PLA01-FIX-02-F02"
+    triggered_stop_gates:
+      - "PLA01-FIX-01-STOP-05"
+      - "PLA01-FIX-01-STOP-08"
+    requirement: "Implement a non-empty cause-specific fix plus deterministic regression and prove it under focused, contention, complete-suite, verify:affected, and repeated full-verify execution without retry or policy weakening."
+  - id: "PLA01-FIX-02-F03"
+    triggered_stop_gate: "PLA01-FIX-01-STOP-08"
+    requirement: "Preserve Vietnamese-only nutrition behavior and every personal-local, release, backup, exact-variant, zero-egress, personal-data, and active-workout PWA invariant outside the narrowly authorized files."
+
+acceptance_tests:
+  - id: "PLA01-FIX-02-AC-01"
+    requirement: "Lineage is exact: FIX-01 FAIL handoff 636d55ab -> packet-only FIX-02 coordinator -> one non-empty immutable FIX-02 candidate -> one direct-child handoff-only commit. All prior artifacts remain unchanged."
+    evidence: "Git parent, object, tree, range, name-only, diff, tag, ledger, and clean-worktree assertions."
+  - id: "PLA01-FIX-02-AC-02"
+    requirement: "Diagnostics profile named recipe-flow phases under isolated and contention conditions and establish one deterministic cause supported by render, interaction, promise, store, cleanup, fixture, or equivalent operation evidence rather than wall-clock inference alone."
+    evidence: "Exact commands, topology, phase measurements, source audit, temporary-instrumentation removal check, and cause statement."
+  - id: "PLA01-FIX-02-AC-03"
+    requirement: "The candidate is non-empty, changes only cause-owning paths, and includes a deterministic regression that fails for the proved base behavior and passes on the candidate without using a timeout threshold as its sole assertion."
+    evidence: "Base/candidate regression comparison, named test, tight diff, assertion audit, and immutable candidate object."
+  - id: "PLA01-FIX-02-AC-04"
+    requirement: "No candidate or test change increases a timeout or budget, adds sleep/retry/skip/only/todo, swallows an error, removes or weakens an assertion, reduces parallelism/workers, changes global runner/configuration, or hides the failure with mocks or command splitting."
+    evidence: "Static diff audit plus exact unchanged configuration objects and required topology output."
+  - id: "PLA01-FIX-02-AC-05"
+    requirement: "NutritionPage retains recipe creation, immutable ingredient snapshot logging, atomic ready-pack update, deterministic store/render cleanup, and Vietnamese-only presentation with all prior assertions retained or strengthened."
+    evidence: "Focused tests, assertion/source comparison, locale audit, store reset evidence, and unchanged nutrition contracts."
+  - id: "PLA01-FIX-02-AC-06"
+    requirement: "Twenty isolated NutritionPage runs with four-worker settings, ten file-parallel apps/web/src runs with four workers, and five complete pnpm run test runs pass from clean candidate state without retrying any failed iteration."
+    evidence: "Exact per-iteration exit records, counts, durations, candidate SHA checks, and clean status."
+  - id: "PLA01-FIX-02-AC-07"
+    requirement: "The original 11-file personal-local suite, scoped lint, typecheck, architecture audit, and pnpm run verify:affected pass against the immutable candidate."
+    evidence: "Exact command output and explained additive test-count difference only."
+  - id: "PLA01-FIX-02-AC-08"
+    requirement: "Three consecutive uninterrupted pnpm run verify executions each pass the unchanged architecture, lint, typecheck, content, full test, production build, PWA generation, and performance gates; a failed iteration stops the packet and is never retried."
+    evidence: "Three exact iteration records against one candidate with no failure rerun."
+  - id: "PLA01-FIX-02-AC-09"
+    requirement: "Every path outside the three candidate paths is byte-identical to 636d55ab at the candidate, including personal-local and release contracts/storage/media/settings/evidence, backup, catalog, workouts, PWA policy, packages, lockfile, configuration, content, and historical governance."
+    evidence: "Protected-path Git object comparison and locked-version assertions."
+  - id: "PLA01-FIX-02-AC-10"
+    requirement: "Personal-local imports remain device-only, zero-egress, backup-excluded, non-distributable, and exact-variant; release gates remain strict; personal workout/nutrition data remains immutable; active-workout PWA update deferral still passes."
+    evidence: "Focused personal-local/PWA suite, zero-egress/build audits, protected-object assertions, and full verify."
+  - id: "PLA01-FIX-02-AC-11"
+    requirement: "The schema-valid handoff records all 26 required commands exactly once, the proved cause, profiling evidence, base/candidate regression, non-empty candidate, no active stop gate, optional_manual_evidence, automated status PASS, and merge_authorized true only when every required command passed."
+    evidence: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml."
+
+required_checks:
+  automated_commands:
+    - "git status --short"
+    - "assert producer start commit parent is 636d55ab5fe32de147528c5cdf8a2f7534ad60de and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-02.yaml"
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis"
+    - "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=1 --reporter=verbose"
+    - "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose"
+    - "profile the first NutritionPage recipe flow by named phase under isolated and four-worker contention conditions; record deterministic render, interaction, promise, store, cleanup, and child-tree evidence; remove all temporary instrumentation and outputs before candidate creation"
+    - "prove one deterministic cause and a cause-specific regression against base 636d55ab5fe32de147528c5cdf8a2f7534ad60de and the candidate without changing base history, using a wall-clock threshold as sole proof, or weakening behavior coverage"
+    - "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose"
+    - '$candidate = (git rev-parse HEAD).Trim(); 1..20 | ForEach-Object { pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "NutritionPage isolated stress iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during isolated stress"; exit 1 }; if (git status --porcelain) { Write-Error "isolated stress left Git dirty"; exit 1 }'
+    - '$candidate = (git rev-parse HEAD).Trim(); 1..10 | ForEach-Object { pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "web file-parallel stress iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during web stress"; exit 1 }; if (git status --porcelain) { Write-Error "web stress left Git dirty"; exit 1 }'
+    - '$candidate = (git rev-parse HEAD).Trim(); 1..5 | ForEach-Object { pnpm run test; if ($LASTEXITCODE -ne 0) { Write-Error "complete test-suite iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during complete-suite stress"; exit 1 }; if (git status --porcelain) { Write-Error "complete-suite stress left Git dirty"; exit 1 }'
+    - "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs"
+    - '$paths = @("apps/web/src/features/nutrition/NutritionPage.tsx", "apps/web/src/features/nutrition/NutritionPage.test.tsx", "packages/contracts/src/index.ts", "packages/contracts/src/personal-local-animation.ts", "packages/contracts/src/personal-local-animation.test.ts", "packages/storage/src/index.ts", "packages/storage/src/personal-local-animation", "packages/media/src/index.ts", "packages/media/src/animation-player.ts", "packages/media/src/animation-player.test.ts", "packages/media/src/personal-local-animation.ts", "packages/media/src/personal-local-animation.test.ts", "apps/web/src/features/settings/SettingsPage.tsx", "apps/web/src/features/settings/SettingsPage.test.tsx", "apps/web/src/features/settings/PersonalLocalAnimationCard.tsx", "apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx", "scripts/personal-local-animation-evidence.mjs", "scripts/personal-local-animation-evidence.test.mjs"); if (Test-Path -LiteralPath "apps/web/src/features/nutrition/NutritionPage.test-support.tsx") { $paths += "apps/web/src/features/nutrition/NutritionPage.test-support.tsx" }; pnpm exec eslint $paths --max-warnings=0; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }'
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run verify:affected"
+    - '$candidate = (git rev-parse HEAD).Trim(); 1..3 | ForEach-Object { pnpm run verify; if ($LASTEXITCODE -ne 0) { Write-Error "full verify iteration $_ failed; do not retry"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during full verify"; exit 1 }; if (git status --porcelain) { Write-Error "full verify left Git dirty"; exit 1 }'
+    - "node scripts/personal-local-animation-evidence.mjs validate"
+    - "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "assert candidate is non-empty and changed paths are a subset of apps/web/src/features/nutrition/NutritionPage.tsx, apps/web/src/features/nutrition/NutritionPage.test.tsx, and apps/web/src/features/nutrition/NutritionPage.test-support.tsx; assert every other path is byte-identical to 636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+    - "assert no candidate change increases a timeout or budget, adds sleep/retry/skip/only/todo, removes or weakens assertions, swallows errors, disables file parallelism, lowers worker count, changes global runner/configuration, commits timing instrumentation, uses wall-clock threshold as sole regression proof, or mocks away required behavior"
+    - "assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, release storage layout 1, and personal-local schema/layout 1 remain locked"
+    - "assert Vietnamese-only nutrition presentation, immutable nutrition snapshots, formula/provider/pack semantics, personal-local and release contracts/storage/media/settings/evidence, backup implementation, catalog, workout/history/PR/routine/session data, exact-variant and zero-egress rules, source/license/provenance gates, Vite PWA policy, package files, lockfile, content, public assets, and historical governance are byte-identical or behaviorally unchanged as required"
+    - "parse every YAML file under docs/ai and validate the FIX-02 handoff required fields, 26 exact command records, candidate SHA, non-empty candidate mode, profiling and regression evidence, optional_manual_evidence, status, and merge_authorized consistency"
+    - "assert candidate_commit remains unchanged before and after all post-candidate commands, no temporary diagnostic output is tracked or present, and git status --porcelain is empty"
+  execution_rule: "Run commands 1 through 7 before implementation; diagnostic commands 6 and 7 pass only when the handoff contains reproducible evidence satisfying diagnostic_requirements. Create one non-empty immutable candidate, then run commands 8 through 26 in order against that exact candidate. Do not retry a failed command or iteration. Any failure, not_run result, absent deterministic cause/regression, empty candidate, candidate mutation, dirty state, temporary instrumentation, unexpected path, hidden timeout workaround, invariant change, or schema-invalid handoff prevents PASS."
+  evidence_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "PLA01-FIX-02-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, the worktree is dirty, branch/parent/coordinator delta is wrong, required reads are incomplete, prior lineage cannot be resolved, or a locked version differs."
+    action: "Stop before implementation and write a BLOCKED handoff only if it can be the sole authorized metadata change. Do not substitute a model, clean user work, amend, rebase, or widen scope."
+  - id: "PLA01-FIX-02-STOP-02"
+    condition: "A deterministic cause cannot be established with profiling and a cause-specific regression, the only available candidate would be empty or verification-only, or the failure can be addressed only by timing margin."
+    action: "Stop BLOCKED before candidate creation and report the exact diagnostic gap. Do not create another empty candidate or claim ambient flakiness."
+  - id: "PLA01-FIX-02-STOP-03"
+    condition: "The proved cause requires a path outside the component, its test, or the explicitly named colocated test-support file, including a shared UI component, store, package, runner, configuration, dependency, lockfile, or global test setup."
+    action: "Stop BLOCKED and report the exact owning path and packet needed. Do not widen this fixer or copy unrelated production code into test support."
+  - id: "PLA01-FIX-02-STOP-04"
+    condition: "A proposed correction increases a timeout or budget, sleeps, polls by delay, retries, reruns a failure, skips or filters coverage, uses only/todo, removes or weakens an assertion, swallows an error, fakes completion, reduces workers, disables file parallelism, serializes the suite, changes global Vitest/Vite/package configuration, splits verify to avoid its topology, or uses a wall-clock threshold as its sole regression proof."
+    action: "Stop FAIL. Preserve the failure and do not authorize merge."
+  - id: "PLA01-FIX-02-STOP-05"
+    condition: "A test helper or mock bypasses the recipe flow, ingredient snapshot semantics, pack update behavior, Vietnamese presentation, store reset, async settlement, render cleanup, or the specific work identified as the cause."
+    action: "Stop FAIL. The regression must exercise the cause and retain product behavior coverage."
+  - id: "PLA01-FIX-02-STOP-06"
+    condition: "Any correction changes user-visible nutrition behavior, introduces English nutrition presentation, permits stored nutrition snapshots to be rewritten, or changes a nutrition formula, provider, pack, persistence, schema, route, or API boundary."
+    action: "Stop FAIL and preserve the Vietnamese-only nutrition boundary, informational/editable guidance, and immutable snapshots."
+  - id: "PLA01-FIX-02-STOP-07"
+    condition: "Any personal-local/release contract, storage, media, Settings behavior, exact-variant rule, zero-egress rule, backup exclusion, personal data, source/license/provenance gate, asset/content, build/precache behavior, or active-workout PWA deferral changes."
+    action: "Stop FAIL, record the protected-path difference, and do not authorize merge."
+  - id: "PLA01-FIX-02-STOP-08"
+    condition: "Any focused, stress, verify:affected, or full-verify command or iteration fails or is not run; a failed iteration is retried; pnpm run verify is interrupted or split; an unexpected path changes; the candidate is empty or mutates during verification; temporary diagnostics remain; the worktree is dirty; optional evidence is invented; or the handoff is schema-invalid."
+    action: "Record FAIL or BLOCKED with merge_authorized false. Do not amend or replace the candidate, merge, push, update the coordinator ledger, or create a checkpoint tag."
+
+handoff:
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+  metadata_commit_rule: "For PASS or post-candidate FAIL, add and commit only the FIX-02 handoff as the immutable candidate's direct child. For pre-candidate BLOCKED, add and commit only the handoff as the producer start commit's direct child. Never amend or replace any prior artifact or the FIX-02 candidate, and never name the handoff's own metadata commit inside the handoff."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "original_candidate_commit"
+    - "original_handoff_commit"
+    - "fix_01_coordinator_commit"
+    - "fix_01_candidate_commit"
+    - "fix_01_handoff_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "candidate_mode"
+    - "branch"
+    - "changed_paths"
+    - "diagnostic_and_profiling_evidence"
+    - "deterministic_cause"
+    - "base_candidate_regression_evidence"
+    - "finding_resolution"
+    - "nutrition_behavior_evidence"
+    - "stress_evidence"
+    - "personal_local_release_backup_exact_variant_zero_egress_pwa_evidence"
+    - "acceptance_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "known_risks"
+    - "optional_evidence"
+    - "automated_verification"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  candidate_mode_rule: "candidate_mode is exactly deterministic_fix for PASS. It requires a non-empty candidate, proved cause, base-failing/candidate-passing regression, and diff limited to authority.candidate_paths. Pre-candidate BLOCKED uses candidate_commit null and candidate_mode blocked_before_candidate. verification_only and empty candidates are forbidden."
+  disclosure_rule: "Retain the disclosure that personal-local imports are unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte."
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml#automated_verification"
+  schema:
+    schema_version: 1
+    packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-02"
+    candidate_commit: "40-character SHA or null only for pre-candidate BLOCKED"
+    status: "PASS|FAIL|BLOCKED"
+    checks:
+      - command: "exact required command"
+        result: "pass|fail|not_run"
+        evidence: "exact output or immutable artifact"
+    optional_manual_evidence: []
+    merge_authorized: false
+  authorization_rule: "Only PASS with all 26 required commands recorded exactly once as pass, candidate_mode deterministic_fix, a non-empty immutable candidate, proved profiling-supported cause, base-failing/candidate-passing deterministic regression, all stress and three full-verify iterations passed without retry, byte-identical protected paths, and no active stop gate may set merge_authorized true. FAIL or BLOCKED always sets merge_authorized false."
+  optional_evidence_rule: "Cold, owner, independent, legal, visual, biomechanics, manual, named-reviewer, VoiceOver, and physical-device review are optional evidence only. They never complete, block, or authorize the candidate, and an unperformed optional check is never reported as passed."
+
+optional_evidence:
+  cold_review: "optional; no gate effect"
+  owner_review: "optional; no gate effect"
+  independent_review: "optional; no gate effect"
+  named_reviewers: "optional; no gate effect"
+  manual_review: "optional; no gate effect"
+  physical_device_review: "optional; no gate effect"
+  reporting_rule: "Keep optional_manual_evidence empty unless evidence was actually supplied. Never infer or claim PASS for an unperformed optional check."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS, all 26 exact automated command records are pass, candidate_mode is deterministic_fix, the candidate is non-empty, no stop gate is active, and automated_verification.merge_authorized == true"
+  target: "main"
+  method: "fast-forward"
+  squash_policy: "forbidden"
+  checkpoint_tag_after_merge: "checkpoint/personal-local-animation-01-fix-02-automated-pass"
+  automated_checkpoint_rule: "Only after a PASS fast-forward merge, record the complete original-plus-FIX-01-plus-FIX-02 lineage and automated result in docs/ai/reviews/coordinator-ledger.yaml in a separate coordinator checkpoint commit, then create checkpoint/personal-local-animation-01-fix-02-automated-pass. Never create or reuse either earlier personal-local checkpoint tag for this lineage."
+  next_packet_rule: "No downstream packet may consume the personal-local API until checkpoint/personal-local-animation-01-fix-02-automated-pass exists. Any later WORKOUT-INTEGRATION packet must preserve exact variant identity, release-pack separation, zero egress, backup exclusion, and active-workout PWA update deferral."
+  current_coordinator_task_prohibitions:
+    - "Do not diagnose or implement the timeout fix."
+    - "Do not create a FIX-02 candidate or handoff."
+    - "Do not amend or replace any prior packet, candidate, or handoff."
+    - "Do not merge main."
+    - "Do not push."
+    - "Do not update docs/ai/reviews/coordinator-ledger.yaml."
+    - "Do not create any checkpoint tag."
