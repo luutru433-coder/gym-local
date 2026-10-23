@@ -1,0 +1,244 @@
+schema_version: 3
+packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-01"
+status: "automated_fail"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "Packet execution, diagnosis, candidate creation, and automated verification used gpt-5.6-sol."
+subagents_used: false
+
+base_commit: "2852338e2a647fbe6884a237d7eed170d54993e9"
+original_candidate_commit: "4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+original_handoff_commit: "2852338e2a647fbe6884a237d7eed170d54993e9"
+producer_start_commit: "826403c31f85c2537e23cbf0c2efa224faf4deac"
+candidate_parent_commit: "826403c31f85c2537e23cbf0c2efa224faf4deac"
+candidate_commit: "f3652a8311fa57b85412d9d504d425b05b789f00"
+candidate_mode: "verification_only"
+branch: "codex/personal-local-animation-01-fix-01"
+
+changed_paths:
+  candidate: []
+  post_candidate_metadata:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+
+diagnostic_evidence:
+  classification: "reproduced_only_in_required_full_verify_and_unresolved"
+  original_observation: "The independent finalize attempt had passed the 11-file/73-test focused suite, scoped ESLint, typecheck, and architecture audit before pnpm run verify timed out in NutritionPage.test.tsx. No merge, ledger update, or checkpoint tag followed."
+  source_audit: "NutritionPage.tsx and NutritionPage.test.tsx contain no fake or real timers in the tested flows, no explicit listeners, no incomplete user-event awaits, no skip/only/todo, one render cleanup hook, one deterministic beforeEach store reset, three awaited waitFor calls, and nine retained assertions. The refresh effect explicitly consumes rejection and cleanup unmounts Zustand selectors. No deterministic unresolved promise, render leak, subscription leak, shared mutable fixture, or worker-order dependency was established."
+  additional_non_mutating_runs:
+    - command: "initial cold invocation of the required one-worker baseline after pnpm install"
+      result: "inconclusive"
+      evidence: "The tool window detached after 30 seconds with only the Vitest banner; the process later exited, but its exit status was not recoverable. It is not counted as a required command result and elapsed time alone is not treated as a cause."
+    - command: "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx"
+      result: "pass"
+      evidence: "1 file and 3 tests passed in 3.36s with normal Vitest defaults."
+    - command: "pnpm run test"
+      result: "pass"
+      evidence: "Pre-candidate default suite passed 35 files and 563 tests in 39.77s."
+  reproduced_failure:
+    command: "pnpm run verify"
+    pool_and_parallelism: "Vitest repository defaults from vite.config.ts; jsdom with normal file parallelism and worker topology."
+    test_file: "apps/web/src/features/nutrition/NutritionPage.test.tsx"
+    timed_out_test: "nutrition recipe flows > creates a serving-based recipe from saved foods"
+    location: "apps/web/src/features/nutrition/NutritionPage.test.tsx:59"
+    exit_code: 1
+    evidence: "Test timed out at the unchanged 5000ms budget after 5309ms. Full-suite result was 34 passed/1 failed files and 562 passed/1 failed tests; total duration 34.40s."
+
+finding_resolution:
+  - id: "PLA01-FIX-01-F01"
+    result: "fail"
+    evidence: "The timeout reproduced in the required uninterrupted full verify, but no deterministic async, lifecycle, cleanup, store, or ordering cause was established within the two authorized files."
+  - id: "PLA01-FIX-01-F02"
+    result: "fail"
+    evidence: "Ten isolated four-worker runs, five four-worker web-scope runs, and three complete suites passed, but the required full verify failed. The correction is therefore not proved under every required topology."
+  - id: "PLA01-FIX-01-F03"
+    result: "pass"
+    evidence: "The candidate is an explicit empty commit with tree 31b0d4c2f964f8df7eaafa8fa12ee53f12859acf, identical to its coordinator parent. No personal-local, release, backup, nutrition, workout, PWA, package, lockfile, or configuration byte changed."
+
+nutrition_behavior_evidence:
+  result: "fail"
+  evidence: "Production and test source bytes are unchanged; isolated and repeated stress runs retained the three recipe/snapshot/pack flows and all nine assertions. However, the recipe-creation flow timed out under full verify, so deterministic completion is not established. Vietnamese-only presentation, immutable ingredient snapshots, and pack semantics were not changed."
+
+stress_evidence:
+  isolated_nutrition:
+    result: "pass"
+    iterations: 10
+    pool: "threads"
+    file_parallelism: true
+    max_workers: 4
+    evidence: "Every iteration passed 1 file/3 tests with durations 3.56s-3.83s; candidate and worktree remained unchanged and clean."
+  web_file_parallel:
+    result: "pass"
+    iterations: 5
+    pool: "threads"
+    file_parallelism: true
+    max_workers: 4
+    evidence: "Every iteration passed 31 files/553 tests with durations 26.97s-29.28s; candidate and worktree remained unchanged and clean."
+  complete_suite:
+    result: "pass"
+    iterations: 3
+    evidence: "Every iteration passed 35 files/563 tests with durations 33.24s-34.80s; candidate and worktree remained unchanged and clean."
+  full_verify:
+    result: "fail"
+    iterations: 1
+    evidence: "Uninterrupted verify passed architecture, repository lint, typecheck, content validation, and content audit before the full test phase timed out in the first NutritionPage recipe test. Build and later verify phases did not run."
+
+personal_local_and_release_invariant_evidence:
+  result: "pass"
+  evidence: "The empty candidate has the same Git tree as producer start. The coordinator delta from original handoff is only the FIX-01 packet; personal-local and release contracts, storage, media, settings, evidence, exact-variant and zero-egress rules, source/license/provenance gates, and original packet/handoff remain byte-identical. Personal-local imports remain unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte."
+
+backup_build_and_pwa_evidence:
+  result: "blocked_by_failed_full_verify"
+  evidence: "Backup implementation, Vite PWA policy, package files, lockfile, workout data, and active-workout update deferral are unchanged by the empty candidate. The focused backup/App/Workout/PWA suite passed within the 11-file/73-test command, but post-failure build and audit-build commands were not run because PLA01-FIX-01-STOP-08 required stopping."
+
+acceptance_evidence:
+  - id: "PLA01-FIX-01-AC-01"
+    result: "pass"
+    evidence: "Lineage is original handoff 2852338e -> packet-only coordinator 826403c3 -> one empty candidate f3652a83 -> this handoff-only direct child."
+  - id: "PLA01-FIX-01-AC-02"
+    result: "fail"
+    evidence: "The exact timed-out test and topology are recorded, but neither a deterministic cause nor a bounded non-reproduction conclusion is valid after the full-verify reproduction."
+  - id: "PLA01-FIX-01-AC-03"
+    result: "not_run"
+    evidence: "No deterministic cause was established and no source correction was authorized."
+  - id: "PLA01-FIX-01-AC-04"
+    result: "fail"
+    evidence: "The empty candidate met isolated, web-scope, and complete-suite stress requirements, but the required uninterrupted full verify failed."
+  - id: "PLA01-FIX-01-AC-05"
+    result: "fail"
+    evidence: "All assertions and behavior bytes were preserved and repeated focused runs passed, but deterministic completion failed under full verify."
+  - id: "PLA01-FIX-01-AC-06"
+    result: "pass"
+    evidence: "The exact 11-file suite passed 73 tests; scoped lint, typecheck, and architecture audit passed."
+  - id: "PLA01-FIX-01-AC-07"
+    result: "not_run"
+    evidence: "The candidate is empty and tree-identical to producer start, but the required post-candidate protected-path assertion was not run after the stop gate."
+  - id: "PLA01-FIX-01-AC-08"
+    result: "fail"
+    evidence: "pnpm run verify exited 1 during the full test phase before production build and performance budgets."
+  - id: "PLA01-FIX-01-AC-09"
+    result: "pass"
+    evidence: "This handoff records the exact immutable candidate, verification_only mode, all 22 commands exactly once with pass/fail/not_run results, active stop gates, empty optional evidence, FAIL status, and merge_authorized false."
+
+checks:
+  required_commands: 22
+  required_commands_run: 13
+  required_commands_passed: 12
+  required_commands_failed: 1
+  required_commands_not_run: 9
+  immutable_candidate_unchanged_after_commands: true
+  triggered_stop_gates:
+    - "PLA01-FIX-01-STOP-04"
+    - "PLA01-FIX-01-STOP-05"
+    - "PLA01-FIX-01-STOP-08"
+  result: "fail"
+  evidence: "Candidate f3652a8311fa57b85412d9d504d425b05b789f00 remained immutable and tree-identical to its parent. Required command 13 failed; commands 14-22 were not run as required by the stop gate."
+
+protected_path_audit:
+  result: "pass_for_empty_candidate"
+  candidate_path_count: 0
+  candidate_tree: "31b0d4c2f964f8df7eaafa8fa12ee53f12859acf"
+  parent_tree: "31b0d4c2f964f8df7eaafa8fa12ee53f12859acf"
+  unauthorized_paths: []
+  nutrition_paths_changed: []
+  protected_paths_changed: []
+  package_lock_or_configuration_changed: false
+  original_candidate_or_handoff_changed: false
+
+known_risks:
+  - "The first NutritionPage recipe flow can exceed the unchanged 5000ms budget only under the full verify topology despite passing all bounded isolated, web-scope, and complete-suite stress runs. The deterministic cause remains unresolved."
+  - "The verification-only candidate is not mergeable and cannot be amended or replaced. A separately coordinated follow-up fixer is required."
+  - "Commands after the failed full verify were intentionally not run and no PASS is claimed for them."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  named_reviewers: "not_run"
+  manual_review: "not_run"
+  physical_device_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-01"
+  candidate_commit: "f3652a8311fa57b85412d9d504d425b05b789f00"
+  status: "FAIL"
+  checks:
+    - command: "git status --short"
+      result: "pass"
+      evidence: "Producer-start worktree was clean."
+    - command: "assert producer start commit parent is 2852338e2a647fbe6884a237d7eed170d54993e9 and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-01.yaml"
+      result: "pass"
+      evidence: "826403c3 parent is 2852338e and its one-path delta is the FIX-01 packet."
+    - command: "pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis"
+      result: "pass"
+      evidence: "Offline frozen install reused 607 packages, downloaded zero, exited 0, and left Git clean."
+    - command: "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=1"
+      result: "pass"
+      evidence: "1 file and 3 tests passed in 3.32s (tests 1.43s) with exit code 0."
+    - command: "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs"
+      result: "pass"
+      evidence: "11 test files and 73 tests passed in 8.09s."
+    - command: "pnpm exec eslint packages/contracts/src/index.ts packages/contracts/src/personal-local-animation.ts packages/contracts/src/personal-local-animation.test.ts packages/storage/src/index.ts packages/storage/src/personal-local-animation packages/media/src/index.ts packages/media/src/animation-player.ts packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.ts packages/media/src/personal-local-animation.test.ts apps/web/src/features/settings/SettingsPage.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/features/settings/PersonalLocalAnimationCard.tsx apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/nutrition/NutritionPage.tsx apps/web/src/features/nutrition/NutritionPage.test.tsx scripts/personal-local-animation-evidence.mjs scripts/personal-local-animation-evidence.test.mjs --max-warnings=0"
+      result: "pass"
+      evidence: "Exact scoped ESLint command exited 0 with zero warnings."
+    - command: "pnpm run typecheck"
+      result: "pass"
+      evidence: "tsc -b --pretty false exited 0."
+    - command: "pnpm run architecture:audit"
+      result: "pass"
+      evidence: "Architecture boundaries verified."
+    - command: "audit NutritionPage.tsx and NutritionPage.test.tsx for unresolved promises, fake or real timer leaks, incomplete user-event awaits, waitFor misuse, render cleanup, store reset, subscription/listener leakage, cross-file shared state, and worker-sensitive ordering; record candidate_mode and a cause supported by evidence or a bounded non-reproduction conclusion"
+      result: "pass"
+      evidence: "Recorded candidate_mode verification_only. Seven user-event calls are awaited; zero timers/listeners/skip/only/todo; one cleanup and one reset hook; three awaited waitFor calls; nine assertions. No deterministic defect was supported before stress."
+    - command: '$candidate = (git rev-parse HEAD).Trim(); 1..10 | ForEach-Object { pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "NutritionPage isolated stress iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during isolated stress"; exit 1 }; if (git status --porcelain) { Write-Error "isolated stress left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "All 10 iterations passed 1 file/3 tests; candidate remained f3652a83 and Git remained clean."
+    - command: '$candidate = (git rev-parse HEAD).Trim(); 1..5 | ForEach-Object { pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "web file-parallel stress iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during web stress"; exit 1 }; if (git status --porcelain) { Write-Error "web stress left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "All 5 iterations passed 31 files/553 tests; candidate remained f3652a83 and Git remained clean."
+    - command: '$candidate = (git rev-parse HEAD).Trim(); 1..3 | ForEach-Object { pnpm run test; if ($LASTEXITCODE -ne 0) { Write-Error "complete test-suite iteration $_ failed"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during complete-suite stress"; exit 1 }; if (git status --porcelain) { Write-Error "complete-suite stress left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "All 3 iterations passed 35 files/563 tests; candidate remained f3652a83 and Git remained clean."
+    - command: "pnpm run verify"
+      result: "fail"
+      evidence: "Exit 1. Architecture, lint, typecheck, content validation, and content audit passed; NutritionPage.test.tsx recipe-creation test timed out at 5000ms (5309ms observed). Full suite: 34 passed/1 failed files, 562 passed/1 failed tests."
+    - command: "node scripts/personal-local-animation-evidence.mjs validate"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08."
+    - command: "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08; verify did not reach build."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08."
+    - command: "assert candidate changed paths are empty for verification_only or a subset of apps/web/src/features/nutrition/NutritionPage.tsx and apps/web/src/features/nutrition/NutritionPage.test.tsx for reproducible_fix; assert every other path is byte-identical to 2852338e2a647fbe6884a237d7eed170d54993e9"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08. The empty candidate tree identity is recorded separately without claiming this required assertion passed."
+    - command: "assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, release storage layout 1, and personal-local schema/layout 1 remain locked"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08."
+    - command: "assert no candidate change increases a timeout, adds sleep/retry/skip/only/todo, reduces assertions, disables file parallelism, lowers worker count, alters runner configuration, or changes nutrition formula/provider/pack/snapshot semantics"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08."
+    - command: "assert personal-local and release contracts, storage, media, settings, evidence, backup implementation, catalog, workout/history/PR/routine/session data, source/license/provenance gates, Vite PWA policy, package files, and lockfile are byte-identical to 2852338e2a647fbe6884a237d7eed170d54993e9"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08."
+    - command: "parse every YAML file under docs/ai and validate the FIX-01 handoff required fields, exact command records, candidate SHA, candidate mode, optional_manual_evidence, status, and merge_authorized consistency"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08; this handoff is not self-validated as a passed required command."
+    - command: "assert candidate_commit remains unchanged before and after all post-candidate commands and git status --porcelain is empty"
+      result: "not_run"
+      evidence: "Not run after required command 13 triggered PLA01-FIX-01-STOP-08. Candidate immutability and cleanliness are checked only for metadata preparation, not claimed as this required command."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  packet_path: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-01.yaml"
+  candidate_range: "826403c31f85c2537e23cbf0c2efa224faf4deac..f3652a8311fa57b85412d9d504d425b05b789f00"
+  complete_personal_local_range: "e51e2661f5ea8562a84fedade5c31e0ef157e3a4..f3652a8311fa57b85412d9d504d425b05b789f00"
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+  next_task: "Coordinate a new bounded fixer from this immutable FAIL lineage to establish a deterministic cause for the full-verify-only NutritionPage recipe timeout. Do not merge, tag, push, or update the coordinator ledger."
