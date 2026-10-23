@@ -1,0 +1,462 @@
+schema_version: 3
+packet:
+  id: "PERSONAL-LOCAL-ANIMATION-01-FIX-03"
+  title: "Isolate animation-pilot evidence outputs from repeated full verification"
+  type: "review-fix"
+  status: "ready"
+
+supersession:
+  fixes_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-02.yaml"
+  original_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+  original_candidate_commit: "4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+  original_handoff_commit: "2852338e2a647fbe6884a237d7eed170d54993e9"
+  fix_01_coordinator_commit: "826403c31f85c2537e23cbf0c2efa224faf4deac"
+  fix_01_candidate_commit: "f3652a8311fa57b85412d9d504d425b05b789f00"
+  fix_01_fail_handoff_commit: "636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+  fix_02_coordinator_commit: "4bca728cc74c5a1f59a39b2c38ee850fdf67497c"
+  fix_02_candidate_commit: "bcc3a88fceaefae1069b221340957d3edfc3fd7a"
+  fix_02_fail_handoff_commit: "b03a82df988a5fde251920f067a47646c702713d"
+  triggered_stop_gate: "PLA01-FIX-02-STOP-08"
+  authoritative_fix_02_result:
+    candidate_mode: "deterministic_fix"
+    nutrition_result: "Candidate bcc3a88fceaefae1069b221340957d3edfc3fd7a proved the NutritionPage contention cause, preserved every prior nutrition assertion, and fixed it with a non-empty two-path candidate."
+    passed_before_failure:
+      - "Required commands 1 through 16 passed, including the base-failing/candidate-passing render-work regression."
+      - "Twenty isolated NutritionPage iterations, ten file-parallel apps/web/src iterations, and five complete pnpm run test iterations passed without retry."
+      - "The original 11-file personal-local suite, scoped lint, typecheck, architecture audit, and pnpm run verify:affected passed."
+      - "Full pnpm run verify iteration 1 passed every stage."
+    failed_command: "Required command 17: three consecutive uninterrupted pnpm run verify executions."
+    failure: "Iteration 2 failed in scripts/animation-pilot-evidence.test.mjs after the benchmark rerun observed docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json as modified. The four changed defaultPwa numeric fields came from the prior ordinary build/report path."
+    post_failure_rule_followed: "The tracked report was restored exactly to candidate bytes only to prepare the required handoff-only metadata commit. The failed command was not retried, iteration 3 did not run, and commands 18 through 26 were not run."
+    automated_status: "FAIL"
+    merge_authorized: false
+  immutability_rule: "The original, FIX-01, and FIX-02 packets, candidates, handoffs, and commits remain immutable historical evidence. FIX-03 must preserve candidate bcc3a88f's NutritionPage correction and must not amend, replace, or retroactively relabel any earlier result."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "b03a82df988a5fde251920f067a47646c702713d"
+  target_branch: "codex/personal-local-animation-01-fix-03"
+  worktree_required: true
+  sequential_after:
+    - "PERSONAL-LOCAL-ANIMATION-01-FIX-02 FAIL handoff commit b03a82df988a5fde251920f067a47646c702713d"
+  producer_start_rule:
+    start_commit: "The committed PERSONAL-LOCAL-ANIMATION-01-FIX-03 coordinator packet HEAD supplied to the producer."
+    required_parent: "The producer start commit's first parent must be exactly b03a82df988a5fde251920f067a47646c702713d."
+    required_coordinator_delta:
+      - "git diff --name-only b03a82df988a5fde251920f067a47646c702713d..HEAD must print only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-03.yaml before producer work."
+      - "The producer must not amend, replace, delete, restore over, or add to any earlier packet, candidate, handoff, or coordinator commit."
+    non_empty_candidate_rule: "Create exactly one non-empty immutable FIX-03 candidate commit whose first parent is the producer start commit and whose changed paths are a subset of authority.candidate_paths. Empty, verification-only, evidence-only, or historical-evidence-only candidates cannot pass."
+    deterministic_fix_rule: "The candidate must isolate benchmark/test/build outputs by construction, include a cause-specific regression that fails against the base behavior and passes against the candidate, and preserve the complete FIX-02 NutritionPage candidate unchanged."
+    handoff_commit_rule: "After all required commands pass against the immutable candidate, create one direct-child commit containing only docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml. Never amend or replace the candidate and never place the handoff commit's own SHA in the handoff."
+    failed_candidate_rule: "If a required command fails after candidate creation, do not retry it, restore or clean its dirty output, amend the candidate, or continue. Record FAIL in a handoff-only direct-child commit; another correction requires a separately coordinated packet."
+    blocked_rule: "If safe output isolation requires a path outside authority.candidate_paths or deterministic regenerated historical-evidence bytes, stop BLOCKED before widening scope and write only the authorized handoff."
+    review_range_rule: "For PASS or post-candidate FAIL, the FIX-03 candidate range is producer_start_commit..candidate_commit and the handoff range is candidate_commit..handoff_commit. The complete personal-local range remains e51e2661f5ea8562a84fedade5c31e0ef157e3a4..candidate_commit."
+
+authority:
+  allowed_paths:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+  candidate_paths:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+  conditionally_allowed_candidate_paths:
+    - path: "scripts/animation-pilot-benchmark.mjs"
+      condition: "May change only to accept, validate, and use a caller-owned evidence output root for benchmark reports while preserving the CLI's explicit committed-evidence regeneration contract and the complete real benchmark workload."
+    - path: "scripts/animation-pilot-evidence.test.mjs"
+      condition: "May change only to create invocation-owned temporary evidence roots, add the base-failing/candidate-passing no-tracked-mutation regression, assert cleanup, and retain or strengthen all current evidence/workload assertions."
+    - path: "scripts/performance-report.mjs"
+      condition: "May change only to make the ordinary default build report path read-only with respect to tracked historical pilot evidence, or to require an explicit validated nontracked output destination. It must retain all production performance budgets and pilot evidence consistency checks."
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "docs/ai/evidence/**"
+    - "docs/ai/packets/**"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/adr/**"
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "tests/**"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "scripts/personal-local-animation-evidence.mjs"
+    - "scripts/personal-local-animation-evidence.test.mjs"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - ".gitignore"
+    - ".github/**"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+  historical_evidence_policy: "No docs/ai/evidence path is authorized. A tracked historical evidence byte may change only under a separately coordinated packet that names the exact file and proves a deterministic regenerated-byte contract. This packet must stop BLOCKED rather than rewrite, delete, untrack, ignore, or normalize historical evidence."
+  temporary_output_policy: "Tests may create only invocation-owned directories under the operating-system temporary directory or an existing ignored generated-output boundary. Roots must be canonicalized, must not be a repository-tracked path, must be strict children of the validated boundary, and must be removed in finally after the consumer's last read on success and injected failure. Foreign/pre-existing siblings must remain untouched."
+  external_reads_allowed: false
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  global_test_setup_or_runner_changes_allowed: false
+  contract_or_schema_changes_allowed: false
+  database_or_migration_changes_allowed: false
+  backup_format_or_payload_changes_allowed: false
+  catalog_id_or_mapping_changes_allowed: false
+  release_pack_contract_or_validator_changes_allowed: false
+  release_pack_storage_changes_allowed: false
+  personal_local_contract_or_storage_changes_allowed: false
+  service_worker_or_pwa_policy_changes_allowed: false
+  nutrition_changes_allowed: false
+  timeout_sleep_retry_skip_assertion_or_parallelism_changes_allowed: false
+  tracked_evidence_delete_untrack_or_ignore_allowed: false
+  hidden_dirty_state_cleanup_allowed: false
+  generated_binary_assets_allowed: false
+  network_policy: "No new network read or write. Tests, benchmarks, builds, and verification use installed dependencies and deterministic local fixtures only; renderer runtime remote-request attempts remain zero."
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-01.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-02.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+    - "PERSONAL-LOCAL-ANIMATION-01-FIX-02 candidate diff 4bca728cc74c5a1f59a39b2c38ee850fdf67497c..bcc3a88fceaefae1069b221340957d3edfc3fd7a"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-03.yaml"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-03-handoff.yaml"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "apps/web/src/features/nutrition/NutritionPage.tsx"
+    - "apps/web/src/features/nutrition/NutritionPage.test.tsx"
+    - "packages/backup/src/backup.test.ts"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "apps/web/src/pwa/install.test.ts"
+    - "package.json"
+    - "vite.config.ts"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+  accepted_adrs:
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+  locked_versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+    renderer: "three@0.185.1"
+    release_pack_storage_layout: 1
+    personal_local_animation_schema: 1
+    personal_local_storage_layout: 1
+  preserved_invariants:
+    - "Gym Local remains local-first, single-profile, account-free, and usable offline."
+    - "Nutrition presentation remains Vietnamese-only; the FIX-02 memoized NutritionPage boundaries and additive render-work regression remain byte-identical; nutrition formulas, providers, packs, snapshots, persistence, and user-visible behavior do not change."
+    - "Personal-local imports remain unreviewed device-only material in isolated OPFS, absent from backup and transfer, with zero egress and no distribution eligibility."
+    - "Release animation source, license, provenance, checksum, deterministic-build, exact-variant, storage, renderer, and review gates remain strict."
+    - "No personal-local or release animation byte enters Git, public assets, content, default build inputs, service-worker precache, CacheStorage, backup, export, upload, sync, or telemetry."
+    - "Never mix performance history or PR values between equipment variants; stable IDs, workout history, routines, sessions, custom exercises, nutrition history, pantry, and saved plans remain unchanged."
+    - "Only packages/storage owns database and OPFS access; modules continue to interact through public @gym entry points."
+    - "Text, workout data, and installed animation packs remain offline-capable; external video remains optional and online-only."
+    - "A PWA update is never activated during an active workout."
+
+outcome:
+  objective: "Resolve only the FIX-02 full-verify evidence mutation by making animation-pilot benchmark tests and ordinary build reporting write exclusively to validated invocation-owned temporary/generated destinations, never tracked historical evidence, while preserving the FIX-02 NutritionPage correction and all original personal-local and product gates."
+  user_visible_result: "None. Verification becomes repeatable and Git-clean; product, nutrition, animation, storage, backup, catalog, workout, and PWA behavior remain unchanged."
+  deliverables:
+    - "A non-empty immutable candidate limited to the three output-owning script/test files."
+    - "An explicit evidence-output contract for the renderer benchmark: tests provide a validated invocation-owned destination; only explicit evidence-generation CLI paths may target committed evidence and they must reproduce the HEAD bytes exactly."
+    - "A default performance-report path that writes the dist report and enforces every existing budget without implicitly rewriting docs/ai/evidence."
+    - "A cause-specific regression that fails against base behavior because the requested temporary benchmark report is absent or a tracked evidence path is touched, and passes against the candidate with tracked evidence byte-identical."
+    - "Temporary evidence roots are unique across invocations, constrained to a safe nontracked boundary, retained through the consumer's last read, and removed with finally cleanup on success and injected failure without deleting foreign siblings."
+    - "Repeat/stress evidence, explicit three-file parallel evidence, two standalone benchmark reruns, three isolated builds, and three consecutive uninterrupted full pnpm run verify passes with no retry and no tracked mutation."
+    - "The complete original personal-local focused suite, FIX-02 NutritionPage regression/stress matrix, lint, typecheck, architecture, verify:affected, zero-egress/build audits, release benchmark workload, backup/exact-variant rules, and active-workout PWA deferral remain passing."
+    - "One immutable candidate followed by one direct-child handoff-only commit with all 30 exact automated command records."
+  non_goals:
+    - "No rewrite, deletion, untracking, ignore rule, normalization, or regeneration commit for any docs/ai/evidence file."
+    - "No timeout or performance-budget padding; no sleep, polling delay, retry, rerun-on-failure, skip, only, todo, swallowed error, assertion removal, assertion weakening, or fake pass."
+    - "No reduced workers, disabled file parallelism, suite serialization, changed pool, split full verify, or global Vitest/Vite/package/configuration change."
+    - "No hidden git restore, checkout, reset, clean, or byte-copy after a command dirties tracked state; required commands must leave the candidate clean by construction."
+    - "No reduced or mocked benchmark workload, literal pass/score/leak evidence, dropped renderer candidate, fabricated timing, changed score/selection, or dependence on pre-existing generated output."
+    - "No product/runtime, NutritionPage, contract, schema, storage, database, backup, catalog, route, PWA, dependency, lockfile, content, asset, source, license, provenance, or governance change."
+    - "No optional human, cold, owner, independent, manual, named-reviewer, VoiceOver, visual, legal, biomechanics, or physical-device review is required or may substitute for automated evidence."
+
+diagnostic_requirements:
+  cause_boundary:
+    - "Treat the committed FIX-02 handoff as authoritative failing-before evidence: verify iteration 1's ordinary build updated the tracked pilot performance report, then iteration 2's benchmark test rejected the dirty repository-wide state."
+    - "Confirm from source and a controlled base/candidate regression which call writes each report. Do not attribute the failure to ambient flakiness or elapsed time."
+    - "Distinguish the generated dist/reports/performance-report.json product from immutable historical pilot evidence under docs/ai/evidence."
+  output_contract:
+    - "Every test-time benchmark report write uses an explicit invocation-owned nontracked root; a test cannot default to PILOT_EVIDENCE_ROOT."
+    - "The ordinary default build/performance command cannot update historical pilot evidence. Any explicit pilot evidence regeneration remains a separate intentional command and must reproduce committed bytes."
+    - "Caller-supplied roots are resolved, validated outside tracked evidence, and cleaned only by their owner after the final read; injected failure must take the same cleanup path."
+  regression:
+    - "Demonstrate the new regression against base b03a82df988a5fde251920f067a47646c702713d behavior without amending history, then against the candidate. Base must fail for the cause-specific output-destination assertion; candidate must pass."
+    - "The regression must assert temporary report presence and exact bytes, tracked evidence byte identity, output-root uniqueness/containment, success and failure cleanup, and foreign-sentinel preservation. A Git-clean assertion alone is insufficient because an identical-byte tracked rewrite can appear clean."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "branch_parent_start_commit_cleanliness_and_one_file_coordinator_delta"
+    - "all_original_fix_01_fix_02_artifacts_are_immutable_unmerged_uncheckpointed_and_not_recorded_as_passing"
+    - "allowed_candidate_paths_conditional_rules_post_candidate_path_historical_evidence_ban_and_all_unlisted_paths_forbidden"
+    - "required_reads_locked_versions_module_boundaries_and_preserved_invariants"
+    - "exact_fix_02_pass_matrix_iteration_1_pass_iteration_2_evidence_mutation_commands_18_to_26_not_run_and_false_merge_authorization"
+    - "tracked_performance_report_writer_benchmark_test_default_root_and_repository_wide_cleanliness_cause_audit"
+    - "base_candidate_regression_temporary_root_cleanup_parallel_stress_build_isolation_and_three_full_verify_plan"
+    - "applicable_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_producer_start_commit: true
+    producer_start_parent_is_fix_02_fail_handoff_commit: true
+    only_coordinator_delta_is_fix_03_packet: true
+    instructions_read: true
+    exact_model_available: true
+    subagents_unused: true
+    required_inputs_present: true
+    prior_lineage_resolves: true
+    no_required_external_read_or_write: true
+    no_required_human_or_device_input: true
+
+finding_scope:
+  - id: "PLA01-FIX-03-F01"
+    triggered_stop_gate: "PLA01-FIX-02-STOP-08"
+    requirement: "Prevent tests and ordinary builds from writing or depending on tracked animation-pilot evidence while retaining intentional deterministic CLI regeneration and validation."
+  - id: "PLA01-FIX-03-F02"
+    triggered_stop_gate: "PLA01-FIX-02-STOP-08"
+    requirement: "Prove unique temporary evidence-root ownership, safe success/failure cleanup, deterministic report bytes, parallel safety, and clean tracked state under repeated tests, builds, and full verification."
+  - id: "PLA01-FIX-03-F03"
+    triggered_stop_gate: "PLA01-FIX-02-STOP-08"
+    requirement: "Preserve candidate bcc3a88f's NutritionPage correction plus every original personal-local, release, backup, exact-variant, zero-egress, personal-data, offline, module-boundary, and active-workout PWA invariant."
+
+acceptance_tests:
+  - id: "PLA01-FIX-03-AC-01"
+    requirement: "Lineage is exact: FIX-02 FAIL handoff b03a82df -> packet-only FIX-03 coordinator -> one non-empty immutable FIX-03 candidate -> one direct-child handoff-only commit. Every prior artifact remains unchanged."
+    evidence: "Git parent, object, tree, range, name-only, diff, tag, ledger, and clean-worktree assertions."
+  - id: "PLA01-FIX-03-AC-02"
+    requirement: "The deterministic cause is proved: ordinary build reporting and the benchmark test shared tracked pilot evidence/repository-wide dirty state across consecutive verify iterations."
+    evidence: "Source-to-write audit, exact FIX-02 failure, controlled base/candidate regression, and report-path observations."
+  - id: "PLA01-FIX-03-AC-03"
+    requirement: "The candidate is non-empty, changes only the three authorized files, and includes a regression that fails on base behavior and passes on the candidate because benchmark output is present under the requested temporary root and no tracked evidence path is touched."
+    evidence: "Base/candidate result, named test, tight diff, output-path trace, and immutable candidate object."
+  - id: "PLA01-FIX-03-AC-04"
+    requirement: "Each test invocation owns a unique canonical nontracked evidence root through its final read; success and injected failure remove only that root, preserve a foreign sentinel, and leave no temporary root, staging path, owner marker, or lock artifact."
+    evidence: "Regression assertions, source audit, root list before/after, and injected-failure output."
+  - id: "PLA01-FIX-03-AC-05"
+    requirement: "The ordinary default build writes only generated build/report outputs and validates but never rewrites tracked pilot evidence. Three isolated build executions preserve every docs/ai/evidence blob and leave Git clean without restoration."
+    evidence: "Per-iteration expected/actual Git blob hashes, status, and source audit."
+  - id: "PLA01-FIX-03-AC-06"
+    requirement: "Intentional standalone benchmark reruns reproduce renderer-benchmark.json byte-for-byte, preserve scores 3981390/2929347/3934825 and three-direct selection, and leave Git clean."
+    evidence: "Two rerun records, report comparison, expected/actual blob, score vector, selected renderer, and status."
+  - id: "PLA01-FIX-03-AC-07"
+    requirement: "Ten focused regression iterations and five explicit file-parallel three-file iterations pass without retry, tracked mutation, shared-root collision, or leaked temporary state."
+    evidence: "Exact iteration results, pool/fileParallelism/maxWorkers topology, candidate SHA, evidence blobs, and cleanup assertions."
+  - id: "PLA01-FIX-03-AC-08"
+    requirement: "The FIX-02 NutritionPage candidate and regression remain unchanged and pass twenty isolated, ten web-scope, and five complete-suite iterations; the original 11-file personal-local suite also passes."
+    evidence: "Git object comparison to bcc3a88f plus exact stress/focused outputs without retry."
+  - id: "PLA01-FIX-03-AC-09"
+    requirement: "Three consecutive uninterrupted pnpm run verify executions each pass unchanged architecture, lint, typecheck, content, full test, production build, PWA generation, and performance gates, and each iteration immediately proves evidence byte identity and Git cleanliness without cleanup or retry."
+    evidence: "Three exact iteration records, HEAD/evidence/status assertions after each, and no retry."
+  - id: "PLA01-FIX-03-AC-10"
+    requirement: "No timeout/budget padding, retry, sleep, skipped/weakened test, reduced parallelism, global configuration change, tracked-evidence deletion/ignore, historical evidence rewrite, or hidden dirty-state cleanup is present."
+    evidence: "Static diff/source/config audit and exact command topology."
+  - id: "PLA01-FIX-03-AC-11"
+    requirement: "All original personal-local and product invariants remain passing: exact case-sensitive variant identity, release trust gates, zero egress/network, backup/build/precache exclusion, personal-data immutability, offline behavior, module ownership, Vietnamese-only nutrition, and active-workout PWA update deferral."
+    evidence: "Focused suite, evidence audits, protected-object comparison, locked-version audit, and full verify."
+  - id: "PLA01-FIX-03-AC-12"
+    requirement: "The schema-valid handoff records all 30 required commands exactly once, the cause, base/candidate regression, output ownership/cleanup evidence, immutable non-empty candidate, no active stop gate, empty optional_manual_evidence, automated PASS, and merge_authorized true only when every command passed."
+    evidence: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml."
+
+required_checks:
+  automated_commands:
+    - "git status --short"
+    - "assert producer start commit parent is b03a82df988a5fde251920f067a47646c702713d and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-03.yaml"
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis"
+    - "establish the failing-before side of the cause-specific regression against base b03a82df988a5fde251920f067a47646c702713d without rewriting history: the candidate regression or an equivalent temporary harness must fail because base does not place the exact benchmark report under the requested invocation-owned temporary root or because base ordinary build reporting touches tracked pilot evidence; record the exact method and output"
+    - "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern \"uses invocation-owned evidence output without mutating tracked evidence\" --pool=threads --fileParallelism --maxWorkers=3"
+    - '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..10 | ForEach-Object { pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern "uses invocation-owned evidence output without mutating tracked evidence" --pool=threads --fileParallelism --maxWorkers=3; if ($LASTEXITCODE -ne 0) { Write-Error "evidence isolation stress iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "evidence isolation stress iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during evidence isolation stress"; exit 1 }; if (git status --porcelain) { Write-Error "evidence isolation stress iteration $_ left Git dirty"; exit 1 } }'
+    - '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..5 | ForEach-Object { pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs --pool=threads --fileParallelism --maxWorkers=3; if ($LASTEXITCODE -ne 0) { Write-Error "parallel animation evidence iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "parallel animation evidence iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during parallel animation evidence stress"; exit 1 }; if (git status --porcelain) { Write-Error "parallel animation evidence iteration $_ left Git dirty"; exit 1 } }'
+    - '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "benchmark rerun 1 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 1 left Git dirty"; exit 1 }'
+    - '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "benchmark rerun 2 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 2 left Git dirty"; exit 1 }'
+    - '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..3 | ForEach-Object { pnpm run build; if ($LASTEXITCODE -ne 0) { Write-Error "isolated build iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "isolated build iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during isolated builds"; exit 1 }; if (git status --porcelain) { Write-Error "isolated build iteration $_ left Git dirty"; exit 1 } }'
+    - "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose"
+    - '$candidate = (git rev-parse HEAD).Trim(); 1..20 | ForEach-Object { pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "NutritionPage isolated stress iteration $_ failed; do not retry"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during NutritionPage stress"; exit 1 }; if (git status --porcelain) { Write-Error "NutritionPage stress left Git dirty"; exit 1 }'
+    - '$candidate = (git rev-parse HEAD).Trim(); 1..10 | ForEach-Object { pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "web file-parallel stress iteration $_ failed; do not retry"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during web stress"; exit 1 }; if (git status --porcelain) { Write-Error "web stress left Git dirty"; exit 1 }'
+    - '$candidate = (git rev-parse HEAD).Trim(); 1..5 | ForEach-Object { pnpm run test; if ($LASTEXITCODE -ne 0) { Write-Error "complete test-suite iteration $_ failed; do not retry"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during complete-suite stress"; exit 1 }; if (git status --porcelain) { Write-Error "complete-suite stress left Git dirty"; exit 1 }'
+    - "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs"
+    - "pnpm exec eslint apps/web/src/features/nutrition/NutritionPage.tsx apps/web/src/features/nutrition/NutritionPage.test.tsx scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/animation-pilot-evidence.test.mjs scripts/performance-report.mjs scripts/personal-local-animation-evidence.mjs scripts/personal-local-animation-evidence.test.mjs --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run verify:affected"
+    - '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..3 | ForEach-Object { pnpm run verify; if ($LASTEXITCODE -ne 0) { Write-Error "full verify iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "full verify iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during full verify iteration $_"; exit 1 }; if (git status --porcelain) { Write-Error "full verify iteration $_ left Git dirty; do not clean or restore"; exit 1 } }'
+    - '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); pnpm animation:pilot:evidence:validate; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "explicit evidence validation changed $path"; exit 1 } }; if (git status --porcelain) { Write-Error "explicit evidence validation left Git dirty"; exit 1 }'
+    - "node scripts/personal-local-animation-evidence.mjs validate"
+    - "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "assert candidate is non-empty and changed paths are a subset of scripts/animation-pilot-benchmark.mjs, scripts/animation-pilot-evidence.test.mjs, and scripts/performance-report.mjs; assert the candidate's NutritionPage.tsx and NutritionPage.test.tsx Git objects equal bcc3a88fceaefae1069b221340957d3edfc3fd7a and every other path outside the three candidate paths is byte-identical to b03a82df988a5fde251920f067a47646c702713d"
+    - "assert no candidate change increases a timeout or budget, adds retry/sleep/polling-delay/skip/only/todo, removes or weakens an assertion, swallows errors, reduces workers or file parallelism, serializes a suite, changes global runner/configuration, deletes/untracks/ignores tracked evidence, relies on pre-existing output, or performs git restore/checkout/reset/clean or hidden byte restoration after a dirty command"
+    - "audit evidence output ownership and cleanup: test benchmark writes require an explicit unique canonical nontracked root; roots are strict children of a validated temporary/generated boundary; ownership lasts through the consumer's final read; finally cleanup covers success and injected failure; foreign siblings survive; ordinary build/report execution is read-only for docs/ai/evidence; intentional CLI benchmark regeneration remains deterministic; no test or default build path writes PILOT_EVIDENCE_ROOT"
+    - "assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, release storage layout 1, and personal-local schema/layout 1 remain locked; assert all docs/ai/evidence blobs equal HEAD; assert benchmark scores/selection/workload are unchanged; assert original personal-local, nutrition, release, backup, exact-variant, zero-egress, offline, module-boundary, personal-data, and active-workout PWA invariants remain passing"
+    - "parse every YAML file under docs/ai and validate the FIX-03 handoff required fields, all 30 exact command records, candidate SHA, non-empty candidate mode, cause and base/candidate regression, output ownership and cleanup evidence, optional_manual_evidence, status, and merge_authorized consistency"
+    - "assert candidate_commit remains unchanged before and after all post-candidate commands, no invocation temporary root/staging path/owner marker/lock artifact remains, every tracked evidence working-tree blob equals HEAD, and git status --porcelain is empty without cleanup or restoration"
+  execution_rule: "Run commands 1 through 3 before editing. Establish command 4 during diagnosis before candidate creation, using only temporary instrumentation or the candidate regression applied without rewriting base history; command 4 passes only when the handoff contains reproducible failing-before evidence satisfying diagnostic_requirements. Create one non-empty immutable candidate, then run commands 5 through 30 in order against that exact candidate; command 5 supplies the passing-after side. Do not retry a failed command or iteration and do not clean, restore, or hide its dirty state. Any failure, not_run result, missing base/candidate regression, tracked evidence write, leaked temporary output, candidate mutation, dirty state, unexpected path, workaround, invariant change, or schema-invalid handoff prevents PASS."
+  evidence_paths:
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/PERSONAL-LOCAL-ANIMATION-01/automated-report.json"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "PLA01-FIX-03-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, the worktree is dirty, branch/parent/coordinator delta is wrong, required reads are incomplete, prior lineage cannot be resolved, or a locked version differs."
+    action: "Stop before implementation and write a BLOCKED handoff only if it can be the sole authorized metadata change. Do not substitute a model, clean user work, amend, rebase, or widen scope."
+  - id: "PLA01-FIX-03-STOP-02"
+    condition: "A deterministic fix requires any path outside the three candidate files, including animation-pilot assets, package scripts, global test setup, runner/configuration, product code, NutritionPage, or tracked evidence."
+    action: "Stop BLOCKED and report the exact owning path and separate packet needed. Do not widen this fixer."
+  - id: "PLA01-FIX-03-STOP-03"
+    condition: "Any test or ordinary default build still writes, deletes, truncates, renames, stages, locks, or otherwise mutates a docs/ai/evidence path, or correctness depends on restoring tracked bytes after execution."
+    action: "Stop FAIL. Preserve the dirty state for the handoff record; do not restore, delete, ignore, or normalize the evidence."
+  - id: "PLA01-FIX-03-STOP-04"
+    condition: "A historical evidence byte would change, or the proposed repair deletes, untracks, ignores, rewrites, or regenerates historical evidence without a separately authorized deterministic regenerated-byte contract."
+    action: "Stop BLOCKED or FAIL as appropriate. Historical evidence is immutable in this packet."
+  - id: "PLA01-FIX-03-STOP-05"
+    condition: "A caller-supplied output root can resolve to a tracked path, repository root, foreign/pre-existing path, shared deletable root, or another invocation's root; ownership ends before the last read; or cleanup is not guaranteed and limited to the exact owned root."
+    action: "Stop FAIL; unsafe output handling cannot authorize merge."
+  - id: "PLA01-FIX-03-STOP-06"
+    condition: "The repair uses timeout/budget padding, retry, rerun-on-failure, sleep/backoff, polling delay, skip/only/todo, failure swallowing, removed/weakened assertions, reduced workers, disabled file parallelism, suite serialization, changed pool/configuration, hidden dirty-state cleanup, or dependence on pre-existing generated output."
+    action: "Stop FAIL; the evidence isolation failure remains unresolved."
+  - id: "PLA01-FIX-03-STOP-07"
+    condition: "The benchmark reduces or mocks the two-release, 12-variant, ten-cycle real renderer workload; changes pinned candidates, operation counts, score vector, three-direct selection, timing policy, zero-network behavior, disposal/leak derivation, or deterministic bytes; or replaces operation-derived evidence with literals."
+    action: "Stop FAIL; output isolation cannot weaken the animation-pilot release gate."
+  - id: "PLA01-FIX-03-STOP-08"
+    condition: "Candidate bcc3a88f's NutritionPage source/test bytes or regression semantics change, Vietnamese-only nutrition changes, or any personal-local/release contract, storage, media, Settings, backup, exact-variant, zero-egress, personal data, source/license/provenance, offline, build/precache, module-boundary, or active-workout PWA invariant changes."
+    action: "Stop FAIL, record the protected-object or behavioral difference, and do not authorize merge."
+  - id: "PLA01-FIX-03-STOP-09"
+    condition: "The base-failing/candidate-passing regression is absent, can pass while a test touches tracked evidence, does not verify temporary report bytes and cleanup, or the repeat/parallel/build/full-verify matrix does not begin clean and finish clean by construction."
+    action: "Stop FAIL; a single clean rerun or repository-wide status assertion is insufficient."
+  - id: "PLA01-FIX-03-STOP-10"
+    condition: "Any of the 30 required commands or an iteration fails or is not run; a failed command is retried; pnpm run verify is interrupted or split; an unexpected path changes; the candidate is empty or mutates; temporary state remains; optional evidence is invented; or the handoff is schema-invalid."
+    action: "Record FAIL or BLOCKED with merge_authorized false. Do not amend or replace the candidate, merge, tag, push, update the coordinator ledger, or clean/restore failed-command state."
+
+handoff:
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+  metadata_commit_rule: "For PASS or post-candidate FAIL, add and commit only the FIX-03 handoff as the immutable candidate's direct child. For pre-candidate BLOCKED, add and commit only the handoff as the producer start commit's direct child. Never amend or replace any prior artifact or the FIX-03 candidate, and never name the handoff's own metadata commit inside the handoff."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "fix_02_candidate_commit"
+    - "fix_02_handoff_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "candidate_mode"
+    - "branch"
+    - "changed_paths"
+    - "deterministic_cause"
+    - "base_candidate_regression_evidence"
+    - "evidence_output_contract"
+    - "temporary_root_ownership_and_cleanup_evidence"
+    - "tracked_evidence_immutability_evidence"
+    - "benchmark_workload_and_rerun_evidence"
+    - "nutrition_fix_preservation_evidence"
+    - "stress_and_full_verify_evidence"
+    - "personal_local_and_product_invariant_evidence"
+    - "finding_resolution"
+    - "acceptance_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "known_risks"
+    - "optional_evidence"
+    - "automated_verification"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  candidate_mode_rule: "candidate_mode is exactly deterministic_fix for PASS. It requires a non-empty candidate, proved cause, base-failing/candidate-passing regression, and diff limited to authority.candidate_paths. Pre-candidate BLOCKED uses candidate_commit null and candidate_mode blocked_before_candidate. Empty or verification_only candidates are forbidden."
+  disclosure_rule: "Retain the disclosure that personal-local imports are unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte."
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml#automated_verification"
+  schema:
+    schema_version: 1
+    packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-03"
+    candidate_commit: "40-character SHA or null only for pre-candidate BLOCKED"
+    status: "PASS|FAIL|BLOCKED"
+    checks:
+      - command: "exact required command"
+        result: "pass|fail|not_run"
+        evidence: "exact output or immutable artifact"
+    optional_manual_evidence: []
+    merge_authorized: false
+  authorization_rule: "Only PASS with all 30 required commands recorded exactly once as pass, candidate_mode deterministic_fix, a non-empty immutable candidate, base-failing/candidate-passing output-isolation regression, byte-identical tracked evidence, safe cleaned temporary roots, preserved FIX-02 NutritionPage bytes, all stress/build/three full-verify iterations passed without retry, and no active stop gate may set merge_authorized true. FAIL or BLOCKED always sets merge_authorized false."
+  optional_evidence_rule: "Cold, owner, independent, legal, visual, biomechanics, manual, named-reviewer, VoiceOver, and physical-device review are optional evidence only. They never complete, block, or authorize the candidate, and an unperformed optional check is never reported as passed."
+
+optional_evidence:
+  cold_review: "optional; no gate effect"
+  owner_review: "optional; no gate effect"
+  independent_review: "optional; no gate effect"
+  named_reviewers: "optional; no gate effect"
+  manual_review: "optional; no gate effect"
+  physical_device_review: "optional; no gate effect"
+  reporting_rule: "Keep optional_manual_evidence empty unless evidence was actually supplied. Never infer or claim PASS for an unperformed optional check."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS, all 30 exact automated command records are pass, candidate_mode is deterministic_fix, the candidate is non-empty, tracked evidence is byte-identical, no stop gate is active, and automated_verification.merge_authorized == true"
+  target: "main"
+  method: "fast-forward"
+  squash_policy: "forbidden"
+  checkpoint_tag_after_merge: "checkpoint/personal-local-animation-01-fix-03-automated-pass"
+  automated_checkpoint_rule: "Only after a PASS fast-forward merge, record the complete original-plus-FIX-01-plus-FIX-02-plus-FIX-03 lineage and automated result in docs/ai/reviews/coordinator-ledger.yaml in a separate coordinator checkpoint commit, then create checkpoint/personal-local-animation-01-fix-03-automated-pass. Never create or reuse an earlier personal-local checkpoint tag for this lineage."
+  next_packet_rule: "No downstream packet may consume the personal-local API until checkpoint/personal-local-animation-01-fix-03-automated-pass exists. Any later WORKOUT-INTEGRATION packet must preserve exact variant identity, release-pack separation, zero egress, backup exclusion, and active-workout PWA update deferral."
+  producer_instruction: "Start from the packet-only coordinator commit, use gpt-5.6-sol with no subagents, preserve bcc3a88f's NutritionPage correction byte-for-byte, implement only the three authorized output-isolation files, create one non-empty immutable candidate, run all 30 commands in order without retry or cleanup, and create only the direct-child handoff commit. Do not merge, tag, push, amend history, or update the ledger."
+  current_coordinator_task_prohibitions:
+    - "Do not implement the evidence isolation fix."
+    - "Do not create a FIX-03 candidate or handoff."
+    - "Do not amend or replace any prior packet, candidate, or handoff."
+    - "Do not rewrite, delete, untrack, or ignore historical evidence."
+    - "Do not merge main."
+    - "Do not push."
+    - "Do not update docs/ai/reviews/coordinator-ledger.yaml."
+    - "Do not create any checkpoint tag."
