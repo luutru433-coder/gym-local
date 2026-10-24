@@ -1,0 +1,351 @@
+schema_version: 3
+packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-04"
+status: "BLOCKED"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "The repository packet was executed with the required gpt-5.6-sol model; no substitution occurred."
+subagents_used: false
+
+base_commit: "5ac56ed6a90d7c4782e35b20e198cb2045531bd3"
+fix_03_candidate_commit: "0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+fix_03_handoff_commit: "5ac56ed6a90d7c4782e35b20e198cb2045531bd3"
+producer_start_commit: "ac8c363a126fa56526d69af39895ae647889c4b9"
+candidate_parent_commit: null
+candidate_commit: null
+candidate_mode: "blocked_before_candidate"
+branch: "codex/personal-local-animation-01-fix-04"
+
+changed_paths:
+  candidate: []
+  post_candidate_metadata:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-04-handoff.yaml"
+
+runtime_profile_and_deterministic_cause:
+  result: "incomplete_required_evidence"
+  deterministic_counts:
+    reproduce_pilot_build_pairs: 3
+    renderer_candidate_executions: 9
+    complete_renderer_workloads: 3
+    report_writes: 3
+    report_reads_and_comparisons: 3
+    assertion_phases: 3
+    exact_root_cleanups: 3
+  cause: "The FIX-03 named default-suite regression serially executes two successful complete renderer workloads and a third complete workload for the injected-failure branch. Each workload performs one reproducePilot build pair and all three renderer candidates, so repository-default parallel contention amplifies deterministic repeated CPU/build work rather than exposing a report-byte or cleanup correctness defect."
+  essential_contract_work: "Root ownership, containment, exclusive creation, exact bytes, tracked byte/mtime identity, scores, selection, diagnostic shape, cleanup, sentinel, Git cleanliness, and rejection paths can be exercised with deterministic report-output contract data without invoking the renderer workload."
+  end_to_end_work: "The unchanged production workload remains required in two separate invocation-owned end-to-end commands."
+  evidence_gap: "The isolated and contended profiler completed and removed its temporary roots, but its phase-duration stdout exceeded the tool result's retained context. Exact per-phase durations therefore could not be recorded. A retry was forbidden. An earlier profiler bootstrap attempt also exited before workload execution because node -e left process.argv[1] undefined."
+
+base_candidate_regression_evidence:
+  result: "fail"
+  base_method: "A source-work oracle attempted to isolate the exact named FIX-03 test and count runRendererBenchmark calls against a zero-complete-workload default-suite bound."
+  base_result: "The oracle failed before producing its required expected-fail comparison because its regex did not match the named test block: 'named FIX-03 regression block not found'."
+  candidate_result: "not_run; the packet forbids retrying a failed required command and requires stopping before implementation."
+
+contract_assertion_mapping:
+  result: "not_run"
+  evidence: "No candidate was created, so no candidate-side mapping or named regression result is claimed."
+
+separate_end_to_end_benchmark_evidence:
+  result: "not_run"
+  evidence: "Commands 9 and 10 were not run because required pre-candidate command 6 failed."
+
+evidence_output_contract_and_fix_03_semantics:
+  result: "preserved_unmodified"
+  evidence: "No benchmark, evidence test, performance-report, workload, score, selection, timing, network, disposal, leak, or cleanup implementation file was edited."
+
+preserved_root_ownership_and_recoverable_cleanup_evidence:
+  result: "pass"
+  quarantine_root: "C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c"
+  temp_root:
+    original: "C:/Users/Q/AppData/Local/Temp/gym-local-animation-pilot-evidence-O7t32z"
+    recovery_receipt: "C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c/preserved-temp-root"
+    inventory_entries: 3
+    sentinel_sha256: "4f658149ae825ce6347afbcf4e58665b376482c077a183b6eea180f4e3189298"
+    nested_owner_marker_sha256: "af302a48e857abe7e8f224e1a76ff2b69ddfcb33542efb5e434c59d617e1ebd3"
+    original_absent_after_move: true
+  external_invocation_root:
+    original: "C:/Users/Q/.codex/worktrees/c14a/Gym/outputs/animation-pilot/invocation-6wa9W2"
+    recovery_receipt: "C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c/preserved-external-invocation-root"
+    inventory_entries: 81
+    owner_marker_sha256: "3709db638c7621bd2a731fe1252d383e170e05c77a3e8af0bad89ee76164b587"
+    top_level_entries:
+      - ".animation-pilot-invocation-owner"
+      - "build-a"
+      - "build-b"
+      - "source-a"
+      - "source-b"
+    original_absent_after_move: true
+  evidence: "Both literal roots were canonical strict children, real non-reparse directories on C:, had their bounded inventories and marker/sentinel hashes recorded, and were moved atomically to the same-volume recovery quarantine. No parent, glob, foreign sibling, tracked path, or unrelated worktree path was removed."
+
+new_root_cleanup_and_iteration_cleanliness_evidence:
+  result: "pass_for_diagnostic_only"
+  evidence: "The completed profiler left no gym-local-fix04-profile-* root and Git remained clean before the blocker report. Post-candidate iterations did not run."
+
+tracked_evidence_immutability_evidence:
+  result: "preserved_unmodified"
+  renderer_benchmark_object: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  performance_report_object: "5e4000acec0c750d8f98f70806670d16a5b7424c"
+  evidence: "No tracked evidence file was edited."
+
+benchmark_workload_score_selection_network_evidence:
+  result: "not_run_after_blocker"
+  expected_workload: "two releases, 12 variants, ten cycles, 240 parsed/mounted assets and 130 trace entries per candidate"
+  expected_scores: "3981390/2929347/3934825"
+  expected_selection: "three-direct"
+  expected_network_and_leaks: "zero network attempts and operation-derived zero leaks"
+  evidence: "No candidate-side or separate end-to-end verification is claimed. The pre-candidate source tree was not modified."
+
+nutrition_fix_preservation_evidence:
+  result: "preserved_unmodified"
+  source_object: "a5f7d17f82007150ef7ce7ff0c322532cf645344"
+  test_object: "6a89aed64ed0802b0134fc8e8d14a79439e55b86"
+  evidence: "No Nutrition path was edited; post-candidate Nutrition tests were not run."
+
+stress_build_and_full_verify_evidence:
+  result: "not_run"
+  evidence: "Commands 7 through 35 were not run after the mandatory pre-candidate failure."
+
+personal_local_and_product_invariant_evidence:
+  result: "preserved_unmodified_but_not_reverified"
+  evidence: "No product, contract, storage, backup, catalog, nutrition, workout, PWA, dependency, configuration, content, or evidence implementation changed. Personal-local imports remain unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte."
+
+finding_resolution:
+  - id: "PLA01-FIX-04-F01"
+    result: "blocked"
+    evidence: "The runtime cause was identified, but exact retained phase-duration evidence was incomplete."
+  - id: "PLA01-FIX-04-F02"
+    result: "not_started"
+    evidence: "No deterministic contract-test candidate was created after command 6 failed."
+  - id: "PLA01-FIX-04-F03"
+    result: "not_started"
+    evidence: "Separate end-to-end commands and the full verification matrix were not run."
+
+acceptance_evidence:
+  - id: "PLA01-FIX-04-AC-01"
+    result: "pass"
+    evidence: "Producer start ac8c363a has parent 5ac56ed6 and changes only the FIX-04 packet."
+  - id: "PLA01-FIX-04-AC-02"
+    result: "fail"
+    evidence: "Deterministic work counts identified the repeated-work cause, but exact phase durations were not retained in the tool result."
+  - id: "PLA01-FIX-04-AC-03"
+    result: "fail"
+    evidence: "The required failing-before oracle failed on its own block-selection regex before establishing the expected base failure; no candidate was permitted."
+  - id: "PLA01-FIX-04-AC-04"
+    result: "not_run"
+    evidence: "No candidate contract regression was implemented or executed."
+  - id: "PLA01-FIX-04-AC-05"
+    result: "not_run"
+    evidence: "Separate production-workload end-to-end commands did not run."
+  - id: "PLA01-FIX-04-AC-06"
+    result: "pass_for_pre_candidate_state"
+    evidence: "No source change weakened FIX-03 production ownership or historical-evidence semantics."
+  - id: "PLA01-FIX-04-AC-07"
+    result: "pass"
+    evidence: "Both preserved roots were exactly validated and recoverably quarantined with receipts retained."
+  - id: "PLA01-FIX-04-AC-08"
+    result: "not_run"
+    evidence: "Required stress and full-verify matrices did not run."
+  - id: "PLA01-FIX-04-AC-09"
+    result: "fail"
+    evidence: "Not all 35 commands passed; merge authorization is false."
+
+checks:
+  required_commands: 35
+  required_commands_run: 6
+  required_commands_passed: 4
+  required_commands_failed: 2
+  required_commands_not_run: 29
+  immutable_candidate_unchanged_after_commands: null
+  triggered_stop_gates:
+    - "PLA01-FIX-04-STOP-10"
+  result: "blocked"
+  evidence: "Command 5 lacks the exact retained duration evidence required for PASS. Command 6 failed with 'named FIX-03 regression block not found' and was not retried. No implementation or candidate was created."
+
+protected_path_audit:
+  result: "pass_for_pre_candidate_state"
+  candidate_path_count: 0
+  unauthorized_candidate_paths: []
+  forbidden_candidate_paths_changed: []
+  tracked_evidence_paths_changed: []
+  nutrition_source_object_matches_fix_02: true
+  nutrition_test_object_matches_fix_02: true
+  package_lock_or_configuration_changed: false
+  benchmark_workload_or_score_changed: false
+  product_runtime_or_contract_changed: false
+
+known_risks:
+  - "The FIX-03 contention defect remains unresolved because no candidate was created."
+  - "Commands 7 through 35 were intentionally not run after the required pre-candidate failure; no PASS is claimed for them."
+  - "The two prior leaked roots are absent from their original locations and remain recoverable at the recorded quarantine path."
+  - "The profile's exact per-phase durations were not retained, so a future coordinator-issued packet must provide a fresh authorized diagnostic sequence rather than treating this handoff as complete profile evidence."
+
+optional_evidence:
+  optional_manual_evidence: []
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  named_reviewers: "not_run"
+  legal_review: "not_run"
+  visual_review: "not_run"
+  biomechanics_review: "not_run"
+  manual_review: "not_run"
+  physical_device_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-04"
+  candidate_commit: null
+  status: "BLOCKED"
+  checks:
+    - command: >-
+        git status --short
+      result: "pass"
+      evidence: "Producer-start worktree was clean."
+    - command: >-
+        assert producer start commit parent is 5ac56ed6a90d7c4782e35b20e198cb2045531bd3 and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-04.yaml
+      result: "pass"
+      evidence: "ac8c363a parent is 5ac56ed6 and its sole delta is the FIX-04 packet."
+    - command: >-
+        pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis
+      result: "pass"
+      evidence: "The frozen offline install reused 607 packages with zero downloads and left Git clean."
+    - command: >-
+        validate literal ownership of C:/Users/Q/AppData/Local/Temp/gym-local-animation-pilot-evidence-O7t32z and C:/Users/Q/.codex/worktrees/c14a/Gym/outputs/animation-pilot/invocation-6wa9W2 exactly as authority.cleanup_authority requires, record inventories and marker hashes, recoverably clean only those two exact roots, verify both original paths absent and every parent/foreign sibling unchanged, and retain recovery receipts through verification
+      result: "pass"
+      evidence: "Validated 3-entry and 81-entry bounded inventories, recorded sentinel/marker hashes, and atomically moved only the two exact roots to C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c; both originals are absent and recovery receipts remain."
+    - command: >-
+        profile the current FIX-03 regression on 0a2aab39/5ac56ed-equivalent bytes under isolated and repository-default parallel contention by named phase; record exact reproducePilot, renderer-candidate, complete-workload, report-I/O, assertion, and cleanup counts/durations; remove all temporary instrumentation and owned output before candidate creation
+      result: "fail"
+      evidence: "The completed profile counted 3 reproducePilot pairs, 9 candidate executions, 3 complete workloads, 3 report writes, 3 reads/comparisons, 3 assertion phases, and 3 cleanups, and left no profile root; however, exact duration stdout was not retained after tool-result truncation, so the command's required evidence is incomplete. It was not retried."
+    - command: >-
+        establish failing-before evidence without rewriting history: the cause-specific candidate regression or equivalent temporary harness must fail on 0a2aab39/5ac56ed-equivalent behavior because the default regression performs three complete renderer benchmark workloads or violates the proved deterministic contract-work bound; record exact method and output
+      result: "fail"
+      evidence: "The source-work oracle exited 1 with 'named FIX-03 regression block not found' before it could record the required expected base failure. The command was not retried."
+    - command: >-
+        pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern "keeps invocation-owned evidence output deterministic and contention-safe" --pool=threads --fileParallelism
+      result: "not_run"
+      evidence: "Stopped before implementation after command 6 failed."
+    - command: >-
+        run 20 fresh iterations of pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern "keeps invocation-owned evidence output deterministic and contention-safe" with repository-default workers and file parallelism; after every iteration assert candidate SHA unchanged, every tracked ANIMATION-PILOT-01-REV-02 evidence blob equals HEAD, git status --porcelain is empty, both named leaked roots are absent, and no new producer-owned temporary/generated root, staging path, owner marker, or lock artifact remains; stop on first failure without retry
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        execute the complete real renderer benchmark end to end once through a fresh validated invocation-owned nontracked evidence root; assert exact committed report bytes, two releases, 12 variants, ten cycles, 240 parsed/mounted assets per candidate, 130 trace entries per candidate, scores 3981390/2929347/3934825, three-direct selection, zero network attempts, operation-derived zero leaks, exact-root cleanup, candidate/evidence identity, and clean Git state
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        repeat the separate complete real end-to-end invocation-owned benchmark from a fresh root; assert the same report bytes/workload/scores/selection/network/leaks and all clean-state/historical-evidence conditions; do not reuse output or retry a failure
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        $path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "benchmark rerun 1 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 1 left Git dirty"; exit 1 }; assert both named leaked roots absent and no new producer-owned root remains
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        $path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "benchmark rerun 2 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 2 left Git dirty"; exit 1 }; assert both named leaked roots absent and no new producer-owned root remains
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        run 10 fresh iterations of pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs with repository-default pool, workers, and file parallelism; after every iteration assert candidate SHA unchanged, every tracked ANIMATION-PILOT-01-REV-02 evidence blob equals HEAD, git status --porcelain is empty, both named leaked roots are absent, and no new producer-owned root remains; stop on first failure without retry
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        run 3 fresh pnpm run build iterations; after every iteration assert candidate SHA unchanged, every tracked ANIMATION-PILOT-01-REV-02 evidence blob equals HEAD, git status --porcelain is empty, both named leaked roots are absent, and no new producer-owned root remains; stop on first failure without retry
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose; immediately assert candidate/evidence identity, clean Git state, both named leaked roots absent, and no new producer-owned root remains
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        run 20 fresh iterations of pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; after every iteration assert candidate/evidence identity, clean Git state, both named leaked roots absent, and no new producer-owned root remains; stop on first failure without retry
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        run 10 fresh iterations of pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; after every iteration assert candidate/evidence identity, clean Git state, both named leaked roots absent, and no new producer-owned root remains; stop on first failure without retry
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        run 5 fresh iterations of pnpm run test with repository-default pool, workers, and file parallelism; after every iteration assert candidate/evidence identity, clean Git state, both named leaked roots absent, and no new producer-owned root remains; stop on first failure without retry
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs; immediately assert candidate/evidence identity, clean Git state, both named leaked roots absent, and no new producer-owned root remains
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        $paths = @("apps/web/src/features/nutrition/NutritionPage.tsx", "apps/web/src/features/nutrition/NutritionPage.test.tsx", "scripts/animation-pilot-benchmark.mjs", "scripts/animation-pilot-evidence.mjs", "scripts/animation-pilot-evidence.test.mjs", "scripts/performance-report.mjs", "scripts/personal-local-animation-evidence.mjs", "scripts/personal-local-animation-evidence.test.mjs"); if (Test-Path -LiteralPath "scripts/animation-pilot-evidence.test-support.mjs") { $paths += "scripts/animation-pilot-evidence.test-support.mjs" }; pnpm exec eslint $paths --max-warnings=0; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        pnpm run typecheck
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        pnpm run architecture:audit
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        pnpm run verify:affected
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        run 3 consecutive uninterrupted pnpm run verify iterations with repository-default pool, workers, file parallelism, and unchanged timeouts; after every iteration and before starting the next assert candidate SHA unchanged, every tracked ANIMATION-PILOT-01-REV-02 evidence blob equals HEAD, git status --porcelain is empty, both named leaked roots are absent, and no new producer-owned temporary/generated root, staging path, owner marker, or lock artifact remains; stop on first failure without retry or cleanup
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        pnpm animation:pilot:evidence:validate; immediately assert every tracked ANIMATION-PILOT-01-REV-02 evidence blob equals HEAD, clean Git state, both named leaked roots absent, and no new producer-owned root remains
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        node scripts/personal-local-animation-evidence.mjs validate
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        node scripts/personal-local-animation-evidence.mjs audit-build --dist dist
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        git diff --check producer_start_commit..candidate_commit
+      result: "not_run"
+      evidence: "No candidate exists."
+    - command: >-
+        assert candidate is non-empty and changed paths are a subset of scripts/animation-pilot-benchmark.mjs, scripts/animation-pilot-evidence.test.mjs, scripts/performance-report.mjs, and scripts/animation-pilot-evidence.test-support.mjs; assert the test-support file exists only if justified; assert NutritionPage.tsx object a5f7d17f82007150ef7ce7ff0c322532cf645344 and NutritionPage.test.tsx object 6a89aed64ed0802b0134fc8e8d14a79439e55b86; assert every path outside the candidate paths and immutable docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-04.yaml coordinator delta is byte-identical to 5ac56ed6a90d7c4782e35b20e198cb2045531bd3
+      result: "not_run"
+      evidence: "No candidate exists."
+    - command: >-
+        assert no candidate change increases a timeout or budget, adds sleep/retry/polling-delay/skip/only/todo, removes or weakens an assertion, swallows errors, reduces workers or file parallelism, serializes or filters a suite, changes global runner/configuration, deletes/untracks/ignores/rewrites/restores tracked evidence, relies on pre-existing output, performs broad filesystem cleanup, or changes benchmark workload, score, selection, timing, network, disposal, or leak policy
+      result: "not_run"
+      evidence: "No candidate exists."
+    - command: >-
+        audit the final evidence-output design and assertion map: deterministic default-suite contract tests cover every FIX-03 ownership/containment/bytes/mtime/score/selection/diagnostic/cleanup/sentinel/Git/failure assertion without complete workload repetition; separate end-to-end commands use production workload and invocation-owned output; ordinary build reporting is read-only for docs/ai/evidence; only explicit CLI committed regeneration is allowed; no assertion or gate is lost
+      result: "not_run"
+      evidence: "No candidate exists."
+    - command: >-
+        audit cleanup authority and final filesystem state: the two named roots had exact validation and recoverable cleanup receipts; no parent/glob/foreign path was removed; candidate-created roots require canonical strict-child identity plus owner token/marker and are absent after last read; both named original paths are absent; no producer-owned staging path, owner marker, lock, or quarantine without a recovery record remains
+      result: "not_run"
+      evidence: "Post-candidate audit was not run; the pre-candidate root receipts are recorded above."
+    - command: >-
+        assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, release storage layout 1, and personal-local schema/layout 1 remain locked; assert all docs/ai/evidence blobs equal HEAD; assert benchmark workload/scores/selection/network/leaks are unchanged; assert original personal-local, nutrition, release, backup, exact-variant, zero-egress, offline, module-boundary, personal-data, and active-workout PWA invariants remain passing
+      result: "not_run"
+      evidence: "Stopped before candidate creation."
+    - command: >-
+        parse every YAML file under docs/ai and validate the FIX-04 handoff required fields, all 35 exact command records, candidate SHA, non-empty candidate mode, runtime profile, failing-before/passing-after evidence, assertion map, separate end-to-end evidence, root ownership and cleanup receipts, optional_manual_evidence, status, and merge_authorized consistency
+      result: "not_run"
+      evidence: "Stopped before candidate creation; this BLOCKED handoff does not claim candidate-mode validation."
+    - command: >-
+        assert candidate_commit remains unchanged before and after all post-candidate commands, both named leaked roots are absent, no producer-owned invocation root/staging path/owner marker/lock artifact remains, every tracked evidence working-tree blob equals HEAD, recovery records remain available, and git status --porcelain is empty without hidden cleanup or restoration
+      result: "not_run"
+      evidence: "No candidate exists and post-candidate commands did not run."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  packet_path: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-04.yaml"
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-04-handoff.yaml"
+  candidate_range: null
+  next_task: "Issue a new committed packet that authorizes a fresh profile/evidence sequence; do not retry this packet's failed commands or treat this BLOCKED handoff as merge authority."
