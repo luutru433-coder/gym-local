@@ -1,0 +1,270 @@
+schema_version: 3
+packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-03"
+status: "automated_fail"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "Implementation, candidate creation, and the required automated commands used gpt-5.6-sol."
+subagents_used: false
+
+base_commit: "b03a82df988a5fde251920f067a47646c702713d"
+fix_02_candidate_commit: "bcc3a88fceaefae1069b221340957d3edfc3fd7a"
+fix_02_handoff_commit: "b03a82df988a5fde251920f067a47646c702713d"
+producer_start_commit: "42babf7d4d7a67481c34160d38e0df841378cc00"
+candidate_parent_commit: "42babf7d4d7a67481c34160d38e0df841378cc00"
+candidate_commit: "0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+candidate_mode: "deterministic_fix"
+branch: "codex/personal-local-animation-01-fix-03"
+
+changed_paths:
+  candidate:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+  post_candidate_metadata:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+
+deterministic_cause:
+  result: "pass"
+  evidence: "Base runRendererBenchmark() defaulted writeEvidence to true and always wrote renderer-benchmark.json under tracked PILOT_EVIDENCE_ROOT. The benchmark test therefore rewrote tracked evidence, while the ordinary performance-report path also rewrote the tracked pilot performance report after each build. FIX-02 full-verify iteration 1 left the performance report dirty, and iteration 2's benchmark test rejected repository-wide dirty state."
+
+base_candidate_regression_evidence:
+  result: "pass"
+  method: "Before candidate creation, an inline temporary harness requested a unique OS-temporary evidence output from base b03a82df behavior without changing history. The base ignored the requested root, left renderer-benchmark.json absent there, and changed the tracked renderer evidence mtime while preserving deterministic bytes. After candidate creation, the named Vitest regression exercised owned temporary roots."
+  base_result: "EXPECTED FAIL: requested report absent at C:/Users/Q/AppData/Local/Temp/gym-local-fix03-base-tppl30/renderer-benchmark.json; base targeted tracked docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json; tracked mtime changed from 1792770866989.016 to 1792771038148.5618."
+  candidate_result: "PASS: uses invocation-owned evidence output without mutating tracked evidence passed with 1 matching test and 1 skipped test in 20.75s; temporary bytes equaled committed bytes, tracked bytes and mtime were unchanged, success and injected-failure roots were removed, and the foreign sentinel survived."
+
+evidence_output_contract:
+  result: "pass_for_focused_and_stress_runs"
+  evidence: "runRendererBenchmark defaults to read-only report generation. Test writes require an invocation object minted by withBenchmarkEvidenceOutputRoot under a canonical OS-temporary child boundary, with filesystem identity and owner-marker checks and exclusive report creation. Only the explicit animation:pilot:benchmark:desktop CLI passes committedEvidence=true and may deterministically rewrite the tracked renderer report. The ordinary performance-report command writes dist/reports/performance-report.json and validates historical pilot evidence without rewriting it."
+
+temporary_root_ownership_and_cleanup_evidence:
+  result: "fail_under_full_verify_timeout"
+  focused_evidence: "The named regression and ten isolated stress iterations proved unique strict-child roots, ownership through the final report read, finally cleanup on success and injected failure, and preservation of a foreign sibling. Five explicit three-file parallel iterations also passed with zero observed leaks."
+  failure_evidence: "Required command 20 timed out the regression at the unchanged 60000ms limit under full-suite contention before cleanup completed. Read-only inspection found C:/Users/Q/AppData/Local/Temp/gym-local-animation-pilot-evidence-O7t32z and outputs/animation-pilot/invocation-6wa9W2 still present. They were not cleaned, restored, or hidden after failure."
+
+tracked_evidence_immutability_evidence:
+  result: "pass_through_failure"
+  evidence: "Every tracked docs/ai/evidence/ANIMATION-PILOT-01-REV-02 blob matched candidate HEAD after the failed command. The five parallel iterations, two standalone benchmark reruns, and three isolated builds each asserted byte identity and clean Git state."
+
+benchmark_workload_and_rerun_evidence:
+  result: "pass_before_full_verify_failure"
+  evidence: "Two standalone CLI reruns selected three-direct and preserved the tracked benchmark blob. Five parallel three-file iterations passed 3 files/8 tests each. The candidate does not change the two-release, 12-variant, ten-cycle workload, 240 parsed/mounted assets, 130 trace entries, score vector 3981390/2929347/3934825, selection, timing policy, network policy, or operation-derived leak checks."
+
+nutrition_fix_preservation_evidence:
+  result: "pass"
+  source_object: "a5f7d17f82007150ef7ce7ff0c322532cf645344"
+  test_object: "6a89aed64ed0802b0134fc8e8d14a79439e55b86"
+  evidence: "Both HEAD objects exactly equal candidate bcc3a88f. The focused 1-file/3-test run, twenty isolated iterations, ten apps/web/src iterations, five complete-suite iterations, and original 11-file/73-test personal-local suite passed without retry."
+
+stress_and_full_verify_evidence:
+  result: "fail"
+  evidence_isolation_stress: "Ten iterations passed 1 matching test each with evidence blobs, candidate SHA, and Git cleanliness asserted after every iteration."
+  parallel_animation_stress: "Five iterations passed 3 files/8 tests each with evidence blobs, candidate SHA, and Git cleanliness asserted after every iteration."
+  isolated_builds: "Three builds passed and wrote only generated dist reporting output; tracked pilot evidence remained byte-identical and Git clean after each."
+  nutrition_stress: "Twenty isolated NutritionPage, ten four-worker web-scope, and five complete pnpm run test iterations passed."
+  full_verify: "Iteration 1 passed architecture, lint, typecheck, content validation, and content audit, then the full test phase failed because the new evidence-isolation regression timed out at 60000ms. The suite reported 34 passed/1 failed files and 562 passed/1 failed tests. No retry or later iteration ran."
+
+personal_local_and_product_invariant_evidence:
+  result: "fail_due_to_required_full_verify"
+  evidence: "The exact 11-file personal-local/backup/App/Workout/PWA suite passed 73 tests; scoped lint, typecheck, architecture audit, verify:affected, three builds, and all pre-failure stress commands passed. Candidate scope changes no product/runtime, contract, storage, backup, catalog, nutrition, workout, PWA, dependency, configuration, content, or evidence file. However, the required full-verify matrix failed, so the combined invariant gate is not passing. Personal-local imports remain unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte."
+
+finding_resolution:
+  - id: "PLA01-FIX-03-F01"
+    result: "pass"
+    evidence: "Tests and ordinary builds no longer write tracked pilot evidence; explicit CLI regeneration remains deterministic."
+  - id: "PLA01-FIX-03-F02"
+    result: "fail"
+    evidence: "Focused and repeated isolation checks passed, but full-suite contention exhausted the unchanged 60000ms test timeout and left temporary state."
+  - id: "PLA01-FIX-03-F03"
+    result: "fail_due_to_required_full_verify"
+    evidence: "Protected candidate scope and focused product suites passed, but the required full-verify gate failed."
+
+acceptance_evidence:
+  - id: "PLA01-FIX-03-AC-01"
+    result: "pass"
+    evidence: "Lineage is b03a82df FIX-02 FAIL handoff -> 42babf7d packet-only coordinator -> 0a2aab39 single non-empty candidate -> this handoff-only direct child."
+  - id: "PLA01-FIX-03-AC-02"
+    result: "pass"
+    evidence: "Source audit, FIX-02 handoff, and controlled base regression proved the shared tracked-evidence write cause."
+  - id: "PLA01-FIX-03-AC-03"
+    result: "pass"
+    evidence: "Candidate changes exactly the three authorized scripts; the cause-specific regression failed on base and passed on the candidate."
+  - id: "PLA01-FIX-03-AC-04"
+    result: "fail"
+    evidence: "Focused success/failure cleanup passed, but the full-verify timeout left one temporary boundary and one nested pilot invocation root."
+  - id: "PLA01-FIX-03-AC-05"
+    result: "pass"
+    evidence: "Three isolated builds preserved all tracked evidence and clean Git state while writing the generated dist report."
+  - id: "PLA01-FIX-03-AC-06"
+    result: "pass"
+    evidence: "Both explicit benchmark reruns reproduced tracked bytes and retained the score vector and three-direct selection."
+  - id: "PLA01-FIX-03-AC-07"
+    result: "pass"
+    evidence: "Ten focused and five explicit three-file parallel iterations passed without retry or tracked mutation."
+  - id: "PLA01-FIX-03-AC-08"
+    result: "pass"
+    evidence: "FIX-02 NutritionPage objects were byte-identical and all required pre-full-verify nutrition/personal-local stress commands passed."
+  - id: "PLA01-FIX-03-AC-09"
+    result: "fail"
+    evidence: "Full-verify iteration 1 failed in the evidence-isolation regression; iterations 2 and 3 did not run."
+  - id: "PLA01-FIX-03-AC-10"
+    result: "pass"
+    evidence: "Candidate adds no timeout/budget padding, retry, sleep, skip/only/todo, assertion weakening, parallelism reduction, configuration change, evidence deletion, or hidden cleanup."
+  - id: "PLA01-FIX-03-AC-11"
+    result: "fail_due_to_required_full_verify"
+    evidence: "Focused invariant suites and protected-object checks passed, but required full verification failed."
+  - id: "PLA01-FIX-03-AC-12"
+    result: "fail"
+    evidence: "All 30 commands are recorded exactly once below, but command 20 failed and commands 21-30 were not run; automated status is FAIL and merge_authorized is false."
+
+checks:
+  required_commands: 30
+  required_commands_run: 20
+  required_commands_passed: 19
+  required_commands_failed: 1
+  required_commands_not_run: 10
+  immutable_candidate_unchanged_after_commands: true
+  triggered_stop_gates:
+    - "PLA01-FIX-03-STOP-09"
+    - "PLA01-FIX-03-STOP-10"
+  result: "fail"
+  evidence: "Candidate 0a2aab39 remained HEAD. Required command 20 failed on full-verify iteration 1 and was not retried; commands 21-30 were not run."
+
+protected_path_audit:
+  result: "pass_for_candidate_scope_but_verification_failed"
+  candidate_path_count: 3
+  unauthorized_candidate_paths: []
+  forbidden_candidate_paths_changed: []
+  tracked_evidence_paths_changed: []
+  nutrition_source_object_matches_fix_02: true
+  nutrition_test_object_matches_fix_02: true
+  package_lock_or_configuration_changed: false
+  benchmark_workload_or_score_changed: false
+  product_runtime_or_contract_changed: false
+
+known_risks:
+  - "The new regression performs three complete renderer workloads. It passed alone and in the required stress matrices but exceeded its unchanged 60000ms test timeout under full repository contention; the immutable candidate cannot be amended or replaced in this packet."
+  - "The timed-out worker left C:/Users/Q/AppData/Local/Temp/gym-local-animation-pilot-evidence-O7t32z and outputs/animation-pilot/invocation-6wa9W2. They were deliberately preserved after failure rather than cleaned or hidden."
+  - "Commands 21-30 were intentionally not run after the first required failure, and no PASS is claimed for them."
+  - "Optional cold, owner, independent, legal, visual, biomechanics, manual, named-reviewer, VoiceOver, and physical-device evidence did not run."
+
+optional_evidence:
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  named_reviewers: "not_run"
+  legal_review: "not_run"
+  visual_review: "not_run"
+  biomechanics_review: "not_run"
+  manual_review: "not_run"
+  physical_device_review: "not_run"
+  pass_claimed_for_optional_evidence: false
+
+automated_verification:
+  schema_version: 1
+  packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-03"
+  candidate_commit: "0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+  status: "FAIL"
+  checks:
+    - command: "git status --short"
+      result: "pass"
+      evidence: "Producer-start worktree was clean."
+    - command: "assert producer start commit parent is b03a82df988a5fde251920f067a47646c702713d and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-03.yaml"
+      result: "pass"
+      evidence: "42babf7d parent is b03a82df and its one-path delta is the FIX-03 packet."
+    - command: "pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis"
+      result: "pass"
+      evidence: "Offline frozen install reused 607 packages, downloaded zero, exited 0, and left Git clean."
+    - command: "establish the failing-before side of the cause-specific regression against base b03a82df988a5fde251920f067a47646c702713d without rewriting history: the candidate regression or an equivalent temporary harness must fail because base does not place the exact benchmark report under the requested invocation-owned temporary root or because base ordinary build reporting touches tracked pilot evidence; record the exact method and output"
+      result: "pass"
+      evidence: "Inline temporary harness observed the requested report absent, tracked renderer evidence mtime changed, tracked bytes HEAD-identical, and Git clean; it removed only its owned OS-temporary root."
+    - command: "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern \"uses invocation-owned evidence output without mutating tracked evidence\" --pool=threads --fileParallelism --maxWorkers=3"
+      result: "pass"
+      evidence: "1 matching test passed, 1 nonmatching test skipped in 20.75s."
+    - command: '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..10 | ForEach-Object { pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern "uses invocation-owned evidence output without mutating tracked evidence" --pool=threads --fileParallelism --maxWorkers=3; if ($LASTEXITCODE -ne 0) { Write-Error "evidence isolation stress iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "evidence isolation stress iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during evidence isolation stress"; exit 1 }; if (git status --porcelain) { Write-Error "evidence isolation stress iteration $_ left Git dirty"; exit 1 } }'
+      result: "pass"
+      evidence: "All 10 iterations passed 1 matching test; evidence blobs, candidate SHA, and Git cleanliness held after every iteration."
+    - command: '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..5 | ForEach-Object { pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs scripts/animation-pilot-assets.test.mjs scripts/animation-pack-v1.test.mjs --pool=threads --fileParallelism --maxWorkers=3; if ($LASTEXITCODE -ne 0) { Write-Error "parallel animation evidence iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "parallel animation evidence iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during parallel animation evidence stress"; exit 1 }; if (git status --porcelain) { Write-Error "parallel animation evidence iteration $_ left Git dirty"; exit 1 } }'
+      result: "pass"
+      evidence: "All 5 iterations passed 3 files/8 tests with unchanged evidence, candidate, and Git state."
+    - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "benchmark rerun 1 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 1 left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "Three-direct selected; tracked benchmark blob remained HEAD-identical and Git clean."
+    - command: '$path = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"; $expected = (git rev-parse "HEAD:$path").Trim(); pnpm animation:pilot:benchmark:desktop; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; if ((git hash-object -- $path).Trim() -ne $expected) { Write-Error "benchmark rerun 2 changed tracked evidence"; exit 1 }; if (git status --porcelain) { Write-Error "benchmark rerun 2 left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "Three-direct selected; tracked benchmark blob remained HEAD-identical and Git clean."
+    - command: '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..3 | ForEach-Object { pnpm run build; if ($LASTEXITCODE -ne 0) { Write-Error "isolated build iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "isolated build iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during isolated builds"; exit 1 }; if (git status --porcelain) { Write-Error "isolated build iteration $_ left Git dirty"; exit 1 } }'
+      result: "pass"
+      evidence: "All 3 builds passed; each reported entry 209.2 KiB, initial graph 616.5 KiB, precache 3235.7 KiB and preserved tracked evidence and clean Git state."
+    - command: "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose"
+      result: "pass"
+      evidence: "1 file/3 tests passed; the recipe flow completed in 614ms."
+    - command: '$candidate = (git rev-parse HEAD).Trim(); 1..20 | ForEach-Object { pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "NutritionPage isolated stress iteration $_ failed; do not retry"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during NutritionPage stress"; exit 1 }; if (git status --porcelain) { Write-Error "NutritionPage stress left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "All 20 iterations passed 1 file/3 tests; candidate and Git state remained unchanged and clean."
+    - command: '$candidate = (git rev-parse HEAD).Trim(); 1..10 | ForEach-Object { pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; if ($LASTEXITCODE -ne 0) { Write-Error "web file-parallel stress iteration $_ failed; do not retry"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during web stress"; exit 1 }; if (git status --porcelain) { Write-Error "web stress left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "All 10 iterations passed 31 files/553 tests; candidate and Git state remained unchanged and clean."
+    - command: '$candidate = (git rev-parse HEAD).Trim(); 1..5 | ForEach-Object { pnpm run test; if ($LASTEXITCODE -ne 0) { Write-Error "complete test-suite iteration $_ failed; do not retry"; exit $LASTEXITCODE } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during complete-suite stress"; exit 1 }; if (git status --porcelain) { Write-Error "complete-suite stress left Git dirty"; exit 1 }'
+      result: "pass"
+      evidence: "All 5 iterations passed 35 files/563 tests; candidate and Git state remained unchanged and clean."
+    - command: "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs"
+      result: "pass"
+      evidence: "11 files/73 tests passed."
+    - command: "pnpm exec eslint apps/web/src/features/nutrition/NutritionPage.tsx apps/web/src/features/nutrition/NutritionPage.test.tsx scripts/animation-pilot-benchmark.mjs scripts/animation-pilot-evidence.mjs scripts/animation-pilot-evidence.test.mjs scripts/performance-report.mjs scripts/personal-local-animation-evidence.mjs scripts/personal-local-animation-evidence.test.mjs --max-warnings=0"
+      result: "pass"
+      evidence: "Exact scoped ESLint command exited 0 with zero warnings."
+    - command: "pnpm run typecheck"
+      result: "pass"
+      evidence: "tsc -b --pretty false exited 0."
+    - command: "pnpm run architecture:audit"
+      result: "pass"
+      evidence: "Architecture boundaries verified."
+    - command: "pnpm run verify:affected"
+      result: "pass"
+      evidence: "Architecture boundaries verified; command exited 0."
+    - command: '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); $candidate = (git rev-parse HEAD).Trim(); 1..3 | ForEach-Object { pnpm run verify; if ($LASTEXITCODE -ne 0) { Write-Error "full verify iteration $_ failed; do not retry"; exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "full verify iteration $_ changed $path"; exit 1 } }; if ((git rev-parse HEAD).Trim() -ne $candidate) { Write-Error "candidate changed during full verify iteration $_"; exit 1 }; if (git status --porcelain) { Write-Error "full verify iteration $_ left Git dirty; do not clean or restore"; exit 1 } }'
+      result: "fail"
+      evidence: "Iteration 1 exited 1 during pnpm run test: the named evidence-isolation regression timed out at 60000ms; 34 files/562 tests passed and 1 file/1 test failed. No retry or later iteration ran."
+    - command: '$evidence = @(git ls-files "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/**"); pnpm animation:pilot:evidence:validate; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; foreach ($path in $evidence) { if ((git hash-object -- $path).Trim() -ne (git rev-parse "HEAD:$path").Trim()) { Write-Error "explicit evidence validation changed $path"; exit 1 } }; if (git status --porcelain) { Write-Error "explicit evidence validation left Git dirty"; exit 1 }'
+      result: "not_run"
+      evidence: "Not run after command 20 triggered PLA01-FIX-03-STOP-09 and STOP-10."
+    - command: "node scripts/personal-local-animation-evidence.mjs validate"
+      result: "not_run"
+      evidence: "Not run after command 20 failed."
+    - command: "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+      result: "not_run"
+      evidence: "Not run after command 20 failed."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "not_run"
+      evidence: "Not run after command 20 failed."
+    - command: "assert candidate is non-empty and changed paths are a subset of scripts/animation-pilot-benchmark.mjs, scripts/animation-pilot-evidence.test.mjs, and scripts/performance-report.mjs; assert the candidate's NutritionPage.tsx and NutritionPage.test.tsx Git objects equal bcc3a88fceaefae1069b221340957d3edfc3fd7a and every other path outside the three candidate paths is byte-identical to b03a82df988a5fde251920f067a47646c702713d"
+      result: "not_run"
+      evidence: "Not run as a required command after command 20 failed; read-only handoff preparation separately observed the three-path candidate and matching NutritionPage objects without claiming this command passed."
+    - command: "assert no candidate change increases a timeout or budget, adds retry/sleep/polling-delay/skip/only/todo, removes or weakens an assertion, swallows errors, reduces workers or file parallelism, serializes a suite, changes global runner/configuration, deletes/untracks/ignores tracked evidence, relies on pre-existing output, or performs git restore/checkout/reset/clean or hidden byte restoration after a dirty command"
+      result: "not_run"
+      evidence: "Not run after command 20 failed."
+    - command: "audit evidence output ownership and cleanup: test benchmark writes require an explicit unique canonical nontracked root; roots are strict children of a validated temporary/generated boundary; ownership lasts through the consumer's final read; finally cleanup covers success and injected failure; foreign siblings survive; ordinary build/report execution is read-only for docs/ai/evidence; intentional CLI benchmark regeneration remains deterministic; no test or default build path writes PILOT_EVIDENCE_ROOT"
+      result: "not_run"
+      evidence: "Not run after command 20 failed; the timeout also left temporary state, so this condition cannot pass."
+    - command: "assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, release storage layout 1, and personal-local schema/layout 1 remain locked; assert all docs/ai/evidence blobs equal HEAD; assert benchmark scores/selection/workload are unchanged; assert original personal-local, nutrition, release, backup, exact-variant, zero-egress, offline, module-boundary, personal-data, and active-workout PWA invariants remain passing"
+      result: "not_run"
+      evidence: "Not run after command 20 failed."
+    - command: "parse every YAML file under docs/ai and validate the FIX-03 handoff required fields, all 30 exact command records, candidate SHA, non-empty candidate mode, cause and base/candidate regression, output ownership and cleanup evidence, optional_manual_evidence, status, and merge_authorized consistency"
+      result: "not_run"
+      evidence: "Not run after command 20 failed; no automated PASS is claimed for handoff self-validation."
+    - command: "assert candidate_commit remains unchanged before and after all post-candidate commands, no invocation temporary root/staging path/owner marker/lock artifact remains, every tracked evidence working-tree blob equals HEAD, and git status --porcelain is empty without cleanup or restoration"
+      result: "not_run"
+      evidence: "Not run after command 20 failed. Read-only handoff preparation observed unchanged candidate and tracked evidence plus a leaked temporary boundary and pilot invocation root."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  packet_path: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-03.yaml"
+  candidate_range: "42babf7d4d7a67481c34160d38e0df841378cc00..0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+  complete_personal_local_range: "e51e2661f5ea8562a84fedade5c31e0ef157e3a4..0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+  next_task: "Coordinate a separate bounded follow-up for the full-suite contention timeout and leaked timeout-interrupted temporary state. Do not amend or replace candidate 0a2aab39, merge, tag, push, or update the coordinator ledger."
