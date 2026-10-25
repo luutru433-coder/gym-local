@@ -1,0 +1,524 @@
+schema_version: 3
+packet:
+  id: "PERSONAL-LOCAL-ANIMATION-01-FIX-05"
+  title: "Repair the contention-safe animation evidence verification oracle"
+  type: "review-fix"
+  status: "ready"
+
+supersession:
+  fixes_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-04.yaml"
+  original_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+  original_candidate_commit: "4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+  original_handoff_commit: "2852338e2a647fbe6884a237d7eed170d54993e9"
+  fix_01_coordinator_commit: "826403c31f85c2537e23cbf0c2efa224faf4deac"
+  fix_01_candidate_commit: "f3652a8311fa57b85412d9d504d425b05b789f00"
+  fix_01_fail_handoff_commit: "636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+  fix_02_coordinator_commit: "4bca728cc74c5a1f59a39b2c38ee850fdf67497c"
+  fix_02_candidate_commit: "bcc3a88fceaefae1069b221340957d3edfc3fd7a"
+  fix_02_fail_handoff_commit: "b03a82df988a5fde251920f067a47646c702713d"
+  fix_03_coordinator_commit: "42babf7d4d7a67481c34160d38e0df841378cc00"
+  fix_03_candidate_commit: "0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+  fix_03_fail_handoff_commit: "5ac56ed6a90d7c4782e35b20e198cb2045531bd3"
+  fix_04_coordinator_commit: "ac8c363a126fa56526d69af39895ae647889c4b9"
+  fix_04_blocked_handoff_commit: "25bbd0075f152a389aa24a029429c26f68e85cf9"
+  triggered_stop_gates:
+    - "PLA01-FIX-04-STOP-10"
+  authoritative_fix_04_result:
+    candidate_commit: null
+    candidate_mode: "blocked_before_candidate"
+    implementation_files_changed: []
+    production_isolation_authority: "FIX-03 candidate 0a2aab39d6c0df527d21f161f8a221dcd5bf8314 remains the correct production output-isolation implementation: test writes require invocation-owned roots, ordinary builds are read-only for historical pilot evidence, and explicit committed-evidence regeneration remains deterministic."
+    deterministic_work_counts: "The completed FIX-04 diagnostic counted three reproducePilot build pairs, nine renderer-candidate executions, three complete renderer workloads, three report writes, three reads/comparisons, three assertion phases, and three exact-root cleanups."
+    profiling_gap: "Exact per-phase duration output was not durably retained after tool-result truncation, so required command 5 could not pass and must be freshly executed under this packet."
+    oracle_gap: "Required command 6 failed before proving the base condition because a regex did not locate the named FIX-03 Vitest block. No candidate was created and the failed command was not retried."
+    cleanup_result: "The two validated timeout-interrupted roots were moved recoverably to C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c. The quarantine is retained read-only recovery evidence and is not a FIX-05 cleanup target."
+    automated_status: "BLOCKED"
+    merge_authorized: false
+  immutability_rule: "Every original through FIX-04 packet, candidate, handoff, and commit remains immutable historical evidence. FIX-05 preserves FIX-02 Nutrition bytes and FIX-03 production isolation semantics and never amends, replaces, retries, or retroactively relabels an earlier result."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "25bbd0075f152a389aa24a029429c26f68e85cf9"
+  target_branch: "codex/personal-local-animation-01-fix-05"
+  worktree_required: true
+  sequential_after:
+    - "PERSONAL-LOCAL-ANIMATION-01-FIX-04 BLOCKED handoff commit 25bbd0075f152a389aa24a029429c26f68e85cf9"
+  producer_start_rule:
+    start_commit: "The committed PERSONAL-LOCAL-ANIMATION-01-FIX-05 coordinator packet HEAD supplied to the producer."
+    required_parent: "The producer start commit's first parent must be exactly 25bbd0075f152a389aa24a029429c26f68e85cf9."
+    required_coordinator_delta:
+      - "git diff --name-only 25bbd0075f152a389aa24a029429c26f68e85cf9..HEAD must print only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-05.yaml before producer work."
+      - "The producer must not amend, replace, delete, restore over, or add to any earlier packet, candidate, handoff, or coordinator commit."
+    non_empty_candidate_rule: "Create exactly one non-empty immutable FIX-05 candidate commit whose first parent is the producer start commit and whose changed paths are a subset of authority.candidate_paths. Empty, verification-only, documentation-only, evidence-only, timeout-only, cleanup-only, or quarantine-only candidates cannot pass."
+    deterministic_fix_rule: "The candidate must use a deterministic parser or explicit balanced block locator, or a named exported helper contract, instead of a regex-only source oracle; it must make the default-suite regression contention-safe while retaining complete separately executed end-to-end benchmark coverage and every FIX-03 output-isolation assertion."
+    durable_evidence_rule: "Commands 5 and 6 must capture their complete stdout, stderr, exit status, exact invocation, phase records, and oracle result in a unique canonical producer-owned OS-temporary evidence root before candidate creation. Hash and size every capture, write a manifest, make the completed capture read-only, retain it unchanged through handoff creation, and copy the exact metrics and hashes into the handoff. Tool-window or conversational output alone is not evidence."
+    handoff_commit_rule: "After all required commands pass against the immutable candidate, create one direct-child commit containing only docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml. Never amend or replace the candidate and never place the handoff commit's own SHA in the handoff."
+    failed_candidate_rule: "If a required command or iteration fails after candidate creation, do not retry it, amend or replace the candidate, clean or hide its output, or continue. Preserve exact failure evidence and record FAIL in a handoff-only direct-child commit."
+    blocked_rule: "If profiling or failing-before proof remains incomplete, the oracle cannot locate its target deterministically, or the proved correction requires an unlisted path or weakened gate, stop BLOCKED before candidate creation and write only the authorized handoff."
+    review_range_rule: "For PASS or post-candidate FAIL, the FIX-05 candidate range is producer_start_commit..candidate_commit and the handoff range is candidate_commit..handoff_commit. For pre-candidate BLOCKED, the sole allowed range is producer_start_commit..blocked_handoff_commit and contains only the declared handoff path."
+
+authority:
+  allowed_paths:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "scripts/animation-pilot-evidence.test-support.mjs"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml"
+  candidate_paths:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "scripts/animation-pilot-evidence.test-support.mjs"
+  conditionally_allowed_candidate_paths:
+    - path: "scripts/animation-pilot-benchmark.mjs"
+      condition: "May change only to expose or consume the smallest named deterministic output-contract seam needed by contention-safe tests. FIX-03 ownership, containment, exclusive-write, cleanup, committed-evidence, workload, candidate, score, selection, timing, network, disposal, leak, and report-byte semantics must remain unchanged."
+    - path: "scripts/animation-pilot-evidence.test.mjs"
+      condition: "May change only to replace the three-real-workload default regression with contention-safe deterministic contract coverage, add or consume an explicit named helper contract, and retain or strengthen every FIX-03 assertion."
+    - path: "scripts/performance-report.mjs"
+      condition: "May change only if the fresh durable profile proves this file owns part of the contention defect. Any change must preserve FIX-03 ordinary-build read-only treatment of docs/ai/evidence and every performance budget and consistency check."
+    - path: "scripts/animation-pilot-evidence.test-support.mjs"
+      condition: "Optional. May be created only when a colocated test-only fixture, deterministic parser/locator, or standalone end-to-end harness is necessary. It must carry the repository license header, be used only by the evidence test or exact required checks, contain no product or production CLI behavior, and must not replace or reduce the separately executed real workload."
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "docs/ai/evidence/**"
+    - "docs/ai/packets/**"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-04-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/adr/**"
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "tests/**"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pack-v1.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/build-animation-pack-v1.mjs"
+    - "scripts/personal-local-animation-evidence.mjs"
+    - "scripts/personal-local-animation-evidence.test.mjs"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - ".gitignore"
+    - ".github/**"
+    - "LICENSE"
+    - "THIRD_PARTY_NOTICES.md"
+  quarantine_policy:
+    path: "C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c"
+    authority: "Read-only recovery evidence only. FIX-05 may validate its canonical path, inventory, attributes, and recorded hashes. It may not write, rename, move, recycle, delete, restore, chmod, retimestamp, traverse unrelated siblings, or use the quarantine as a test or profile output root."
+    expected_receipts:
+      - "preserved-temp-root"
+      - "preserved-external-invocation-root"
+  profiling_capture_policy: "Commands 5 and 6 may create one unique canonical strict-child directory under the OS temporary directory for durable text/JSON evidence only. Use exact paths without glob or prefix cleanup; record canonical path, filesystem identity, file list, byte sizes, SHA-256 hashes, and read-only state in the handoff. Retain this evidence unchanged; it is not a product artifact, candidate path, benchmark output root, or cleanup target."
+  invocation_output_policy: "Candidate tests and separate end-to-end checks may create only invocation-owned canonical strict-child roots under validated temporary/generated boundaries. Ownership must last through the final read and exact-root finally cleanup must preserve foreign siblings."
+  external_reads_allowed: "Read-only access is limited to the exact FIX-04 quarantine, normal installed dependencies/fixtures, and exact producer-owned capture/invocation roots. No network or unrelated external filesystem scan is authorized."
+  external_writes_allowed: "Only the exact durable profiling capture and newly minted producer-owned invocation roots described above are authorized. The FIX-04 quarantine and every historical evidence path are read-only."
+  dependency_changes_allowed: false
+  package_or_lockfile_changes_allowed: false
+  configuration_changes_allowed: false
+  global_test_setup_or_runner_changes_allowed: false
+  contract_or_schema_changes_allowed: false
+  database_or_migration_changes_allowed: false
+  backup_format_or_payload_changes_allowed: false
+  catalog_id_or_mapping_changes_allowed: false
+  release_pack_contract_or_validator_changes_allowed: false
+  release_pack_storage_changes_allowed: false
+  personal_local_contract_or_storage_changes_allowed: false
+  service_worker_or_pwa_policy_changes_allowed: false
+  nutrition_changes_allowed: false
+  timeout_sleep_retry_skip_assertion_or_parallelism_changes_allowed: false
+  benchmark_workload_score_selection_or_network_policy_changes_allowed: false
+  tracked_evidence_delete_untrack_ignore_rewrite_or_restore_allowed: false
+  hidden_dirty_state_cleanup_allowed: false
+  broad_filesystem_actions_allowed: false
+  generated_binary_assets_allowed: false
+  network_policy: "No new network read or write. Tests, benchmarks, builds, profiling, and verification use installed dependencies and deterministic local fixtures only; renderer runtime remote-request attempts remain exactly zero."
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-01.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-02.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-03.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-04.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-04-handoff.yaml"
+    - "PERSONAL-LOCAL-ANIMATION-01-FIX-03 candidate diff 42babf7d4d7a67481c34160d38e0df841378cc00..0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+    - "FIX-04 exact failed command 5 evidence and exact failed command 6 evidence recorded in the committed BLOCKED handoff"
+    - "C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c read-only recovery inventory"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-03.yaml"
+    - "docs/ai/reviews/ANIMATION-PILOT-01-REV-02-FIX-03-handoff.yaml"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+    - "scripts/animation-pilot-assets.mjs"
+    - "scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "apps/web/src/features/nutrition/NutritionPage.tsx"
+    - "apps/web/src/features/nutrition/NutritionPage.test.tsx"
+    - "packages/backup/src/backup.test.ts"
+    - "apps/web/src/App.test.tsx"
+    - "apps/web/src/features/workout/WorkoutPage.test.tsx"
+    - "apps/web/src/pwa/install.test.ts"
+    - "package.json"
+    - "vite.config.ts"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/SKILL.md only if scripts/animation-pilot-evidence.test-support.mjs is created"
+    - "C:/Users/Q/.agents/skills/license-header-adder/resources/HEADER_TEMPLATE.txt only if scripts/animation-pilot-evidence.test-support.mjs is created"
+  accepted_adrs:
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+  locked_versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+    renderer: "three@0.185.1"
+    release_pack_storage_layout: 1
+    personal_local_animation_schema: 1
+    personal_local_storage_layout: 1
+  preserved_objects:
+    nutrition_page_source: "a5f7d17f82007150ef7ce7ff0c322532cf645344"
+    nutrition_page_test: "6a89aed64ed0802b0134fc8e8d14a79439e55b86"
+    renderer_benchmark_evidence: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+    performance_report_evidence: "5e4000acec0c750d8f98f70806670d16a5b7424c"
+  preserved_invariants:
+    - "Gym Local remains local-first, single-profile, account-free, and usable offline."
+    - "Nutrition remains Vietnamese-only; FIX-02's memoized boundaries and additive render-work regression remain byte-identical; formulas, providers, packs, snapshots, persistence, and user-visible behavior do not change."
+    - "Personal-local imports remain unreviewed device-only material in isolated OPFS, absent from backup and transfer, with zero egress and no distribution eligibility."
+    - "Release animation source, license, provenance, checksum, deterministic-build, exact-variant, storage, renderer, and review gates remain strict."
+    - "FIX-03 production isolation remains exact: test writes require validated invocation ownership, ordinary build reporting never mutates historical evidence, and only explicit CLI committed regeneration is allowed."
+    - "The real benchmark remains two releases, 12 variants, ten cycles, 240 parsed/mounted assets per candidate, 130 operation-trace entries per candidate, zero network attempts, operation-derived cleanup/leak checks, scores 3981390/2929347/3934825, and three-direct selection."
+    - "No personal-local or release animation byte enters Git, public assets, content, default build inputs, service-worker precache, CacheStorage, backup, export, upload, sync, or telemetry."
+    - "Never mix performance history or PR values between equipment variants; stable IDs, workout history, routines, sessions, custom exercises, nutrition history, pantry, and saved plans remain unchanged."
+    - "Only packages/storage owns database and OPFS access; modules interact only through public @gym entry points."
+    - "A PWA update is never activated during an active workout."
+
+outcome:
+  objective: "Resolve only the FIX-03 default-suite contention timeout and the FIX-04 coordination defects by durably profiling before candidate creation, using a deterministic non-regex oracle, and separating fast default-suite contract coverage from complete separately executed end-to-end renderer benchmarking without weakening production isolation or release gates."
+  user_visible_result: "None. Verification becomes repeatable at unchanged default parallelism and timeouts; product, nutrition, animation, storage, backup, catalog, workout, and PWA behavior remain unchanged."
+  deliverables:
+    - "A durable pre-candidate profile record with complete retained stdout/stderr, exact phase counts and durations, exit status, file sizes, SHA-256 hashes, manifest, canonical path, and read-only state."
+    - "A deterministic failing-before oracle using a parser, balanced explicit block locator, or named exported helper contract; regex-only matching is forbidden."
+    - "A non-empty immutable candidate limited to the minimal FIX-03 script set and, only if justified, one colocated test-support fixture."
+    - "Fast deterministic default-suite contract tests covering every FIX-03 ownership, containment, exclusive-write, byte, mtime, score, selection, diagnostic, cleanup, sentinel, Git-cleanliness, and failure-path assertion without repeated complete renderer workloads."
+    - "Two fresh separate end-to-end executions of the unchanged real renderer benchmark through invocation-owned roots, with exact report, workload, score, selection, network, disposal, leak, and cleanup assertions."
+    - "Failing-before proof against 0a2aab39/25bbd007-equivalent behavior and passing-after proof against the candidate, using a deterministic work/contract oracle rather than wall-clock timing."
+    - "Repeated focused default-worker, default-parallel three-file, full default-suite, isolated-build, Nutrition, personal-local, and three uninterrupted full pnpm run verify passes with immediate clean-state and historical-evidence assertions after every iteration."
+    - "One immutable candidate followed by one handoff-only direct-child commit with all 36 exact automated command records."
+  non_goals:
+    - "No retry of either failed FIX-04 command and no use of the FIX-04 BLOCKED handoff as passing profile or oracle evidence."
+    - "No timeout, testTimeout, hookTimeout, performance-budget, or worker-budget increase."
+    - "No sleep, polling delay, retry, rerun-on-failure, skip, only, todo, swallowed error, assertion removal, assertion weakening, fake pass, or wall-clock-only regression oracle."
+    - "No reduced worker count, disabled file parallelism, suite serialization, changed pool, filtered full suite, split pnpm run verify, or global Vitest/Vite/package/configuration change."
+    - "No deletion, untracking, ignore rule, rewrite, regeneration commit, normalization, restoration, or timestamp touch for tracked historical evidence."
+    - "No write, move, delete, restore, retimestamp, or reuse of the FIX-04 quarantine."
+    - "No broad, parent, prefix, wildcard, or glob filesystem action; no git clean, restore, checkout, reset, or hidden cleanup."
+    - "No reduced, stubbed, or mocked end-to-end benchmark workload; deterministic fixture data may test output plumbing only and never satisfy end-to-end coverage."
+    - "No product/runtime, NutritionPage, contract, schema, storage, database, backup, catalog, route, PWA, dependency, lockfile, content, asset, source, license, provenance, or governance change."
+    - "No optional human, cold, owner, independent, manual, named-reviewer, VoiceOver, visual, legal, biomechanics, or physical-device review is required or may substitute for automated evidence."
+
+diagnostic_requirements:
+  durable_runtime_profile:
+    - "Treat the committed FIX-03 timeout and FIX-04 work counts as authoritative history, but execute one fresh authorized profile because FIX-04 did not retain complete phase evidence."
+    - "Before candidate creation, profile isolated and repository-default parallel contention by named phase: each reproducePilot build pair, each renderer candidate, each complete runRendererBenchmark invocation, report write/read/compare, assertion phase, injected-failure branch, ownership checks, and finally cleanup."
+    - "Capture complete structured output directly to the durable profiling root while the command runs. Record CPU time where available, wall time as supporting context only, exact work counts, exit status, and root cleanup observations. Conversation or terminal scrollback is not sufficient."
+    - "Remove temporary instrumentation before candidate creation, but retain the immutable capture root and manifest. A cause is proved only when deterministic repeated work or blocking behavior explains contention exposure and is represented by a non-timing regression."
+  oracle_contract:
+    - "The failing-before command must not use a regular expression as its block-selection or correctness oracle."
+    - "Use a deterministic JavaScript parser, an explicit unique test-name locator plus balanced token/string/comment-aware block traversal, or a named exported helper contract. The locator must reject zero or multiple targets and report exact source offsets or helper identity."
+    - "The base-side oracle must prove that 0a2aab39/25bbd007-equivalent default regression behavior performs three complete renderer workloads or violates the deterministic contract-work bound. Record machine-readable expected-fail output in the durable capture before candidate creation."
+    - "The candidate-side oracle must prove the fast default regression satisfies the deterministic work bound and the separate end-to-end commands still run the complete production workload."
+  coverage_split:
+    - "Default-suite tests execute all output-ownership and cleanup assertions deterministically without repeating the complete renderer workload."
+    - "The complete real workload runs separately through production code, real candidates, real generated pilot releases/assets, and fresh invocation-owned destinations."
+    - "A deterministic fixture may supply exact already-validated report bytes only to output-plumbing contract tests. It cannot satisfy or reduce workload, score, selection, network, disposal, leak, or committed-byte checks."
+    - "Map every FIX-03 assertion one-for-one to default contract coverage or separate end-to-end coverage; no assertion may disappear or weaken."
+
+preflight:
+  report_before_editing:
+    - "model_and_no_subagents"
+    - "branch_parent_start_commit_cleanliness_and_one_file_coordinator_delta"
+    - "all_original_through_fix_04_artifacts_are_immutable_unmerged_uncheckpointed_and_not_recorded_as_passing"
+    - "allowed_candidate_paths_optional_test_support_post_candidate_path_and_all_unlisted_paths_forbidden"
+    - "required_reads_locked_versions_preserved_objects_module_boundaries_and_product_invariants"
+    - "exact_fix_03_production_result_timeout_and_fix_04_profile_retention_regex_oracle_blocker"
+    - "read_only_fix_04_quarantine_inventory_and_no_mutation_plan"
+    - "durable_profile_capture_deterministic_locator_failing_before_passing_after_assertion_map_and_separate_end_to_end_plan"
+    - "default_parallel_full_suite_three_full_verify_and_after_every_iteration_clean_state_plan"
+    - "applicable_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_producer_start_commit: true
+    producer_start_parent_is_fix_04_blocked_handoff_commit: true
+    only_coordinator_delta_is_fix_05_packet: true
+    instructions_read: true
+    exact_model_available: true
+    subagents_unused: true
+    required_inputs_present: true
+    prior_lineage_resolves: true
+    fix_04_quarantine_readable_and_unmodified: true
+    no_required_network_or_human_input: true
+
+finding_scope:
+  - id: "PLA01-FIX-05-F01"
+    triggered_stop_gate: "PLA01-FIX-04-STOP-10"
+    requirement: "Capture complete durable pre-candidate phase evidence so tool-output truncation cannot erase required profiling facts."
+  - id: "PLA01-FIX-05-F02"
+    triggered_stop_gate: "PLA01-FIX-04-STOP-10"
+    requirement: "Replace the brittle regex source-work oracle with a deterministic parser/explicit block locator or named exported helper contract that proves failing-before and passing-after work bounds."
+  - id: "PLA01-FIX-05-F03"
+    triggered_stop_gates:
+      - "PLA01-FIX-03-STOP-09"
+      - "PLA01-FIX-03-STOP-10"
+    requirement: "Make the default-suite isolation regression contention-safe without timeout padding, reduced parallelism, workload changes, or weakened assertions while preserving separate complete end-to-end coverage."
+  - id: "PLA01-FIX-05-F04"
+    triggered_stop_gate: "PLA01-FIX-04-STOP-10"
+    requirement: "Preserve FIX-02 Nutrition, FIX-03 production isolation, read-only quarantine recovery evidence, historical evidence, and every personal-local/product invariant through repeated default-parallel and full verification."
+
+acceptance_tests:
+  - id: "PLA01-FIX-05-AC-01"
+    requirement: "Lineage is exact: FIX-04 BLOCKED handoff 25bbd007 -> packet-only FIX-05 coordinator -> one non-empty immutable FIX-05 candidate -> one handoff-only direct child. Every prior artifact remains unchanged."
+    evidence: "Git parent, object, tree, range, name-only, diff, tag, ledger, and clean-worktree assertions."
+  - id: "PLA01-FIX-05-AC-02"
+    requirement: "A fresh isolated/default-parallel phase profile is durably captured before candidate creation with complete output, exact work counts and durations, exit status, manifest, sizes, hashes, canonical path, and read-only retention."
+    evidence: "External capture manifest plus exact handoff transcription and hash verification before and after candidate verification."
+  - id: "PLA01-FIX-05-AC-03"
+    requirement: "Failing-before and passing-after work-bound proof uses a deterministic parser/explicit balanced locator or named exported helper contract; no regex-only block matching or elapsed-time oracle is present."
+    evidence: "Locator/helper identity, unique-target proof, exact offsets or exported contract, machine-readable base failure, candidate pass, and source audit."
+  - id: "PLA01-FIX-05-AC-04"
+    requirement: "The candidate is non-empty, changes only the authorized minimal FIX-03 script set and optional justified test-support fixture, and makes default-suite contract verification contention-safe at unchanged timeout and parallelism defaults."
+    evidence: "Immutable candidate diff, named regression, default-worker stress, and static policy audit."
+  - id: "PLA01-FIX-05-AC-05"
+    requirement: "Default tests retain or strengthen every FIX-03 ownership, containment, exclusive-write, exact-byte, mtime, score, selection, diagnostic, cleanup, sentinel, Git, and failure-path assertion without executing repeated complete renderer workloads."
+    evidence: "One-for-one assertion map, focused output, deterministic work counter, success/failure fixture evidence, and source audit."
+  - id: "PLA01-FIX-05-AC-06"
+    requirement: "Two separate fresh end-to-end commands each run the unchanged complete renderer workload and prove exact committed bytes, two releases, 12 variants, ten cycles, 240 parsed/mounted assets and 130 trace entries per candidate, scores 3981390/2929347/3934825, three-direct selection, zero network attempts, zero owned-resource leaks, and exact-root cleanup."
+    evidence: "Two independent production-workload records with fresh roots and no output reuse or retry."
+  - id: "PLA01-FIX-05-AC-07"
+    requirement: "The FIX-04 quarantine remains byte/metadata-identical and read-only throughout execution; no quarantine child is restored, removed, renamed, retimestamped, or used as output."
+    evidence: "Canonical inventory and hash comparison at preflight, after each repeated matrix, and final handoff."
+  - id: "PLA01-FIX-05-AC-08"
+    requirement: "Twenty focused default-worker contract iterations, ten repository-default parallel three-file iterations, five complete default pnpm run test iterations, and three isolated builds pass without retry; every iteration immediately asserts candidate, evidence, quarantine, owned-root, and Git state."
+    evidence: "Per-iteration exit, topology, SHA, evidence-object, quarantine-inventory, root-inventory, and status records."
+  - id: "PLA01-FIX-05-AC-09"
+    requirement: "FIX-02 Nutrition source/test objects remain exact and pass focused, twenty isolated, and ten four-worker web-scope iterations; the original 11-file personal-local suite also passes."
+    evidence: "Object IDs a5f7d17f/6a89aed6, exact counts/topology, Vietnamese-only behavior audit, and immediate clean-state assertions."
+  - id: "PLA01-FIX-05-AC-10"
+    requirement: "Three consecutive uninterrupted pnpm run verify executions pass without retry at repository-default pool, workers, file parallelism, and unchanged timeouts, with immediate clean-state assertions before the next iteration."
+    evidence: "Three complete verify records covering architecture, lint, typecheck, content, full test, production build, PWA generation, performance budgets, and post-iteration state."
+  - id: "PLA01-FIX-05-AC-11"
+    requirement: "No retry, sleep, timeout/budget padding, skipped/weakened test, reduced parallelism, global configuration change, benchmark semantic change, evidence deletion/ignore/untracking/restoration, hidden cleanup, broad filesystem action, or quarantine mutation exists."
+    evidence: "Static diff/source/config audit, command topology, assertion map, evidence objects, quarantine audit, and root log."
+  - id: "PLA01-FIX-05-AC-12"
+    requirement: "All personal-local and product invariants remain passing, including exact case-sensitive variant identity, release trust gates, zero egress/network, backup/build/precache exclusion, personal-data immutability, offline behavior, module ownership, Vietnamese-only nutrition, and active-workout PWA update deferral."
+    evidence: "Focused suite, evidence audits, protected-object comparison, locked-version audit, and three full verifies."
+  - id: "PLA01-FIX-05-AC-13"
+    requirement: "The schema-valid handoff records all 36 required commands exactly once, durable profiling evidence, oracle contract, base/candidate proof, assertion map, separate end-to-end evidence, immutable non-empty candidate, empty optional_manual_evidence, automated PASS, and merge_authorized true only when every command passed and no stop gate is active."
+    evidence: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml."
+
+required_checks:
+  automated_commands:
+    - "git status --short"
+    - "assert producer start commit parent is 25bbd0075f152a389aa24a029429c26f68e85cf9 and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-05.yaml"
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis"
+    - "read-only validate the exact canonical FIX-04 quarantine C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c, both named recovery receipts, bounded inventories, attributes, and recorded marker/sentinel hashes; record a manifest and prove no quarantine path is written, moved, deleted, restored, retimestamped, or used as output"
+    - "profile the current FIX-03 regression on 0a2aab39/25bbd007-equivalent bytes under isolated and repository-default parallel contention by named phase; stream complete structured stdout/stderr and exit status directly into a unique canonical producer-owned OS-temporary durable capture before candidate creation; record reproducePilot, renderer-candidate, complete-workload, report-I/O, assertion, failure-branch, ownership, and cleanup counts/durations; remove instrumentation and temporary invocation roots, then record capture path, identity, size, SHA-256, and read-only state without deleting the capture"
+    - "establish failing-before evidence without rewriting history by using a deterministic JavaScript parser, a unique explicit test-name locator with balanced token/string/comment-aware block traversal, or a named exported helper contract; reject zero or multiple targets; do not use regex as the block-selection or correctness oracle; prove 0a2aab39/25bbd007-equivalent behavior performs three complete renderer workloads or violates the deterministic contract-work bound; write machine-readable output into the durable capture, finalize and hash its manifest, and forbid candidate creation unless the capture is complete and retained"
+    - "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern \"keeps invocation-owned evidence output deterministic and contention-safe\" --pool=threads --fileParallelism"
+    - "run 20 fresh iterations of the named contention-safe evidence contract test with repository-default workers and file parallelism; after every iteration assert candidate SHA unchanged, all tracked ANIMATION-PILOT-01-REV-02 evidence blobs equal HEAD, Git is clean, the FIX-04 quarantine manifest is unchanged, the durable profile capture hashes are unchanged, and no new producer-owned invocation root/staging path/owner marker/lock remains; stop on first failure without retry"
+    - "execute the complete real renderer benchmark end to end once through a fresh validated invocation-owned nontracked evidence root; assert exact committed report bytes, two releases, 12 variants, ten cycles, 240 parsed/mounted assets and 130 trace entries per candidate, scores 3981390/2929347/3934825, three-direct selection, zero network attempts, operation-derived zero leaks, exact-root cleanup, candidate/evidence/quarantine/profile identity, and clean Git state"
+    - "repeat the complete real end-to-end invocation-owned renderer benchmark from a fresh root; assert the same report bytes, workload, scores, selection, network, leaks, cleanup, and all clean-state/historical-evidence/quarantine/profile conditions; do not reuse output or retry a failure"
+    - "run explicit committed-evidence benchmark rerun 1; assert renderer-benchmark.json remains byte-identical to HEAD, expected scores and three-direct selection remain exact, Git is clean, quarantine/profile manifests are unchanged, and no producer-owned invocation root remains"
+    - "run explicit committed-evidence benchmark rerun 2 under the same assertions; do not reuse output or retry a failure"
+    - "run 10 fresh iterations of scripts/animation-pilot-evidence.test.mjs, scripts/animation-pilot-assets.test.mjs, and scripts/animation-pack-v1.test.mjs with repository-default pool, workers, and file parallelism; after every iteration assert candidate, tracked evidence, quarantine, durable profile, owned-root, and Git state; stop on first failure without retry"
+    - "run 3 fresh pnpm run build iterations; after every iteration assert candidate, tracked evidence, quarantine, durable profile, owned-root, and Git state; stop on first failure without retry"
+    - "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose; immediately assert candidate/evidence/quarantine/profile identity, clean Git state, and no producer-owned invocation root remains"
+    - "run 20 fresh iterations of pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; after every iteration assert candidate/evidence/quarantine/profile identity, clean Git state, and no producer-owned root remains; stop on first failure without retry"
+    - "run 10 fresh iterations of pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; after every iteration assert candidate/evidence/quarantine/profile identity, clean Git state, and no producer-owned root remains; stop on first failure without retry"
+    - "run 5 fresh iterations of pnpm run test with repository-default pool, workers, file parallelism, and unchanged timeouts; after every iteration assert candidate/evidence/quarantine/profile identity, clean Git state, and no producer-owned root remains; stop on first failure without retry"
+    - "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs; immediately assert candidate/evidence/quarantine/profile identity, clean Git state, and no producer-owned root remains"
+    - "run scoped ESLint over FIX-02 Nutrition paths, all candidate paths that exist, animation-pilot-evidence.mjs, personal-local-animation-evidence.mjs, and personal-local-animation-evidence.test.mjs with --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run verify:affected"
+    - "run 3 consecutive uninterrupted pnpm run verify iterations with repository-default pool, workers, file parallelism, and unchanged timeouts; after every iteration and before the next assert candidate SHA unchanged, every tracked ANIMATION-PILOT-01-REV-02 evidence blob equals HEAD, Git is clean, the FIX-04 quarantine and durable profile manifests are unchanged, and no producer-owned invocation root/staging path/owner marker/lock remains; stop on first failure without retry or cleanup"
+    - "pnpm animation:pilot:evidence:validate; immediately assert tracked evidence, quarantine, durable profile, candidate, owned-root, and Git state"
+    - "node scripts/personal-local-animation-evidence.mjs validate"
+    - "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "assert candidate is non-empty and changed paths are a subset of scripts/animation-pilot-benchmark.mjs, scripts/animation-pilot-evidence.test.mjs, scripts/performance-report.mjs, and scripts/animation-pilot-evidence.test-support.mjs; assert the support file exists only if justified; assert NutritionPage objects a5f7d17f82007150ef7ce7ff0c322532cf645344 and 6a89aed64ed0802b0134fc8e8d14a79439e55b86; assert every other path outside the immutable FIX-05 coordinator delta is byte-identical to 25bbd0075f152a389aa24a029429c26f68e85cf9"
+    - "assert no candidate or command increases a timeout or budget, adds retry/sleep/polling-delay/skip/only/todo, removes or weakens an assertion, swallows errors, reduces workers or file parallelism, serializes/filters/splits a suite, changes global runner/configuration, deletes/untracks/ignores/rewrites/restores evidence, mutates the FIX-04 quarantine, relies on pre-existing benchmark output, performs hidden or broad filesystem cleanup, or changes benchmark workload, score, selection, timing, network, disposal, or leak semantics"
+    - "audit the final locator/helper and durable evidence contract: no regex-only block oracle exists; target selection is deterministic and unique; failing-before and passing-after outputs are machine-readable; complete pre-candidate profile/oracle captures and hashes are retained unchanged and transcribed into the handoff"
+    - "audit the final evidence-output design and assertion map: deterministic default-suite contract tests cover every FIX-03 ownership/containment/exclusive-write/bytes/mtime/score/selection/diagnostic/cleanup/sentinel/Git/failure assertion without repeated complete workloads; separate end-to-end commands use production workload and fresh invocation-owned output; ordinary build reporting is read-only for docs/ai/evidence; only explicit CLI committed regeneration is allowed; no gate is lost"
+    - "audit final filesystem state: the FIX-04 quarantine is read-only and unchanged; durable profile evidence is retained read-only with matching manifest; candidate-created roots require canonical strict-child identity plus owner token/marker and are absent after last read; no unrecorded staging path, owner marker, lock, quarantine, or broad cleanup occurred"
+    - "assert app 0.7.0, database 5, backup 5, catalog 3, animation-pack schema 1, animation-player protocol 1, animation catalog 1, renderer three@0.185.1, release storage layout 1, and personal-local schema/layout 1 remain locked; assert all docs/ai/evidence blobs equal HEAD; assert benchmark workload/scores/selection/network/leaks are unchanged; assert original personal-local, nutrition, release, backup, exact-variant, zero-egress, offline, module-boundary, personal-data, and active-workout PWA invariants remain passing"
+    - "parse every YAML file under docs/ai and validate the FIX-05 handoff required fields, all 36 exact command records, candidate SHA, deterministic_fix mode, durable profile and oracle evidence, base/candidate regression, assertion map, separate end-to-end evidence, quarantine immutability, optional_manual_evidence, status, and merge_authorized consistency"
+    - "assert candidate_commit remains unchanged before and after all post-candidate commands, FIX-04 quarantine and durable profile evidence remain exact, no producer-owned invocation root/staging path/owner marker/lock remains, every tracked evidence working-tree blob equals HEAD, and git status --porcelain is empty without hidden cleanup or restoration"
+  execution_rule: "Run commands 1 through 6 before implementation. Commands 5 and 6 pass only when complete evidence is durably captured and hashed outside the worktree before candidate creation; they are fresh FIX-05 commands, not retries of FIX-04. Create one non-empty immutable candidate, then run commands 7 through 36 in order against that exact candidate. Do not retry any failed command or iteration. Every repeated iteration must perform its stated candidate, tracked-evidence, quarantine, durable-profile, Git, and owned-root assertions before the next iteration. Any failure, not_run result, missing durable record, parser/locator ambiguity, regex-only oracle, absent base/candidate proof, missing assertion mapping or end-to-end run, timeout/parallelism/workload weakening, quarantine/evidence mutation, leaked root, candidate mutation, dirty state, unexpected path, invariant change, or schema-invalid handoff prevents PASS."
+  evidence_paths:
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/PERSONAL-LOCAL-ANIMATION-01/automated-report.json"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml"
+    - "The exact external durable profiling capture and manifest recorded in the FIX-05 handoff"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "PLA01-FIX-05-STOP-01"
+    condition: "gpt-5.6-sol is unavailable, a subagent would be required, the worktree is dirty, branch/parent/coordinator delta is wrong, required reads are incomplete, prior lineage cannot be resolved, the quarantine cannot be inspected read-only, or a locked version differs."
+    action: "Stop before implementation and write a BLOCKED handoff only if it can be the sole authorized metadata change. Do not substitute a model, mutate the quarantine, clean user state, amend, rebase, or widen scope."
+  - id: "PLA01-FIX-05-STOP-02"
+    condition: "The FIX-04 quarantine differs from its committed recovery record, is mutated or used as output, or validation would require a write, move, restore, delete, parent scan, wildcard, or unrelated filesystem access."
+    action: "Stop BLOCKED without changing the quarantine. Record the exact mismatch and do not perform cleanup or recovery."
+  - id: "PLA01-FIX-05-STOP-03"
+    condition: "The fresh profile does not complete, its full output is not durably captured before candidate creation, its manifest/hash/read-only state is incomplete, exact phase evidence is missing, or a producer proposes to rerun a failed profile."
+    action: "Stop BLOCKED before candidate creation. Preserve the exact capture and failure; do not retry, summarize from memory, delete evidence, or proceed from truncated tool output."
+  - id: "PLA01-FIX-05-STOP-04"
+    condition: "The failing-before oracle uses regex-only block matching, cannot identify exactly one target with deterministic parser/locator/helper evidence, does not prove the base work bound, or fails for an oracle/bootstrap reason."
+    action: "Stop BLOCKED before candidate creation. Preserve the oracle output; do not retry, fall back to regex, or create a speculative candidate."
+  - id: "PLA01-FIX-05-STOP-05"
+    condition: "A deterministic correction requires any path outside the four candidate paths, including package scripts, global test setup, runner/configuration, product code, NutritionPage, historical evidence, or the FIX-04 quarantine."
+    action: "Stop BLOCKED and report the exact owning path and separate packet needed. Do not widen this fixer."
+  - id: "PLA01-FIX-05-STOP-06"
+    condition: "The proposed fix increases a timeout or budget; adds sleep, polling delay, retry, rerun, skip, only, todo, failure swallowing, or wall-clock-only proof; reduces workers/file parallelism; serializes, filters, or splits the suite; changes global configuration; or hides a failure with cleanup."
+    action: "Stop FAIL. The contention defect remains unresolved."
+  - id: "PLA01-FIX-05-STOP-07"
+    condition: "A deterministic fixture or contract test replaces, stubs, reduces, or mocks the separately required complete renderer workload; any FIX-03 assertion is removed or weakened; or a separate end-to-end command is missing or does not use production code and real candidates/assets."
+    action: "Stop FAIL. Default-suite speed cannot weaken behavioral or release-gate coverage."
+  - id: "PLA01-FIX-05-STOP-08"
+    condition: "FIX-03 production isolation regresses; benchmark workload, scores, selection, timing, network, disposal, leak, or report bytes change; a non-explicit path touches historical evidence; or the durable profiling capture changes after finalization."
+    action: "Stop FAIL and preserve exact evidence/root state. Do not restore, delete, ignore, normalize, or hide it."
+  - id: "PLA01-FIX-05-STOP-09"
+    condition: "FIX-02 Nutrition objects or semantics change, Vietnamese-only nutrition changes, or any personal-local/release contract, storage, media, Settings, backup, exact-variant, zero-egress, personal data, source/license/provenance, offline, build/precache, module-boundary, or active-workout PWA invariant changes."
+    action: "Stop FAIL, record the protected-object or behavioral difference, and do not authorize merge."
+  - id: "PLA01-FIX-05-STOP-10"
+    condition: "Any required command or iteration fails or is not run; a failure is retried; pnpm run verify is interrupted or split; an immediate clean-state assertion is omitted; an unexpected path changes; the candidate is empty or mutates; a producer-owned root leaks; optional evidence is invented; or the handoff is schema-invalid."
+    action: "Record FAIL or BLOCKED with merge_authorized false. Do not amend or replace the candidate, merge, tag, push, update the coordinator ledger, delete evidence, mutate the quarantine, or clean/restore failed-command state."
+
+handoff:
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml"
+  metadata_commit_rule: "For PASS or post-candidate FAIL, add and commit only the FIX-05 handoff as the immutable candidate's direct child. For pre-candidate BLOCKED, add and commit only the handoff as the producer start commit's direct child. Never amend or replace any prior artifact or the FIX-05 candidate, and never name the handoff's own metadata commit inside the handoff."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "fix_03_candidate_commit"
+    - "fix_04_handoff_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "candidate_mode"
+    - "branch"
+    - "changed_paths"
+    - "durable_runtime_profile_evidence"
+    - "deterministic_locator_or_helper_evidence"
+    - "base_candidate_regression_evidence"
+    - "contract_assertion_mapping"
+    - "separate_end_to_end_benchmark_evidence"
+    - "evidence_output_contract_and_fix_03_semantics"
+    - "fix_04_quarantine_immutability_evidence"
+    - "new_root_cleanup_and_iteration_cleanliness_evidence"
+    - "tracked_evidence_immutability_evidence"
+    - "benchmark_workload_score_selection_network_evidence"
+    - "nutrition_fix_preservation_evidence"
+    - "stress_build_and_full_verify_evidence"
+    - "personal_local_and_product_invariant_evidence"
+    - "finding_resolution"
+    - "acceptance_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "known_risks"
+    - "optional_evidence"
+    - "automated_verification"
+    - "review_target"
+  prohibited_fields:
+    - "handoff_commit"
+    - "metadata_commit"
+    - "self_sha"
+  candidate_mode_rule: "candidate_mode is exactly deterministic_fix for PASS. It requires a non-empty candidate, complete durable pre-candidate profile, deterministic non-regex oracle, base-failing/candidate-passing proof, complete assertion map, separate real end-to-end coverage, and diff limited to authority.candidate_paths. Pre-candidate BLOCKED uses candidate_commit null and candidate_mode blocked_before_candidate. Empty, verification_only, timeout_only, cleanup_only, and evidence_only candidates are forbidden."
+  disclosure_rule: "Retain the disclosure that personal-local imports are unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte."
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml#automated_verification"
+  schema:
+    schema_version: 1
+    packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-05"
+    candidate_commit: "40-character SHA or null only for pre-candidate BLOCKED"
+    status: "PASS|FAIL|BLOCKED"
+    checks:
+      - command: "exact required command"
+        result: "pass|fail|not_run"
+        evidence: "exact output or immutable artifact"
+    optional_manual_evidence: []
+    merge_authorized: false
+  authorization_rule: "Only PASS with all 36 required commands recorded exactly once as pass, candidate_mode deterministic_fix, a non-empty immutable candidate, complete durable pre-candidate profile, deterministic non-regex oracle, base-failing/candidate-passing proof, complete assertion mapping, two separate real end-to-end executions, unchanged quarantine/profile/historical evidence/Nutrition objects, all stress/build/three full-verify iterations passed without retry, and no active stop gate may set merge_authorized true. FAIL or BLOCKED always sets merge_authorized false."
+  optional_evidence_rule: "Cold, owner, independent, legal, visual, biomechanics, manual, named-reviewer, VoiceOver, and physical-device review are optional evidence only. They never complete, block, or authorize the candidate, and an unperformed optional check is never reported as passed."
+
+optional_evidence:
+  cold_review: "optional; no gate effect"
+  owner_review: "optional; no gate effect"
+  independent_review: "optional; no gate effect"
+  named_reviewers: "optional; no gate effect"
+  manual_review: "optional; no gate effect"
+  physical_device_review: "optional; no gate effect"
+  reporting_rule: "Keep optional_manual_evidence empty unless evidence was actually supplied. Never infer or claim PASS for an unperformed optional check."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS, all 36 exact automated command records are pass, candidate_mode is deterministic_fix, the candidate is non-empty, FIX-04 quarantine and durable profile evidence remain exact, every tracked evidence blob and preserved Nutrition object is exact, no stop gate is active, and automated_verification.merge_authorized == true"
+  target: "main"
+  method: "fast-forward"
+  squash_policy: "forbidden"
+  checkpoint_tag_after_merge: "checkpoint/personal-local-animation-01-fix-05-automated-pass"
+  automated_checkpoint_rule: "Only after the committed handoff is validated and main fast-forwards without changing candidate or handoff bytes, record the complete original-through-FIX-05 lineage and automated result in docs/ai/reviews/coordinator-ledger.yaml in a separate coordinator checkpoint commit, then create checkpoint/personal-local-animation-01-fix-05-automated-pass. Never create or reuse an earlier personal-local checkpoint tag for this lineage."
+  next_packet_rule: "No downstream packet may consume the personal-local API until checkpoint/personal-local-animation-01-fix-05-automated-pass exists. Any later WORKOUT-INTEGRATION packet must preserve exact variant identity, release-pack separation, zero egress, backup exclusion, and active-workout PWA update deferral."
+  producer_instruction: "Start from the packet-only FIX-05 coordinator commit, use gpt-5.6-sol with no subagents, keep the FIX-04 quarantine read-only, durably capture a fresh complete profile and deterministic non-regex failing-before proof before candidate creation, preserve FIX-02 Nutrition and FIX-03 production isolation, implement only the authorized minimal script set plus an optional justified colocated test-support fixture, create one non-empty immutable candidate, run all 36 commands in order without retry or hidden cleanup, then create only the handoff direct-child commit. Do not merge, tag, push, amend history, update the ledger, delete evidence, or mutate the quarantine."
+  current_coordinator_task_prohibitions:
+    - "Do not implement the contention-safe verification fix."
+    - "Do not write, move, delete, restore, retimestamp, or reuse the FIX-04 quarantine."
+    - "Do not create a FIX-05 candidate or handoff."
+    - "Do not amend or replace any prior packet, candidate, or handoff."
+    - "Do not rewrite, delete, untrack, ignore, or restore historical evidence."
+    - "Do not merge main."
+    - "Do not push."
+    - "Do not update docs/ai/reviews/coordinator-ledger.yaml."
+    - "Do not create any checkpoint tag."
