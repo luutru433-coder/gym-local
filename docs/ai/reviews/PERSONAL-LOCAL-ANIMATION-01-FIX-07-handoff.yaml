@@ -1,0 +1,348 @@
+schema_version: 3
+packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-07"
+status: "FAIL"
+producer_model: "gpt-5.6-sol"
+model_gate_evidence:
+  result: "pass"
+  requested_model: "gpt-5.6-sol"
+  used_model: "gpt-5.6-sol"
+  evidence: "The packet ran with the mandated model and no substitution."
+subagents_used: false
+
+base_commit: "c9b7d7ee5e81c1755904227af7ff86be727eebc9"
+fix_03_candidate_commit: "0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+fix_06_handoff_commit: "c9b7d7ee5e81c1755904227af7ff86be727eebc9"
+producer_start_commit: "b9c46004e582f44384409d6d057bb71a7531894b"
+candidate_parent_commit: "b9c46004e582f44384409d6d057bb71a7531894b"
+candidate_commit: "70b9c9643f320143cbcff65d09dc50a45bef900f"
+candidate_mode: "deterministic_fix"
+branch: "codex/personal-local-animation-01-fix-07"
+
+changed_paths:
+  candidate:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+  post_candidate_metadata:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-07-handoff.yaml"
+
+historical_status_preservation:
+  original_handoff: "automated_pass"
+  fix_01_handoff: "automated_fail"
+  fix_02_handoff: "automated_fail"
+  fix_03_handoff: "automated_fail"
+  fix_04_handoff: "BLOCKED"
+  fix_05_handoff: "BLOCKED"
+  fix_06_handoff: "BLOCKED"
+  result: "pass"
+  evidence: "No historical packet, candidate, handoff, capture, quarantine, commit, or recorded status was rewritten or relabeled."
+
+retained_external_raw_identity_evidence:
+  result: "pass"
+  fix_04_quarantine: "C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c"
+  quarantine_entries: 86
+  quarantine_files: 67
+  quarantine_directories: 19
+  sentinel_sha256: "4f658149ae825ce6347afbcf4e58665b376482c077a183b6eea180f4e3189298"
+  nested_owner_marker_sha256: "af302a48e857abe7e8f224e1a76ff2b69ddfcb33542efb5e434c59d617e1ebd3"
+  external_owner_marker_sha256: "3709db638c7621bd2a731fe1252d383e170e05c77a3e8af0bad89ee76164b587"
+  fix_05_capture: "C:/Users/Q/AppData/Local/Temp/gym-local-fix05-profile-5468bb5ab6c14c048f0b0851007853a3"
+  capture_entries: 6
+  capture_files: 6
+  mutation_observed: false
+  evidence: "Command 4 used only literal bounded reads, matched all declared raw sizes and hashes, compared before/after attributes and metadata, and observed no retained-root mutation."
+
+legacy_capture_decoder_evidence:
+  result: "pass"
+  decoded_targets:
+    - { name: "capture-manifest.json", raw_byte_size: 1152, raw_sha256: "f0ceff3ba4afc167b28ce1e17aa272a7bec3e4a68c0e8b1e53bf6253e5442e4f" }
+    - { name: "profile-command-failure.json", raw_byte_size: 679, raw_sha256: "5d85526b0df5922153381cdc54182eeb8006e2f0f3eb6084b864d3bd4ed4f03c" }
+    - { name: "quarantine-manifest.json", raw_byte_size: 33382, raw_sha256: "35f8b40df0650d440dcd4de7a38fdbf5c719260a270b78418ec6f4f62070d525" }
+  exact_trailer_hex: "60 6e"
+  negative_cases: 6
+  exact_inventory_comparison: true
+  scope: "Only the three declared raw identities were decoded after raw-first validation; exactly literal backtick+n was removed in memory before strict JSON.parse."
+  evidence: "Wrong identity, absent/different/extra trailer, invalid UTF-8, malformed JSON, and an undeclared target were rejected without trim, normalization, rewriting, or an ignore policy."
+
+new_capture_strict_json_evidence:
+  result: "pass"
+  capture_root: "C:/Users/Q/AppData/Local/Temp/gym-local-fix07-profile-37b65badbaf6406da051f801449654b9"
+  final_manifest_sha256: "0dca031ca0a8ae55afbd441913e57a508d28e387876142db13f2d722ab8b216f"
+  capture_entries: 10
+  strict_utf8: true
+  actual_lf: true
+  parse_reserialize_byte_identity: true
+  read_only: true
+  evidence: "Every new JSON/JSONL record was atomically written in the exact owned root, rejected the legacy trailer, round-tripped byte-identically through the stable serializer, and was revalidated after read-only finalization."
+
+bootstrap_evidence:
+  result: "pass"
+  workload_invocations: 0
+  helper_sha256: "460bd2bd96320a2291c44fdc1733ef0cbf58a7358bd98d35506ddfb8abef2f51"
+  bootstrap_summary_sha256: "110d174df087f271c3dea68df328188e186efd0ab7ba318feb2e523fa1b000af"
+  bootstrap_manifest_sha256: "9772d28404ef104a663d5c1cebddac62ca637c7dd835d9ab78a17e6377a6dba5"
+  evidence: "The external helper passed syntax and absolute import resolution, a balanced lexical unique locator, base parent/delta, Git-clean-after-flush, strict-child ownership, atomic strict JSON, and exact-root manifest checks without invoking reproducePilot or a renderer candidate."
+
+durable_runtime_profile_evidence:
+  result: "pass"
+  profile_summary_sha256: "34017944e392f80ec81c714e47debc4827051ed7e6b31c33409e1cbef0f2175d"
+  isolated:
+    duration_ms: 42151.793
+    workload_durations_ms: [35685.693, 3109.915, 3277.114]
+    reproduce_pilot_pairs: 3
+    renderer_candidates: 9
+    complete_workloads: 3
+    report_writes: 3
+    report_reads: 3
+    assertions: 25
+    failure_branches: 1
+    ownership_roots: 3
+    cleanups: 3
+  repository_default_contention:
+    duration_ms: 17343.998
+    workload_durations_ms: [3177.395, 6369.848, 5173.093]
+    reproduce_pilot_pairs: 3
+    renderer_candidates: 9
+    complete_workloads: 3
+    report_writes: 3
+    report_reads: 3
+    assertions: 26
+    failure_branches: 1
+    ownership_roots: 3
+    cleanups: 3
+    contention_exit_status: 0
+  deterministic_three_workload_base_bound: true
+  retry_performed: false
+  evidence: "Metrics were durably fsynced before final cleanliness assertions; Git was actually clean, exact roots were cleaned by owner proof, and the capture was finalized once without retry."
+
+deterministic_locator_or_helper_evidence:
+  result: "pass"
+  locator: "balanced lexical call locator"
+  target: "uses invocation-owned evidence output without mutating tracked evidence"
+  matches: 1
+  regex_only: false
+  helper_location: "external finalized FIX-07 capture"
+  evidence: "The helper never existed in the worktree and used an exact string plus balanced lexical scan to locate one base test call."
+
+base_candidate_regression_evidence:
+  result: "pass_before_later_gate"
+  base_complete_workloads_per_phase: 3
+  candidate_named_test_workloads: 0
+  command_7: "pass; 1 selected test passed in 1.62s"
+  command_8: "pass; 20 fresh selected-test iterations, each followed by candidate/evidence/capture/root/Git assertions"
+  evidence: "The candidate contract test uses the committed report with the real ownership and exclusive-write seam; the base profile proved three complete workloads per phase."
+
+contract_assertion_mapping:
+  result: "implemented_and_focused_verified_but_final_audit_not_run"
+  mappings:
+    ownership_and_containment: "withBenchmarkEvidenceOutputRoot plus invocation containment assertions"
+    exclusive_write: "a second write is required to fail with EEXIST"
+    bytes_and_mtime: "temporary bytes equal HEAD; tracked bytes and mtime remain unchanged"
+    score_and_selection: "all committed candidate scores and three-direct selection remain asserted"
+    diagnostics: "the production diagnostic emitter validates and emits three positive noncommitted diagnostics; no timing field is persisted"
+    cleanup_and_failure: "two success roots and the post-read injected-failure root are absent after callbacks"
+    sentinel_and_git: "the foreign sibling is byte-identical and Git status is empty"
+    forged_owner: "an unowned root is rejected"
+  evidence: "Commands 7 and 8 passed. The separately required complete workload command failed before starting, so the final assertion-map audit and end-to-end corroboration are not claimed."
+
+separate_end_to_end_benchmark_evidence:
+  result: "fail"
+  failed_command_position: 9
+  workload_started: false
+  root_created: false
+  exact_failure: "TypeError [ERR_INVALID_ARG_TYPE]: The path argument must be of type string. Received undefined at pathToFileURL in scripts/animation-pilot-assets.mjs:395:25."
+  cause: "The producer invoked the one-off ESM verifier through node --input-type=module on stdin. That entrypoint has no process.argv[1], and the imported module's CLI guard evaluates pathToFileURL(process.argv[1]) before the benchmark boundary is created."
+  retry_performed: false
+  evidence: "Required command 9 exited 1. The packet forbids retrying, so command 10 and all later commands were not run."
+
+tracked_evidence_immutability_evidence:
+  result: "pass_through_command_8"
+  renderer_benchmark_object: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+  performance_report_object: "5e4000acec0c750d8f98f70806670d16a5b7424c"
+  evidence: "Commands 7 and 8 asserted tracked evidence against candidate HEAD after every run. Command 9 failed during module import before creating output or writing evidence."
+
+nutrition_fix_preservation_evidence:
+  result: "object_identity_pass_tests_not_run"
+  source_object: "a5f7d17f82007150ef7ce7ff0c322532cf645344"
+  test_object: "6a89aed64ed0802b0134fc8e8d14a79439e55b86"
+  evidence: "The FIX-02 Nutrition objects matched before candidate creation and were outside the candidate delta; the required Nutrition and later full test commands were not run after command 9 failed."
+
+stress_build_and_full_verify_evidence:
+  result: "not_run"
+  evidence: "Commands 11 through 26 were not run after required command 9 failed."
+
+personal_local_and_product_invariant_evidence:
+  result: "candidate_scope_preserved_but_required_verification_not_run"
+  disclosure: "Personal-local imports remain unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte. The legacy decoder interprets retained historical failure evidence only and is never approval evidence or a producer-profile substitute."
+  evidence: "The candidate changed only test-facing benchmark evidence plumbing; later personal-local, backup, exact-variant, zero-egress, offline, module-boundary, personal-data, and active-workout PWA verification was not run after the stop gate."
+
+acceptance_evidence:
+  - { id: "PLA01-FIX-07-AC-01", result: "pass", evidence: "Model, no-subagent rule, branch, parent, packet-only producer delta, required reads, offline install, and clean preflight passed." }
+  - { id: "PLA01-FIX-07-AC-02", result: "pass", evidence: "The exact raw-first bounded legacy decoder and immutable retained-root comparison passed." }
+  - { id: "PLA01-FIX-07-AC-03", result: "pass", evidence: "The external workload-free bootstrap and strict new-capture checks passed." }
+  - { id: "PLA01-FIX-07-AC-04", result: "pass", evidence: "The one isolated-plus-contention profile proved the deterministic three-workload base bound." }
+  - { id: "PLA01-FIX-07-AC-05", result: "pass", evidence: "The non-empty candidate moved the default named regression to the real fast contract seam; commands 7 and 8 passed." }
+  - { id: "PLA01-FIX-07-AC-06", result: "fail", evidence: "Required separate end-to-end command 9 failed before executing a benchmark workload." }
+  - { id: "PLA01-FIX-07-AC-07", result: "pass_through_executed_commands", evidence: "Historical objects, retained roots, evidence, and FIX-02 object identities remained unchanged through command 8; command 9 failed before mutation." }
+  - { id: "PLA01-FIX-07-AC-08", result: "not_run", evidence: "Stress, build, Nutrition, web, full test, lint, typecheck, architecture, affected, and full verify matrices were prohibited after the stop gate." }
+  - { id: "PLA01-FIX-07-AC-09", result: "pass_for_candidate_delta", evidence: "No timeout, retry, sleep, skip, worker reduction, configuration change, generic tolerant decoder, benchmark workload change, or hidden cleanup appears in the candidate." }
+  - { id: "PLA01-FIX-07-AC-10", result: "not_run", evidence: "Final static, helper, assertion-map, filesystem, historical, invariant, YAML, and terminal-state audits were not run." }
+  - { id: "PLA01-FIX-07-AC-11", result: "fail", evidence: "Only commands 1 through 9 ran; command 9 failed and commands 10 through 36 are not_run, so merge authorization is false." }
+
+checks:
+  required_commands: 36
+  required_commands_run: 9
+  required_commands_passed: 8
+  required_commands_failed: 1
+  required_commands_not_run: 27
+  immutable_candidate_unchanged_after_commands: true
+  triggered_stop_gates:
+    - "PLA01-FIX-07-STOP-09"
+  result: "fail"
+  evidence: "Required command 9 exited 1 and was not retried. Commands 10 through 36 were not run."
+
+protected_path_audit:
+  result: "pass_for_candidate_scope"
+  candidate_path_count: 2
+  unauthorized_candidate_paths: []
+  forbidden_candidate_paths_changed: []
+  tracked_evidence_paths_changed: []
+  nutrition_source_object_matches_fix_02: true
+  nutrition_test_object_matches_fix_02: true
+  package_lock_or_configuration_changed: false
+  benchmark_workload_or_score_changed: false
+  product_runtime_or_contract_changed: false
+
+known_risks:
+  - "The candidate's two separate required end-to-end benchmark executions were not established because command 9 failed before its first workload."
+  - "Commands 10 through 36 were intentionally not run after the first post-candidate failure."
+  - "The candidate passed the focused contract stress but lacks the packet's build, full-suite, invariant, and three uninterrupted full-verify evidence."
+
+optional_evidence:
+  optional_manual_evidence: []
+  cold_review: "not_run"
+  owner_review: "not_run"
+  independent_review: "not_run"
+  manual_review: "not_run"
+  physical_device_review: "not_run"
+
+automated_verification:
+  schema_version: 1
+  packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-07"
+  candidate_commit: "70b9c9643f320143cbcff65d09dc50a45bef900f"
+  status: "FAIL"
+  checks:
+    - command: "git status --short"
+      result: "pass"
+      evidence: "Exited 0 with empty output."
+    - command: "assert producer start commit parent is c9b7d7ee5e81c1755904227af7ff86be727eebc9 and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-07.yaml"
+      result: "pass"
+      evidence: "Producer start b9c46004e582f44384409d6d057bb71a7531894b had the exact parent and sole packet delta."
+    - command: "pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis"
+      result: "pass"
+      evidence: "Reused all 607 packages, downloaded zero, exited 0, and left Git clean."
+    - command: "read-only validate the exact canonical FIX-04 quarantine and FIX-05 capture using literal bounded inventories, attributes, raw sizes, and raw hashes before decoding; for only capture-manifest.json, profile-command-failure.json, and quarantine-manifest.json require their exact declared 0x60 0x6e trailer, remove exactly literal backtick+n in memory, then strict-parse and validate the decoded contracts and exact 86-entry quarantine inventory; reject wrong hash, unexpected trailer, invalid UTF-8, malformed JSON, or any generic trim/ignore policy; prove neither retained root or its metadata is changed"
+      result: "pass"
+      evidence: "Exact 86-entry/67-file/19-directory quarantine and 6-file capture passed raw identity, bounded decoder, negative cases, contract, inventory, and before/after metadata checks with mutationObserved=false."
+    - command: "create a unique canonical producer-owned OS-temporary FIX-07 capture and external helper with absolute file-URL imports to exact immutable repository files; without invoking reproducePilot or any renderer candidate, bootstrap-validate helper syntax/import resolution, unique deterministic non-regex target location, expected base delta, Git-clean logic, structured output flush before cleanliness assertions, strict JSON with actual LF and byte-identical parse-reserialize roundtrip, strict-child ownership, and exact-root manifest logic; record and hash all bootstrap output"
+      result: "pass"
+      evidence: "External capture 37b65badbaf6406da051f801449654b9 passed with workloadInvocations=0; helper, summary, and bootstrap manifest hashes are recorded above."
+    - command: "run exactly one fresh helper profile of current FIX-03 behavior under isolated and repository-default contention phases; stream and durably flush structured output before final cleanliness assertions; record counts/durations for reproducePilot pairs, renderer candidates, complete workloads, report I/O, assertions, failure branches, ownership, cleanup, and deterministic three-workload base bound; require actual clean Git because the helper is external; validate every new capture JSON by strict parse-roundtrip, finalize/hash/read-only the capture, and do not retry"
+      result: "pass"
+      evidence: "Both phases recorded 3 reproducePilot pairs, 9 candidates, 3 complete workloads, 3 report writes/reads, one failure branch, 3 owned roots, and 3 cleanups; final manifest 0dca031c...; no retry."
+    - command: "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern \"keeps invocation-owned evidence output deterministic and contention-safe\" --pool=threads --fileParallelism"
+      result: "pass"
+      evidence: "1 selected test passed, 1 skipped, duration 1.62s."
+    - command: "run 20 fresh iterations of the named contention-safe evidence contract test with repository-default workers and file parallelism; after every iteration assert candidate SHA unchanged, tracked pilot evidence equals HEAD, Git is clean, retained roots and new capture are unchanged, and no producer-owned invocation root/staging path/owner marker/lock remains; stop on first failure without retry"
+      result: "pass"
+      evidence: "All 20 fresh iterations passed with immediate state assertions; candidate remained 70b9c9643f320143cbcff65d09dc50a45bef900f."
+    - command: "execute the complete real renderer benchmark end to end once through a fresh validated invocation-owned nontracked evidence root; assert committed report bytes, two releases, 12 variants, ten cycles, 240 parsed/mounted assets and 130 trace entries per candidate, scores 3981390/2929347/3934825, three-direct selection, zero network attempts, operation-derived zero leaks, exact-root cleanup, immutable evidence/captures/candidate, and clean Git"
+      result: "fail"
+      evidence: "Exited 1 before boundary creation or workload start: ERR_INVALID_ARG_TYPE at pathToFileURL(process.argv[1]) because the one-off verifier was run from stdin. No retry was performed."
+    - command: "repeat the complete real end-to-end invocation-owned renderer benchmark from a fresh root under the same assertions; do not reuse output or retry"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run explicit committed-evidence benchmark rerun 1; assert renderer-benchmark.json remains byte-identical to HEAD, expected scores and selection remain exact, Git is clean, retained manifests are unchanged, and no producer-owned root remains"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run explicit committed-evidence benchmark rerun 2 under the same assertions; do not reuse output or retry"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run 10 fresh iterations of scripts/animation-pilot-evidence.test.mjs, scripts/animation-pilot-assets.test.mjs, and scripts/animation-pack-v1.test.mjs with repository-default pool, workers, file parallelism, and timeouts; assert immutable candidate/evidence/captures and clean root state after every iteration"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run 3 fresh pnpm run build iterations; assert immutable candidate/evidence/captures and clean root state after every iteration"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose; immediately assert immutable candidate/evidence/captures, clean Git, and no owned root"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run 20 fresh iterations of pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; assert immutable candidate/evidence/captures and clean root state after every iteration"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run 10 fresh iterations of pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; assert immutable candidate/evidence/captures and clean root state after every iteration"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run 5 fresh iterations of pnpm run test with repository-default pool, workers, file parallelism, and unchanged timeouts; assert immutable candidate/evidence/captures and clean root state after every iteration"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs; immediately assert immutable candidate/evidence/captures, clean Git, and no owned root"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run scoped ESLint over FIX-02 Nutrition paths, every existing candidate path, animation-pilot-evidence.mjs, personal-local-animation-evidence.mjs, and personal-local-animation-evidence.test.mjs with --max-warnings=0"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "pnpm run typecheck"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "pnpm run architecture:audit"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "pnpm run verify:affected"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "run 3 consecutive uninterrupted pnpm run verify iterations with repository-default pool, workers, file parallelism, and unchanged timeouts; between iterations assert candidate SHA, tracked evidence, all retained capture manifests, no owned root, and clean Git; stop on first failure without retry or cleanup"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "pnpm animation:pilot:evidence:validate; immediately assert tracked evidence, retained captures, candidate, owned-root, and Git state"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "node scripts/personal-local-animation-evidence.mjs validate"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "git diff --check producer_start_commit..candidate_commit"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "assert candidate is non-empty and changed paths are a subset of the four authorized scripts; assert Nutrition objects a5f7d17f82007150ef7ce7ff0c322532cf645344 and 6a89aed64ed0802b0134fc8e8d14a79439e55b86; assert every other path outside the packet delta is byte-identical to c9b7d7ee5e81c1755904227af7ff86be727eebc9"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "assert no candidate or command increases timeout/budget, adds retry/sleep/poll/skip/only/todo, weakens assertions, swallows errors, reduces workers/file parallelism, serializes/filters/splits a suite, changes global configuration, mutates evidence/captures, introduces generic trim/ignore parsing, performs hidden cleanup, or changes benchmark workload/score/selection/timing/network/disposal/leak semantics"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "audit the final locator/helper and durable capture: no regex-only oracle; deterministic unique target; external pre-candidate helper or precisely inventoried fallback delta; metrics emitted and flushed before cleanliness checks; new JSON is strict with actual LF and parse-roundtrip identity; complete profile/oracle captures and hashes retained unchanged and transcribed"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "audit final assertion mapping: default-suite contract tests preserve every FIX-03 ownership/containment/exclusive-write/bytes/mtime/score/selection/diagnostic/cleanup/sentinel/Git/failure assertion without a complete workload; separate commands execute complete production workloads; no gate is lost"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "audit final filesystem state: FIX-04 quarantine, FIX-05 capture, and FIX-07 capture are read-only and exact; the legacy decoder is limited to the three declared raw identities; owned roots require canonical strict-child identity plus owner token and are absent; no unrecorded staging/owner/lock/quarantine or broad cleanup exists"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "assert locked versions and all historical evidence objects remain exact; assert benchmark workload/scores/selection/network/leaks are unchanged; assert personal-local, nutrition, release, backup, exact-variant, zero-egress, offline, module-boundary, personal-data, and active-workout PWA invariants pass"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "parse every YAML under docs/ai and validate the FIX-07 handoff required fields, all 36 exact command records, candidate SHA, deterministic_fix mode, legacy-decoder evidence, strict new-capture evidence, durable bootstrap/profile/oracle evidence, regression, assertion map, end-to-end evidence, retained-root immutability, optional_manual_evidence, status, and merge_authorized consistency"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+    - command: "assert candidate_commit remains unchanged before and after all post-candidate commands, retained roots remain exact, no producer-owned root/staging/owner/lock remains, tracked evidence equals HEAD, and git status --porcelain is empty without hidden cleanup or restoration"
+      result: "not_run"
+      evidence: "Stopped after command 9 failed."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+review_target:
+  commit: "70b9c9643f320143cbcff65d09dc50a45bef900f"
+  compare_from: "b9c46004e582f44384409d6d057bb71a7531894b"
+  note: "Review the immutable candidate only; the direct child contains this FAIL handoff."
