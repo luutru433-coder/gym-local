@@ -1,0 +1,393 @@
+schema_version: 3
+packet:
+  id: "PERSONAL-LOCAL-ANIMATION-01-FIX-07"
+  title: "Decode the exact retained legacy capture envelope before contention-safe animation evidence verification"
+  type: "review-fix"
+  status: "ready"
+
+supersession:
+  fixes_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-06.yaml"
+  original_packet: "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml"
+  original_candidate_commit: "4b4e4f6a2c0cc0783dd6bdb75254d3cadfbaf24e"
+  original_handoff_commit: "2852338e2a647fbe6884a237d7eed170d54993e9"
+  fix_01_candidate_commit: "f3652a8311fa57b85412d9d504d425b05b789f00"
+  fix_01_fail_handoff_commit: "636d55ab5fe32de147528c5cdf8a2f7534ad60de"
+  fix_02_candidate_commit: "bcc3a88fceaefae1069b221340957d3edfc3fd7a"
+  fix_02_fail_handoff_commit: "b03a82df988a5fde251920f067a47646c702713d"
+  fix_03_candidate_commit: "0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+  fix_03_fail_handoff_commit: "5ac56ed6a90d7c4782e35b20e198cb2045531bd3"
+  fix_04_blocked_handoff_commit: "25bbd0075f152a389aa24a029429c26f68e85cf9"
+  fix_05_blocked_handoff_commit: "f86059b178fec5f22775466bb4f508722560c505"
+  fix_06_coordinator_commit: "37851d1644fcf650e01f35fde3cf49f4e6af4e0d"
+  fix_06_blocked_handoff_commit: "c9b7d7ee5e81c1755904227af7ff86be727eebc9"
+  exact_historical_statuses:
+    original_handoff: "automated_pass"
+    fix_01_handoff: "automated_fail"
+    fix_02_handoff: "automated_fail"
+    fix_03_handoff: "automated_fail"
+    fix_04_handoff: "BLOCKED"
+    fix_05_handoff: "BLOCKED"
+    fix_06_handoff: "BLOCKED"
+  authoritative_prior_result:
+    production_isolation: "FIX-03 candidate 0a2aab39d6c0df527d21f161f8a221dcd5bf8314 correctly isolates benchmark output, but its default-suite regression executes three complete renderer workloads and times out under full-suite contention."
+    fix_04_gap: "FIX-04 lost durable profile output and its regex-only target locator failed before proving the base condition."
+    fix_05_gap: "FIX-05 command 5 ran the profiler from an authorized but untracked repository path, so the profiler's unconditional Git-clean assertion rejected its own helper before contention profiling."
+    fix_06_gap: "FIX-06 command 4 verified the retained manifest raw hashes, then strict JSON parsing rejected the immutable FIX-05 quarantine-manifest.json because it has a documented two-byte literal backtick+n trailer. No bootstrap, profile, implementation, candidate, or producer verification followed."
+    retained_evidence_rule: "The FIX-04 quarantine and FIX-05 capture are immutable read-only historical failure evidence. They are never approval evidence and never substitute for a fresh producer-owned profile."
+  immutability_rule: "All original through FIX-06 packets, candidates, handoffs, captures, quarantines, commits, and their exact recorded statuses remain immutable historical evidence. FIX-07 must not rewrite, normalize, relabel, or reinterpret any earlier result as PASS."
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  coordinator_and_producer_must_be_separate_tasks: true
+  base_commit: "c9b7d7ee5e81c1755904227af7ff86be727eebc9"
+  target_branch: "codex/personal-local-animation-01-fix-07"
+  worktree_required: true
+  sequential_after:
+    - "PERSONAL-LOCAL-ANIMATION-01-FIX-06 BLOCKED handoff commit c9b7d7ee5e81c1755904227af7ff86be727eebc9"
+  producer_start_rule:
+    required_parent: "The packet-only producer start commit's first parent must be exactly c9b7d7ee5e81c1755904227af7ff86be727eebc9."
+    required_delta: "git diff --name-only c9b7d7ee5e81c1755904227af7ff86be727eebc9..HEAD must print only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-07.yaml before producer work."
+    non_empty_candidate: "Create one non-empty immutable candidate whose first parent is the producer start commit and whose paths are a subset of authority.candidate_paths."
+    handoff_only_child: "After verification, create exactly one direct-child commit containing only docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-07-handoff.yaml."
+    failure_rule: "Stop at the first failed or not-run gate, never retry or clean its state, never amend a candidate, and record FAIL or BLOCKED in the handoff-only child when safe."
+
+authority:
+  allowed_paths:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "scripts/animation-pilot-evidence.test-support.mjs"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-07-handoff.yaml"
+  candidate_paths:
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "scripts/animation-pilot-evidence.test-support.mjs"
+  conditional_scope:
+    - "animation-pilot-benchmark.mjs may expose only the smallest deterministic seam needed for contract testing; workload, scores, selection, output ownership, cleanup, timing, network, disposal, leaks, and report bytes remain unchanged."
+    - "animation-pilot-evidence.test.mjs may replace repeated complete benchmark work only with deterministic contract coverage preserving every FIX-03 assertion."
+    - "performance-report.mjs may change only if the durable profile proves it owns part of the contention defect; historical evidence stays read-only and every budget remains exact."
+    - "animation-pilot-evidence.test-support.mjs is optional, test-only, must carry the repository license header, and cannot replace separate complete end-to-end benchmark commands."
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-07-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  forbidden_paths:
+    - "docs/ai/evidence/**"
+    - "docs/ai/packets/**"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-02-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-03-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-04-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-05-handoff.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-06-handoff.yaml"
+    - "docs/ai/reviews/coordinator-ledger.yaml"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/adr/**"
+    - "apps/**"
+    - "packages/**"
+    - "content/**"
+    - "public/**"
+    - "package.json"
+    - "pnpm-lock.yaml"
+    - "pnpm-workspace.yaml"
+    - "vite.config.ts"
+    - "eslint.config.mjs"
+    - "tsconfig*.json"
+    - ".gitignore"
+    - ".github/**"
+  retained_external_evidence:
+    fix_04_quarantine:
+      path: "C:/Users/Q/AppData/Local/Temp/gym-local-fix04-quarantine-a5d19e5ac292446fa48362ce5cfe130c"
+      expected_entries: 86
+      expected_files: 67
+      expected_directories: 19
+      sentinel_sha256: "4f658149ae825ce6347afbcf4e58665b376482c077a183b6eea180f4e3189298"
+      nested_owner_marker_sha256: "af302a48e857abe7e8f224e1a76ff2b69ddfcb33542efb5e434c59d617e1ebd3"
+      external_owner_marker_sha256: "3709db638c7621bd2a731fe1252d383e170e05c77a3e8af0bad89ee76164b587"
+    fix_05_capture:
+      path: "C:/Users/Q/AppData/Local/Temp/gym-local-fix05-profile-5468bb5ab6c14c048f0b0851007853a3"
+      expected_entries: 6
+      expected_files: 6
+      expected_directories: 0
+      files:
+        - { name: ".fix05-profile-owner", raw_byte_size: 68, raw_sha256: "e07df506e7421165526bc2d35942a9fb6a04dec50184ed4934bdc3bfb0d96fc3" }
+        - { name: "capture-manifest.json", raw_byte_size: 1152, raw_sha256: "f0ceff3ba4afc167b28ce1e17aa272a7bec3e4a68c0e8b1e53bf6253e5442e4f", legacy_trailer_hex: "60 6e", legacy_trailer_text: "literal backtick followed by lowercase n" }
+        - { name: "profile-command-failure.json", raw_byte_size: 679, raw_sha256: "5d85526b0df5922153381cdc54182eeb8006e2f0f3eb6084b864d3bd4ed4f03c", legacy_trailer_hex: "60 6e", legacy_trailer_text: "literal backtick followed by lowercase n" }
+        - { name: "profile-isolated.stderr.txt", raw_byte_size: 742, raw_sha256: "1761252485fc1c8352eb335acc830fb6a83dd73cc5fec3331326ce4921b3d71e" }
+        - { name: "profile-isolated.stdout.jsonl", raw_byte_size: 0, raw_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" }
+        - { name: "quarantine-manifest.json", raw_byte_size: 33382, raw_sha256: "35f8b40df0650d440dcd4de7a38fdbf5c719260a270b78418ec6f4f62070d525", legacy_trailer_hex: "60 6e", legacy_trailer_text: "literal backtick followed by lowercase n" }
+  legacy_capture_decoder_policy:
+    scope: "Interpretation is authorized only for the three exact FIX-05 JSON paths, raw byte sizes, raw SHA-256 values, and two-byte trailers declared above. It interprets historical failure evidence only and is neither approval evidence nor a substitute for the producer's fresh profile."
+    raw_first_rule: "Read each exact literal file as raw bytes and verify its declared byte size and SHA-256 before UTF-8 decoding, suffix handling, JSON parsing, inventory comparison, or semantic use. A size or hash mismatch stops BLOCKED."
+    exact_envelope_rule: "After raw identity passes, decode with fatal UTF-8, require the final two raw bytes and final two decoded characters to be exactly 0x60 0x6e / literal backtick+n, remove exactly those two characters from an in-memory working string, and strictly JSON.parse the remainder. Do not trim, normalize, replace, rewrite, or accept any other prefix, suffix, whitespace policy, encoding, or malformed JSON."
+    rejection_rule: "Reject a wrong size or hash before decoding; reject an absent, extra, or different trailer; reject invalid UTF-8 and malformed post-envelope JSON; reject zero or multiple decoded targets; never apply this exception to arbitrary JSON or any newly created capture."
+    immutability_rule: "Never rewrite, normalize, chmod, retimestamp, rename, move, recycle, delete, restore, reuse, or write beneath either retained root. Never use a glob, wildcard, parent scan, generic ignore-error parser, or generic trim policy."
+  new_capture_json_policy: "Every FIX-07-created JSON or JSONL record must be strict UTF-8 JSON with an actual LF byte 0x0a where a terminal newline is used, never literal backtick+n. Before expensive profiling, bootstrap must write its new JSON atomically inside the exact owned root, read raw bytes back, require strict JSON.parse success, reserialize with the same stable serializer plus LF, require byte-for-byte roundtrip identity, and reject any legacy trailer or extra bytes. Repeat exact validation when the capture is finalized read-only."
+  external_profile_helper_policy: "Before implementation, create the profiling/bootstrap helper only inside a new unique canonical producer-owned capture root under the OS temporary directory. It must import immutable repository modules through explicit absolute file URLs, must never exist in the worktree, and remains part of the finalized read-only capture."
+  fallback_instrumentation_policy: "Only if an external helper is technically impossible for a recorded deterministic reason may temporary instrumentation exist in one precisely inventoried authorized candidate path. Pre-candidate cleanliness logic must subtract exactly that known temporary delta, reject every unexpected path, emit and durably flush all metrics before asserting cleanliness, then remove the instrumentation and require genuinely empty git status before candidate creation."
+  capture_policy: "The new capture root contains helper source, bootstrap output, profile stdout/stderr, machine-readable phase/oracle results, exit statuses, ownership record, raw sizes, SHA-256 hashes, and a final manifest. Durable metrics must be emitted and flushed before any Git-clean assertion. Finalize the capture read-only before candidate creation and retain it unchanged through handoff."
+  no_workaround_policy: "No timeout/budget increase, retry, sleep, polling delay, skip/only/todo, swallowed error, weakened assertion, reduced workers, reduced file parallelism, suite filtering/serialization/splitting, global configuration change, benchmark semantic change, regex-only locator, hidden cleanup, or broad filesystem action."
+  network_policy: "Zero network. Use installed dependencies and deterministic local fixtures only; benchmark remote-request attempts remain exactly zero."
+
+coordination_validation:
+  date: "2026-10-26"
+  result: "pass"
+  read_only_inspection: "The exact FIX-05 capture contained six read-only files. Raw identity was checked before decoding. All three affected JSON files matched the declared sizes and SHA-256 values and ended in exactly 0x60 0x6e. Removing only that trailer in memory allowed strict parsing. The decoded quarantine inventory matched all 86 exact FIX-04 quarantine entries, including attributes, timestamps, sizes, and file hashes."
+  decoder_negative_cases: "The packet-authoring decoder was exercised against the real retained bytes and rejected a wrong expected hash before decode, an unexpected trailer, and malformed post-envelope JSON. No retained byte or metadata was changed."
+  non_authority_notice: "This coordinator validation only proves that the precise historical envelope is interpretable read-only. It does not pass a producer command, approve an earlier packet, create a candidate, or replace the required fresh FIX-07 bootstrap/profile."
+
+context:
+  required_reads:
+    - "AGENTS.md and every applicable nested AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/coordinate-packet-template.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01.yaml and its handoff"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-01.yaml through PERSONAL-LOCAL-ANIMATION-01-FIX-06.yaml"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-01-handoff.yaml through PERSONAL-LOCAL-ANIMATION-01-FIX-06-handoff.yaml"
+    - "docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-07.yaml"
+    - "FIX-03 candidate diff 42babf7d4d7a67481c34160d38e0df841378cc00..0a2aab39d6c0df527d21f161f8a221dcd5bf8314"
+    - "the exact FIX-04 quarantine and FIX-05 durable capture by bounded literal read only"
+    - "docs/ai/packets/ANIMATION-PILOT-01-REV-02-FIX-03.yaml and its handoff"
+    - "docs/adr/0019-animation-pilot-renderer-and-release-gate.md"
+    - "docs/adr/0022-personal-local-animation-imports.md"
+    - "scripts/animation-pilot-assets.mjs and scripts/animation-pilot-assets.test.mjs"
+    - "scripts/animation-pilot-benchmark.mjs"
+    - "scripts/animation-pilot-evidence.mjs and scripts/animation-pilot-evidence.test.mjs"
+    - "scripts/animation-pack-v1.test.mjs"
+    - "scripts/performance-report.mjs"
+    - "scripts/personal-local-animation-evidence.mjs and scripts/personal-local-animation-evidence.test.mjs"
+    - "package.json and vite.config.ts"
+    - "C:/Users/Q/.agents/skills/git-commit-formatter/SKILL.md"
+    - "C:/Users/Q/.agents/skills/license-header-adder/SKILL.md and resources/HEADER_TEMPLATE.txt if a support file is created"
+  locked_versions:
+    app: "0.7.0"
+    database: 5
+    backup: 5
+    catalog: 3
+    animation_pack_schema: 1
+    animation_player_protocol: 1
+    animation_catalog: 1
+    renderer: "three@0.185.1"
+    release_pack_storage_layout: 1
+    personal_local_animation_schema: 1
+    personal_local_storage_layout: 1
+  preserved_objects:
+    nutrition_page_source: "a5f7d17f82007150ef7ce7ff0c322532cf645344"
+    nutrition_page_test: "6a89aed64ed0802b0134fc8e8d14a79439e55b86"
+    renderer_benchmark_evidence: "cbc85c6ecf90963eea830aaa7ae42d3125ce5cdd"
+    performance_report_evidence: "5e4000acec0c750d8f98f70806670d16a5b7424c"
+  preserved_invariants:
+    - "Gym Local remains local-first, single-profile, account-free, and usable offline."
+    - "Nutrition remains Vietnamese-only; FIX-02's memoized boundaries and additive render-work regression remain byte-identical; formulas, providers, packs, snapshots, persistence, and user-visible behavior do not change."
+    - "Personal-local imports remain unreviewed device-only material in isolated OPFS, absent from backup and transfer, with zero egress and no distribution eligibility."
+    - "Release animation source, license, provenance, checksum, deterministic-build, exact-variant, storage, renderer, and review gates remain strict."
+    - "FIX-03 production isolation remains exact: test writes require validated invocation ownership, ordinary build reporting never mutates historical evidence, and only explicit CLI committed regeneration is allowed."
+    - "The real benchmark remains two releases, 12 variants, ten cycles, 240 parsed/mounted assets per candidate, 130 operation-trace entries per candidate, zero network attempts, operation-derived cleanup/leak checks, scores 3981390/2929347/3934825, and three-direct selection."
+    - "No personal-local or release animation byte enters Git, public assets, content, default build inputs, service-worker precache, CacheStorage, backup, export, upload, sync, or telemetry."
+    - "Never mix performance history or PR values between equipment variants; stable IDs, workout history, routines, sessions, custom exercises, nutrition history, pantry, and saved plans remain unchanged."
+    - "Only packages/storage owns database and OPFS access; modules interact only through public @gym entry points."
+    - "A PWA update is never activated during an active workout."
+
+outcome:
+  objective: "Interpret only the exact retained FIX-05 legacy JSON envelope read-only, then preserve FIX-03 output isolation while making its default-suite regression contention-safe with a fresh external pre-candidate profile and separately executed complete real benchmark workloads."
+  user_visible_result: "None; verification becomes repeatable without changing product behavior."
+  deliverables:
+    - "A strict raw-first decoder limited to the three exact retained FIX-05 JSON files and their declared size/hash/trailer tuples; it never changes retained evidence and never becomes a generic tolerant JSON policy."
+    - "A finalized read-only FIX-07 capture using strict JSON with actual LF and parse-roundtrip validation, proving helper bootstrap, one complete isolated-plus-contention profile, and a deterministic base-work regression."
+    - "Fast contract tests preserving every FIX-03 ownership, containment, exclusive-write, bytes, mtime, score, selection, diagnostic, cleanup, sentinel, Git-cleanliness, and failure assertion."
+    - "Two separate fresh complete production benchmark executions plus two explicit committed-evidence reruns."
+    - "A non-empty immutable candidate limited to the four authorized script paths."
+    - "All 36 commands passing once in order, including three uninterrupted full verify passes."
+    - "A schema-valid handoff-only direct child with status PASS and merge_authorized true."
+  non_goals:
+    - "No product, contract, storage, backup, catalog, nutrition, workout, PWA, content, dependency, configuration, historical evidence, quarantine, prior capture, or prior status change."
+    - "No generic trimming, ignore-error parsing, normalization, repair, rewrite, or acceptance of arbitrary malformed JSON."
+    - "No reduction or mock replacement of the separately required complete renderer benchmark workload."
+
+diagnostic_requirements:
+  retained_legacy_envelope:
+    - "Validate raw byte size and SHA-256 first for every exact retained file. Only the three declared affected JSON files may use the exact two-byte legacy-envelope decoder."
+    - "Strictly reject wrong hashes, unexpected trailers, invalid UTF-8, malformed post-envelope JSON, inventory mismatch, or any attempt to apply the exception to another file."
+  bootstrap:
+    - "Before expensive work, validate external-helper syntax, absolute file-URL resolution to exact immutable repository files, deterministic unique non-regex target location, expected base delta, Git-clean logic, structured capture append/flush behavior, strict JSON LF roundtrip, owner identity, strict-child containment, and exact-root finalization."
+    - "Bootstrap must execute no renderer candidate and no reproducePilot workload."
+  profile:
+    - "Run exactly one required profiling command after bootstrap. It may contain the required isolated and repository-default contention phases, but neither phase may be separately retried."
+    - "Stream and durably flush structured phase metrics before final Git-clean assertions so a failure cannot erase counts, durations, or the deterministic base oracle."
+    - "Record reproducePilot pairs, renderer candidates, complete workloads, report reads/writes, assertions, failure branches, ownership, cleanup, exact durations, exit status, and the three-workload base bound."
+  oracle:
+    - "Use a JavaScript parser, balanced token/string/comment-aware traversal, or named exported helper contract. Reject zero or multiple targets. Regex-only selection or correctness proof is forbidden."
+
+preflight:
+  required_conditions:
+    clean_worktree: true
+    branch_matches_target_branch: true
+    head_is_packet_only_producer_start_commit: true
+    exact_model_available: true
+    subagents_unused: true
+    instructions_read: true
+    prior_lineage_resolves: true
+    retained_external_raw_identity_matches: true
+    exact_legacy_envelope_decoder_matches_only_declared_files: true
+    locked_versions_match: true
+
+acceptance_tests:
+  - { id: "PLA01-FIX-07-AC-01", requirement: "Exact lineage and packet-only producer start are proven while every original/fixer status remains unchanged.", evidence: "Git parent, range, path, branch, handoff-status, and clean-state assertions." }
+  - { id: "PLA01-FIX-07-AC-02", requirement: "Raw-first validation and the exact two-byte in-memory decoder interpret only the three declared retained JSON files and reject every other mismatch without mutation.", evidence: "Raw size/hash/trailer records, negative decoder cases, exact 86-entry quarantine comparison, and before/after metadata identity." }
+  - { id: "PLA01-FIX-07-AC-03", requirement: "Bootstrap proves external absolute-import helper resolution, ownership, strict-JSON capture, locator, baseline-delta, and cleanliness logic before expensive work.", evidence: "Durable bootstrap JSON, roundtrip result, sizes, and hashes." }
+  - { id: "PLA01-FIX-07-AC-04", requirement: "One durable profile completes and proves three complete base workloads without self-dirtying Git; metrics are emitted before cleanliness assertions.", evidence: "Read-only capture with ordered phase records and manifest." }
+  - { id: "PLA01-FIX-07-AC-05", requirement: "The deterministic regression fails base behavior and passes candidate behavior without a wall-clock or regex oracle.", evidence: "Machine-readable base/candidate results." }
+  - { id: "PLA01-FIX-07-AC-06", requirement: "Default-suite contract coverage preserves every FIX-03 assertion while executing no complete renderer workload.", evidence: "Assertion map and focused stress." }
+  - { id: "PLA01-FIX-07-AC-07", requirement: "Two fresh complete end-to-end benchmarks and two explicit regeneration reruns preserve exact workload, bytes, scores, selection, zero network, and cleanup.", evidence: "Commands 9 through 12." }
+  - { id: "PLA01-FIX-07-AC-08", requirement: "Quarantine, FIX-05 capture, FIX-07 capture, historical evidence, Nutrition objects, and candidate remain immutable.", evidence: "Object, raw hash, size, manifest, filesystem metadata, and Git assertions." }
+  - { id: "PLA01-FIX-07-AC-09", requirement: "Stress, build, personal-local, lint, typecheck, architecture, affected verification, and three uninterrupted full verifies pass without retry or weakened topology.", evidence: "Commands 8 and 13 through 26." }
+  - { id: "PLA01-FIX-07-AC-10", requirement: "No timeout, retry, sleep, skip, weakening, reduced parallelism, global configuration change, generic tolerant JSON, network access, or hidden cleanup exists.", evidence: "Static diff, decoder audit, and runtime audit." }
+  - { id: "PLA01-FIX-07-AC-11", requirement: "All 36 commands pass exactly once and the schema-valid handoff authorizes merge.", evidence: "FIX-07 handoff automated_verification." }
+
+required_checks:
+  automated_commands:
+    - "git status --short"
+    - "assert producer start commit parent is c9b7d7ee5e81c1755904227af7ff86be727eebc9 and its delta contains only docs/ai/packets/PERSONAL-LOCAL-ANIMATION-01-FIX-07.yaml"
+    - "pnpm install --offline --frozen-lockfile; git status --short must remain empty before diagnosis"
+    - "read-only validate the exact canonical FIX-04 quarantine and FIX-05 capture using literal bounded inventories, attributes, raw sizes, and raw hashes before decoding; for only capture-manifest.json, profile-command-failure.json, and quarantine-manifest.json require their exact declared 0x60 0x6e trailer, remove exactly literal backtick+n in memory, then strict-parse and validate the decoded contracts and exact 86-entry quarantine inventory; reject wrong hash, unexpected trailer, invalid UTF-8, malformed JSON, or any generic trim/ignore policy; prove neither retained root or its metadata is changed"
+    - "create a unique canonical producer-owned OS-temporary FIX-07 capture and external helper with absolute file-URL imports to exact immutable repository files; without invoking reproducePilot or any renderer candidate, bootstrap-validate helper syntax/import resolution, unique deterministic non-regex target location, expected base delta, Git-clean logic, structured output flush before cleanliness assertions, strict JSON with actual LF and byte-identical parse-reserialize roundtrip, strict-child ownership, and exact-root manifest logic; record and hash all bootstrap output"
+    - "run exactly one fresh helper profile of current FIX-03 behavior under isolated and repository-default contention phases; stream and durably flush structured output before final cleanliness assertions; record counts/durations for reproducePilot pairs, renderer candidates, complete workloads, report I/O, assertions, failure branches, ownership, cleanup, and deterministic three-workload base bound; require actual clean Git because the helper is external; validate every new capture JSON by strict parse-roundtrip, finalize/hash/read-only the capture, and do not retry"
+    - "pnpm exec vitest run scripts/animation-pilot-evidence.test.mjs --testNamePattern \"keeps invocation-owned evidence output deterministic and contention-safe\" --pool=threads --fileParallelism"
+    - "run 20 fresh iterations of the named contention-safe evidence contract test with repository-default workers and file parallelism; after every iteration assert candidate SHA unchanged, tracked pilot evidence equals HEAD, Git is clean, retained roots and new capture are unchanged, and no producer-owned invocation root/staging path/owner marker/lock remains; stop on first failure without retry"
+    - "execute the complete real renderer benchmark end to end once through a fresh validated invocation-owned nontracked evidence root; assert committed report bytes, two releases, 12 variants, ten cycles, 240 parsed/mounted assets and 130 trace entries per candidate, scores 3981390/2929347/3934825, three-direct selection, zero network attempts, operation-derived zero leaks, exact-root cleanup, immutable evidence/captures/candidate, and clean Git"
+    - "repeat the complete real end-to-end invocation-owned renderer benchmark from a fresh root under the same assertions; do not reuse output or retry"
+    - "run explicit committed-evidence benchmark rerun 1; assert renderer-benchmark.json remains byte-identical to HEAD, expected scores and selection remain exact, Git is clean, retained manifests are unchanged, and no producer-owned root remains"
+    - "run explicit committed-evidence benchmark rerun 2 under the same assertions; do not reuse output or retry"
+    - "run 10 fresh iterations of scripts/animation-pilot-evidence.test.mjs, scripts/animation-pilot-assets.test.mjs, and scripts/animation-pack-v1.test.mjs with repository-default pool, workers, file parallelism, and timeouts; assert immutable candidate/evidence/captures and clean root state after every iteration"
+    - "run 3 fresh pnpm run build iterations; assert immutable candidate/evidence/captures and clean root state after every iteration"
+    - "pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4 --reporter=verbose; immediately assert immutable candidate/evidence/captures, clean Git, and no owned root"
+    - "run 20 fresh iterations of pnpm exec vitest run apps/web/src/features/nutrition/NutritionPage.test.tsx --pool=threads --fileParallelism --maxWorkers=4; assert immutable candidate/evidence/captures and clean root state after every iteration"
+    - "run 10 fresh iterations of pnpm exec vitest run apps/web/src --pool=threads --fileParallelism --maxWorkers=4; assert immutable candidate/evidence/captures and clean root state after every iteration"
+    - "run 5 fresh iterations of pnpm run test with repository-default pool, workers, file parallelism, and unchanged timeouts; assert immutable candidate/evidence/captures and clean root state after every iteration"
+    - "pnpm exec vitest run packages/contracts/src/personal-local-animation.test.ts packages/storage/src/personal-local-animation packages/media/src/animation-player.test.ts packages/media/src/personal-local-animation.test.ts packages/backup/src/backup.test.ts apps/web/src/features/settings/PersonalLocalAnimationCard.test.tsx apps/web/src/features/settings/SettingsPage.test.tsx apps/web/src/App.test.tsx apps/web/src/features/workout/WorkoutPage.test.tsx apps/web/src/pwa/install.test.ts scripts/personal-local-animation-evidence.test.mjs; immediately assert immutable candidate/evidence/captures, clean Git, and no owned root"
+    - "run scoped ESLint over FIX-02 Nutrition paths, every existing candidate path, animation-pilot-evidence.mjs, personal-local-animation-evidence.mjs, and personal-local-animation-evidence.test.mjs with --max-warnings=0"
+    - "pnpm run typecheck"
+    - "pnpm run architecture:audit"
+    - "pnpm run verify:affected"
+    - "run 3 consecutive uninterrupted pnpm run verify iterations with repository-default pool, workers, file parallelism, and unchanged timeouts; between iterations assert candidate SHA, tracked evidence, all retained capture manifests, no owned root, and clean Git; stop on first failure without retry or cleanup"
+    - "pnpm animation:pilot:evidence:validate; immediately assert tracked evidence, retained captures, candidate, owned-root, and Git state"
+    - "node scripts/personal-local-animation-evidence.mjs validate"
+    - "node scripts/personal-local-animation-evidence.mjs audit-build --dist dist"
+    - "git diff --check producer_start_commit..candidate_commit"
+    - "assert candidate is non-empty and changed paths are a subset of the four authorized scripts; assert Nutrition objects a5f7d17f82007150ef7ce7ff0c322532cf645344 and 6a89aed64ed0802b0134fc8e8d14a79439e55b86; assert every other path outside the packet delta is byte-identical to c9b7d7ee5e81c1755904227af7ff86be727eebc9"
+    - "assert no candidate or command increases timeout/budget, adds retry/sleep/poll/skip/only/todo, weakens assertions, swallows errors, reduces workers/file parallelism, serializes/filters/splits a suite, changes global configuration, mutates evidence/captures, introduces generic trim/ignore parsing, performs hidden cleanup, or changes benchmark workload/score/selection/timing/network/disposal/leak semantics"
+    - "audit the final locator/helper and durable capture: no regex-only oracle; deterministic unique target; external pre-candidate helper or precisely inventoried fallback delta; metrics emitted and flushed before cleanliness checks; new JSON is strict with actual LF and parse-roundtrip identity; complete profile/oracle captures and hashes retained unchanged and transcribed"
+    - "audit final assertion mapping: default-suite contract tests preserve every FIX-03 ownership/containment/exclusive-write/bytes/mtime/score/selection/diagnostic/cleanup/sentinel/Git/failure assertion without a complete workload; separate commands execute complete production workloads; no gate is lost"
+    - "audit final filesystem state: FIX-04 quarantine, FIX-05 capture, and FIX-07 capture are read-only and exact; the legacy decoder is limited to the three declared raw identities; owned roots require canonical strict-child identity plus owner token and are absent; no unrecorded staging/owner/lock/quarantine or broad cleanup exists"
+    - "assert locked versions and all historical evidence objects remain exact; assert benchmark workload/scores/selection/network/leaks are unchanged; assert personal-local, nutrition, release, backup, exact-variant, zero-egress, offline, module-boundary, personal-data, and active-workout PWA invariants pass"
+    - "parse every YAML under docs/ai and validate the FIX-07 handoff required fields, all 36 exact command records, candidate SHA, deterministic_fix mode, legacy-decoder evidence, strict new-capture evidence, durable bootstrap/profile/oracle evidence, regression, assertion map, end-to-end evidence, retained-root immutability, optional_manual_evidence, status, and merge_authorized consistency"
+    - "assert candidate_commit remains unchanged before and after all post-candidate commands, retained roots remain exact, no producer-owned root/staging/owner/lock remains, tracked evidence equals HEAD, and git status --porcelain is empty without hidden cleanup or restoration"
+  execution_rule: "Run commands 1-6 before implementation. Command 4 first verifies immutable raw identities and then uses only the exact documented legacy decoder. Command 5 is a workload-free bootstrap and command 6 is the one required profile; none may be retried. Freeze the candidate only after commands 1-6 pass and the FIX-07 capture is finalized read-only. Run commands 7-36 exactly once in order. These are the same 36 command positions and stress/build/full-verify matrices authorized by FIX-06; no additional matrix is authorized. Any failure, not_run, ambiguity, missing durable output, unexpected path, leaked root, dirty state, mutation, weakened gate, or schema error prevents PASS."
+  evidence_paths:
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json"
+    - "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/performance-report.json"
+    - "docs/ai/evidence/PERSONAL-LOCAL-ANIMATION-01/automated-report.json"
+    - "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-07-handoff.yaml"
+    - "the exact external FIX-07 durable capture recorded in the handoff"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - { id: "PLA01-FIX-07-STOP-01", condition: "Model, no-subagent, branch, base, packet-only delta, clean worktree, required reads, prior lineage, exact historical statuses, retained evidence, or locked-version preflight fails.", action: "Stop BLOCKED before implementation; do not substitute, clean, amend, rebase, relabel, or widen scope." }
+  - { id: "PLA01-FIX-07-STOP-02", condition: "Either retained root or declared raw size/hash differs; an affected JSON does not have exactly the declared 0x60 0x6e trailer; strict post-envelope parsing or the 86-entry inventory comparison fails; validation would mutate retained state or scan unrelated paths; or a generic trim/ignore decoder is proposed.", action: "Stop BLOCKED without changing external evidence. Preserve the raw failure and reject the legacy interpretation." }
+  - { id: "PLA01-FIX-07-STOP-03", condition: "Bootstrap invokes expensive work, cannot resolve exact absolute imports/target/ownership/capture/cleanliness semantics, writes non-strict JSON, lacks actual-LF parse-roundtrip identity, or uses regex-only selection.", action: "Stop BLOCKED before the profile and preserve output; do not retry." }
+  - { id: "PLA01-FIX-07-STOP-04", condition: "The one profile fails, omits durable metrics before Git-clean assertions, self-dirties unexpectedly, lacks exact phases/base bound, emits malformed new JSON, or would need retry.", action: "Stop BLOCKED before candidate creation and preserve the read-only capture." }
+  - { id: "PLA01-FIX-07-STOP-05", condition: "A correction requires an unlisted path or historical evidence/capture mutation.", action: "Stop BLOCKED without widening scope." }
+  - { id: "PLA01-FIX-07-STOP-06", condition: "A timeout, retry, sleep, skip, weakened assertion, reduced parallelism, filtering, serialization, configuration change, generic tolerant JSON policy, regex oracle, hidden cleanup, or benchmark semantic change appears.", action: "Stop FAIL." }
+  - { id: "PLA01-FIX-07-STOP-07", condition: "Contract coverage loses a FIX-03 assertion or separate complete production benchmarks are reduced, mocked, missing, or changed.", action: "Stop FAIL." }
+  - { id: "PLA01-FIX-07-STOP-08", condition: "FIX-02 Nutrition, FIX-03 isolation, evidence bytes, retained roots, prior statuses, product invariants, exact-variant, zero-egress, backup, or active-workout update deferral changes.", action: "Stop FAIL and preserve exact state." }
+  - { id: "PLA01-FIX-07-STOP-09", condition: "Any required command fails/is not run, is retried, omits immediate assertions, changes the candidate, leaks a root, dirties Git, or produces an invalid handoff.", action: "Stop and record FAIL or BLOCKED with merge_authorized false; do not clean, amend, merge, tag, push, or update the ledger." }
+
+handoff:
+  report_path: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-07-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  metadata_commit_rule: "The only child of the immutable candidate is a commit containing only the FIX-07 handoff. Never name that metadata commit inside the handoff."
+  required_fields:
+    - "schema_version"
+    - "packet_id"
+    - "status"
+    - "producer_model"
+    - "model_gate_evidence"
+    - "subagents_used"
+    - "base_commit"
+    - "fix_03_candidate_commit"
+    - "fix_06_handoff_commit"
+    - "producer_start_commit"
+    - "candidate_parent_commit"
+    - "candidate_commit"
+    - "candidate_mode"
+    - "branch"
+    - "changed_paths"
+    - "historical_status_preservation"
+    - "retained_external_raw_identity_evidence"
+    - "legacy_capture_decoder_evidence"
+    - "new_capture_strict_json_evidence"
+    - "bootstrap_evidence"
+    - "durable_runtime_profile_evidence"
+    - "deterministic_locator_or_helper_evidence"
+    - "base_candidate_regression_evidence"
+    - "contract_assertion_mapping"
+    - "separate_end_to_end_benchmark_evidence"
+    - "tracked_evidence_immutability_evidence"
+    - "nutrition_fix_preservation_evidence"
+    - "stress_build_and_full_verify_evidence"
+    - "personal_local_and_product_invariant_evidence"
+    - "acceptance_evidence"
+    - "checks"
+    - "protected_path_audit"
+    - "known_risks"
+    - "optional_evidence"
+    - "automated_verification"
+    - "review_target"
+  prohibited_fields: ["handoff_commit", "metadata_commit", "self_sha"]
+  disclosure_rule: "Personal-local imports remain unreviewed device-only material, absent from backup and transfer, and never eligible for distribution; strict release-grade source/license/provenance evidence remains mandatory for every committed or distributable byte. The legacy decoder interprets retained historical failure evidence only and is never approval evidence or a producer-profile substitute."
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/PERSONAL-LOCAL-ANIMATION-01-FIX-07-handoff.yaml#automated_verification"
+  schema:
+    schema_version: 1
+    packet_id: "PERSONAL-LOCAL-ANIMATION-01-FIX-07"
+    candidate_commit: "40-character SHA or null only for pre-candidate BLOCKED"
+    status: "PASS|FAIL|BLOCKED"
+    checks:
+      - command: "exact required command"
+        result: "pass|fail|not_run"
+        evidence: "exact output or immutable artifact"
+    optional_manual_evidence: []
+    merge_authorized: false
+  authorization_rule: "Only PASS with all 36 commands recorded exactly once as pass, deterministic_fix mode, a non-empty immutable candidate, exact raw-first legacy interpretation, strict new-capture JSON, complete bootstrap/profile/base-candidate proof, complete assertion map, two separate real end-to-end executions, unchanged retained roots/evidence/Nutrition objects/statuses, three uninterrupted full verifies, no stop gate, and merge_authorized true may merge."
+
+optional_evidence:
+  cold_review: "optional; no gate effect"
+  owner_review: "optional; no gate effect"
+  independent_review: "optional; no gate effect"
+  manual_review: "optional; no gate effect"
+  physical_device_review: "optional; no gate effect"
+  reporting_rule: "Never infer execution or PASS for absent optional evidence."
+
+merge:
+  allowed_only_after: "automated_verification.status == PASS and every one of the 36 required command records is pass and merge_authorized == true"
+  target: "main"
+  method: "fast-forward"
+  squash_policy: "forbidden"
+  checkpoint_tag_after_merge: "checkpoint/personal-local-animation-01-fix-07-automated-pass"
+  automated_checkpoint_rule: "Only after the committed FIX-07 handoff is schema-valid, names the immutable candidate, records all 36 commands as pass, and main fast-forwards without changing candidate or handoff bytes, append the complete original-through-FIX-07 lineage and automated PASS result to docs/ai/reviews/coordinator-ledger.yaml in a separate coordinator checkpoint commit. Then create checkpoint/personal-local-animation-01-fix-07-automated-pass at that checkpoint. Never create or reuse an earlier personal-local checkpoint tag."
+  next_packet_rule: "No downstream packet may consume the personal-local API until checkpoint/personal-local-animation-01-fix-07-automated-pass exists. Any later WORKOUT-INTEGRATION packet must preserve exact variant identity, release-pack separation, zero egress, backup exclusion, and active-workout PWA update deferral."
+  producer_instruction: "Start from the packet-only FIX-07 coordinator commit on codex/personal-local-animation-01-fix-07, use gpt-5.6-sol with no subagents, preserve every historical status and retained byte, apply the legacy decoder only after exact raw identity succeeds, bootstrap the external absolute-import helper before expensive profiling, emit durable metrics before Git-clean assertions, create one non-empty immutable candidate limited to the four script paths, run all 36 commands once in order with unchanged timeouts and parallelism including separate real end-to-end workloads and three uninterrupted full verifies, then create only the handoff direct-child commit. Do not merge, tag, push, amend history, update the ledger, retry a failure, or clean failed state."
+  current_coordinator_task_prohibitions:
+    - "Do not implement the contention-safe verification fix."
+    - "Do not create a FIX-07 candidate or handoff."
+    - "Do not run producer verification or any required command as producer evidence."
+    - "Do not write, normalize, chmod, retimestamp, move, recycle, delete, restore, reuse, or clean either retained root."
+    - "Do not amend or replace any prior packet, candidate, handoff, capture, quarantine, commit, or status."
+    - "Do not merge main, push, update the coordinator ledger, or create any checkpoint tag."
