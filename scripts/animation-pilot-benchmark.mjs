@@ -166,6 +166,33 @@ function stableJson(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
+export function emitRendererTimingDiagnostics(diagnostics, onTimingDiagnostic) {
+  for (const diagnostic of diagnostics) {
+    if (
+      typeof diagnostic?.id !== "string"
+      || !Number.isFinite(diagnostic.durationMs)
+      || diagnostic.durationMs <= 0
+      || !Number.isFinite(diagnostic.averageAssetMs)
+      || diagnostic.averageAssetMs <= 0
+    ) {
+      throw new Error("Renderer benchmark timing diagnostic is invalid.");
+    }
+    onTimingDiagnostic?.(diagnostic);
+  }
+}
+
+export async function writeRendererBenchmarkReport(report, { committedEvidence = false, evidenceOutputRoot } = {}) {
+  if (committedEvidence) {
+    if (evidenceOutputRoot !== undefined) throw new Error("Committed benchmark evidence cannot use a temporary output root.");
+    await mkdir(PILOT_EVIDENCE_ROOT, { recursive: true });
+    await writeFile(join(PILOT_EVIDENCE_ROOT, "renderer-benchmark.json"), stableJson(report));
+    return;
+  }
+  if (evidenceOutputRoot === undefined) throw new Error("Test benchmark evidence requires an invocation-owned output root.");
+  await assertOwnedBenchmarkEvidenceRoot(evidenceOutputRoot);
+  await writeFile(join(evidenceOutputRoot.root, "renderer-benchmark.json"), stableJson(report), { flag: "wx" });
+}
+
 async function packageRoot(name, importerRoot = process.cwd()) {
   const linkedRoot = join(importerRoot, "node_modules", ...name.split("/"));
   try {
@@ -705,6 +732,7 @@ export async function runRendererBenchmark({ writeEvidence = false, committedEvi
       await onReproductionReady?.(reproduction, invocation);
   const lockText = await readFile("pnpm-lock.yaml", "utf8");
   const workload = [];
+  const timingDiagnostics = [];
   for (const candidate of candidates) {
     const metadata = await packageMetadata(candidate, lockText);
     const measured = await measuredCandidateWorkload(candidate, reproduction);
@@ -717,7 +745,9 @@ export async function runRendererBenchmark({ writeEvidence = false, committedEvi
     const observedOperations = Object.values(measured.operationCounts).reduce((total, count) => total + count, 0);
     const passedGateCount = Object.values(hardGates).filter(Boolean).length;
     const score = Math.round(passedGateCount * 1_000_000 + observedOperations + measured.parsedAssets + measured.frameEvents - metadata.closureBytes / 1024);
-    onTimingDiagnostic?.({ id: candidate.id, ...measured.timingDiagnostic });
+    const timingDiagnostic = { id: candidate.id, ...measured.timingDiagnostic };
+    timingDiagnostics.push(timingDiagnostic);
+    emitRendererTimingDiagnostics([timingDiagnostic], onTimingDiagnostic);
     workload.push({
       id: candidate.id,
       packages: metadata.packages,
@@ -759,17 +789,8 @@ export async function runRendererBenchmark({ writeEvidence = false, committedEvi
     selected: passing[0].id,
     candidates: workload
   };
-  if (writeEvidence) {
-    if (committedEvidence) {
-      if (evidenceOutputRoot !== undefined) throw new Error("Committed benchmark evidence cannot use a temporary output root.");
-      await mkdir(PILOT_EVIDENCE_ROOT, { recursive: true });
-      await writeFile(join(PILOT_EVIDENCE_ROOT, "renderer-benchmark.json"), stableJson(report));
-    } else {
-      if (evidenceOutputRoot === undefined) throw new Error("Test benchmark evidence requires an invocation-owned output root.");
-      await assertOwnedBenchmarkEvidenceRoot(evidenceOutputRoot);
-      await writeFile(join(evidenceOutputRoot.root, "renderer-benchmark.json"), stableJson(report), { flag: "wx" });
-    }
-  }
+  if (timingDiagnostics.length !== candidates.length) throw new Error("Renderer benchmark timing diagnostic count changed.");
+  if (writeEvidence) await writeRendererBenchmarkReport(report, { committedEvidence, evidenceOutputRoot });
   return report;
     }
   });

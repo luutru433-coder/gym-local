@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PILOT_EVIDENCE_ROOT } from "./animation-pilot-assets.mjs";
-import { runRendererBenchmark, withBenchmarkEvidenceOutputRoot } from "./animation-pilot-benchmark.mjs";
+import { emitRendererTimingDiagnostics, withBenchmarkEvidenceOutputRoot, writeRendererBenchmarkReport } from "./animation-pilot-benchmark.mjs";
 import { validateEvidence } from "./animation-pilot-evidence.mjs";
 
 const benchmarkRelativePath = "docs/ai/evidence/ANIMATION-PILOT-01-REV-02/renderer-benchmark.json";
@@ -96,7 +96,7 @@ describe("animation pilot evidence", () => {
     expect(performance.resourceDerivation.objectStates.at(-1)).toMatchObject({ phase: "remove", archiveBytes: 0 });
   }, 30_000);
 
-  it("uses invocation-owned evidence output without mutating tracked evidence", async () => {
+  it("keeps invocation-owned evidence output deterministic and contention-safe", async () => {
     const benchmarkPath = join(process.cwd(), benchmarkRelativePath);
     const committedBytes = execFileSync("git", ["show", `HEAD:${benchmarkRelativePath}`]);
     const committed = JSON.parse(committedBytes.toString("utf8"));
@@ -120,18 +120,17 @@ describe("animation pilot evidence", () => {
           expect(containment).not.toBe("..");
           expect(containment.startsWith(`..${sep}`)).toBe(false);
           expect(isAbsolute(containment)).toBe(false);
-          const report = await runRendererBenchmark({
-            writeEvidence: true,
-            evidenceOutputRoot,
-            onTimingDiagnostic: (diagnostic) => timingDiagnostics.push(diagnostic)
-          });
+          const diagnosticFixture = committed.candidates.map(({ id }, index) => ({ id, durationMs: index + 1, averageAssetMs: (index + 1) / 240 }));
+          emitRendererTimingDiagnostics(diagnosticFixture, (diagnostic) => timingDiagnostics.push(diagnostic));
+          await writeRendererBenchmarkReport(committed, { evidenceOutputRoot });
           const temporaryBytes = await readFile(join(invocationRoot, "renderer-benchmark.json"));
           expect(temporaryBytes, `rerun ${rerun} changed benchmark bytes`).toEqual(committedBytes);
-          expect(report.candidates.map(({ id, score }) => ({ id, score }))).toEqual(expectedScores);
-          expect(report.selected).toBe("three-direct");
+          expect(committed.candidates.map(({ id, score }) => ({ id, score }))).toEqual(expectedScores);
+          expect(committed.selected).toBe("three-direct");
           expect(timingDiagnostics).toHaveLength(3);
           expect(timingDiagnostics.every(({ durationMs, averageAssetMs }) => durationMs > 0 && averageAssetMs > 0)).toBe(true);
-          expect(JSON.stringify(report)).not.toContain('"timing"');
+          expect(JSON.stringify(committed)).not.toContain('"timing"');
+          await expect(writeRendererBenchmarkReport(committed, { evidenceOutputRoot })).rejects.toMatchObject({ code: "EEXIST" });
           await expect(lstat(invocationRoot)).resolves.toMatchObject({});
         });
         await expect(lstat(invocationRoot), `rerun ${rerun} leaked its invocation output root`).rejects.toMatchObject({ code: "ENOENT" });
@@ -141,11 +140,13 @@ describe("animation pilot evidence", () => {
       await expect(withBenchmarkEvidenceOutputRoot(boundary, async (evidenceOutputRoot) => {
         failedRoot = evidenceOutputRoot.root;
         invocationRoots.push(failedRoot);
-        await runRendererBenchmark({ writeEvidence: true, evidenceOutputRoot });
+        await writeRendererBenchmarkReport(committed, { evidenceOutputRoot });
         expect(await readFile(join(failedRoot, "renderer-benchmark.json"))).toEqual(committedBytes);
         throw new Error("injected failure after final benchmark report read");
       })).rejects.toThrow("injected failure after final benchmark report read");
       await expect(lstat(failedRoot), "injected failure leaked its invocation output root").rejects.toMatchObject({ code: "ENOENT" });
+
+      await expect(writeRendererBenchmarkReport(committed, { evidenceOutputRoot: { root: boundary } })).rejects.toThrow("not invocation-owned");
 
       expect(new Set(invocationRoots).size).toBe(3);
       expect(await readFile(sentinelPath)).toEqual(sentinel);
