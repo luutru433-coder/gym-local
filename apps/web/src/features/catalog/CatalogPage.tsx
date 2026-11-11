@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { AlertTriangle, ArrowUpRight, CheckCircle2, Dumbbell, Info, Search, ShieldCheck, SlidersHorizontal, Target } from "lucide-react";
 import { Button, Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
 import type { EquipmentType, ExerciseVariant, Movement, MuscleGroup } from "@gym/contracts";
-import { EQUIPMENT_OPTIONS, getVariantsForMovement, MOVEMENTS, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
-import { openExternalMedia } from "@gym/media";
+import { CONTENT_SOURCES, EQUIPMENT_OPTIONS, getExerciseReferencePage, getVariantsForMovement, MOVEMENTS, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
+import { isSafeMediaUrl, openExternalMedia } from "@gym/media";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
@@ -42,7 +42,8 @@ export function CatalogPage() {
   const selectedMovement = MOVEMENTS.find((movement) => movement.id === selectedMovementId);
   const variants = selectedMovement ? rankVariantsForEquipment(selectedMovement.id, availableEquipment) : [];
   const activeVariant = selectedVariant ?? variants[0];
-  const referenceImage = activeVariant?.media.find((asset) => asset.type === "image");
+  const referenceImages = activeVariant?.media.filter((asset) => asset.type === "image" && asset.onlineOnly && isSafeMediaUrl(asset)) ?? [];
+  const referencePage = activeVariant && getExerciseReferencePage(activeVariant.id);
   const tutorialVideo = activeVariant?.videoGuides[0];
 
   const openMovement = (id: string) => {
@@ -120,7 +121,41 @@ export function CatalogPage() {
               })}</div>
             </section>
 
-            {referenceImage ? <figure className="exercise-media-preview"><div><img src={referenceImage.url} alt={localize(referenceImage.title, locale)} loading="lazy" onError={(event) => event.currentTarget.parentElement?.classList.add("media-load-error")} /><span>{locale === "vi" ? "Cần Internet để tải hình" : "Internet required for image"}</span></div><figcaption><span className="eyebrow">Free Exercise DB · Unlicense</span><strong>{localize(referenceImage.title, locale)}</strong><p>{locale === "vi" ? "Hình tham khảo công khai; hướng dẫn song ngữ của Gym Local vẫn dùng được offline." : "Public-domain reference; Gym Local's written guide remains available offline."}</p><Button size="sm" variant="ghost" onClick={() => openExternalMedia(referenceImage)}>{locale === "vi" ? "Mở ảnh nguồn" : "Open source image"}<ArrowUpRight size={15} /></Button></figcaption></figure> : null}
+            {referenceImages.map((asset) => {
+              const source = CONTENT_SOURCES.find((entry) => entry.id === asset.sourceId);
+              if (!source) return null;
+              const sourceUrl = referencePage ?? source.sourceUrl;
+              const license = source.licenseId === "unlicense" ? "Unlicense" : source.licenseId;
+              const title = localize(asset.title, locale);
+              return (
+                <figure className="exercise-media-preview" key={asset.id}>
+                  <div>
+                    <img
+                      src={asset.url}
+                      alt={title}
+                      loading="lazy"
+                      style={referencePage ? { objectFit: "contain" } : undefined}
+                      onError={(event) => event.currentTarget.parentElement?.classList.add("media-load-error")}
+                    />
+                    <span>{locale === "vi" ? "Không tải được ảnh trực tuyến" : "Could not load the online image"}</span>
+                  </div>
+                  <figcaption>
+                    <span className="eyebrow">{source.label}</span>
+                    <strong>{title}</strong>
+                    <p>
+                      {sourceUrl ? <a href={sourceUrl} target="_blank" rel="noopener noreferrer">{source.author}</a> : source.author}
+                      {" · "}
+                      {source.licenseUrl ? <a href={source.licenseUrl} target="_blank" rel="noopener noreferrer">{license}</a> : license}
+                      <br />
+                      {locale === "vi" ? "Ảnh cần Internet. Hướng dẫn bằng chữ dùng được ngoại tuyến." : "Images require Internet access. Written guidance is available offline."}
+                    </p>
+                    <Button size="sm" variant="ghost" onClick={() => openExternalMedia(asset)}>
+                      {locale === "vi" ? "Mở ảnh nguồn" : "Open source image"}<ArrowUpRight size={15} />
+                    </Button>
+                  </figcaption>
+                </figure>
+              );
+            })}
 
             <div className="instruction-layout">
               <section>

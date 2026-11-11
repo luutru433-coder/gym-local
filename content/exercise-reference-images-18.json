@@ -1,0 +1,489 @@
+{
+  "sourceDate": "2026-11-11",
+  "reviewStatus": "reviewed",
+  "sources": {
+    "free-exercise-db": {
+      "name": "Free Exercise DB",
+      "url": "https://github.com/yuhonas/free-exercise-db",
+      "revision": "f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5",
+      "licenseId": "Unlicense",
+      "licenseUrl": "https://github.com/yuhonas/free-exercise-db/blob/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/LICENSE.md",
+      "attribution": "Free Exercise DB contributors (yuhonas/free-exercise-db)",
+      "redistributionAllowed": true,
+      "modified": false
+    },
+    "bruceblaus-heel-raise": {
+      "name": "Exercise Heel Raise Two Legs",
+      "url": "https://commons.wikimedia.org/wiki/File:Exercise_Heel_Raise_Two_Legs.png",
+      "licenseId": "CC-BY-SA-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "BruceBlaus, Exercise Heel Raise Two Legs, Wikimedia Commons, CC BY-SA 4.0",
+      "redistributionAllowed": true,
+      "modified": false
+    }
+  },
+  "records": [
+    {
+      "variantId": "chest_press__dumbbell",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Dumbbell_Bench_Press",
+      "title": {
+        "vi": "Đẩy ngực ngang với tạ đơn",
+        "en": "Dumbbell Bench Press"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bench_Press",
+      "assets": [
+        {
+          "path": "images/chest_press__dumbbell/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bench_Press/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 63319,
+          "sha256": "06494fc5d679283ad7de10fd60149e543396bbd9ba65b0821937de317ce9e001"
+        },
+        {
+          "path": "images/chest_press__dumbbell/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bench_Press/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 64120,
+          "sha256": "29ce1d1335b10ae5e92b208c512f4f562493379a9c49bafb249f945c5b702299"
+        }
+      ]
+    },
+    {
+      "variantId": "chest_press__barbell",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+      "title": {
+        "vi": "Đẩy ngực ngang với tạ đòn, tay nắm vừa",
+        "en": "Barbell Bench Press (Medium Grip)"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Bench_Press_-_Medium_Grip",
+      "assets": [
+        {
+          "path": "images/chest_press__barbell/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 72816,
+          "sha256": "44ba81b3ea124f625c555ae812b37263f82ae460749bbc9ebbeb55a6309f6663"
+        },
+        {
+          "path": "images/chest_press__barbell/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 72202,
+          "sha256": "5056475ae5def865dbe52882d30d2730142de2b03231bda304f82fd0b088f608"
+        }
+      ]
+    },
+    {
+      "variantId": "incline_chest_press__dumbbell",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Incline_Dumbbell_Press",
+      "title": {
+        "vi": "Đẩy ngực trên với tạ đơn",
+        "en": "Incline Dumbbell Press"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Incline_Dumbbell_Press",
+      "assets": [
+        {
+          "path": "images/incline_chest_press__dumbbell/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Incline_Dumbbell_Press/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 61978,
+          "sha256": "5128af58efedb66e5d3e2454c7a1e3c7f9353b573e97c8430e37cb638da8882e"
+        },
+        {
+          "path": "images/incline_chest_press__dumbbell/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Incline_Dumbbell_Press/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 61629,
+          "sha256": "7e4cd389cd0c537911da937657333f33118102e69f050c36906a6d49ae3f921f"
+        }
+      ]
+    },
+    {
+      "variantId": "dip__bodyweight",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Dips_-_Chest_Version",
+      "title": {
+        "vi": "Hít xà kép thiên về ngực",
+        "en": "Chest Dip"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dips_-_Chest_Version",
+      "assets": [
+        {
+          "path": "images/dip__bodyweight/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dips_-_Chest_Version/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 73206,
+          "sha256": "4140a8932a82e7437e10894369a0205d6f35ba333715fffd5a64de77c2c92e34"
+        },
+        {
+          "path": "images/dip__bodyweight/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dips_-_Chest_Version/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 72525,
+          "sha256": "3d537e22cb97304c0c2068c5209e8db5fec69be86e0465799e1a1b502f6e992f"
+        }
+      ]
+    },
+    {
+      "variantId": "lat_pulldown__cable",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Wide-Grip_Lat_Pulldown",
+      "title": {
+        "vi": "Kéo xô cáp tay rộng",
+        "en": "Wide-Grip Cable Lat Pulldown"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Wide-Grip_Lat_Pulldown",
+      "assets": [
+        {
+          "path": "images/lat_pulldown__cable/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 71951,
+          "sha256": "929bc29751c35d0a624840b24501e74dc59438d351e66cc017e7ee8682fb3346"
+        },
+        {
+          "path": "images/lat_pulldown__cable/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Wide-Grip_Lat_Pulldown/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 71400,
+          "sha256": "781952e629e8a4cff549df94ee6b1da7e32c7cd507382d47e8566718c07807dd"
+        }
+      ]
+    },
+    {
+      "variantId": "pull_up__bodyweight",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Pullups",
+      "title": {
+        "vi": "Kéo xà bằng trọng lượng cơ thể",
+        "en": "Bodyweight Pull-Up"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Pullups",
+      "assets": [
+        {
+          "path": "images/pull_up__bodyweight/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Pullups/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 42281,
+          "sha256": "e56c8c43a41cfe2489dcfffc2c8195fd9e8897ba25165dbc34a4154ed6df5c7a"
+        },
+        {
+          "path": "images/pull_up__bodyweight/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Pullups/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 40018,
+          "sha256": "40549a52b064e5084a85e2c36afb51438df6ac1097169379a05f21565f8b4f3f"
+        }
+      ]
+    },
+    {
+      "variantId": "horizontal_row__cable",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Seated_Cable_Rows",
+      "title": {
+        "vi": "Ngồi kéo cáp ngang",
+        "en": "Seated Cable Row"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Seated_Cable_Rows",
+      "assets": [
+        {
+          "path": "images/horizontal_row__cable/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Seated_Cable_Rows/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 65319,
+          "sha256": "f5a4adf972f93a6c7b09e003f23005a1163653a7e36b71f1e374acab0243ddf7"
+        },
+        {
+          "path": "images/horizontal_row__cable/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Seated_Cable_Rows/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 65659,
+          "sha256": "0b8e1a0b0fff86cafff45d851ea631a20d469713e9fd735031d3fffb0299fde6"
+        }
+      ]
+    },
+    {
+      "variantId": "overhead_press__dumbbell",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Dumbbell_Shoulder_Press",
+      "title": {
+        "vi": "Đẩy vai với tạ đơn",
+        "en": "Dumbbell Shoulder Press"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Shoulder_Press",
+      "assets": [
+        {
+          "path": "images/overhead_press__dumbbell/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Shoulder_Press/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 62474,
+          "sha256": "e0a775bfa0b32b63c84f19fba2b1a05db535bde849feb3e54a3479a943b3bed6"
+        },
+        {
+          "path": "images/overhead_press__dumbbell/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Shoulder_Press/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 63882,
+          "sha256": "940d5aad6b85960e833f88e218de8ce4f806d84cf2764741f1cbff9cce365d84"
+        }
+      ]
+    },
+    {
+      "variantId": "biceps_curl__dumbbell",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Dumbbell_Bicep_Curl",
+      "title": {
+        "vi": "Cuốn tay trước với tạ đơn",
+        "en": "Dumbbell Biceps Curl"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bicep_Curl",
+      "assets": [
+        {
+          "path": "images/biceps_curl__dumbbell/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bicep_Curl/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 57223,
+          "sha256": "fad8458c2f70c39e1abb0a9554bba280da5abf9f8dc2d76f7c0be44ffdbfc99b"
+        },
+        {
+          "path": "images/biceps_curl__dumbbell/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bicep_Curl/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 58066,
+          "sha256": "ec2c3a539aa80ea911a85e00ca9fb74502407e8ef0d8a4526e3b076a5a52b30a"
+        }
+      ]
+    },
+    {
+      "variantId": "triceps_pushdown__cable",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Triceps_Pushdown",
+      "title": {
+        "vi": "Ép tay sau với cáp",
+        "en": "Cable Triceps Pushdown"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Triceps_Pushdown",
+      "assets": [
+        {
+          "path": "images/triceps_pushdown__cable/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Triceps_Pushdown/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 77630,
+          "sha256": "5f52b0f699fcd01bcf07053d9abe26e428f227816d62bc61a3232435715b5e7e"
+        },
+        {
+          "path": "images/triceps_pushdown__cable/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Triceps_Pushdown/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 78235,
+          "sha256": "76f7793452cebb4f00846f9fd5ce3306d90d4b1912b192125cd428c2d8b76a3c"
+        }
+      ]
+    },
+    {
+      "variantId": "squat__bodyweight",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Bodyweight_Squat",
+      "title": {
+        "vi": "Squat bằng trọng lượng cơ thể",
+        "en": "Bodyweight Squat"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Bodyweight_Squat",
+      "assets": [
+        {
+          "path": "images/squat__bodyweight/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Bodyweight_Squat/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 37986,
+          "sha256": "85715b9b75afe568ef7cb1863005be532a2457bf7e340802da0cd5cc06914b62"
+        },
+        {
+          "path": "images/squat__bodyweight/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Bodyweight_Squat/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 41546,
+          "sha256": "3fa6886632674f02308cdee53ce32649fd648774701fbd20ee280d63be40e5a4"
+        }
+      ]
+    },
+    {
+      "variantId": "lunge__dumbbell",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Dumbbell_Lunges",
+      "title": {
+        "vi": "Chùng chân với tạ đơn",
+        "en": "Dumbbell Lunge"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Lunges",
+      "assets": [
+        {
+          "path": "images/lunge__dumbbell/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Lunges/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 55460,
+          "sha256": "ab3d56b0b44e82d189dfd88de2838220445cb245fae8a0f1586daa67355604d4"
+        },
+        {
+          "path": "images/lunge__dumbbell/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Lunges/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 61678,
+          "sha256": "138a08303cb955b1f4867cf6eaeab1664c32079dcbd7fac871eccf7d9597d671"
+        }
+      ]
+    },
+    {
+      "variantId": "step_up__bodyweight",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Step-up_with_Knee_Raise",
+      "title": {
+        "vi": "Minh họa bước lên bục kết hợp nâng gối",
+        "en": "Illustration: Step-Up with Knee Raise"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Step-up_with_Knee_Raise",
+      "note": "This reference includes a knee raise at the top. Use only as an illustrative step-up variation, not an exact GLB motion input.",
+      "assets": [
+        {
+          "path": "images/step_up__bodyweight/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Step-up_with_Knee_Raise/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 50253,
+          "sha256": "60c44f399a96d4bda485df453b3316c858da7c3fccc3cebd14f4a749962e1cea"
+        },
+        {
+          "path": "images/step_up__bodyweight/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Step-up_with_Knee_Raise/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 54122,
+          "sha256": "f278412d713cc59a8959fec466faef106b548d7d6cff3533af505281cc555f4e"
+        }
+      ]
+    },
+    {
+      "variantId": "romanian_deadlift__barbell",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Romanian_Deadlift",
+      "title": {
+        "vi": "Romanian deadlift với tạ đòn",
+        "en": "Barbell Romanian Deadlift"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Romanian_Deadlift",
+      "assets": [
+        {
+          "path": "images/romanian_deadlift__barbell/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Romanian_Deadlift/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 59859,
+          "sha256": "cd62a031d395afa1f63f660370e79d812ca0f9cf52718a33ee24d9fec2a9709f"
+        },
+        {
+          "path": "images/romanian_deadlift__barbell/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Romanian_Deadlift/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 57367,
+          "sha256": "156406c703e8d4a172034e413b317b93907be82deaad5ea2f3cc0a9f181c7b9b"
+        }
+      ]
+    },
+    {
+      "variantId": "leg_curl__machine",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Lying_Leg_Curls",
+      "title": {
+        "vi": "Nằm gập gối trên máy",
+        "en": "Lying Machine Leg Curl"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Lying_Leg_Curls",
+      "assets": [
+        {
+          "path": "images/leg_curl__machine/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Lying_Leg_Curls/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 77402,
+          "sha256": "0875bf50a6615d4dc33df63110d3c6ee55b41606ed79a9fe705e17fcb4626095"
+        },
+        {
+          "path": "images/leg_curl__machine/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Lying_Leg_Curls/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 87755,
+          "sha256": "4ccf6f4a26dc97dcf8241cc55e08e22579b5a02bdebafe56d74f951ceab2bd06"
+        }
+      ]
+    },
+    {
+      "variantId": "deadlift__trap_bar",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Trap_Bar_Deadlift",
+      "title": {
+        "vi": "Deadlift với thanh trap bar",
+        "en": "Trap Bar Deadlift"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Trap_Bar_Deadlift",
+      "assets": [
+        {
+          "path": "images/deadlift__trap_bar/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Trap_Bar_Deadlift/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 111196,
+          "sha256": "541c735e260754b50e9da3320578ce252d1a0e61de93fa3c82e154c1a7c7417d"
+        },
+        {
+          "path": "images/deadlift__trap_bar/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Trap_Bar_Deadlift/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 86805,
+          "sha256": "34bdaa71ed3282d48d7b83113b434f776a97028cc1cc332876091779a30ac181"
+        }
+      ]
+    },
+    {
+      "variantId": "standing_calf_raise__bodyweight",
+      "sourceId": "bruceblaus-heel-raise",
+      "title": {
+        "vi": "Nhón gót hai chân (cả hai tư thế)",
+        "en": "Two-Leg Heel Raise (Both Poses)"
+      },
+      "referencePage": "https://commons.wikimedia.org/wiki/File:Exercise_Heel_Raise_Two_Legs.png",
+      "note": "Single source illustration shows both poses.",
+      "assets": [
+        {
+          "path": "images/standing_calf_raise__bodyweight/0.png",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Exercise_Heel_Raise_Two_Legs.png",
+          "mediaType": "image/png",
+          "byteSize": 326757,
+          "sha256": "b8f6bac56f07f578ef49de95211e2b68929d81b41a7f13b13a912142bb174d7d"
+        }
+      ]
+    },
+    {
+      "variantId": "crunch__bodyweight",
+      "sourceId": "free-exercise-db",
+      "sourceExerciseId": "Crunches",
+      "title": {
+        "vi": "Gập bụng bằng trọng lượng cơ thể",
+        "en": "Bodyweight Crunch"
+      },
+      "referencePage": "https://github.com/yuhonas/free-exercise-db/tree/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Crunches",
+      "assets": [
+        {
+          "path": "images/crunch__bodyweight/0.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Crunches/0.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 69289,
+          "sha256": "8b424d42b3196b9b6fdd70c86db60ba6fdae7a337710e8c01c278a6ea5c4220a"
+        },
+        {
+          "path": "images/crunch__bodyweight/1.jpg",
+          "url": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Crunches/1.jpg",
+          "mediaType": "image/jpeg",
+          "byteSize": 69225,
+          "sha256": "84df8957fcc20c051475a2d28fedb0c1a3b3e63b00913ae4acec1ed0dc150d22"
+        }
+      ]
+    }
+  ]
+}

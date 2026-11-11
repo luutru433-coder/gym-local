@@ -11,7 +11,9 @@ Project-authored guidance points to this policy through `sourcePath`; external m
 - The review gate checks that title/creator metadata corresponds to the exercise and equipment variant. It is a content review, not a medical endorsement.
 - Videos are embedded only after a click through `youtube-nocookie.com`; autoplay, download, offline caching, and YouTube search pages are prohibited.
 - Missing, blocked, or removed videos fall back to project-authored setup, execution, breathing, and safety cues plus a direct source link.
-- Reference images come from the public-domain Free Exercise DB under the Unlicense and remain remote/online-only.
+- Reference images remain remote and online-only. Free Exercise DB photos are public domain under the Unlicense. The two-pose heel-raise illustration is by BruceBlaus (Wikimedia Commons) under CC BY-SA 4.0.
+- `content/exercise-reference-images-18.json` binds each staged image to an exact variant ID, source page, license and attribution record, and the byte size and SHA-256 of the staged source file. These hashes document provenance for the staged copies. The catalog loads the original image URLs and does not bundle the image files.
+- Reference captions identify the depicted movement. The step-up photos illustrate a step-up with knee raise.
 
 Every new media host must be added to the allowlist in `packages/media`, carry a source record, and add an allowlist test. Automated checks validate direct-video coverage, unique variant IDs, creator metadata, URLs, translations, equipment references, sources, licenses/terms, review dates, and routine-template references.
 
