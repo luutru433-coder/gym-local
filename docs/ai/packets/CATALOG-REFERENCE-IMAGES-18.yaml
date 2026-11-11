@@ -6,11 +6,12 @@ packet:
   status: "ready"
 
 execution:
-  model: "gpt-5.6-sol"
+  model: "gpt-6.1-sol"
+  model_exception: "The user explicitly approved gpt-6.1-sol instead of gpt-5.6-sol for this packet only, after the original producer reported the prior model unavailable. This supersedes the default model requirement for this packet; it does not modify the root guidance or the verification disposition."
   subagents_allowed: false
   producer_task_handles_only_this_packet: true
   base_commit: "4bca728cc74c5a1f59a39b2c38ee850fdf67497c"
-  producer_start_rule: "Start at the direct child of base_commit that adds only this packet. Do not amend the coordinator commit."
+  producer_start_rule: "Start at the direct child of the immutable original coordinator commit d5cea5a7dab86c181c9dcdb5724ea41f2b32c772. The model-exception commit changes only this packet. Neither coordinator commit may be amended."
   target_branch: "codex/catalog-reference-images-18"
   worktree_required: false
   sequential_after: []
