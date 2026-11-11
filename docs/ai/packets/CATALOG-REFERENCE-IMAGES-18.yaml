@@ -1,0 +1,139 @@
+schema_version: 3
+packet:
+  id: "CATALOG-REFERENCE-IMAGES-18"
+  title: "Show source-attributed reference images for 18 priority exercise variants"
+  type: "content"
+  status: "ready"
+
+execution:
+  model: "gpt-5.6-sol"
+  subagents_allowed: false
+  producer_task_handles_only_this_packet: true
+  base_commit: "4bca728cc74c5a1f59a39b2c38ee850fdf67497c"
+  producer_start_rule: "Start at the direct child of base_commit that adds only this packet. Do not amend the coordinator commit."
+  target_branch: "codex/catalog-reference-images-18"
+  worktree_required: false
+  sequential_after: []
+  user_instruction: "Tạo task đưa ảnh 18 bài vào app, không chạy test tự động."
+  verification_disposition: "Local candidate for the user's own use. Do not execute the listed automated commands; record each as not_run and leave verification BLOCKED with merge_authorized false."
+
+authority:
+  allowed_paths:
+    - "content/exercise-reference-images-18.json"
+    - "packages/catalog/src/index.ts"
+    - "apps/web/src/features/catalog/CatalogPage.tsx"
+    - "docs/content-policy.md"
+    - "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml"
+  candidate_paths:
+    - "content/exercise-reference-images-18.json"
+    - "packages/catalog/src/index.ts"
+    - "apps/web/src/features/catalog/CatalogPage.tsx"
+    - "docs/content-policy.md"
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml"
+  all_unlisted_paths_forbidden: true
+  external_writes_allowed: false
+  dependency_changes_allowed: false
+  generated_binary_assets_allowed: false
+
+context:
+  required_reads:
+    - "AGENTS.md"
+    - "content/AGENTS.md"
+    - "docs/ai/master-plan.md"
+    - "docs/ai/review-procedure.md"
+    - "docs/ai/packets/CATALOG-REFERENCE-IMAGES-18.yaml"
+    - "docs/content-policy.md"
+    - "C:/Users/Q/.codex/visualizations/2026/08/31/01a05847-e2d7-7fe0-ae88-29d01c85af9e/gym-wave-01-reference-data/manifest.json"
+    - "C:/Users/Q/.codex/visualizations/2026/08/31/01a05847-e2d7-7fe0-ae88-29d01c85af9e/gym-wave-01-reference-data/checksums.json"
+  accepted_adrs: []
+  assumptions:
+    - "This is an online-only image-reference catalog update, not a GLB pack, personal-local import, or Wave 01 release. The staged ZIP is the offline copy."
+    - "Use the exact known image URLs and attribution in the staged manifest. No crawling, media re-download, or new hosts are needed."
+
+outcome:
+  objective: "Expose 35 sourced reference images across exactly the 18 priority variants from the supplied manifest on the existing exercise detail screen."
+  user_visible_result: "The 18 variants show their reference images and correct source credit in the catalog. Written guidance is unchanged and works offline."
+  deliverables:
+    - "A scoped manifest with bilingual titles, immutable variant mapping, source/license/attribution, source URL and provenance for each reference."
+    - "Show one or both available reference poses for every target variant via the existing allowed online image media flow. Preserve existing primary media IDs for variants with an existing image and use distinct IDs for added poses."
+    - "Use source-aware captions and links: the 34 photos are Free Exercise DB, Unlicense; the two-pose calf image is BruceBlaus, Wikimedia Commons, CC BY-SA 4.0. Do not imply all assets are public domain."
+    - "Label the step-up image as an illustrative step-up with knee raise. Do not imply that the knee-raise variant is the exact GLB movement or alter any variant identity."
+    - "Leave the candidate on this local branch for the user to try and write the BLOCKED verification handoff recording unrun commands."
+  non_goals:
+    - "No automated tests or verification commands, test changes, cold review, release, merge, push, or checkpoint tagging."
+    - "No media download or binary bundling, PWA cache changes, animation player, GLB pack, or changes to personal-local import."
+    - "No exercise ID, contract, backup, storage, history, user routine, equipment mapping, nutrition, or video-guide changes."
+
+preflight:
+  report_before_editing:
+    - "branch_and_base_commit"
+    - "dirty_files"
+    - "allowed_paths"
+    - "applicable_stop_gates"
+  required_conditions:
+    clean_worktree: true
+    head_matches_producer_start_rule: true
+    instructions_read: true
+    required_inputs_present: true
+
+decisions:
+  contract_or_schema_change: "none"
+  version_decisions: []
+  migration_or_rollback: "not_applicable"
+  source_or_license_impact: "metadata_only"
+
+acceptance_tests:
+  - id: "AC-01"
+    requirement: "All 18 exact IDs have the catalog references from the staged manifest; the other variants, current primary media IDs, and written/video guides are unchanged."
+    evidence: "Candidate diff and exact variant source mappings; automated checks not run."
+  - id: "AC-02"
+    requirement: "All added links are online-only HTTPS URLs on existing allowed hosts; correct source credit and license are displayed."
+    evidence: "Candidate source records and UI diff; runtime behavior not asserted as passed."
+  - id: "AC-03"
+    requirement: "No changes to persistence, package dependencies, service worker, or prior packet history; no automated PASS or merge."
+    evidence: "Candidate and metadata changed-path lists and handoff."
+
+required_checks:
+  automated_commands:
+    - "pnpm run verify:affected"
+    - "pnpm content:validate"
+    - "pnpm content:audit"
+  execution_rule: "Do not run these commands or other automated tests in this task by user instruction. Record each required command exactly as not_run, not pass."
+  evidence_paths:
+    - "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml"
+  optional_manual_or_device_checks: []
+
+stop_gates:
+  - id: "STOP-01"
+    condition: "Wrong model or branch/lineage, dirty checkout, missing inputs, unclear image rights/provenance, unexpected scope, or inability to keep IDs and protected behavior unchanged."
+    action: "Stop without widening scope. Report the blocker and do not authorize merge."
+
+handoff:
+  report_path: "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml"
+  candidate_commit_excludes_handoff_and_verification_metadata: true
+  post_candidate_metadata_paths:
+    - "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml"
+  metadata_commit_rule: "After the immutable candidate, commit only the declared handoff."
+  required_fields:
+    - "packet_id"
+    - "status"
+    - "base_commit"
+    - "candidate_commit"
+    - "branch"
+    - "changed_paths"
+    - "acceptance_evidence"
+    - "automated_verification"
+    - "licenses"
+    - "known_risks"
+    - "review_target"
+
+automated_verification:
+  required: true
+  record_location: "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml#automated_verification"
+  authorization_rule: "Use the schema in review-procedure.md. BLOCKED with not_run for every listed command, empty optional_manual_evidence, and merge_authorized false. The user's future manual use is not PASS."
+
+merge:
+  target: "main"
+  allowed_only_after: "A later separately authorized PASS; no merge in this task."
+  squash_policy: "forbidden"
