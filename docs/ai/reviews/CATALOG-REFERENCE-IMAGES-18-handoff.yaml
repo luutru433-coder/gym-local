@@ -1,0 +1,70 @@
+schema_version: 3
+packet_id: "CATALOG-REFERENCE-IMAGES-18"
+status: "automated_blocked"
+producer_model: "gpt-6.1-sol"
+subagents_used: false
+base_commit: "4bca728cc74c5a1f59a39b2c38ee850fdf67497c"
+producer_start_commit: "6b4efc6cfc94fdb8b927d048d2f12df2953cacb9"
+candidate_commit: "a4410b765bb2149c8c474e50a83e98e1cfadfb98"
+branch: "codex/catalog-reference-images-18"
+
+changed_paths:
+  candidate:
+    - "content/exercise-reference-images-18.json"
+    - "packages/catalog/src/index.ts"
+    - "apps/web/src/features/catalog/CatalogPage.tsx"
+    - "docs/content-policy.md"
+  post_candidate_metadata:
+    - "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml"
+
+acceptance_evidence:
+  - id: "AC-01"
+    evidence:
+      - "The candidate manifest maps the 35 supplied image URLs and staged checksums to 18 exact variant IDs. The catalog keeps the primary image ID format and assigns a distinct ID to each second photo."
+      - "The diff preserves the image records of variants outside the manifest and leaves instructions and video guide data unchanged."
+  - id: "AC-02"
+    evidence:
+      - "CatalogPage filters image assets through the existing online-only media policy. Captions use the matched source and license, link to the source page and license, and identify the step-up photos as illustrations of a step-up with knee raise."
+      - "Runtime image loading and presentation were not exercised."
+  - id: "AC-03"
+    evidence:
+      - "The producer delta is limited to the four declared candidate paths. The prior commits establish the coordinator packet and the authorized model exception."
+      - "All required automated commands are recorded as not_run. The candidate is for local use with merge authorization disabled."
+
+automated_verification:
+  schema_version: 1
+  packet_id: "CATALOG-REFERENCE-IMAGES-18"
+  candidate_commit: "a4410b765bb2149c8c474e50a83e98e1cfadfb98"
+  status: "BLOCKED"
+  checks:
+    - command: "pnpm run verify:affected"
+      result: "not_run"
+      evidence: "Not executed by explicit user instruction for this local candidate."
+    - command: "pnpm content:validate"
+      result: "not_run"
+      evidence: "Not executed by explicit user instruction for this local candidate."
+    - command: "pnpm content:audit"
+      result: "not_run"
+      evidence: "Not executed by explicit user instruction for this local candidate."
+  optional_manual_evidence: []
+  merge_authorized: false
+
+licenses:
+  - source_id: "free-exercise-db"
+    license_id: "Unlicense"
+    image_count: 34
+    attribution: "Free Exercise DB contributors (yuhonas/free-exercise-db)"
+    revision: "f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5"
+  - source_id: "bruceblaus-heel-raise"
+    license_id: "CC-BY-SA-4.0"
+    image_count: 1
+    attribution: "BruceBlaus, Exercise Heel Raise Two Legs, Wikimedia Commons, CC BY-SA 4.0"
+
+known_risks:
+  - "Availability depends on the remote hosts and an Internet connection. Staged checksums document provenance and are not a runtime integrity check."
+  - "Runtime display and all automated commands remain unverified in this task."
+
+review_target:
+  packet_path: "docs/ai/packets/CATALOG-REFERENCE-IMAGES-18.yaml"
+  candidate_range: "6b4efc6cfc94fdb8b927d048d2f12df2953cacb9..a4410b765bb2149c8c474e50a83e98e1cfadfb98"
+  report_path: "docs/ai/reviews/CATALOG-REFERENCE-IMAGES-18-handoff.yaml"
