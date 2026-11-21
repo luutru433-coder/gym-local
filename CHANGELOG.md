@@ -4,6 +4,11 @@
 
 - Fixed the routine editor saving a hidden 8–12 rep target for timed and distance-tracked exercises (plank, farmer carry): new exercises and added sets now save the 30-second duration target the editor shows, so the workout screen displays it. Existing routines are not rewritten.
 
+## Unreleased — Muscle recovery map
+
+- Added a muscle recovery map to the home screen: the front/back body diagram colours each muscle group as fatigued, recovering, or ready, with the estimated time left and this week's working sets per muscle. It works offline from finished sessions only.
+- Recovery estimate: each finished session gives a muscle a window of 36 h + 4 h per completed working set (secondary muscles and full-body movements count half a set), capped at 96 h. Under half the window is fatigued, under the full window recovering. Warm-ups and unfinished sessions are ignored; it is a guide, not programming advice.
+
 ## Unreleased — Self-adjusting training plan
 
 - Added an offline self-adjusting training plan on the home screen: the week's remaining sessions reflow around missed days, and the next session shows per-exercise adjustments with a bilingual reason.
