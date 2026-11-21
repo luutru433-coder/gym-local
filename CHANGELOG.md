@@ -7,6 +7,12 @@
 - The suggestion is never applied on its own: "Use new target" saves it as a manual target, "Ignore" hides it for 7 days on this device. Changing body details in Settings afterwards asks for the estimate to be reviewed again.
 - No database or backup schema change.
 
+## Unreleased — Supersets in live workouts
+
+- Exercises that share a superset label in a routine now run as a superset during the workout: finishing a set moves straight to the next exercise in the group with no rest, and the rest timer starts only after the last exercise of the round. Each grouped exercise shows a "Superset" badge and what comes next.
+- During a workout, "Superset next" in the exercise edit tools groups an exercise with the one after it, and "Ungroup" takes it out. This changes the current workout only, not the routine.
+- Sessions now keep the optional superset label (ADR 0018). No database or backup version change; older backups and sessions are unaffected.
+
 ## Unreleased — Weekly nutrition trends
 
 - The Nutrition page now shows weekly trends: average daily calories for the last six Monday–Sunday weeks against your target, and the chosen week's average protein, carbs, and fat with the gap to each target. Averages count only days with logged food, so empty days are not treated as zero. No stored data or formula changed.

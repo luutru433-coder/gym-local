@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
       "@gym/catalog/custom": fromRoot("./packages/catalog/src/custom-exercise.ts"),
       "@gym/catalog": fromRoot("./packages/catalog/src/index.ts"),
       "@gym/workouts/plan": fromRoot("./packages/workouts/src/adaptive-plan.ts"),
+      "@gym/workouts/superset": fromRoot("./packages/workouts/src/superset.ts"),
       "@gym/workouts": fromRoot("./packages/workouts/src/index.ts"),
       "@gym/nutrition/trends": fromRoot("./packages/nutrition/src/trends.ts"),
       "@gym/nutrition": fromRoot("./packages/nutrition/src/index.ts"),
