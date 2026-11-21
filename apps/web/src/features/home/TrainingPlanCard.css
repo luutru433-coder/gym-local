@@ -2,10 +2,10 @@
 .training-plan__card { padding: 18px; display: grid; gap: 14px; }
 .training-plan__week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .training-plan__day { min-width: 0; display: grid; justify-items: center; gap: 2px; padding: 8px 2px; border: 1px solid var(--line, rgba(0,0,0,.1)); border-radius: 11px; text-align: center; }
-.training-plan__day small { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; opacity: .65; }
+.training-plan__day small { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; opacity: .65; }
 .training-plan__day strong { font-size: 17px; line-height: 1.1; }
-.training-plan__day span { display: inline-flex; align-items: center; gap: 2px; font-size: 10px; font-weight: 700; }
-.training-plan__day em { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; font-style: normal; opacity: .7; }
+.training-plan__day span { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; }
+.training-plan__day em { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-style: normal; opacity: .7; }
 .training-plan__day--planned { background: var(--lime, #dbff58); border-color: transparent; color: var(--ink, #14170f); }
 .training-plan__day--done { background: var(--ink, #14170f); border-color: transparent; color: #fff; }
 .training-plan__day--rest { opacity: .7; }
@@ -21,7 +21,7 @@
 .training-plan__item strong { font-size: 13px; }
 .training-plan__item b { font-size: 12px; font-weight: 700; }
 .training-plan__item small { font-size: 11px; line-height: 1.45; opacity: .72; }
-.training-plan__badge { display: inline-flex; align-items: center; justify-content: center; gap: 3px; min-height: 24px; padding: 2px 6px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; background: rgba(0,0,0,.07); }
+.training-plan__badge { display: inline-flex; align-items: center; justify-content: center; gap: 3px; min-height: 24px; padding: 2px 6px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; background: rgba(0,0,0,.07); }
 .training-plan__item--progress .training-plan__badge { background: var(--lime, #dbff58); color: var(--ink, #14170f); }
 .training-plan__item--reduce .training-plan__badge,
 .training-plan__item--ease_back .training-plan__badge { background: #ffe1d6; color: #7a2a10; }

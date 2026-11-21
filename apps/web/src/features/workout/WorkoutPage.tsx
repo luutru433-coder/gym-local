@@ -145,6 +145,8 @@ export function WorkoutPage() {
   };
 
   const save = (session: WorkoutSession) => {
+    // Keep the 1s clock in step with the edit so a new rest never reads a second too long.
+    setNow(Date.now());
     void persist(session);
   };
 

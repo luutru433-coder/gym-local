@@ -37,7 +37,7 @@
   position: absolute;
   top: 3px;
   left: 4px;
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -58,7 +58,7 @@
   color: white;
   background: rgba(24, 26, 21, .72);
   border-radius: 50%;
-  font-size: 7px;
+  font-size: 10px;
   font-style: normal;
   font-weight: 850;
 }
@@ -74,7 +74,7 @@
   justify-content: flex-end;
   gap: 5px;
   color: var(--muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .activity-calendar__legend i {
@@ -98,7 +98,7 @@
 
 .variant-trend-picker > span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 850;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -140,7 +140,7 @@
 .variant-trend-summary span,
 .variant-trend-summary small {
   color: var(--muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .variant-trend-summary strong {
@@ -162,7 +162,7 @@
 
 .variant-trend-card__identity span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .variant-trend-chart {
@@ -181,14 +181,14 @@
   width: 100%;
   min-width: 520px;
   border-collapse: collapse;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .variant-trend-table caption {
   padding: 9px 10px;
   color: var(--muted);
   background: var(--surface-2);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
   text-align: left;
 }
@@ -204,7 +204,7 @@
 .variant-trend-table thead th {
   color: var(--muted);
   background: #f4f2eb;
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: .04em;
   text-transform: uppercase;
 }
@@ -217,7 +217,7 @@
   color: #2b350d;
   background: var(--lime);
   border-radius: 20px;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 900;
 }
 
@@ -325,7 +325,7 @@
 
 .chart-facts dt {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 760;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -358,7 +358,7 @@
   align-items: center;
   gap: 6px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .chart-legend__pr {

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Bug fixes and phone/desktop polish
+
+- Finishing onboarding now confirms the calorie and macro estimate shown on its last step, so the nutrition target is usable straight away instead of asking for a review in Settings. Targets that were never confirmed now say so instead of claiming the body details changed.
+- The home screen's weekly stat cards no longer overlap on phones.
+- Raised the smallest text across the app (navigation labels, stat captions, chart notes) to a readable 10–11px floor on phone and desktop.
+- A new rest countdown starts at the planned time instead of one second over (02:01 for a 120s rest).
+- The next-workout goal and "working sets" label follow the selected language, and the offline food library card and macro rings are available in English.
+
 ## Unreleased — Self-adjusting training plan
 
 - Added an offline self-adjusting training plan on the home screen: the week's remaining sessions reflow around missed days, and the next session shows per-exercise adjustments with a bilingual reason.
