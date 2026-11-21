@@ -7,3 +7,4 @@
 *.wasm binary
 *.sqlite3 binary
 *.zip binary
+public/exercise-animations/** -diff linguist-generated=true

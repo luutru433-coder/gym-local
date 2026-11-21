@@ -1,9 +1,14 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CONTENT_SOURCES,
+  EXERCISE_ANIMATIONS,
   EXERCISE_TRACKING_PROFILES,
   EXERCISE_VARIANTS,
   MOVEMENTS,
+  getExerciseAnimation,
+  getMovementAnimation,
   getTrackingProfile,
   getVariantsForMovement,
   rankVariantsForEquipment,
@@ -16,12 +21,28 @@ describe("exercise catalog", () => {
     expect(EXERCISE_VARIANTS.length).toBeGreaterThanOrEqual(180);
   });
 
+  it("bundles an offline animation for every reviewed variant", () => {
+    const reviewed = EXERCISE_VARIANTS.filter((variant) => variant.reviewStatus === "reviewed");
+    expect(EXERCISE_ANIMATIONS).toHaveLength(reviewed.length);
+    for (const variant of reviewed) {
+      const animation = getExerciseAnimation(variant.id);
+      expect(animation, variant.id).toBeDefined();
+      expect(animation?.frames.length).toBeGreaterThanOrEqual(2);
+      expect(animation?.onlineOnly).toBe(false);
+      for (const frame of animation?.frames ?? []) {
+        expect(["public", "../../public"].some((base) => existsSync(resolve(base, frame))), frame).toBe(true);
+      }
+    }
+    expect(MOVEMENTS.every((movement) => getMovementAnimation(movement.id))).toBe(true);
+    expect(getExerciseAnimation("chest_press__barbell")).toMatchObject({ match: "exact", frames: { length: 3 } });
+    expect(CONTENT_SOURCES.some((source) => source.id === "workout-guide" && source.licenseId === "cc-by-sa-4.0")).toBe(true);
+  });
+
   it("contains the required chest press equipment alternatives", () => {
     const variants = getVariantsForMovement("chest_press");
     const equipment = variants.flatMap((variant) => variant.equipment);
     expect(equipment).toEqual(expect.arrayContaining(["machine", "cable", "dumbbell", "smith"]));
-    expect(variants.filter((variant) => variant.media.some((media) => media.type === "image"))).toHaveLength(5);
-    expect(CONTENT_SOURCES.some((source) => source.id === "free-exercise-db" && source.licenseId === "unlicense")).toBe(true);
+    expect(EXERCISE_VARIANTS.every((variant) => variant.media.length === 0)).toBe(true);
     expect(CONTENT_SOURCES.every((source) => source.sourcePath || source.sourceUrl?.startsWith("https://"))).toBe(true);
   });
 
