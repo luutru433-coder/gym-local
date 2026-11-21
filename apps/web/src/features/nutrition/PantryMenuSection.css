@@ -46,7 +46,7 @@
 .pantry-builder__heading p {
   margin-top: 2px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .pantry-groups {
@@ -67,7 +67,7 @@
   color: var(--ink);
   background: var(--surface);
   font: inherit;
-  font-size: 10px;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -130,7 +130,7 @@
 .pantry-search-results small {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .pantry-add-selected {
@@ -152,7 +152,7 @@
 
 .pantry-add-selected > div:first-child small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .pantry-add-selected > div:first-child strong {
@@ -181,7 +181,7 @@
   border-radius: 6px;
   color: #2e6371;
   background: #e8f5f7;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -203,7 +203,7 @@
 .pantry-list small {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .pantry-list input {
@@ -264,7 +264,7 @@
 .allergen-picker legend {
   margin-bottom: 7px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -275,14 +275,14 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: 11px;
   cursor: pointer;
 }
 
 .menu-controls__note {
   margin: 10px 0 0;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.5;
 }
 
@@ -321,7 +321,7 @@
 .menu-suggestion p {
   margin-top: 5px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .menu-match {
@@ -329,7 +329,7 @@
   border-radius: 999px;
   color: #73551d;
   background: #fff1c7;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -382,12 +382,12 @@
 }
 
 .ingredient-match strong {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ingredient-match small {
   margin-top: 2px;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .menu-suggestion footer {
@@ -401,7 +401,7 @@
 
 .menu-suggestion footer > span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 @media (max-width: 820px) {
