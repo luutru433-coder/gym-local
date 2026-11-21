@@ -27,7 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Card, EmptyState, Modal, ProgressBar } from "@gym/ui";
 import type { ExerciseVariant, LoadEntryMode, ProgressionRule, SetLog, SetType, WorkoutSession } from "@gym/contracts";
 import type { SetSuggestion } from "@gym/workouts";
-import { EQUIPMENT_OPTIONS, MOVEMENTS, getExerciseAnimation, getMovement, getTrackingProfile, getVariant, rankVariantsForEquipment, trackingProfileForLoadMode } from "@gym/catalog";
+import { EQUIPMENT_OPTIONS, listMovements, getExerciseAnimation, getMovement, getTrackingProfile, getVariant, rankVariantsForEquipment, trackingProfileForLoadMode } from "@gym/catalog";
 import {
   addExerciseBlock,
   addSet,
@@ -126,12 +126,14 @@ export function WorkoutPage() {
   const [restAlertMuted, setRestAlertMutedState] = useState(isRestAlertMuted);
   const armedRestEnd = useRef<string | undefined>(undefined);
   const availableEquipment = profile.locations.find((location) => location.id === profile.activeLocationId)?.equipment ?? [];
+  const customMovements = useGymStore((state) => state.customMovements);
   const filteredMovements = useMemo(() => {
     const query = exerciseQuery.trim().toLocaleLowerCase(locale);
-    if (!query) return MOVEMENTS;
-    return MOVEMENTS.filter((movement) => [movement.name.vi, movement.name.en, ...movement.aliases]
+    const movements = listMovements(customMovements);
+    if (!query) return movements;
+    return movements.filter((movement) => [movement.name.vi, movement.name.en, ...movement.aliases]
       .some((candidate) => candidate.toLocaleLowerCase(locale).includes(query)));
-  }, [exerciseQuery, locale]);
+  }, [customMovements, exerciseQuery, locale]);
 
   // Rest handlers call this after computing the new end time, so the 1s clock is never behind it (no 02:01 for a 120s rest).
   const syncClock = useCallback(() => setNow(Date.now()), []);
@@ -637,7 +639,7 @@ export function WorkoutPage() {
             ) : null}
             <div className="live-exercise-picker__results">
               {(exercisePicker.mode === "replace" && pickerExercise
-                ? MOVEMENTS.filter((movement) => movement.id === pickerExercise.movementId)
+                ? listMovements().filter((movement) => movement.id === pickerExercise.movementId)
                 : filteredMovements).map((movement) => {
                   const variants = rankVariantsForEquipment(movement.id, availableEquipment);
                   return (

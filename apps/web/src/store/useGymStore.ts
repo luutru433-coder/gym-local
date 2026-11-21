@@ -43,6 +43,7 @@ import {
   getSettings,
   initializeDatabase,
   listBodyMetrics,
+  listCustomExercises,
   listFoods,
   listFoodPreferences,
   listMeals,
@@ -83,7 +84,8 @@ import {
   logMealPlanDays,
   undoLatestRestore
 } from "@gym/storage";
-import type { BackupPayload } from "@gym/contracts";
+import type { BackupPayload, ExerciseVariant, Movement } from "@gym/contracts";
+import { setCustomExercises } from "@gym/catalog";
 
 interface GymState {
   ready: boolean;
@@ -112,6 +114,8 @@ interface GymState {
   nutritionPackManifest?: NutritionPackManifest;
   nutritionPackError?: string;
   bodyMetrics: BodyMetric[];
+  customMovements: Movement[];
+  customVariants: ExerciseVariant[];
   settings: AppSettings;
   recoveryAvailable: boolean;
   sessionSaveStatus: "idle" | "saving" | "saved" | "error";
@@ -185,7 +189,7 @@ export function nutritionPackRecordAfterFailedInstall(
 }
 
 async function loadSnapshot() {
-  const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, settings, recoveryPoints] = await Promise.all([
+  const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, customExercises, settings, recoveryPoints] = await Promise.all([
     getProfile(),
     listRoutines(),
     listPrograms(),
@@ -199,10 +203,12 @@ async function loadSnapshot() {
     listPantryItems(),
     listMealPlans(),
     listBodyMetrics(),
+    listCustomExercises(),
     getSettings(),
     listRecoveryPoints()
   ]);
-  return { profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
+  setCustomExercises(customExercises.movements, customExercises.variants);
+  return { profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, customMovements: customExercises.movements, customVariants: customExercises.variants, settings, recoveryAvailable: recoveryPoints.length > 0 };
 }
 
 let lastPersistedActiveSession: WorkoutSession | undefined;
@@ -225,6 +231,8 @@ export const useGymStore = create<GymState>((set, get) => ({
   menuSuggestionStatus: "idle",
   nutritionPackRecord: { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 },
   bodyMetrics: [],
+  customMovements: [],
+  customVariants: [],
   settings: defaultSettings,
   recoveryAvailable: false,
   sessionSaveStatus: "idle",

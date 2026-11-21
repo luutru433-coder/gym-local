@@ -433,20 +433,37 @@ export const EQUIPMENT_OPTIONS = Object.entries(equipmentName).map(([id, name]) 
   name
 }));
 
+let customMovements: Movement[] = [];
+let customVariants: ExerciseVariant[] = [];
+
+/** Makes the user's own exercises resolvable through the same lookups as the bundled catalog, which is always looked up first. */
+export function setCustomExercises(movements: Movement[], variants: ExerciseVariant[]): void {
+  customMovements = movements;
+  customVariants = variants;
+}
+
+/** Custom exercises first, without deleted ones kept for history; pass `custom` from UI state so memoized lists follow edits. */
+export function listMovements(custom: Movement[] = customMovements): Movement[] {
+  return [...custom.filter((movement) => movement.reviewStatus !== "deprecated"), ...MOVEMENTS];
+}
+
 export function getMovement(id: string): Movement | undefined {
-  return MOVEMENTS.find((movement) => movement.id === id);
+  return MOVEMENTS.find((movement) => movement.id === id) ?? customMovements.find((movement) => movement.id === id);
 }
 
 export function getVariant(id: string): ExerciseVariant | undefined {
-  return EXERCISE_VARIANTS.find((variant) => variant.id === id);
+  return EXERCISE_VARIANTS.find((variant) => variant.id === id) ?? customVariants.find((variant) => variant.id === id);
 }
 
 export function getTrackingProfile(variantId: string): ExerciseTrackingProfile | undefined {
-  return EXERCISE_TRACKING_PROFILES.find((profile) => profile.variantId === variantId);
+  const reviewed = EXERCISE_TRACKING_PROFILES.find((profile) => profile.variantId === variantId);
+  if (reviewed) return reviewed;
+  const custom = customVariants.find((variant) => variant.id === variantId);
+  return custom ? trackingProfileForLoadMode(custom.id, custom.loadEntryMode) : undefined;
 }
 
 export function getVariantsForMovement(movementId: string): ExerciseVariant[] {
-  return EXERCISE_VARIANTS.filter((variant) => variant.movementId === movementId);
+  return [...EXERCISE_VARIANTS, ...customVariants].filter((variant) => variant.movementId === movementId);
 }
 
 function foldSearchText(value: string): string {
@@ -459,9 +476,9 @@ function foldSearchText(value: string): string {
     .trim();
 }
 
-export function searchCatalog(query: string, muscle?: MuscleGroup, equipment?: EquipmentType): Movement[] {
+export function searchCatalog(query: string, muscle?: MuscleGroup, equipment?: EquipmentType, movements: Movement[] = listMovements()): Movement[] {
   const normalized = foldSearchText(query);
-  return MOVEMENTS.filter((movement) => {
+  return movements.filter((movement) => {
     const variants = getVariantsForMovement(movement.id);
     const matchesText = !normalized || [movement.name.vi, movement.name.en, ...movement.aliases]
       .some((value) => foldSearchText(value).includes(normalized));

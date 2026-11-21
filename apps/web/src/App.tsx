@@ -6,6 +6,7 @@ import { UpdatePrompt } from "./components/UpdatePrompt";
 import { useDocumentLanguage } from "./lib/i18n";
 import { useGymStore } from "./store/useGymStore";
 
+// Only a first run needs onboarding, so it stays out of the startup chunk.
 const Onboarding = lazy(() => import("./features/onboarding/Onboarding").then((module) => ({ default: module.Onboarding })));
 const HomePage = lazy(() => import("./features/home/HomePage").then((module) => ({ default: module.HomePage })));
 const RoutinesPage = lazy(() => import("./features/routines/RoutinesPage").then((module) => ({ default: module.RoutinesPage })));

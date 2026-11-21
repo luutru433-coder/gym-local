@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, Dumbbell, Info, Search, ShieldCheck, SlidersHorizontal, Target } from "lucide-react";
-import { Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
+import { AlertTriangle, CheckCircle2, Dumbbell, Info, Pencil, Plus, Search, ShieldCheck, SlidersHorizontal, Target, Trash2, UserRound } from "lucide-react";
+import { Button, Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
 import type { EquipmentType, ExerciseVariant, Movement, MuscleGroup } from "@gym/contracts";
-import { EQUIPMENT_OPTIONS, getExerciseAnimation, getMovementAnimation, getVariantsForMovement, MOVEMENTS, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
+import { EQUIPMENT_OPTIONS, getExerciseAnimation, getMovementAnimation, getMovement, getVariantsForMovement, listMovements, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
+import type { CustomExerciseInput } from "@gym/catalog/custom";
+import { removeUserCustomExercise, saveUserCustomExercise } from "./customExerciseActions";
+import { CustomExerciseForm } from "./CustomExerciseForm";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
@@ -33,8 +36,15 @@ export function CatalogPage() {
   const [selectedMovementId, setSelectedMovementId] = useState<string>();
   const [selectedVariant, setSelectedVariant] = useState<ExerciseVariant>();
 
-  const results = useMemo(() => searchCatalog(query, muscle, equipment), [equipment, muscle, query]);
-  const selectedMovement = MOVEMENTS.find((movement) => movement.id === selectedMovementId);
+  const customMovements = useGymStore((state) => state.customMovements);
+  const [formMode, setFormMode] = useState<"create" | "edit">();
+  const [deleteError, setDeleteError] = useState<string>();
+
+  const movements = useMemo(() => listMovements(customMovements), [customMovements]);
+  const results = useMemo(() => searchCatalog(query, muscle, equipment, movements), [equipment, movements, muscle, query]);
+  const movementCount = movements.length;
+  const selectedMovement = selectedMovementId ? getMovement(selectedMovementId) : undefined;
+  const selectedIsCustom = customMovements.some((movement) => movement.id === selectedMovementId);
   const variants = selectedMovement ? rankVariantsForEquipment(selectedMovement.id, availableEquipment) : [];
   const activeVariant = selectedVariant ?? variants[0];
   const tutorialVideo = activeVariant?.videoGuides[0];
@@ -47,12 +57,36 @@ export function CatalogPage() {
   const closeMovement = () => {
     setSelectedMovementId(undefined);
     setSelectedVariant(undefined);
+    setFormMode(undefined);
+    setDeleteError(undefined);
+  };
+
+  const submitCustomExercise = async (input: CustomExerciseInput) => {
+    const saved = await saveUserCustomExercise(input, formMode === "edit" ? selectedMovementId : undefined);
+    setFormMode(undefined);
+    setSelectedVariant(undefined);
+    setSelectedMovementId(saved.id);
+  };
+
+  const deleteSelected = async () => {
+    if (!selectedMovement) return;
+    const question = locale === "vi"
+      ? `Xóa bài "${localize(selectedMovement.name, locale)}"? Các buổi tập đã lưu vẫn được giữ.`
+      : `Delete "${localize(selectedMovement.name, locale)}"? Saved workouts are kept.`;
+    if (!window.confirm(question)) return;
+    try {
+      await removeUserCustomExercise(selectedMovement.id);
+      closeMovement();
+    } catch (caught) {
+      setDeleteError(caught instanceof Error ? caught.message : String(caught));
+    }
   };
 
   return (
     <div className="page catalog-page">
       <header className="page-header">
-        <div><span className="eyebrow">{MOVEMENTS.length} {locale === "vi" ? "nhóm động tác" : "movement families"}</span><h1>{locale === "vi" ? "Thư viện bài tập" : "Exercise library"}</h1><p>{locale === "vi" ? "Một động tác, nhiều cách tập. Chọn theo dụng cụ bạn đang có." : "One movement, many ways to train. Choose what fits your equipment."}</p></div>
+        <div><span className="eyebrow">{movementCount} {locale === "vi" ? "nhóm động tác" : "movement families"}</span><h1>{locale === "vi" ? "Thư viện bài tập" : "Exercise library"}</h1><p>{locale === "vi" ? "Một động tác, nhiều cách tập. Chọn theo dụng cụ bạn đang có." : "One movement, many ways to train. Choose what fits your equipment."}</p></div>
+        <Button variant="secondary" onClick={() => setFormMode("create")}><Plus size={18} />{locale === "vi" ? "Tạo bài tập" : "Create exercise"}</Button>
       </header>
 
       <Card className="catalog-toolbar">
@@ -99,8 +133,28 @@ export function CatalogPage() {
         </div>
       ) : <EmptyState icon={<Search />} title={locale === "vi" ? "Không tìm thấy bài phù hợp" : "No matching movement"} body={locale === "vi" ? "Thử bỏ bớt bộ lọc hoặc tìm bằng tên tiếng Anh." : "Remove a filter or try another search term."} />}
 
-      <Modal open={Boolean(selectedMovement)} title={selectedMovement ? localize(selectedMovement.name, locale) : ""} onClose={closeMovement} className="modal--exercise">
-        {selectedMovement && activeVariant ? (
+      <Modal open={formMode === "create"} title={locale === "vi" ? "Tạo bài tập của bạn" : "Create your exercise"} onClose={() => setFormMode(undefined)}>
+        {formMode === "create" ? <CustomExerciseForm locale={locale} onSave={submitCustomExercise} onCancel={() => setFormMode(undefined)} /> : null}
+      </Modal>
+
+      <Modal open={Boolean(selectedMovement) && formMode !== "create"} title={selectedMovement ? localize(selectedMovement.name, locale) : ""} onClose={closeMovement} className="modal--exercise">
+        {selectedMovement && activeVariant && formMode === "edit" ? (
+          <CustomExerciseForm locale={locale} movement={selectedMovement} variant={activeVariant} onSave={submitCustomExercise} onCancel={() => setFormMode(undefined)} />
+        ) : selectedMovement && activeVariant && selectedIsCustom ? (
+          <div className="exercise-detail">
+            <div className="exercise-detail__hero">
+              <div><span className="eyebrow">{selectedMovement.primaryMuscles.map((item) => muscleLabels[item][locale]).join(", ")} · {activeVariant.equipment.map((item) => EQUIPMENT_OPTIONS.find((entry) => entry.id === item)?.name[locale]).join(" + ")}</span><p>{localize(selectedMovement.description, locale)}</p></div>
+              <span className="review-badge"><UserRound size={16} />{locale === "vi" ? "Bài tự tạo" : "Your exercise"}</span>
+            </div>
+            <ExerciseAnimation key={`${activeVariant.id}-${selectedMovement.contentVersion}`} animation={undefined} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
+            {deleteError ? <Notice tone="warning">{deleteError}</Notice> : null}
+            <div className="custom-exercise-actions">
+              <Button variant="secondary" onClick={() => { setDeleteError(undefined); setFormMode("edit"); }}><Pencil size={17} />{locale === "vi" ? "Sửa" : "Edit"}</Button>
+              <Button variant="danger" onClick={() => void deleteSelected()}><Trash2 size={17} />{locale === "vi" ? "Xóa" : "Delete"}</Button>
+            </div>
+            <Notice>{locale === "vi" ? "Bài tự tạo chỉ lưu trên máy này và nằm trong file sao lưu. Chưa có hình động minh họa." : "Your exercises stay on this device and are included in backups. No animation is available."}</Notice>
+          </div>
+        ) : selectedMovement && activeVariant ? (
           <div className="exercise-detail">
             <div className="exercise-detail__hero">
               <div><span className="eyebrow">{patternLabels[selectedMovement.pattern][locale]} · {selectedMovement.primaryMuscles.map((item) => muscleLabels[item][locale]).join(", ")}</span><p>{localize(selectedMovement.description, locale)}</p></div>

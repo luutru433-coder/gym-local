@@ -655,6 +655,7 @@ export interface PersonalDataSnapshot {
   pantryItems: PantryItem[];
   mealPlans: SavedMealPlan[];
   bodyMetrics: BodyMetric[];
+  customMovements: Movement[];
   customVariants: ExerciseVariant[];
   settings: AppSettings;
 }
@@ -680,13 +681,16 @@ export interface BackupPayload {
   data: PersonalDataSnapshot;
 }
 
+export const CUSTOM_MOVEMENT_ID_PREFIX = "custom_movement_";
+export const CUSTOM_VARIANT_ID_PREFIX = "custom_variant_";
+
 export const APP_VERSIONS = {
   app: "0.7.0",
-  database: 5,
+  database: 6,
   catalog: 3,
   routines: 2,
   nutritionFormula: 1,
-  backup: 5,
+  backup: 6,
   minimumNutritionPackSchema: 1,
   nutritionPackSchema: 3
 } as const;

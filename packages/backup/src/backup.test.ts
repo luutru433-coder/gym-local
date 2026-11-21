@@ -3,7 +3,8 @@ import JSZip from "jszip";
 import type { PersonalDataSnapshot, SavedMealPlan } from "@gym/contracts";
 import { defaultSettings } from "@gym/storage";
 import { cloneRoutineTemplate, createSessionFromRoutine } from "@gym/workouts";
-import { createBackup, readBackup } from "./index";
+import { buildCustomExercise } from "@gym/catalog/custom";
+import { createBackup, readBackup, workoutCsv } from "./index";
 
 function emptyData(overrides: Partial<PersonalDataSnapshot> = {}): PersonalDataSnapshot {
   return {
@@ -18,6 +19,7 @@ function emptyData(overrides: Partial<PersonalDataSnapshot> = {}): PersonalDataS
     foodPreferences: [],
     pantryItems: [],
     bodyMetrics: [],
+    customMovements: [],
     customVariants: [],
     settings: { ...defaultSettings },
     ...overrides,
@@ -108,6 +110,7 @@ async function legacyBackup(data: unknown, backupVersion: 1 | 2): Promise<Blob> 
 
 async function v3Backup(): Promise<Blob> {
   const data = emptyData();
+  Reflect.deleteProperty(data, "customMovements");
   Reflect.deleteProperty(data, "pantryItems");
   Reflect.deleteProperty(data, "mealPlans");
   data.settings = { ...data.settings, dbSchemaVersion: 3, backupVersion: 3 };
@@ -130,6 +133,7 @@ async function v3Backup(): Promise<Blob> {
 
 async function v4Backup(): Promise<Blob> {
   const data = emptyData();
+  Reflect.deleteProperty(data, "customMovements");
   Reflect.deleteProperty(data, "mealPlans");
   data.settings = { ...data.settings, dbSchemaVersion: 4, backupVersion: 4 };
   const serialized = JSON.stringify(data);
@@ -152,8 +156,63 @@ async function v4Backup(): Promise<Blob> {
   return zip.generateAsync({ type: "blob" });
 }
 
+async function v5Backup(customVariants: unknown[] = []): Promise<Blob> {
+  const data = { ...emptyData(), customVariants };
+  Reflect.deleteProperty(data, "customMovements");
+  data.settings = { ...data.settings, dbSchemaVersion: 5, backupVersion: 5 };
+  const serialized = JSON.stringify(data);
+  const collectionKeys = [
+    "routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries",
+    "foodPreferences", "bodyMetrics", "customVariants", "pantryItems", "mealPlans"
+  ] as const;
+  const zip = new JSZip();
+  zip.file("manifest.json", JSON.stringify({
+    appVersion: "0.7.0",
+    backupVersion: 5,
+    exportedAt: "2026-08-15T00:00:00.000Z",
+    checksum: await sha256(serialized),
+    format: "gym-local-backup",
+    dbSchemaVersion: 5,
+    dataBytes: new TextEncoder().encode(serialized).byteLength,
+    counts: Object.fromEntries(collectionKeys.map((key) => [key, data[key].length]))
+  }));
+  zip.file("data.json", serialized);
+  return zip.generateAsync({ type: "blob" });
+}
+
 describe("backup", () => {
-  it("round-trips v5 personal data, Vietnamese text, pantry, meal plans, tracking semantics, and manifest metadata", async () => {
+  it("round-trips a custom exercise with its movement and variant", async () => {
+    const { movement, variant } = buildCustomExercise({
+      name: "Kéo cáp một tay",
+      primaryMuscle: "back",
+      secondaryMuscles: ["biceps"],
+      equipment: "cable",
+      loadEntryMode: "per_hand",
+      note: "Giữ vai thấp."
+    });
+
+    const restored = await readBackup(await createBackup(emptyData({ customMovements: [movement], customVariants: [variant] })));
+
+    expect(restored.manifest.counts).toMatchObject({ customMovements: 1, customVariants: 1 });
+    expect(restored.data.customMovements).toEqual([movement]);
+    expect(restored.data.customVariants).toEqual([variant]);
+  });
+
+  it("rejects a custom variant whose movement is missing from the backup", async () => {
+    const { variant } = buildCustomExercise({ name: "Orphan", primaryMuscle: "core", secondaryMuscles: [], equipment: "bodyweight", loadEntryMode: "reps_only" });
+
+    await expect(createBackup(emptyData({ customVariants: [variant] }))).rejects.toThrow("custom exercise relationship");
+  });
+
+  it("migrates a detailed v5 backup to v6 with an empty custom-movement collection", async () => {
+    const restored = await readBackup(await v5Backup());
+
+    expect(restored.manifest).toMatchObject({ backupVersion: 5, dbSchemaVersion: 5 });
+    expect(restored.data.customMovements).toEqual([]);
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 6, backupVersion: 6 });
+  });
+
+  it("round-trips v6 personal data, Vietnamese text, pantry, meal plans, tracking semantics, and manifest metadata", async () => {
     const routine = cloneRoutineTemplate("tpl_full_body_a");
     const session = createSessionFromRoutine(routine);
     session.programId = "program_1";
@@ -249,7 +308,7 @@ describe("backup", () => {
     const restored = await readBackup(await createBackup(data));
 
     expect(restored.data.settings.catalogVersion).toBe(3);
-    expect(restored.manifest).toMatchObject({ backupVersion: 5, format: "gym-local-backup", dbSchemaVersion: 5 });
+    expect(restored.manifest).toMatchObject({ backupVersion: 6, format: "gym-local-backup", dbSchemaVersion: 6 });
     expect(restored.manifest.counts).toEqual({
       routines: 1,
       programs: 1,
@@ -262,7 +321,8 @@ describe("backup", () => {
       pantryItems: 1,
       mealPlans: 1,
       bodyMetrics: 0,
-      customVariants: 0
+      customVariants: 0,
+      customMovements: 0
     });
     expect(restored.data.routines[0].name.vi).toBe(routine.name.vi);
     expect(restored.data.sessions[0].exercises[0].sets[0]).toMatchObject({ targetMinReps: 8, targetMaxReps: 12 });
@@ -316,7 +376,7 @@ describe("backup", () => {
     const restored = await readBackup(await legacyBackup(legacy, 1));
 
     expect(restored.data.foods[0].per100g).toMatchObject({ ironMg: 2.7, vitaminCMg: 28.1 });
-    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 6, backupVersion: 6 });
     expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [], mealPlans: [] });
   });
 
@@ -381,25 +441,25 @@ describe("backup", () => {
     expect(restored.data).toMatchObject({ programs: [], recipes: [], waterEntries: [], foodPreferences: [], pantryItems: [], mealPlans: [] });
   });
 
-  it("migrates a detailed v3 backup to v5 with empty pantry and meal-plan collections", async () => {
+  it("migrates a detailed v3 backup to v6 with empty pantry and meal-plan collections", async () => {
     const restored = await readBackup(await v3Backup());
 
     expect(restored.manifest).toMatchObject({ backupVersion: 3, dbSchemaVersion: 3 });
     expect(restored.data.pantryItems).toEqual([]);
     expect(restored.data.mealPlans).toEqual([]);
-    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 6, backupVersion: 6 });
   });
 
-  it("migrates a detailed v4 backup to v5 without changing older personal data", async () => {
+  it("migrates a detailed v4 backup to v6 without changing older personal data", async () => {
     const restored = await readBackup(await v4Backup());
 
     expect(restored.manifest).toMatchObject({ backupVersion: 4, dbSchemaVersion: 4 });
     expect(restored.data.pantryItems).toEqual([]);
     expect(restored.data.mealPlans).toEqual([]);
-    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    expect(restored.data.settings).toMatchObject({ dbSchemaVersion: 6, backupVersion: 6 });
   });
 
-  it("rejects a v5 manifest whose collection counts do not exactly match data", async () => {
+  it("rejects a v6 manifest whose collection counts do not exactly match data", async () => {
     const original = await createBackup(emptyData());
     const zip = await JSZip.loadAsync(original);
     const manifestFile = zip.file("manifest.json");
@@ -411,7 +471,7 @@ describe("backup", () => {
     await expect(readBackup(await zip.generateAsync({ type: "blob" }))).rejects.toThrow("collection counts");
   });
 
-  it("rejects a v5 manifest whose byte count does not match serialized data", async () => {
+  it("rejects a v6 manifest whose byte count does not match serialized data", async () => {
     const original = await createBackup(emptyData());
     const zip = await JSZip.loadAsync(original);
     const manifestFile = zip.file("manifest.json");
@@ -548,5 +608,17 @@ describe("backup", () => {
   it("refuses to create a backup with an invalid active-program pointer", async () => {
     const data = emptyData({ settings: { ...defaultSettings, activeProgramId: "program_missing" } });
     await expect(createBackup(data)).rejects.toThrow("active program pointer");
+  });
+
+  it("exports a formula-like exercise name as plain text in the workout CSV", () => {
+    const name = { vi: "=HYPERLINK(1)", en: " =HYPERLINK(1)" };
+    const csv = workoutCsv(emptyData({
+      sessions: [{
+        id: "session_csv",
+        startedAt: "2026-08-10T01:00:00.000Z",
+        exercises: [{ id: "block_csv", movementId: "custom_movement_csv", variantId: "custom_variant_csv", movementNameSnapshot: name, variantNameSnapshot: name, loadEntryModeSnapshot: "total_weight", restSeconds: 90, sets: [{ id: "set_csv", type: "working", weightKg: 20, reps: 8, rir: -1, completedAt: "2026-08-10T01:10:00.000Z" }] }]
+      }]
+    }));
+    expect(csv).toContain(`"' =HYPERLINK(1)","' =HYPERLINK(1)","working","20","8","-1",""`);
   });
 });
