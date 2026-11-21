@@ -257,6 +257,13 @@ export class GymDatabase extends Dexie {
 export const gymDb = new GymDatabase();
 let sessionWriteQueue: Promise<void> = Promise.resolve();
 
+/** Runs session writes one at a time, in call order, even after a failed write. */
+function queueSessionWrite(commit: () => PromiseLike<unknown>): Promise<unknown> {
+  const operation = sessionWriteQueue.then(commit, commit);
+  sessionWriteQueue = operation.then(() => undefined, () => undefined);
+  return operation;
+}
+
 export const defaultSettings: AppSettings = {
   id: "app",
   catalogVersion: APP_VERSIONS.catalog,
@@ -403,9 +410,7 @@ export async function saveSession(session: WorkoutSession, db: GymDatabase = gym
     const settings = (await db.settings.get("app")) ?? defaultSettings;
     await db.settings.put({ ...settings, activeSessionId: session.finishedAt ? undefined : session.id });
   });
-  const operation = sessionWriteQueue.then(commit, commit);
-  sessionWriteQueue = operation.then(() => undefined, () => undefined);
-  await operation;
+  await queueSessionWrite(commit);
 }
 
 export async function saveStartedSession(
@@ -432,9 +437,7 @@ export async function saveStartedSession(
       activeProgramId: session.programId ?? settings.activeProgramId
     });
   });
-  const operation = sessionWriteQueue.then(commit, commit);
-  sessionWriteQueue = operation.then(() => undefined, () => undefined);
-  await operation;
+  await queueSessionWrite(commit);
 }
 
 /**
@@ -472,10 +475,31 @@ export async function saveCompletedSessionAndAdvanceProgram(
       .map((program) => program.id === advanced?.id ? advanced : program)
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt) || left.id.localeCompare(right.id));
   });
-  const operation = sessionWriteQueue.then(commit, commit);
-  sessionWriteQueue = operation.then(() => undefined, () => undefined);
-  await operation;
+  await queueSessionWrite(commit);
   return programs;
+}
+
+/**
+ * Rewrites a workout that is already finished. The active-session pointer and
+ * program day are left alone, so correcting history never disturbs a live workout.
+ */
+export async function updateFinishedSession(session: WorkoutSession, db: GymDatabase = gymDb): Promise<void> {
+  assertFiniteRecord(session, "session");
+  await queueSessionWrite(() => db.transaction("rw", db.sessions, async () => {
+    const existing = await db.sessions.get(session.id);
+    if (!existing?.finishedAt || !session.finishedAt) throw new Error("Only finished workouts can be edited");
+    if (session.finishedAt < session.startedAt) throw new Error("Workout cannot finish before it starts");
+    await db.sessions.put(session);
+  }));
+}
+
+/** Deletes one finished workout. An unfinished workout must be finished first. */
+export async function deleteFinishedSession(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await queueSessionWrite(() => db.transaction("rw", db.sessions, async () => {
+    const existing = await db.sessions.get(id);
+    if (existing && !existing.finishedAt) throw new Error("An unfinished workout cannot be deleted");
+    await db.sessions.delete(id);
+  }));
 }
 
 export async function getActiveSession(db: GymDatabase = gymDb): Promise<WorkoutSession | undefined> {
@@ -759,6 +783,10 @@ export async function listBodyMetrics(db: GymDatabase = gymDb): Promise<BodyMetr
 export async function saveBodyMetric(metric: BodyMetric, db: GymDatabase = gymDb): Promise<void> {
   assertFiniteRecord(metric, "body metric");
   await db.bodyMetrics.put(metric);
+}
+
+export async function deleteBodyMetric(id: string, db: GymDatabase = gymDb): Promise<void> {
+  await db.bodyMetrics.delete(id);
 }
 
 export async function getSettings(db: GymDatabase = gymDb): Promise<AppSettings> {
