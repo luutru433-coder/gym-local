@@ -47,7 +47,7 @@ function squat(loaded: boolean, equipment: ExerciseTechnique["equipment"]): Exer
 function deadlift(equipment: ExerciseTechnique["equipment"]): ExerciseTechnique {
   const frame: Frame = { ...standing, grip: { kind: "bar", size: 20 } };
   const start: TechniquePose = { ...stand, torso: 27, leg: [-17, -100], arm: [-88, -88] };
-  const knee: TechniquePose = { ...stand, torso: 30, leg: [-50, -92], arm: [-106, -106] };
+  const knee: TechniquePose = { ...stand, torso: 30, leg: [-50, -92], arm: [-98, -98] };
   const top: TechniquePose = { ...stand, torso: 90, leg: [-89, -91], arm: [-90, -90] };
   return technique("deadlift", equipment, frame, {
     setup: [start, [
@@ -63,9 +63,9 @@ function deadlift(equipment: ExerciseTechnique["equipment"]): ExerciseTechnique 
         cue("Tay luôn duỗi thẳng, không co khuỷu để kéo.", "Arms stay straight; never bend the elbows to pull.", at("elbow", undefined, [14, 0]))
       ]],
       [t("Khóa hông", "Lockout"), [knee, top], [
-        cue("Qua gối thì đẩy hông về phía thanh đòn và siết mông.", "Once past the knees, drive the hips to the bar and squeeze the glutes.", at("hip", 0, [-14, 0])),
-        cue("Kết thúc đứng thẳng: hông và gối 180°, vai nằm trên hông, không ngửa ra sau.", "Finish standing tall: hips and knees at 180°, shoulders over hips, no leaning back.", ang("shoulder", "hip", "knee", [-32, 0])),
-        cue("Thanh đòn vẫn chạm đùi.", "The bar stays against the thighs.", at("wrist", undefined, [14, 0]))
+        cue("Qua gối thì đẩy hông về phía thanh đòn và siết mông.", "Once past the knees, drive the hips to the bar and squeeze the glutes.", at("hip", 0, [-18, -16])),
+        cue("Kết thúc đứng thẳng: hông và gối 180°, vai nằm trên hông, không ngửa ra sau.", "Finish standing tall: hips and knees at 180°, shoulders over hips, no leaning back.", ang("shoulder", "hip", "knee", [14, -12])),
+        cue("Thanh đòn vẫn chạm đùi.", "The bar stays against the thighs.", at("wrist", undefined, [18, 16]))
       ]],
       [stepTitle.lower, [top, start], [
         cue("Đẩy hông ra sau trước, thanh đòn trượt dọc đùi.", "Push the hips back first and slide the bar down the thighs.", at("hip", 180, [0, -14])),
