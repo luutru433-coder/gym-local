@@ -449,12 +449,22 @@ export function getVariantsForMovement(movementId: string): ExerciseVariant[] {
   return EXERCISE_VARIANTS.filter((variant) => variant.movementId === movementId);
 }
 
+function foldSearchText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLocaleLowerCase("vi")
+    .trim();
+}
+
 export function searchCatalog(query: string, muscle?: MuscleGroup, equipment?: EquipmentType): Movement[] {
-  const normalized = query.trim().toLocaleLowerCase("vi");
+  const normalized = foldSearchText(query);
   return MOVEMENTS.filter((movement) => {
     const variants = getVariantsForMovement(movement.id);
     const matchesText = !normalized || [movement.name.vi, movement.name.en, ...movement.aliases]
-      .some((value) => value.toLocaleLowerCase("vi").includes(normalized));
+      .some((value) => foldSearchText(value).includes(normalized));
     const matchesMuscle = !muscle || movement.primaryMuscles.includes(muscle) || movement.secondaryMuscles.includes(muscle);
     const matchesEquipment = !equipment || variants.some((variant) => variant.equipment.includes(equipment));
     return matchesText && matchesMuscle && matchesEquipment;

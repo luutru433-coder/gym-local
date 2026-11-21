@@ -11,7 +11,8 @@ import {
   getMovementAnimation,
   getTrackingProfile,
   getVariantsForMovement,
-  rankVariantsForEquipment
+  rankVariantsForEquipment,
+  searchCatalog
 } from "./index";
 
 describe("exercise catalog", () => {
@@ -102,5 +103,15 @@ describe("exercise catalog", () => {
     expect(EXERCISE_TRACKING_PROFILES).toHaveLength(EXERCISE_VARIANTS.length);
     expect(new Set(EXERCISE_TRACKING_PROFILES.map((profile) => profile.variantId)).size).toBe(EXERCISE_VARIANTS.length);
     expect(EXERCISE_VARIANTS.every((variant) => getTrackingProfile(variant.id)?.variantId === variant.id)).toBe(true);
+  });
+
+  it("matches Vietnamese search queries with or without diacritics", () => {
+    const ids = (query: string) => searchCatalog(query).map((movement) => movement.id);
+    expect(ids("Kéo xà")).toContain("pull_up");
+    expect(ids("keo xa")).toEqual(ids("Kéo xà"));
+    expect(ids("KEO XA")).toEqual(ids("Kéo xà"));
+    expect(ids("keo")).toEqual(ids("kéo"));
+    expect(ids("day nguc")).toContain("chest_press");
+    expect(ids("  pull-up ")).toContain("pull_up");
   });
 });
