@@ -10,6 +10,7 @@ import { formatDate, formatNumber } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { getThemePreference, saveThemePreference, type ThemePreference } from "../../lib/theme";
 import { PwaInstallCard } from "./PwaInstallCard";
+import { ExerciseImagePackCard } from "./ExerciseImagePackCard";
 
 const themeLabels: Record<ThemePreference, { vi: string; en: string }> = {
   system: { vi: "Theo máy", en: "System" }, light: { vi: "Sáng", en: "Light" }, dark: { vi: "Tối", en: "Dark" }
@@ -256,6 +257,11 @@ export function SettingsPage() {
               <input ref={fileRef} type="file" accept=".zip,application/zip" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importBackup(file); }} />
               {backupMessage ? <Notice tone={backupMessage.tone}>{backupMessage.text}</Notice> : null}
             </Card>
+          </section>
+
+          <section>
+            <SectionTitle eyebrow={locale === "vi" ? "Chỉ trên máy này" : "This device only"} title={locale === "vi" ? "Hình bài tập" : "Exercise images"} />
+            <ExerciseImagePackCard locale={locale} />
           </section>
         </div>
 

@@ -2,5 +2,8 @@
   "name": "@gym/media",
   "private": true,
   "type": "module",
-  "exports": "./src/index.ts"
+  "exports": {
+    ".": "./src/index.ts",
+    "./exercise-pack": "./src/exercise-pack.ts"
+  }
 }

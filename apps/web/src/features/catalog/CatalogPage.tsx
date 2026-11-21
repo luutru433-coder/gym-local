@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Suspense, lazy, useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, Dumbbell, Info, Pencil, Plus, Search, ShieldCheck, SlidersHorizontal, Target, Trash2, UserRound } from "lucide-react";
 import { Button, Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
 import type { EquipmentType, ExerciseVariant, Movement, MuscleGroup } from "@gym/contracts";
@@ -10,6 +10,8 @@ import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
+
+const ExercisePackImage = lazy(() => import("../../components/ExercisePackImage"));
 import { frameUrl, muscleLabels } from "../../lib/exercise-visuals";
 
 
@@ -169,6 +171,7 @@ export function CatalogPage() {
               })}</div>
             </section>
 
+            <Suspense fallback={null}><ExercisePackImage key={`pack-${activeVariant.id}`} variantId={activeVariant.id} exerciseName={localize(selectedMovement.name, locale)} locale={locale} /></Suspense>
             <ExerciseAnimation key={activeVariant.id} animation={getExerciseAnimation(activeVariant.id)} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
 
 

@@ -1,5 +1,10 @@
 # Verification report — 2026-11-21
 
+## Device-only exercise image pack (ADR 0020)
+
+- Storage, pack reading, name suggestions, the import action and the exercise-page picker are covered by unit and component tests (fake IndexedDB; ZIP, loose files, size variants, JSON names by id and by file reference).
+- No vendor pack was available. The import was exercised with a test pack built from the app's own bundled drawings (30 GIFs in two sizes plus a JSON name list); a real pack's layout and the import on an iPhone are unverified.
+
 ## Nutrition pack 2026.11.1 — food names and duplicates
 
 - Rebuilding the unchanged script from the pinned USDA downloads (Foundation 2026-04-30, SR Legacy 2018-04, FNDDS 2021-2023) reproduced every row of the released 2026.08.1 `foods` table, so the comparison below is against the pack users have.

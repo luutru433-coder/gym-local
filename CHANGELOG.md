@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Your own exercise image pack
+
+- Settings has a new "Exercise images" card: pick image files (GIF, WebP, PNG, JPG) you hold a licence for, with the pack's JSON file if it has one, or a ZIP of them. The images are stored on this device only; they are uploaded nowhere, are not in the app or its repository, and are not part of backups.
+- After an import the app suggests an image for each exercise it can match by name and equipment. The exercise page shows that image above the drawing, with "Change image" (search the pack by name) and "Remove image" for each equipment variant. Your own choices are kept when the pack is imported again.
+- "Remove pack" deletes every imported image from the device. Without a pack nothing changes.
+- Stored in a separate on-device database (ADR 0020); no change to the personal database or the backup format.
+
 ## Unreleased — Weight trend and calorie target check
 
 - The body weight chart now draws a smoothed trend line over the scale readings (each day moves the trend 10% toward the reading, several readings on one day are averaged), so day-to-day water swings stop hiding the direction.

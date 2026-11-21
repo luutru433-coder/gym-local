@@ -29,9 +29,11 @@
       "@gym/progress": ["packages/progress/src/index.ts"],
       "@gym/storage/device": ["packages/storage/src/device-preferences.ts"],
       "@gym/storage/custom-exercises": ["packages/storage/src/custom-exercises.ts"],
+      "@gym/storage/exercise-images": ["packages/storage/src/exercise-images.ts"],
       "@gym/storage/history": ["packages/storage/src/history-edit.ts"],
       "@gym/storage": ["packages/storage/src/index.ts"],
       "@gym/backup": ["packages/backup/src/index.ts"],
+      "@gym/media/exercise-pack": ["packages/media/src/exercise-pack.ts"],
       "@gym/media": ["packages/media/src/index.ts"],
       "@gym/ui": ["packages/ui/src/index.ts"]
     },
