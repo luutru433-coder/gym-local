@@ -252,5 +252,14 @@ describe("progress calculations", () => {
     expect(at("2026-08-12T10:00:00.000Z").chest).toMatchObject({ status: "ready", hoursUntilReady: 0 });
     expect(at("2026-08-12T10:00:00.000Z").chest.weeklySets).toBe(3);
     expect(at("2026-08-09T10:00:00.000Z").chest.status).toBe("ready");
+
+    // Heavy session (15 sets -> 96 h window) then a light one (1 set -> 40 h) 31 h later: the light one
+    // is the least recovered (19/40), but the heavy one still needs 46 h.
+    const overlapping = [
+      session("heavy", "2026-08-10T10:00:00.000Z", [exercise("chest_press__dumbbell", sets("heavy", 15))]),
+      session("light", "2026-08-11T17:00:00.000Z", [exercise("chest_press__dumbbell", sets("light", 1))])
+    ];
+    const chest = muscleRecoveryMap(overlapping, new Date("2026-08-12T12:00:00.000Z")).find((item) => item.muscle === "chest");
+    expect(chest).toMatchObject({ status: "fatigued", recoveryPercent: 47, hoursUntilReady: 46, lastTrainedAt: "2026-08-11T17:00:00.000Z" });
   });
 });

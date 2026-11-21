@@ -399,7 +399,7 @@ const SECONDARY_SET_WEIGHT = 0.5;
 /**
  * Estimated recovery per muscle from finished sessions. Each session gives a muscle a window of
  * 36 h + 4 h per effective working set (primary 1, secondary or full-body 0.5), capped at 96 h;
- * the least-recovered session wins. Under half the window is "fatigued", under the full window "recovering".
+ * the least-recovered session sets the status and the latest deadline sets the hours left. Under half the window is "fatigued", under the full window "recovering".
  */
 export function muscleRecoveryMap(sessions: WorkoutSession[], now: Date = new Date()): MuscleRecovery[] {
   const weekly = weeklyMuscleSets(sessions, localWeekStart(now));
@@ -425,9 +425,11 @@ export function muscleRecoveryMap(sessions: WorkoutSession[], now: Date = new Da
       const percent = Math.min(1, elapsedHours / windowHours);
       const current = state.get(muscle);
       const lastTrainedAt = !current?.lastTrainedAt || session.finishedAt! > current.lastTrainedAt ? session.finishedAt : current.lastTrainedAt;
-      state.set(muscle, !current || percent < current.percent
-        ? { percent, hoursLeft: Math.max(0, windowHours - elapsedHours), lastTrainedAt }
-        : { ...current, lastTrainedAt });
+      state.set(muscle, {
+        percent: Math.min(percent, current?.percent ?? 1),
+        hoursLeft: Math.max(0, windowHours - elapsedHours, current?.hoursLeft ?? 0),
+        lastTrainedAt
+      });
     });
   });
   return RECOVERY_MUSCLES.map((muscle) => {
