@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { IScannerControls } from "@zxing/browser";
-import { Barcode, Camera, Check, ChevronRight, CookingPot, Database, Download, Droplets, Flame, HardDrive, Heart, Pencil, Plus, Salad, ScanLine, Search, ShieldCheck, Trash2, Utensils } from "lucide-react";
+import { Barcode, Camera, Check, ChevronRight, CookingPot, Database, Download, Droplets, Flame, Heart, Pencil, Plus, Salad, ScanLine, Search, ShieldCheck, Trash2, Utensils } from "lucide-react";
 import { Button, Card, EmptyState, Field, MetricRing, Modal, Notice, ProgressBar, SectionTitle } from "@gym/ui";
 import type { FoodItem, MealEntry, Recipe } from "@gym/contracts";
-import { assessNutrientCompleteness, completeFoodLookupCandidate, createMealEntry, createMealEntryFromRecipe, createRecipe, createWaterEntry, dailyNutrition, dailyNutritionWithMicronutrients, estimateNutritionTarget, nutritionTargetNeedsConfirmation, parseNutritionNumber, rankFoodsByPreference, recipeNutrition, upsertFoodPreference, validateCustomFoodDraft, validateMealInput, type FoodLookupCandidate, type NutritionEstimateInput, type NutritionValidationError } from "@gym/nutrition";
+import { assessNutrientCompleteness, completeFoodLookupCandidate, createMealEntry, createMealEntryFromRecipe, createRecipe, createWaterEntry, dailyNutrition, dailyNutritionWithMicronutrients, estimateNutritionTarget, nutritionTargetNeedsConfirmation, parseNutritionNumber, normalizeFoodSearchText, rankFoodsByPreference, recipeNutrition, upsertFoodPreference, validateCustomFoodDraft, validateMealInput, type FoodLookupCandidate, type NutritionEstimateInput, type NutritionValidationError } from "@gym/nutrition";
 import { formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { PantryMenuSection } from "./PantryMenuSection";
@@ -16,6 +16,9 @@ const mealLabels: Record<MealEntry["meal"], { vi: string; en: string }> = {
   dinner: { vi: "Bữa tối", en: "Dinner" },
   snack: { vi: "Ăn nhẹ", en: "Snack" }
 };
+
+const OFFLINE_SEARCH_DELAY_MS = 200;
+const OFFLINE_SEARCH_MIN_LENGTH = 2;
 
 function localDate(date = new Date()): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -69,7 +72,7 @@ export function NutritionPage() {
   const [custom, setCustom] = useState({ name: "", calories: "", protein: "", carbs: "", fat: "" });
   const [nutritionError, setNutritionError] = useState<string>();
   const [offlineResults, setOfflineResults] = useState<FoodItem[]>([]);
-  const [offlineSearchBusy, setOfflineSearchBusy] = useState(false);
+  const [settledSearchQuery, setSettledSearchQuery] = useState("");
   const [waterAmount, setWaterAmount] = useState("250");
   const [recipeOpen, setRecipeOpen] = useState(false);
   const [editingRecipeId, setEditingRecipeId] = useState<string>();
@@ -99,7 +102,12 @@ export function NutritionPage() {
   const targetIsCurrent = Boolean(profile.nutritionTarget && currentEstimatedTarget
     && !nutritionTargetNeedsConfirmation(profile.nutritionTarget, currentEstimateInput));
   const target = targetIsCurrent ? profile.nutritionTarget : undefined;
-  const filteredFoods = rankFoodsByPreference(foods, foodPreferences, locale, foodQuery);
+  const preferenceByFoodId = useMemo(() => new Map(foodPreferences.map((preference) => [preference.foodId, preference])), [foodPreferences]);
+  const filteredFoods = useMemo(() => rankFoodsByPreference(foods, foodPreferences, locale, foodQuery), [foods, foodPreferences, locale, foodQuery]);
+  const packReady = packRecord.status === "ready";
+  const searchRequestRef = useRef(0);
+  const offlineSearchQuery = addOpen && packReady && normalizeFoodSearchText(foodQuery).length >= OFFLINE_SEARCH_MIN_LENGTH ? foodQuery.trim() : "";
+  const offlineSearchBusy = Boolean(offlineSearchQuery) && settledSearchQuery !== offlineSearchQuery;
   const visibleFoods = [...filteredFoods, ...offlineResults.filter((candidate) => !filteredFoods.some((saved) => saved.id === candidate.id))];
   const packUpdateAvailable = packRecord.status === "ready"
     && Boolean(packManifest)
@@ -115,6 +123,7 @@ export function NutritionPage() {
     setSelectedFood(undefined);
     setFoodQuery("");
     setOfflineResults([]);
+    setSettledSearchQuery("");
     setLookupCandidate(undefined);
     setFormErrors([]);
     setLookupError(undefined);
@@ -205,16 +214,38 @@ export function NutritionPage() {
     }
   };
 
-  const searchFoods = async () => {
-    if (!foodQuery.trim() || packRecord.status !== "ready") return;
-    setOfflineSearchBusy(true);
-    setLookupError(undefined);
+  // Search the installed pack as the user types; only the latest request may update the list.
+  useEffect(() => {
+    const request = ++searchRequestRef.current;
+    if (!offlineSearchQuery) return;
+    const query = offlineSearchQuery;
+    const timer = window.setTimeout(() => {
+      searchOfflineNutritionFoods(query)
+        .then((results) => {
+          if (searchRequestRef.current !== request) return;
+          setOfflineResults(results);
+          setLookupError(undefined);
+        })
+        .catch((error: unknown) => {
+          if (searchRequestRef.current !== request) return;
+          setLookupError(error instanceof Error ? error.message : "Offline search failed");
+        })
+        .finally(() => {
+          if (searchRequestRef.current === request) setSettledSearchQuery(query);
+        });
+    }, OFFLINE_SEARCH_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [offlineSearchQuery, searchOfflineNutritionFoods]);
+
+  const quickAddFood = async (food: FoodItem, servingGrams: number) => {
     try {
-      setOfflineResults(await searchOfflineNutritionFoods(foodQuery.trim()));
+      const entry = createMealEntry(food, servingGrams, date, mealType);
+      if (!foods.some((saved) => saved.id === food.id)) await addFood(food);
+      await addMeal(entry);
+      setAddOpen(false);
+      setSelectedFood(undefined);
     } catch (error) {
-      setLookupError(error instanceof Error ? error.message : "Offline search failed");
-    } finally {
-      setOfflineSearchBusy(false);
+      setLookupError(error instanceof Error ? error.message : "Không thể lưu món ăn.");
     }
   };
 
@@ -434,8 +465,7 @@ export function NutritionPage() {
       <Modal open={addOpen} title={`${editingMealId ? (locale === "vi" ? "Sửa món trong" : "Edit food in") : (locale === "vi" ? "Thêm vào" : "Add to")} ${mealLabels[mealType][locale].toLocaleLowerCase(locale)}`} onClose={() => { setAddOpen(false); setEditingMealId(undefined); }} className="modal--wide">
         <div className="food-picker">
           <div className="food-picker__tabs">
-            <div className="search-box"><Search size={18} /><input value={foodQuery} onChange={(event) => { setFoodQuery(event.target.value); setOfflineResults([]); }} onKeyDown={(event) => { if (event.key === "Enter") void searchFoods(); }} placeholder={packRecord.status === "ready" ? (locale === "vi" ? "Nhập tên rồi bấm Tìm offline…" : "Enter a name, then search offline…") : (locale === "vi" ? "Tìm thực phẩm đã lưu…" : "Search saved foods…")} /></div>
-            {packRecord.status === "ready" ? <Button variant="secondary" disabled={offlineSearchBusy || !foodQuery.trim()} onClick={() => void searchFoods()}><HardDrive size={17} />{offlineSearchBusy ? "…" : (locale === "vi" ? "Tìm offline" : "Search offline")}</Button> : null}
+            <div className="search-box"><Search size={18} /><input value={foodQuery} type="search" enterKeyHint="search" autoComplete="off" aria-label="Tìm thực phẩm" onChange={(event) => { setFoodQuery(event.target.value); if (normalizeFoodSearchText(event.target.value).length < OFFLINE_SEARCH_MIN_LENGTH) setOfflineResults([]); }} placeholder={packReady ? "Gõ tên món, có dấu hoặc không dấu…" : "Tìm thực phẩm đã lưu…"} />{offlineSearchBusy ? <span className="search-box__status" role="status">Đang tìm…</span> : null}</div>
             <Button variant="secondary" onClick={() => setScannerOpen(true)}><ScanLine size={17} />{locale === "vi" ? "Quét mã" : "Scan"}</Button>
             <Button variant="ghost" onClick={() => { setFormErrors([]); setCustomOpen(true); }}><Plus size={17} />{locale === "vi" ? "Tự tạo" : "Custom"}</Button>
           </div>
@@ -446,8 +476,27 @@ export function NutritionPage() {
 
           {formErrors.length ? <Notice tone="warning"><ul>{formErrors.map((error, index) => <li key={`${error.field}-${error.code}-${index}`}>{error.message}</li>)}</ul></Notice> : null}
 
+          {!editingMealId && !foodQuery.trim() && filteredFoods.some((food) => preferenceByFoodId.get(food.id)?.lastUsedAt) ? <p className="food-results__label">Dùng gần đây ở trên cùng · bấm + để ghi ngay lượng lần trước</p> : null}
           <div className="food-results">
-            {visibleFoods.length ? visibleFoods.map((food) => { const favorite = foodPreferences.find((preference) => preference.foodId === food.id)?.favorite; return <div className={selectedFood?.id === food.id ? "food-result food-result--selected" : "food-result"} key={food.id}><button type="button" className="food-result__select" onClick={() => { setSelectedFood(food); setGrams(String(foodPreferences.find((preference) => preference.foodId === food.id)?.defaultServingGrams ?? food.servingGrams ?? 100)); }}><span className="food-result__icon"><Salad size={19} /></span><span><strong>{localize(food.name, locale)}</strong><small>{food.brand ? `${food.brand} · ` : ""}{formatNumber(food.per100g.calories, locale, 1)} kcal / 100g · {food.source === "vietnamese_recipe" ? (locale === "vi" ? "món ước tính" : "recipe estimate") : food.source === "usda_fdc" ? "USDA" : (locale === "vi" ? "đã lưu" : "saved")}</small></span>{selectedFood?.id === food.id ? <Check size={18} /> : <ChevronRight size={18} />}</button>{foods.some((saved) => saved.id === food.id) ? <button type="button" className="favorite-button" aria-pressed={Boolean(favorite)} aria-label={favorite ? (locale === "vi" ? `Bỏ yêu thích ${localize(food.name, locale)}` : `Unfavorite ${localize(food.name, locale)}`) : (locale === "vi" ? `Yêu thích ${localize(food.name, locale)}` : `Favorite ${localize(food.name, locale)}`)} onClick={() => void toggleFavorite(food)}><Heart size={16} fill={favorite ? "currentColor" : "none"} /></button> : null}</div>; }) : <EmptyState title={locale === "vi" ? "Chưa có kết quả" : "No results yet"} body={packRecord.status === "ready" ? (locale === "vi" ? "Nhập tên và bấm Tìm offline, hoặc quét mã vạch." : "Enter a name and press Search offline, or scan a barcode.") : (locale === "vi" ? "Cài kho offline, quét mã vạch hoặc tạo thực phẩm thủ công." : "Install the offline library, scan a barcode, or create a custom food.")} />}
+            {visibleFoods.length ? visibleFoods.map((food) => {
+              const preference = preferenceByFoodId.get(food.id);
+              const favorite = Boolean(preference?.favorite);
+              const name = localize(food.name, locale);
+              const quickGrams = !editingMealId && preference?.lastUsedAt ? preference.defaultServingGrams : undefined;
+              const selected = selectedFood?.id === food.id;
+              const sourceLabel = preference?.lastUsedAt ? "gần đây" : food.source === "vietnamese_recipe" ? "món ước tính" : food.source === "usda_fdc" ? "USDA" : "đã lưu";
+              return (
+                <div className={`food-result${selected ? " food-result--selected" : ""}${quickGrams ? " food-result--quick" : ""}`} key={food.id}>
+                  <button type="button" className="food-result__select" onClick={() => { setSelectedFood(food); setGrams(String(preference?.defaultServingGrams ?? food.servingGrams ?? 100)); }}>
+                    <span className="food-result__icon"><Salad size={19} /></span>
+                    <span><strong>{name}</strong><small>{food.brand ? `${food.brand} · ` : ""}{formatNumber(food.per100g.calories, locale, 1)} kcal / 100g · {sourceLabel}</small></span>
+                    {selected ? <Check size={18} /> : <ChevronRight size={18} />}
+                  </button>
+                  {quickGrams ? <button type="button" className="quick-add-button" aria-label={`Ghi nhanh ${formatNumber(quickGrams, locale, 1)}g ${name}`} onClick={() => void quickAddFood(food, quickGrams)}><Plus size={14} />{formatNumber(quickGrams, locale, 1)}g</button> : null}
+                  {foods.some((saved) => saved.id === food.id) ? <button type="button" className="favorite-button" aria-pressed={favorite} aria-label={favorite ? `Bỏ yêu thích ${name}` : `Yêu thích ${name}`} onClick={() => void toggleFavorite(food)}><Heart size={16} fill={favorite ? "currentColor" : "none"} /></button> : null}
+                </div>
+              );
+            }) : <EmptyState title={offlineSearchBusy ? "Đang tìm…" : "Chưa có kết quả"} body={packReady ? "Gõ ít nhất 2 ký tự để tìm trong kho offline, hoặc quét mã vạch." : "Cài kho offline, quét mã vạch hoặc tạo thực phẩm thủ công."} />}
           </div>
 
           {selectedFood ? <><div className="food-selection"><div><span>{locale === "vi" ? "Đã chọn" : "Selected"}</span><strong>{localize(selectedFood.name, locale)}</strong></div><Field label={locale === "vi" ? "Khối lượng (g)" : "Amount (g)"}><input inputMode="decimal" value={grams} onChange={(event) => { setGrams(event.target.value); setFormErrors([]); }} aria-invalid={formErrors.some((error) => error.field === "grams")} /></Field><div className="food-selection__calories"><strong>{gramsPreview.ok ? Math.round(selectedFood.per100g.calories * gramsPreview.value / 100) : "—"}</strong><span>kcal</span></div></div><NutrientDetails food={selectedFood} locale={locale} /></> : null}

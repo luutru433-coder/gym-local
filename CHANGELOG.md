@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## Unreleased — Faster meal logging
 
-- Exercise catalog search now ignores Vietnamese diacritics and letter case, so `keo xa` finds “Kéo xà” and `day nguc` finds “Đẩy ngực ngang”.
+- The add-food dialog now searches the installed offline food pack while you type (accented or unaccented), replacing the separate “Tìm offline” button.
+- Recently logged foods are listed first, ahead of unused favorites, and each has a one-tap button that logs the last amount again.
+- Saved-food search now ignores Vietnamese accents.
 
 ## 2026-11-21 — Nutrition pack 2026.11.1: accurate names, no duplicate foods
 
