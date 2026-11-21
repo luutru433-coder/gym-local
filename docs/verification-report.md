@@ -1,5 +1,10 @@
 # Verification report — 2026-11-21
 
+## ExerciseDB exercises added to the owner's list (ADR 0022)
+
+- Tests cover the vocabulary mapping, listing only exercises the app does not show yet, adding one with image link and steps, and not adding it twice.
+- Not verified on a physical iPhone; names and steps are not translated.
+
 ## Free ExerciseDB images on the device (ADR 0021)
 
 - Provider tests mock `fetch` and Cache Storage: paged list with retry on 429/503, only `static.exercisedb.dev` addresses accepted, each GIF saved once with `mode: "no-cors"`, failures counted, cache removal.

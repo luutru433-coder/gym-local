@@ -10,6 +10,8 @@ export interface CustomExerciseInput {
   equipment: EquipmentType;
   loadEntryMode: LoadEntryMode;
   note?: string;
+  /** Ready-made steps, e.g. from a downloaded exercise list; shown in place of the note. */
+  instructions?: string[];
 }
 
 const customPattern: Partial<Record<MuscleGroup, Pattern>> = {
@@ -60,7 +62,7 @@ export function buildCustomExercise(
       equipment: [input.equipment],
       difficulty: "beginner",
       loadEntryMode: input.loadEntryMode,
-      instructions: note ? [{ vi: note, en: note }] : [],
+      instructions: input.instructions?.length ? input.instructions.slice(0, 12).map((step) => ({ vi: step, en: step })) : note ? [{ vi: note, en: note }] : [],
       cues: [],
       commonMistakes: [],
       safety: [],

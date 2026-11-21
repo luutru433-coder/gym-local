@@ -1,6 +1,7 @@
 import { EXERCISE_VARIANTS } from "@gym/catalog";
 import { expandPackFiles, readExercisePack, suggestExerciseImageLinks } from "@gym/media/exercise-pack";
 import { listExerciseDbImages, storeExerciseDbGifs } from "@gym/media/online-gifs";
+import { useGymStore } from "../../store/useGymStore";
 import { applyExerciseImageLinksWhereMissing, applySuggestedExerciseImageLinks, importExerciseImages, importRemoteExerciseImages, listExerciseImages, listLinkedRemoteExerciseImageUrls } from "@gym/storage/exercise-images";
 
 export interface ExerciseImagePackImport {
@@ -43,9 +44,17 @@ export interface ExerciseDbDownload {
  */
 export async function downloadExerciseDbImages(onProgress?: (step: "list" | "gifs", done: number, total: number) => void, signal?: AbortSignal): Promise<ExerciseDbDownload> {
   const listed = await listExerciseDbImages((done, total) => onProgress?.("list", done, total), signal);
-  const images = listed.map((item) => ({ id: `exercisedb:${item.id}`, name: item.name, fileName: `${item.id}.gif`, type: "image/gif", size: 0, remoteUrl: item.gifUrl }));
+  const images = listed.map((item) => ({ id: `exercisedb:${item.id}`, name: item.name, fileName: `${item.id}.gif`, type: "image/gif", size: 0, remoteUrl: item.gifUrl, details: item.details }));
   await importRemoteExerciseImages(images);
   const suggestions = suggestExerciseImageLinks(images, EXERCISE_VARIANTS.map((variant) => ({ id: variant.id, movementId: variant.movementId, equipment: variant.equipment })));
+  // Exercises the owner added from this set (e.g. restored from a backup on a new device) get their image back by name.
+  const byName = new Map(images.map((image) => [image.name.trim().toLowerCase(), image.id]));
+  const { customMovements, customVariants } = useGymStore.getState();
+  for (const variant of customVariants) {
+    const movement = customMovements.find((item) => item.id === variant.movementId);
+    const imageId = movement && byName.get(movement.name.en.trim().toLowerCase());
+    if (imageId) suggestions[variant.id] = imageId;
+  }
   const suggested = await applyExerciseImageLinksWhereMissing(suggestions);
   const saved = await storeExerciseDbGifs(await listLinkedRemoteExerciseImageUrls(), (done, total) => onProgress?.("gifs", done, total), signal);
   return { listed: images.length, suggested, ...saved };
