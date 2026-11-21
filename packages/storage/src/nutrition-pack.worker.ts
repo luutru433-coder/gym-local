@@ -4,6 +4,7 @@ import sqlite3InitModule, { type Database, type SAHPoolUtil } from "@sqlite.org/
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex } from "@noble/hashes/utils.js";
 import { APP_VERSIONS, type NutritionPackManifest } from "@gym/contracts";
+import { nutritionPackSearchQueries } from "./nutrition-pack-search";
 import { commitStagedNutritionPack, downloadNutritionPack, nutritionPackTransferSizeMatches, obsoletePackFileAfterActivation } from "./providers/nutrition-pack";
 
 const LEGACY_PACK_FILENAME = "/gym-local-nutrition.sqlite3";
@@ -153,17 +154,6 @@ async function writePointer(pointer: PackPointer): Promise<void> {
   }
 }
 
-function ftsQuery(query: string): string {
-  return query
-    .normalize("NFC")
-    .replace(/["'():*^{}[\]]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 8)
-    .map((token) => `"${token}"*`)
-    .join(" ");
-}
-
 function readMetadata(db: Database): Record<string, string> {
   const columns = db.exec({
     sql: "PRAGMA table_info(pack_meta)",
@@ -225,7 +215,7 @@ function validatePack(db: Database, manifest?: NutritionPackManifest): Record<st
   });
   const sampleName = String(sampleRows[0]?.sample_name ?? "");
   if (!sampleName) throw new Error("Nutrition pack contains no searchable foods");
-  const match = ftsQuery(sampleName.split(/\s+/)[0] ?? "");
+  const match = nutritionPackSearchQueries(sampleName.split(/\s+/)[0] ?? "")?.match ?? "";
   const searchRows = db.exec({
     sql: `SELECT f.id FROM food_fts JOIN foods f ON f.rowid = food_fts.rowid
       WHERE food_fts MATCH $match LIMIT 1`,
@@ -424,8 +414,8 @@ async function search(query: string, limit: number) {
   const db = await openDatabase();
   if (!db) throw new Error("Offline nutrition pack is not installed");
   const schemaVersion = Number(readMetadata(db).schema_version);
-  const match = ftsQuery(String(query));
-  if (!match) return [];
+  const queries = nutritionPackSearchQueries(String(query));
+  if (!queries) return [];
   const schema3Columns = schemaVersion >= 3
     ? `, f.source_dataset_id, f.source_dataset_version, f.source_license_id,
       f.translation_status, f.translation_reviewed_at`
@@ -440,8 +430,21 @@ async function search(query: string, limit: number) {
       f.vitamin_e_mg, f.vitamin_k_mcg, f.vitamin_b6_mg, f.vitamin_b12_mcg,
       f.folate_mcg, f.data_quality ${schema3Columns}
       FROM food_fts JOIN foods f ON f.rowid = food_fts.rowid
-      WHERE food_fts MATCH $match ${visibilityFilter} ORDER BY bm25(food_fts) LIMIT $limit`,
-    bind: { $match: match, $limit: Math.min(50, Math.max(1, Number(limit) || 30)) },
+      WHERE food_fts MATCH $match ${visibilityFilter}
+      ORDER BY CASE
+          WHEN f.rowid IN (SELECT rowid FROM food_fts WHERE food_fts MATCH $nameStart) THEN 0
+          WHEN f.rowid IN (SELECT rowid FROM food_fts WHERE food_fts MATCH $namePhrase) THEN 1
+          ELSE 2
+        END,
+        f.source <> 'usda_fdc',
+        bm25(food_fts)
+      LIMIT $limit`,
+    bind: {
+      $match: queries.match,
+      $nameStart: queries.nameStart,
+      $namePhrase: queries.namePhrase,
+      $limit: Math.min(50, Math.max(1, Number(limit) || 30))
+    },
     rowMode: "object",
     returnValue: "resultRows"
   });
