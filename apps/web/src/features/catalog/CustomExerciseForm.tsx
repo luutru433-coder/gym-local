@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button, Chip, Field, Notice } from "@gym/ui";
 import type { EquipmentType, ExerciseVariant, LoadEntryMode, Movement, MuscleGroup, Profile } from "@gym/contracts";
-import { EQUIPMENT_OPTIONS, type CustomExerciseInput } from "@gym/catalog";
+import { EQUIPMENT_OPTIONS } from "@gym/catalog";
+import type { CustomExerciseInput } from "@gym/catalog/custom";
 import "./CustomExerciseForm.css";
 import { muscleLabels } from "../../lib/exercise-visuals";
 

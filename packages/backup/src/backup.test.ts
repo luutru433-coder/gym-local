@@ -3,8 +3,8 @@ import JSZip from "jszip";
 import type { PersonalDataSnapshot, SavedMealPlan } from "@gym/contracts";
 import { defaultSettings } from "@gym/storage";
 import { cloneRoutineTemplate, createSessionFromRoutine } from "@gym/workouts";
-import { buildCustomExercise } from "@gym/catalog";
-import { createBackup, readBackup } from "./index";
+import { buildCustomExercise } from "@gym/catalog/custom";
+import { createBackup, readBackup, workoutCsv } from "./index";
 
 function emptyData(overrides: Partial<PersonalDataSnapshot> = {}): PersonalDataSnapshot {
   return {
@@ -608,5 +608,17 @@ describe("backup", () => {
   it("refuses to create a backup with an invalid active-program pointer", async () => {
     const data = emptyData({ settings: { ...defaultSettings, activeProgramId: "program_missing" } });
     await expect(createBackup(data)).rejects.toThrow("active program pointer");
+  });
+
+  it("exports a formula-like exercise name as plain text in the workout CSV", () => {
+    const name = { vi: "=HYPERLINK(1)", en: "=HYPERLINK(1)" };
+    const csv = workoutCsv(emptyData({
+      sessions: [{
+        id: "session_csv",
+        startedAt: "2026-08-10T01:00:00.000Z",
+        exercises: [{ id: "block_csv", movementId: "custom_movement_csv", variantId: "custom_variant_csv", movementNameSnapshot: name, variantNameSnapshot: name, loadEntryModeSnapshot: "total_weight", restSeconds: 90, sets: [{ id: "set_csv", type: "working", weightKg: 20, reps: 8, rir: -1, completedAt: "2026-08-10T01:10:00.000Z" }] }]
+      }]
+    }));
+    expect(csv).toContain(`"'=HYPERLINK(1)","'=HYPERLINK(1)","working","20","8","-1",""`);
   });
 });

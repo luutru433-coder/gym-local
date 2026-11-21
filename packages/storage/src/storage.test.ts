@@ -2,13 +2,12 @@ import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { PersonalDataSnapshot, Profile, Program, Routine, SavedMealPlan, WorkoutSession } from "@gym/contracts";
-import { buildCustomExercise } from "@gym/catalog";
+import { buildCustomExercise } from "@gym/catalog/custom";
+import { deleteCustomExercise, saveCustomExercise } from "./custom-exercises";
 import {
   GymDatabase,
   defaultSettings,
-  deleteCustomExercise,
   listCustomExercises,
-  saveCustomExercise,
   exportAllData,
   getActiveSession,
   getProfile,
@@ -691,8 +690,20 @@ describe("IndexedDB schema and recovery", () => {
     expect(await db.customMovements.count()).toBe(1);
 
     await db.routines.delete(usedBy.id);
-    await deleteCustomExercise(movement.id, db);
+    await expect(deleteCustomExercise(movement.id, db)).resolves.toBe(false);
     expect(await listCustomExercises(db)).toEqual({ movements: [], variants: [] });
+
+    await saveCustomExercise(movement, variant, db);
+    const logged: WorkoutSession = {
+      id: "session_custom",
+      startedAt: "2026-08-10T01:00:00.000Z",
+      finishedAt: "2026-08-10T02:00:00.000Z",
+      exercises: [{ id: "block_custom", movementId: movement.id, variantId: variant.id, movementNameSnapshot: movement.name, variantNameSnapshot: variant.name, loadEntryModeSnapshot: variant.loadEntryMode, restSeconds: 90, sets: [] }]
+    };
+    await db.sessions.put(logged);
+    await expect(deleteCustomExercise(movement.id, db)).resolves.toBe(true);
+    expect(await listCustomExercises(db)).toMatchObject({ movements: [{ id: movement.id, reviewStatus: "deprecated" }], variants: [{ id: variant.id, reviewStatus: "deprecated" }] });
+    expect(await db.sessions.get(logged.id)).toEqual(logged);
   });
 
   it("blocks restore while a workout is active without changing data or recovery points", async () => {

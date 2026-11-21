@@ -6,7 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip, Modal, ProgressBar, ToggleGroup, ToggleGroupItem } from "@gym/ui";
 import type { NutritionPackRecord, Profile, WorkoutSession } from "@gym/contracts";
 import { defaultSettings, exportAllData, getProfile, gymDb, initializeDatabase, listRoutines, saveProfile, saveSession } from "@gym/storage";
-import { getTrackingProfile, getVariant, getVariantsForMovement, searchCatalog, type CustomExerciseInput } from "@gym/catalog";
+import { getTrackingProfile, getVariant, getVariantsForMovement, searchCatalog } from "@gym/catalog";
+import type { CustomExerciseInput } from "@gym/catalog/custom";
+import { removeUserCustomExercise, saveUserCustomExercise } from "./features/catalog/customExerciseActions";
 import { addExerciseBlock, createFreestyleSession } from "@gym/workouts";
 import { App } from "./App";
 import { UpdatePrompt } from "./components/UpdatePrompt";
@@ -314,25 +316,47 @@ describe("custom exercises", () => {
     await useGymStore.getState().hydrate();
     const input: CustomExerciseInput = { name: "  Kéo cáp một tay ", primaryMuscle: "back", secondaryMuscles: ["biceps"], equipment: "cable", loadEntryMode: "per_hand" };
 
-    const created = await useGymStore.getState().saveCustomExercise(input);
+    const created = await saveUserCustomExercise(input);
     const variant = getVariantsForMovement(created.id)[0];
 
     expect(created.name).toEqual({ vi: "Kéo cáp một tay", en: "Kéo cáp một tay" });
     expect(searchCatalog("keo cap", "back", "cable")[0]?.id).toBe(created.id);
     expect(getTrackingProfile(variant.id)).toMatchObject({ loadEntryMode: "per_hand", effortKind: "reps" });
-    await expect(useGymStore.getState().saveCustomExercise(input)).rejects.toThrow();
+    await expect(saveUserCustomExercise(input)).rejects.toThrow();
 
     const session = addExerciseBlock(createFreestyleSession(), variant);
     expect(session.exercises[0]).toMatchObject({ movementId: created.id, variantId: variant.id, variantNameSnapshot: created.name });
 
-    const edited = await useGymStore.getState().saveCustomExercise({ ...input, name: "Kéo cáp", loadEntryMode: "reps_only" }, created.id);
+    const edited = await saveUserCustomExercise({ ...input, name: "Kéo cáp", loadEntryMode: "reps_only" }, created.id);
     expect(edited).toMatchObject({ id: created.id, contentVersion: 2 });
     expect(getVariant(variant.id)).toMatchObject({ id: variant.id, loadEntryMode: "reps_only" });
     await expect(exportAllData()).resolves.toMatchObject({ customMovements: [{ id: created.id }], customVariants: [{ id: variant.id }] });
 
-    await useGymStore.getState().removeCustomExercise(created.id);
+    await removeUserCustomExercise(created.id);
     expect(getVariant(variant.id)).toBeUndefined();
     expect(useGymStore.getState().customMovements).toEqual([]);
     await expect(exportAllData()).resolves.toMatchObject({ customMovements: [], customVariants: [] });
+  });
+
+  it("keeps a logged custom exercise for history: no setup change, and delete only hides it", async () => {
+    await initializeDatabase();
+    await useGymStore.getState().hydrate();
+    const input: CustomExerciseInput = { name: "Kéo cáp một tay", primaryMuscle: "back", secondaryMuscles: [], equipment: "cable", loadEntryMode: "per_hand" };
+    const created = await saveUserCustomExercise(input);
+    const variant = getVariantsForMovement(created.id)[0];
+    const logged = addExerciseBlock(createFreestyleSession(), variant);
+    await saveSession({ ...logged, finishedAt: "2026-08-12T11:00:00.000Z" });
+    await useGymStore.getState().hydrate();
+
+    await expect(saveUserCustomExercise({ ...input, loadEntryMode: "total_weight" }, created.id)).rejects.toThrow();
+    await expect(saveUserCustomExercise({ ...input, equipment: "dumbbell" }, created.id)).rejects.toThrow();
+    await expect(saveUserCustomExercise({ ...input, name: "Kéo cáp", primaryMuscle: "biceps" }, created.id)).resolves.toMatchObject({ id: created.id });
+
+    await removeUserCustomExercise(created.id);
+    expect(searchCatalog("keo cap")).toEqual([]);
+    expect(getVariant(variant.id)).toMatchObject({ reviewStatus: "deprecated" });
+    await expect(saveUserCustomExercise({ ...input, name: "Kéo cáp" })).resolves.toMatchObject({ reviewStatus: "draft" });
+    await useGymStore.getState().hydrate();
+    expect(getVariant(variant.id)).toBeDefined();
   });
 });

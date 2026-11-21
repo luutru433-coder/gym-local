@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, Dumbbell, Info, Pencil, Plus, Search, ShieldCheck, SlidersHorizontal, Target, Trash2, UserRound } from "lucide-react";
 import { Button, Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
 import type { EquipmentType, ExerciseVariant, Movement, MuscleGroup } from "@gym/contracts";
-import { EQUIPMENT_OPTIONS, getExerciseAnimation, getMovementAnimation, getMovement, getVariantsForMovement, isCustomMovement, listMovements, rankVariantsForEquipment, searchCatalog, type CustomExerciseInput } from "@gym/catalog";
+import { EQUIPMENT_OPTIONS, getExerciseAnimation, getMovementAnimation, getMovement, getVariantsForMovement, listMovements, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
+import type { CustomExerciseInput } from "@gym/catalog/custom";
+import { removeUserCustomExercise, saveUserCustomExercise } from "./customExerciseActions";
 import { CustomExerciseForm } from "./CustomExerciseForm";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -35,8 +37,6 @@ export function CatalogPage() {
   const [selectedVariant, setSelectedVariant] = useState<ExerciseVariant>();
 
   const customMovements = useGymStore((state) => state.customMovements);
-  const saveCustomExercise = useGymStore((state) => state.saveCustomExercise);
-  const removeCustomExercise = useGymStore((state) => state.removeCustomExercise);
   const [formMode, setFormMode] = useState<"create" | "edit">();
   const [deleteError, setDeleteError] = useState<string>();
 
@@ -44,7 +44,7 @@ export function CatalogPage() {
   const results = useMemo(() => searchCatalog(query, muscle, equipment, movements), [equipment, movements, muscle, query]);
   const movementCount = movements.length;
   const selectedMovement = selectedMovementId ? getMovement(selectedMovementId) : undefined;
-  const selectedIsCustom = selectedMovement ? isCustomMovement(selectedMovement.id) : false;
+  const selectedIsCustom = customMovements.some((movement) => movement.id === selectedMovementId);
   const variants = selectedMovement ? rankVariantsForEquipment(selectedMovement.id, availableEquipment) : [];
   const activeVariant = selectedVariant ?? variants[0];
   const tutorialVideo = activeVariant?.videoGuides[0];
@@ -62,7 +62,7 @@ export function CatalogPage() {
   };
 
   const submitCustomExercise = async (input: CustomExerciseInput) => {
-    const saved = await saveCustomExercise(input, formMode === "edit" ? selectedMovementId : undefined);
+    const saved = await saveUserCustomExercise(input, formMode === "edit" ? selectedMovementId : undefined);
     setFormMode(undefined);
     setSelectedVariant(undefined);
     setSelectedMovementId(saved.id);
@@ -75,7 +75,7 @@ export function CatalogPage() {
       : `Delete "${localize(selectedMovement.name, locale)}"? Saved workouts are kept.`;
     if (!window.confirm(question)) return;
     try {
-      await removeCustomExercise(selectedMovement.id);
+      await removeUserCustomExercise(selectedMovement.id);
       closeMovement();
     } catch (caught) {
       setDeleteError(caught instanceof Error ? caught.message : String(caught));

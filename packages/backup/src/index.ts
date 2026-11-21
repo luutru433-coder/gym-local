@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { APP_VERSIONS, CUSTOM_VARIANT_ID_PREFIX, FOOD_GROUP_IDS, type BackupPayload } from "@gym/contracts";
+import { APP_VERSIONS, CUSTOM_MOVEMENT_ID_PREFIX, CUSTOM_VARIANT_ID_PREFIX, FOOD_GROUP_IDS, type BackupPayload } from "@gym/contracts";
 import { z } from "zod";
 
 const manifestSchema = z.object({
@@ -487,6 +487,7 @@ function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | 
 }): void {
   const customMovementIds = new Set<string>();
   for (const movement of data.customMovements) {
+    if (!movement.id.startsWith(CUSTOM_MOVEMENT_ID_PREFIX)) throw new Error("Backup custom exercise ID is invalid");
     if (customMovementIds.has(movement.id)) throw new Error("Backup custom exercise is duplicated");
     customMovementIds.add(movement.id);
   }
@@ -728,7 +729,9 @@ export function downloadBlob(blob: Blob, filename: string): void {
 }
 
 function csvCell(value: unknown): string {
-  const text = value == null ? "" : String(value);
+  const raw = value == null ? "" : String(value);
+  // Text a spreadsheet would run as a formula is exported as plain text.
+  const text = /^[=+\-@\t\r]/.test(raw) && !Number.isFinite(Number(raw)) ? `'${raw}` : raw;
   return `"${text.replaceAll('"', '""')}"`;
 }
 

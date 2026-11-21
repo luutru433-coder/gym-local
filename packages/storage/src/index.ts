@@ -1,8 +1,6 @@
 import Dexie, { type EntityTable } from "dexie";
 import {
   APP_VERSIONS,
-  CUSTOM_MOVEMENT_ID_PREFIX,
-  CUSTOM_VARIANT_ID_PREFIX,
   FOOD_GROUP_IDS,
   type AppSettings,
   type BodyMetric,
@@ -795,36 +793,6 @@ export async function saveBodyMetric(metric: BodyMetric, db: GymDatabase = gymDb
 export async function listCustomExercises(db: GymDatabase = gymDb): Promise<{ movements: Movement[]; variants: ExerciseVariant[] }> {
   const [movements, variants] = await Promise.all([db.customMovements.toArray(), db.customVariants.toArray()]);
   return { movements, variants };
-}
-
-export async function saveCustomExercise(movement: Movement, variant: ExerciseVariant, db: GymDatabase = gymDb): Promise<void> {
-  if (!movement.id.startsWith(CUSTOM_MOVEMENT_ID_PREFIX) || !variant.id.startsWith(CUSTOM_VARIANT_ID_PREFIX)) {
-    throw new Error("Custom exercise IDs must not collide with catalog IDs");
-  }
-  if (variant.movementId !== movement.id) throw new Error("Custom exercise variant does not belong to its movement");
-  if (!movement.name.vi.trim() || !movement.name.en.trim()) throw new Error("Custom exercise name is required");
-  await db.transaction("rw", db.customMovements, db.customVariants, async () => {
-    await db.customMovements.put(movement);
-    await db.customVariants.put(variant);
-  });
-}
-
-/** Logged sessions keep their own name snapshots, so history survives; routines must drop the exercise first. */
-export async function deleteCustomExercise(movementId: string, db: GymDatabase = gymDb): Promise<void> {
-  await sessionWriteQueue;
-  await db.transaction("rw", db.customMovements, db.customVariants, db.routines, db.sessions, db.settings, async () => {
-    const routines = await db.routines.toArray();
-    if (routines.some((routine) => routine.items.some((item) => item.movementId === movementId))) {
-      throw new Error("Custom exercise is used by a routine");
-    }
-    const settings = await db.settings.get("app");
-    const active = settings?.activeSessionId ? await db.sessions.get(settings.activeSessionId) : undefined;
-    if (active && !active.finishedAt && active.exercises.some((exercise) => exercise.movementId === movementId)) {
-      throw new Error("Custom exercise is used by the active workout");
-    }
-    await db.customVariants.where("movementId").equals(movementId).delete();
-    await db.customMovements.delete(movementId);
-  });
 }
 
 export async function getSettings(db: GymDatabase = gymDb): Promise<AppSettings> {

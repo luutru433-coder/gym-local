@@ -12,11 +12,13 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@gym/contracts": fromRoot("./packages/contracts/src/index.ts"),
+      "@gym/catalog/custom": fromRoot("./packages/catalog/src/custom-exercise.ts"),
       "@gym/catalog": fromRoot("./packages/catalog/src/index.ts"),
       "@gym/workouts/plan": fromRoot("./packages/workouts/src/adaptive-plan.ts"),
       "@gym/workouts": fromRoot("./packages/workouts/src/index.ts"),
       "@gym/nutrition": fromRoot("./packages/nutrition/src/index.ts"),
       "@gym/progress": fromRoot("./packages/progress/src/index.ts"),
+      "@gym/storage/custom-exercises": fromRoot("./packages/storage/src/custom-exercises.ts"),
       "@gym/storage": fromRoot("./packages/storage/src/index.ts"),
       "@gym/backup": fromRoot("./packages/backup/src/index.ts"),
       "@gym/media": fromRoot("./packages/media/src/index.ts"),
