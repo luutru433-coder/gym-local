@@ -27,9 +27,9 @@
   padding: 4px;
   display: grid;
   place-items: center;
-  color: #6d7066;
-  background: #efede5;
-  border: 1px solid #dfddd4;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   border-radius: 7px;
 }
 
@@ -63,10 +63,10 @@
   font-weight: 850;
 }
 
-.activity-day--1 { background: #eef6ca; border-color: #d6e49c; }
-.activity-day--2 { background: #dceca1; border-color: #c2d879; }
-.activity-day--3 { color: #29310e; background: #c9df69; border-color: #abc84d; }
-.activity-day--4 { color: #1d2018; background: var(--lime); border-color: #9fbd2d; }
+.activity-day--1 { background: color-mix(in srgb, var(--lime) 22%, var(--surface)); border-color: color-mix(in srgb, var(--lime) 40%, var(--surface)); }
+.activity-day--2 { background: color-mix(in srgb, var(--lime) 45%, var(--surface)); border-color: color-mix(in srgb, var(--lime) 60%, var(--surface)); }
+.activity-day--3 { color: var(--ink-fixed); background: #c9df69; border-color: #abc84d; }
+.activity-day--4 { color: var(--ink-fixed); background: var(--lime); border-color: #9fbd2d; }
 
 .activity-calendar__legend {
   display: flex;
@@ -80,7 +80,7 @@
 .activity-calendar__legend i {
   width: 13px;
   height: 13px;
-  border: 1px solid #dfddd4;
+  border: 1px solid var(--line);
   border-radius: 3px;
 }
 
@@ -203,7 +203,7 @@
 
 .variant-trend-table thead th {
   color: var(--muted);
-  background: #f4f2eb;
+  background: var(--surface-2);
   font-size: 10px;
   letter-spacing: .04em;
   text-transform: uppercase;
