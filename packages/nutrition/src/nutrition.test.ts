@@ -158,12 +158,24 @@ describe("nutrition", () => {
     expect(findFoodByBarcode([food], "1234567890123")).toBeUndefined();
   });
 
-  it("ranks favorites and recent foods while preserving explicit serving defaults", () => {
+  it("ranks recently logged foods first, then unused favorites, while preserving explicit serving defaults", () => {
     const first = createCustomFood("Apple", { calories: 50, protein: 0, carbs: 12, fat: 0 });
     const second = createCustomFood("Banana", { calories: 90, protein: 1, carbs: 22, fat: 0 });
+    const third = createCustomFood("Cherry", { calories: 60, protein: 1, carbs: 15, fat: 0 });
+    const fourth = createCustomFood("Date", { calories: 280, protein: 2, carbs: 75, fat: 0 });
     const recent = recordFoodUse(undefined, first.id, { usedAt: "2026-08-13T01:00:00.000Z", defaultServingGrams: 150 });
-    const favorite = { ...recordFoodUse(undefined, second.id, { usedAt: "2026-08-12T01:00:00.000Z" }), favorite: true };
-    expect(rankFoodsByPreference([first, second], [recent, favorite], "en").map((food) => food.id)).toEqual([second.id, first.id]);
+    const older = { ...recordFoodUse(undefined, second.id, { usedAt: "2026-08-12T01:00:00.000Z" }), favorite: true };
+    const unusedFavorite = { id: "preference-date", foodId: fourth.id, favorite: true, useCount: 0 };
+    expect(rankFoodsByPreference([third, fourth, second, first], [recent, older, unusedFavorite], "en").map((food) => food.id))
+      .toEqual([first.id, second.id, fourth.id, third.id]);
     expect(recent).toMatchObject({ defaultServingGrams: 150, useCount: 1 });
+  });
+
+  it("matches saved foods without Vietnamese accents", () => {
+    const pho = createCustomFood("Phở bò", { calories: 90, protein: 6, carbs: 12, fat: 2 });
+    const tofu = createCustomFood("Đậu hũ", { calories: 76, protein: 8, carbs: 2, fat: 5 });
+    expect(rankFoodsByPreference([pho, tofu], [], "vi", "pho bo").map((food) => food.id)).toEqual([pho.id]);
+    expect(rankFoodsByPreference([pho, tofu], [], "vi", " dau ").map((food) => food.id)).toEqual([tofu.id]);
+    expect(rankFoodsByPreference([pho, tofu], [], "vi", "PHỞ").map((food) => food.id)).toEqual([pho.id]);
   });
 });
