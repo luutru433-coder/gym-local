@@ -95,7 +95,9 @@ export function SettingsPage() {
       activityFactor: profile.activityFactor!,
       goal: profile.goal
     } : undefined;
-    const targetNeedsConfirmation = nutritionTargetNeedsConfirmation(profile.nutritionTarget, estimateInput);
+    // An accepted calorie adjustment is a manual target: body detail edits replace it with a fresh estimate to review.
+    const targetNeedsConfirmation = nutritionTargetNeedsConfirmation(profile.nutritionTarget, estimateInput)
+      || (nutritionFieldsChanged && profile.nutritionTarget?.source === "manual");
     if (estimateInput && targetNeedsConfirmation) {
       try {
         nutritionTarget = estimateNutritionTarget(estimateInput);
@@ -223,6 +225,10 @@ export function SettingsPage() {
                 ? (locale === "vi"
                   ? `Công thức Mifflin–St Jeor v${profile.nutritionTarget.formulaVersion} · tính ${formatDate(profile.nutritionTarget.calculatedAt, locale)} · ${profile.nutritionTarget.basis.biologicalSex === "female" ? "nữ" : "nam"}, ${profile.nutritionTarget.basis.weightKg} kg, ${profile.nutritionTarget.basis.heightCm} cm, ${profile.nutritionTarget.basis.age} tuổi, hệ số hoạt động ${profile.nutritionTarget.basis.activityFactor}, mục tiêu ${goalLabels[profile.nutritionTarget.basis.goal][locale].toLowerCase()}.`
                   : `Mifflin–St Jeor formula v${profile.nutritionTarget.formulaVersion} · calculated ${formatDate(profile.nutritionTarget.calculatedAt, locale)} · ${profile.nutritionTarget.basis.biologicalSex}, ${profile.nutritionTarget.basis.weightKg} kg, ${profile.nutritionTarget.basis.heightCm} cm, age ${profile.nutritionTarget.basis.age}, activity factor ${profile.nutritionTarget.basis.activityFactor}, goal ${goalLabels[profile.nutritionTarget.basis.goal][locale].toLowerCase()}.`)
+                : profile.nutritionTarget.source === "manual" && profile.nutritionTarget.confirmedAt
+                  ? (locale === "vi"
+                    ? `Đã chỉnh theo lượng ăn và xu hướng cân nặng thực tế ngày ${formatDate(profile.nutritionTarget.confirmedAt, locale)}. Đổi thông tin cơ thể rồi lưu để quay lại ước tính theo công thức.`
+                    : `Adjusted from your logged intake and weight trend on ${formatDate(profile.nutritionTarget.confirmedAt, locale)}. Change your body details and save to go back to the formula estimate.`)
                 : (locale === "vi" ? "Mục tiêu cũ chưa có đủ thông tin nguồn tính; lưu lại để xem và xác nhận bản ước tính mới." : "This legacy target has no complete calculation provenance; save again to review and confirm a new estimate.")}</p></> : null}
               <p className="fine-print">{locale === "vi" ? "Ước tính chỉ là điểm bắt đầu, không thay thế chẩn đoán hay tư vấn của chuyên gia." : "Estimates are only a starting point and do not replace professional advice."}</p>
             </Card>
