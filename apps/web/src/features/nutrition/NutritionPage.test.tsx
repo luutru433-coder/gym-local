@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FoodItem, NutritionPackManifest, Profile } from "@gym/contracts";
-import { createRecipe } from "@gym/nutrition";
+import { createMealEntry, createRecipe } from "@gym/nutrition";
 import { defaultSettings } from "@gym/storage";
 import { useGymStore } from "../../store/useGymStore";
 import { NutritionPage } from "./NutritionPage";
@@ -172,5 +172,49 @@ describe("fast meal logging", () => {
     const entry = vi.mocked(useGymStore.getState().addMeal).mock.calls[0]?.[0];
     expect(entry).toMatchObject({ foodId: rice.id, grams: 150, meal: "dinner" });
     await waitFor(() => expect(screen.queryByRole("searchbox", { name: "Tìm thực phẩm" })).toBeNull());
+  });
+});
+
+describe("copying meals from a previous day", () => {
+  const rice: FoodItem = { ...food, id: "food-rice", name: { vi: "Cơm trắng", en: "White rice" } };
+  const pad = (value: number) => String(value).padStart(2, "0");
+  const dayOffset = (offset: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  };
+
+  it("copies a whole earlier day into the selected day", async () => {
+    const user = userEvent.setup();
+    const source = dayOffset(-2);
+    const meals = [createMealEntry(food, 60, source, "breakfast"), createMealEntry(rice, 150, source, "lunch")];
+    useGymStore.setState({ foods: [food, rice], meals });
+    render(<NutritionPage />);
+
+    await user.click(screen.getByRole("button", { name: "Sao chép ngày trước" }));
+    expect(screen.getByLabelText("Sao chép từ ngày")).toHaveValue(source);
+    await user.click(screen.getByRole("button", { name: /Sao chép 2 món/ }));
+
+    await waitFor(() => expect(useGymStore.getState().addMeal).toHaveBeenCalledTimes(2));
+    const copies = vi.mocked(useGymStore.getState().addMeal).mock.calls.map((call) => call[0]);
+    expect(copies.every((entry) => entry.date === dayOffset(0))).toBe(true);
+    expect(copies.map((entry) => entry.meal).sort()).toEqual(["breakfast", "lunch"]);
+    expect(copies.find((entry) => entry.meal === "lunch")).toMatchObject({ foodId: rice.id, grams: 150, nutrientsSnapshot: meals[1].nutrientsSnapshot });
+    expect(copies.some((entry) => meals.some((original) => original.id === entry.id))).toBe(false);
+  });
+
+  it("copies a single meal from the last day it was logged", async () => {
+    const user = userEvent.setup();
+    const meals = [createMealEntry(food, 60, dayOffset(-1), "breakfast"), createMealEntry(rice, 150, dayOffset(-3), "lunch")];
+    useGymStore.setState({ foods: [food, rice], meals });
+    render(<NutritionPage />);
+
+    expect(screen.queryByRole("button", { name: "Sao chép bữa tối từ ngày trước" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Sao chép bữa trưa từ ngày trước" }));
+    expect(screen.getByLabelText("Sao chép từ ngày")).toHaveValue(dayOffset(-3));
+    await user.click(screen.getByRole("button", { name: /Sao chép 1 món/ }));
+
+    await waitFor(() => expect(useGymStore.getState().addMeal).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(useGymStore.getState().addMeal).mock.calls[0]?.[0]).toMatchObject({ meal: "lunch", foodId: rice.id, grams: 150, date: dayOffset(0) });
   });
 });

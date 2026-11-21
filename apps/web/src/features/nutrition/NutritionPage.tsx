@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { IScannerControls } from "@zxing/browser";
-import { Barcode, Camera, Check, ChevronRight, CookingPot, Database, Download, Droplets, Flame, Heart, Pencil, Plus, Salad, ScanLine, Search, ShieldCheck, Trash2, Utensils } from "lucide-react";
+import { Barcode, Camera, Check, ChevronRight, CookingPot, Copy, Database, Download, Droplets, Flame, Heart, Pencil, Plus, Salad, ScanLine, Search, ShieldCheck, Trash2, Utensils } from "lucide-react";
 import { Button, Card, EmptyState, Field, MetricRing, Modal, Notice, ProgressBar, SectionTitle } from "@gym/ui";
 import type { FoodItem, MealEntry, Recipe } from "@gym/contracts";
-import { assessNutrientCompleteness, completeFoodLookupCandidate, createMealEntry, createMealEntryFromRecipe, createRecipe, createWaterEntry, dailyNutrition, dailyNutritionWithMicronutrients, estimateNutritionTarget, nutritionTargetNeedsConfirmation, parseNutritionNumber, normalizeFoodSearchText, rankFoodsByPreference, recipeNutrition, upsertFoodPreference, validateCustomFoodDraft, validateMealInput, type FoodLookupCandidate, type NutritionEstimateInput, type NutritionValidationError } from "@gym/nutrition";
+import { assessNutrientCompleteness, completeFoodLookupCandidate, copyMealEntries, createMealEntry, createMealEntryFromRecipe, createRecipe, createWaterEntry, dailyNutrition, dailyNutritionWithMicronutrients, estimateNutritionTarget, latestDiaryDateBefore, nutritionTargetNeedsConfirmation, parseNutritionNumber, normalizeFoodSearchText, rankFoodsByPreference, recipeNutrition, upsertFoodPreference, validateCustomFoodDraft, validateMealInput, type FoodLookupCandidate, type NutritionEstimateInput, type NutritionValidationError } from "@gym/nutrition";
 import { formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { PantryMenuSection } from "./PantryMenuSection";
@@ -22,6 +22,19 @@ const OFFLINE_SEARCH_MIN_LENGTH = 2;
 
 function localDate(date = new Date()): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+const mealOrder = Object.keys(mealLabels) as MealEntry["meal"][];
+
+function previousDate(date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  if (!year || !month || !day) return date;
+  return localDate(new Date(year, month - 1, day - 1));
+}
+
+function formatDiaryDate(date: string): string {
+  const [year, month, day] = date.split("-");
+  return year && month && day ? `${day}/${month}/${year}` : date;
 }
 
 function formatBytes(value: number, locale: "vi" | "en"): string {
@@ -80,6 +93,12 @@ export function NutritionPage() {
   const [recipeYield, setRecipeYield] = useState("500");
   const [recipeServings, setRecipeServings] = useState("2");
   const [recipeIngredients, setRecipeIngredients] = useState<Array<{ foodId: string; grams: string }>>([]);
+
+  const [copyOpen, setCopyOpen] = useState(false);
+  const [copyFromDate, setCopyFromDate] = useState("");
+  const [copyMeals, setCopyMeals] = useState<MealEntry["meal"][]>([]);
+  const [copyBusy, setCopyBusy] = useState(false);
+  const [copyError, setCopyError] = useState<string>();
 
   const dayMeals = useMemo(() => meals.filter((entry) => entry.date === date), [date, meals]);
   const total = dailyNutrition(meals, date);
@@ -246,6 +265,33 @@ export function NutritionPage() {
       setSelectedFood(undefined);
     } catch (error) {
       setLookupError(error instanceof Error ? error.message : "Không thể lưu món ăn.");
+    }
+  };
+
+  const openCopy = (meal?: MealEntry["meal"]) => {
+    setCopyFromDate(latestDiaryDateBefore(meals, date, meal) ?? previousDate(date));
+    setCopyMeals(meal ? [meal] : mealOrder);
+    setCopyError(undefined);
+    setCopyOpen(true);
+  };
+
+  const copySourceMeals = useMemo(() => meals.filter((entry) => entry.date === copyFromDate), [copyFromDate, meals]);
+  const copySelection = copySourceMeals.filter((entry) => copyMeals.includes(entry.meal));
+  const copySelectionCalories = copySelection.reduce((sum, entry) => sum + entry.nutrientsSnapshot.calories, 0);
+
+  const submitCopy = async () => {
+    if (copyBusy) return;
+    setCopyBusy(true);
+    setCopyError(undefined);
+    try {
+      // The store lists the newest entry first, so save in reverse to keep the source order on screen.
+      const copies = copyMealEntries(meals, copyFromDate, date, copyMeals).reverse();
+      for (const entry of copies) await addMeal(entry);
+      setCopyOpen(false);
+    } catch (error) {
+      setCopyError(error instanceof Error ? error.message : "Không thể sao chép bữa ăn.");
+    } finally {
+      setCopyBusy(false);
     }
   };
 
@@ -441,14 +487,14 @@ export function NutritionPage() {
 
       <div className="meal-layout">
         <section>
-          <SectionTitle eyebrow={`${dayMeals.length} ${locale === "vi" ? "món đã ghi" : "entries"}`} title={locale === "vi" ? "Nhật ký ăn uống" : "Food diary"} />
+          <SectionTitle eyebrow={`${dayMeals.length} ${locale === "vi" ? "món đã ghi" : "entries"}`} title={locale === "vi" ? "Nhật ký ăn uống" : "Food diary"} action={<Button size="sm" variant="secondary" disabled={!meals.some((entry) => entry.date !== date)} onClick={() => openCopy()}><Copy size={16} />Sao chép ngày trước</Button>} />
           <div className="meal-groups">
             {(Object.keys(mealLabels) as MealEntry["meal"][]).map((meal) => {
               const entries = dayMeals.filter((entry) => entry.meal === meal);
               const calories = entries.reduce((sum, entry) => sum + entry.nutrientsSnapshot.calories, 0);
               return (
                 <Card className="meal-card" key={meal}>
-                  <header><span className="meal-card__icon"><Utensils size={18} /></span><div><h3>{mealLabels[meal][locale]}</h3><p>{calories} kcal</p></div><button type="button" className="icon-button" onClick={() => openAdd(meal)} aria-label={`Add ${meal}`}><Plus size={20} /></button></header>
+                  <header><span className="meal-card__icon"><Utensils size={18} /></span><div><h3>{mealLabels[meal][locale]}</h3><p>{calories} kcal</p></div><span className="meal-card__actions">{meals.some((entry) => entry.meal === meal && entry.date !== date) ? <button type="button" className="icon-button" onClick={() => openCopy(meal)} aria-label={`Sao chép ${mealLabels[meal].vi.toLocaleLowerCase("vi")} từ ngày trước`}><Copy size={17} /></button> : null}<button type="button" className="icon-button" onClick={() => openAdd(meal)} aria-label={`Add ${meal}`}><Plus size={20} /></button></span></header>
                   {entries.length ? <ul>{entries.map((entry) => <li key={entry.id}><div><strong>{localize(entry.foodNameSnapshot, locale)}</strong><small>{entry.grams}g · Đạm {entry.nutrientsSnapshot.protein}g · Bột đường {entry.nutrientsSnapshot.carbs}g · Béo {entry.nutrientsSnapshot.fat}g</small></div><span>{entry.nutrientsSnapshot.calories} kcal</span><span className="meal-entry-actions"><button type="button" onClick={() => editMealEntry(entry)} aria-label={locale === "vi" ? `Sửa ${localize(entry.foodNameSnapshot, locale)}` : `Edit ${localize(entry.foodNameSnapshot, locale)}`}><Pencil size={15} /></button><button type="button" onClick={() => void removeMealEntry(entry.id)} aria-label={locale === "vi" ? `Xóa ${localize(entry.foodNameSnapshot, locale)}` : `Delete ${localize(entry.foodNameSnapshot, locale)}`}><Trash2 size={15} /></button></span></li>)}</ul> : <button className="meal-card__empty" type="button" onClick={() => openAdd(meal)}><Plus size={16} />{locale === "vi" ? "Thêm món" : "Add food"}</button>}
                 </Card>
               );
@@ -501,6 +547,33 @@ export function NutritionPage() {
 
           {selectedFood ? <><div className="food-selection"><div><span>{locale === "vi" ? "Đã chọn" : "Selected"}</span><strong>{localize(selectedFood.name, locale)}</strong></div><Field label={locale === "vi" ? "Khối lượng (g)" : "Amount (g)"}><input inputMode="decimal" value={grams} onChange={(event) => { setGrams(event.target.value); setFormErrors([]); }} aria-invalid={formErrors.some((error) => error.field === "grams")} /></Field><div className="food-selection__calories"><strong>{gramsPreview.ok ? Math.round(selectedFood.per100g.calories * gramsPreview.value / 100) : "—"}</strong><span>kcal</span></div></div><NutrientDetails food={selectedFood} locale={locale} /></> : null}
           <div className="modal-actions"><Button variant="ghost" onClick={() => { setAddOpen(false); setEditingMealId(undefined); }}>{locale === "vi" ? "Hủy" : "Cancel"}</Button><Button disabled={!selectedFood || !gramsPreview.ok} onClick={() => void submitMeal()}>{editingMealId ? (locale === "vi" ? "Lưu thay đổi" : "Save changes") : (locale === "vi" ? "Thêm vào nhật ký" : "Add to diary")}</Button></div>
+        </div>
+      </Modal>
+
+      <Modal open={copyOpen} title="Sao chép bữa ăn" onClose={() => setCopyOpen(false)}>
+        <div className="copy-meals">
+          <Field label="Sao chép từ ngày"><input type="date" value={copyFromDate} onChange={(event) => { setCopyFromDate(event.target.value); setCopyError(undefined); }} /></Field>
+          <p className="copy-meals__target">Thêm vào nhật ký ngày {formatDiaryDate(date)}. Các món đã ghi được giữ nguyên.</p>
+          {copyFromDate === date ? <Notice tone="warning">Hãy chọn một ngày khác với ngày đang xem.</Notice> : copySourceMeals.length ? (
+            <ul className="copy-meals__list">
+              {mealOrder.map((meal) => {
+                const entries = copySourceMeals.filter((entry) => entry.meal === meal);
+                if (!entries.length) return null;
+                const calories = entries.reduce((sum, entry) => sum + entry.nutrientsSnapshot.calories, 0);
+                const checked = copyMeals.includes(meal);
+                return (
+                  <li key={meal}>
+                    <label>
+                      <input type="checkbox" checked={checked} onChange={() => setCopyMeals((current) => checked ? current.filter((item) => item !== meal) : [...current, meal])} />
+                      <span><strong>{mealLabels[meal].vi} · {calories} kcal</strong><small>{entries.map((entry) => `${localize(entry.foodNameSnapshot, locale)} ${formatNumber(entry.grams, locale, 1)}g`).join(", ")}</small></span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : <Notice>Ngày {formatDiaryDate(copyFromDate)} chưa ghi món nào.</Notice>}
+          {copyError ? <Notice tone="warning">{copyError}</Notice> : null}
+          <div className="modal-actions"><Button variant="ghost" onClick={() => setCopyOpen(false)}>Hủy</Button><Button disabled={copyBusy || copyFromDate === date || !copySelection.length} onClick={() => void submitCopy()}><Copy size={16} />{copySelection.length ? `Sao chép ${copySelection.length} món · ${copySelectionCalories} kcal` : "Sao chép"}</Button></div>
         </div>
       </Modal>
 

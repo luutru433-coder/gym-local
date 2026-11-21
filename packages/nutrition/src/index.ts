@@ -380,6 +380,48 @@ export function createMealEntry(food: FoodItem, grams: number, date: string, mea
   };
 }
 
+/** Latest diary date before `date` that has entries (optionally only for one meal). */
+export function latestDiaryDateBefore(entries: MealEntry[], date: string, meal?: MealEntry["meal"]): string | undefined {
+  let latest: string | undefined;
+  for (const entry of entries) {
+    if (entry.date >= date || (meal && entry.meal !== meal)) continue;
+    if (!latest || entry.date > latest) latest = entry.date;
+  }
+  return latest;
+}
+
+/**
+ * Copies diary entries from one day to another. The copies keep the original name and
+ * nutrient snapshots, get new ids, and drop meal-plan links so plan tracking is not double counted.
+ * Source entries are never modified.
+ */
+export function copyMealEntries(
+  entries: MealEntry[],
+  fromDate: string,
+  toDate: string,
+  meals?: ReadonlyArray<MealEntry["meal"]>,
+  createdAt = new Date().toISOString()
+): MealEntry[] {
+  const validated = validateMealInput("1", toDate, "en");
+  if (!validated.ok) throw new Error(validated.errors.map((error) => error.message).join(" "));
+  if (fromDate === toDate) throw new Error("Cannot copy a day onto itself");
+  const baseTime = Date.parse(createdAt);
+  if (!Number.isFinite(baseTime)) throw new Error("Invalid meal entry timestamp");
+  return entries
+    .filter((entry) => entry.date === fromDate && (!meals || meals.includes(entry.meal)))
+    .sort((left, right) => left.createdAt.localeCompare(right.createdAt))
+    .map((entry, index) => ({
+      id: createId("meal"),
+      date: toDate,
+      meal: entry.meal,
+      foodId: entry.foodId,
+      foodNameSnapshot: { ...entry.foodNameSnapshot },
+      grams: entry.grams,
+      nutrientsSnapshot: { ...entry.nutrientsSnapshot },
+      createdAt: new Date(baseTime + index).toISOString()
+    }));
+}
+
 export function dailyNutrition(entries: MealEntry[], date: string) {
   return entries.filter((entry) => entry.date === date).reduce(
     (total, entry) => ({
