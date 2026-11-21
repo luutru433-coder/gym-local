@@ -81,6 +81,29 @@ afterEach(() => {
 });
 
 describe("live workout editing", () => {
+  it("groups two exercises into a superset and alternates sets before resting", async () => {
+    const user = userEvent.setup();
+    const base = session();
+    base.restTimerEndsAt = undefined;
+    base.exercises.push({ ...structuredClone(base.exercises[0]), id: "exercise-two", sets: [{ id: "set-three", type: "working" }] });
+    arrange(base);
+
+    await user.click(screen.getByRole("button", { name: "Ghép bài sau" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.exercises.map((exercise) => exercise.supersetGroup)).toEqual(["A", "A"]));
+    expect(screen.getByText(/không nghỉ/)).toBeInTheDocument();
+
+    await user.type(screen.getByRole("textbox", { name: "Set 1, Số lần" }), "10");
+    await user.click(screen.getByRole("button", { name: "Hoàn tất set 1" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.activeExerciseId).toBe("exercise-two"));
+    expect(useGymStore.getState().activeSession?.restTimerEndsAt).toBeUndefined();
+    expect(screen.getByText(/hết lượt: nghỉ 90s/)).toBeInTheDocument();
+
+    await user.type(screen.getByRole("textbox", { name: "Set 1, Số lần" }), "8");
+    await user.click(screen.getByRole("button", { name: "Hoàn tất set 1" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.restTimerEndsAt).toBeDefined());
+    expect(useGymStore.getState().activeSession?.activeExerciseId).toBe("exercise-one");
+  });
+
   it("changes set type, removes unfinished sets, and persists notes", async () => {
     const user = userEvent.setup();
     arrange(session());

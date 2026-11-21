@@ -84,7 +84,8 @@ const sessionExerciseSchema = z.object({
   trackingProfileSnapshot: trackingProfileSchema.optional(),
   sets: z.array(setLogSchema),
   restSeconds: nonNegativeNumber,
-  note: z.string().optional()
+  note: z.string().optional(),
+  supersetGroup: z.string().optional()
 }).passthrough();
 
 const sessionSchema = z.object({
