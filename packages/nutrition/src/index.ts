@@ -543,6 +543,15 @@ export function recordFoodUse(
   });
 }
 
+export function normalizeFoodSearchText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, "d")
+    .toLowerCase()
+    .trim();
+}
+
 export function rankFoodsByPreference(
   foods: FoodItem[],
   preferences: FoodPreference[],
@@ -550,17 +559,17 @@ export function rankFoodsByPreference(
   query = ""
 ): FoodItem[] {
   const preferenceByFoodId = new Map(preferences.map((preference) => [preference.foodId, preference]));
-  const normalizedQuery = query.trim().toLocaleLowerCase(locale);
+  const normalizedQuery = normalizeFoodSearchText(query);
   const visible = normalizedQuery
     ? foods.filter((food) => [food.name.vi, food.name.en, ...(food.aliases ?? []), food.brand ?? ""]
-      .some((value) => value.toLocaleLowerCase(locale).includes(normalizedQuery)))
+      .some((value) => normalizeFoodSearchText(value).includes(normalizedQuery)))
     : foods;
   return [...visible].sort((left, right) => {
     const leftPreference = preferenceByFoodId.get(left.id);
     const rightPreference = preferenceByFoodId.get(right.id);
-    if (Boolean(leftPreference?.favorite) !== Boolean(rightPreference?.favorite)) return leftPreference?.favorite ? -1 : 1;
     const recent = (rightPreference?.lastUsedAt ?? "").localeCompare(leftPreference?.lastUsedAt ?? "");
     if (recent) return recent;
+    if (Boolean(leftPreference?.favorite) !== Boolean(rightPreference?.favorite)) return leftPreference?.favorite ? -1 : 1;
     const useCount = (rightPreference?.useCount ?? 0) - (leftPreference?.useCount ?? 0);
     if (useCount) return useCount;
     return left.name[locale].localeCompare(right.name[locale], locale);

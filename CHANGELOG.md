@@ -1,11 +1,10 @@
 # Changelog
 
-## 2026-11-21 — Detailed progress charts
+## Unreleased — Faster meal logging
 
-- Added a 4-week / 3-month / 1-year / all-time range filter to the progress page.
-- The exact-variation trend can now chart e1RM, load, assistance, duration, distance, session volume, best reps, or total reps, marks each new record for the chosen metric, and shows latest value, record, and change in range. History is still never mixed between equipment variants.
-- Added weekly charts for external-load volume, working sets, workouts, and duration (local Monday weeks), plus weekly working sets per primary muscle group.
-- Body measurements can chart weight, waist, chest, hips, arm, or thigh.
+- The add-food dialog now searches the installed offline food pack while you type (accented or unaccented), replacing the separate “Tìm offline” button.
+- Recently logged foods are listed first, ahead of unused favorites, and each has a one-tap button that logs the last amount again.
+- Saved-food search now ignores Vietnamese accents.
 
 ## 2026-11-21 — Nutrition pack 2026.11.1: accurate names, no duplicate foods
 
