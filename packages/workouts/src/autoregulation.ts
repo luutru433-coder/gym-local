@@ -1,7 +1,7 @@
 import type { LocalizedText, MuscleGroup } from "@gym/contracts";
 
 /**
- * Autoregulation engine (ADR 0023). Pure functions over plain data: no catalog,
+ * Autoregulation engine (ADR 0024). Pure functions over plain data: no catalog,
  * storage or clock access, so every output is reproducible from its inputs.
  * Units: kg, whole reps, seconds, hours. RIR 0-10 in 0.5 steps.
  */
@@ -36,6 +36,8 @@ export const AUTOREG = {
   weeklySetBounds: { min: 6, max: 20 } as const,
   setsPerExercise: { min: 2, max: 6 } as const,
   switchLoadPenalty: 0.5,
+  /** Week-over-week fall in mean fresh e1RM that counts as "could not match last week"; one rep of RIR error is about 2.5%. */
+  e1rmDropForRecovery: 0.05,
   deloadRir: 5
 } as const;
 
@@ -69,6 +71,9 @@ function checkSet(set: ObservedSet): void {
   check(Number.isInteger(set.reps) && set.reps >= 0, "reps must be a whole number >= 0");
   if (set.rir !== undefined) check(set.rir >= 0 && set.rir <= 10 && Number.isInteger(set.rir * 2), "rir must be 0-10 in 0.5 steps");
   if (set.rpe !== undefined) check(set.rpe >= 1 && set.rpe <= 10 && Number.isInteger(set.rpe * 2), "rpe must be 1-10 in 0.5 steps");
+  if (set.targetRir !== undefined) check(set.targetRir >= 0 && set.targetRir <= 10, "targetRir must be 0-10");
+  if (set.restBeforeSeconds !== undefined) check(set.restBeforeSeconds >= 0 && Number.isFinite(set.restBeforeSeconds), "restBeforeSeconds must be >= 0");
+  if (set.workSeconds !== undefined) check(set.workSeconds >= 0 && Number.isFinite(set.workSeconds), "workSeconds must be >= 0");
 }
 
 /** RIR used for a set: logged RIR, else 10 − RPE, else the set's target, else 0 (conservative). */
@@ -89,7 +94,7 @@ export function e1rmFromSet(set: ObservedSet): number | undefined {
 
 /** Reps to failure at a load for a given capacity (inverse Epley), never negative. */
 export function repsToFailure(loadKg: number, e1rmKg: number): number {
-  check(loadKg > 0 && e1rmKg > 0, "loadKg and e1rmKg must be > 0");
+  check(loadKg > 0 && Number.isFinite(loadKg) && e1rmKg > 0 && Number.isFinite(e1rmKg), "loadKg and e1rmKg must be > 0");
   return Math.max(0, AUTOREG.epleyReps * (e1rmKg / loadKg - 1));
 }
 
@@ -124,6 +129,8 @@ export function estimateBaseline(history: VariantSessionRecord[], now: Date): Ba
     .sort((left, right) => right.at - left.at)
     .slice(0, AUTOREG.baselineSessions);
   if (!sessions.length) return undefined;
+  // Time off counts from the last session that trained the variant at all, estimable or not.
+  const lastTrained = Math.max(sessions[0].at, ...history.filter((record) => record.sets.length).map((record) => new Date(record.finishedAt).getTime()).filter((time) => time <= now.getTime()));
   let weight = 1;
   let total = 0;
   let weights = 0;
@@ -132,14 +139,24 @@ export function estimateBaseline(history: VariantSessionRecord[], now: Date): Ba
     weights += weight;
     weight /= 2;
   }
-  const daysSinceLast = Math.floor((now.getTime() - sessions[0].at) / 86_400_000);
+  const daysSinceLast = Math.floor((now.getTime() - lastTrained) / 86_400_000);
   const detrainFactor = Math.max(AUTOREG.detrainFloor, 1 - AUTOREG.detrainPerDay * Math.max(0, daysSinceLast - AUTOREG.detrainAfterDays));
   const measured = sessions.filter((session) => session.measured).length;
   const confidence: Confidence = sessions.length >= 3 && measured >= 2 && daysSinceLast <= 14 ? "high" : sessions.length >= 2 ? "medium" : "low";
   return { e1rmKg: round1((total / weights) * detrainFactor), sessionsUsed: sessions.length, daysSinceLast, detrainFactor, confidence };
 }
 
-/** Personal set-to-set capacity drop: median over consecutive measured sets; default until 6 pairs exist. */
+function effortMultiplier(set: ObservedSet): number {
+  const { rir, source } = effectiveRir(set);
+  if (source === "assumed" || source === "target") return 1;
+  return rir <= 0 ? 1.5 : rir <= 1 ? 1.2 : rir <= 2 ? 1 : rir <= 3 ? 0.8 : 0.6;
+}
+
+function restMultiplier(restSeconds: number | undefined): number {
+  return restSeconds === undefined ? 1 : clamp(1 + (120 - restSeconds) / 120, [0.75, 1.75]);
+}
+
+/** Personal set-to-set capacity drop at 2 RIR and 120 s rest: median over consecutive measured sets; default until 6 pairs exist. */
 export function calibrateFatigueDrop(history: VariantSessionRecord[]): { dropPerSet: number; pairs: number } {
   const drops: number[] = [];
   for (const record of history) {
@@ -147,7 +164,8 @@ export function calibrateFatigueDrop(history: VariantSessionRecord[]): { dropPer
       const [previous, current] = [record.sets[index - 1], record.sets[index]];
       if (effectiveRir(previous).source !== "logged" || effectiveRir(current).source !== "logged") continue;
       const [before, after] = [e1rmFromSet(previous), e1rmFromSet(current)];
-      if (before && after) drops.push(1 - after / before);
+      // Undo the effort and rest multipliers that nextSetCapacity applies on top of the drop.
+      if (before && after) drops.push((1 - after / before) / (effortMultiplier(previous) * restMultiplier(current.restBeforeSeconds)));
     }
   }
   if (drops.length < 6) return { dropPerSet: AUTOREG.fatigueDropPerSet, pairs: drops.length };
@@ -190,16 +208,6 @@ export function readinessFactor(input: ReadinessInput): ReadinessResult {
 
 // ---------- Capacity for the next set (during the session) ----------
 
-function effortMultiplier(set: ObservedSet): number {
-  const { rir, source } = effectiveRir(set);
-  if (source === "assumed" || source === "target") return 1;
-  return rir <= 0 ? 1.5 : rir <= 1 ? 1.2 : rir <= 2 ? 1 : rir <= 3 ? 0.8 : 0.6;
-}
-
-function restMultiplier(restSeconds: number | undefined): number {
-  return restSeconds === undefined ? 1 : clamp(1 + (120 - restSeconds) / 120, [0.75, 1.75]);
-}
-
 export interface NextSetCapacityInput {
   /** Pre-session estimate: baseline × readiness. Omit for a variant with no history. */
   priorE1rmKg?: number;
@@ -225,6 +233,8 @@ export interface NextSetCapacity {
 export function nextSetCapacity(input: NextSetCapacityInput): NextSetCapacity | undefined {
   const drop = input.fatigueDropPerSet ?? AUTOREG.fatigueDropPerSet;
   check(drop >= 0 && drop < 0.5, "fatigueDropPerSet must be 0-0.5");
+  if (input.priorE1rmKg !== undefined) check(input.priorE1rmKg > 0 && Number.isFinite(input.priorE1rmKg), "priorE1rmKg must be > 0");
+  if (input.restSeconds !== undefined) check(input.restSeconds >= 0 && Number.isFinite(input.restSeconds), "restSeconds must be >= 0");
   let retained = 1;
   let total = input.priorE1rmKg ?? 0;
   let weights = input.priorE1rmKg ? 1 : 0;
@@ -271,27 +281,31 @@ export interface SetPrescription {
   expectedRir: number;
   action: PrescriptionAction;
   inRange: boolean;
+  /** False when no available load allows one rep at the target RIR: the load shown is only the lightest, not a recommendation. */
+  feasible: boolean;
   reason: LocalizedText;
 }
 
 /** Picks the available load whose reps at the target RIR sit inside the rep range, preferring the current load. */
 export function prescribeSet(input: PrescribeSetInput): SetPrescription {
   const { target } = input;
-  check(input.capacityE1rmKg > 0, "capacityE1rmKg must be > 0");
+  check(input.capacityE1rmKg > 0 && Number.isFinite(input.capacityE1rmKg), "capacityE1rmKg must be > 0");
   check(Number.isInteger(target.minReps) && Number.isInteger(target.maxReps) && target.minReps >= 1 && target.maxReps >= target.minReps, "rep range must be whole numbers with 1 <= min <= max");
   check(target.rir >= 0 && target.rir <= 10, "target rir must be 0-10");
-  const loads = [...new Set(input.availableLoadsKg)].filter((load) => load > 0).sort((left, right) => left - right);
+  const loads = [...new Set(input.availableLoadsKg)].filter((load) => load > 0 && Number.isFinite(load)).sort((left, right) => left - right);
   check(loads.length > 0, "availableLoadsKg must contain a positive load");
   const middle = (target.minReps + target.maxReps) / 2;
   let best: { load: number; reps: number; cost: number; toFailure: number } | undefined;
   for (const load of loads) {
     const toFailure = repsToFailure(load, input.capacityE1rmKg);
-    const reps = Math.floor(toFailure - target.rir + 1e-9);
+    // Unclamped so that, among loads too heavy for a single rep, the lightest is the least bad.
+    const reps = Math.floor(AUTOREG.epleyReps * (input.capacityE1rmKg / load - 1) - target.rir + 1e-9);
     const outside = reps < target.minReps ? target.minReps - reps : reps > target.maxReps ? reps - target.maxReps : 0;
     const cost = outside * outside
       + (input.currentLoadKg === undefined ? Math.abs(reps - middle) * 0.01 : load === input.currentLoadKg ? 0 : AUTOREG.switchLoadPenalty);
     if (!best || cost < best.cost - 1e-9 || (Math.abs(cost - best.cost) <= 1e-9 && load > best.load)) best = { load, reps, cost, toFailure };
   }
+  const feasible = best!.reps >= 1;
   const reps = Math.min(target.maxReps, Math.max(1, best!.reps));
   const action: PrescriptionAction = input.currentLoadKg === undefined ? "start"
     : best!.load > input.currentLoadKg ? "raise_load" : best!.load < input.currentLoadKg ? "lower_load" : "keep_load";
@@ -309,7 +323,8 @@ export function prescribeSet(input: PrescribeSetInput): SetPrescription {
     expectedRir: round1(Math.max(0, best!.toFailure - reps)),
     action,
     inRange: best!.reps >= target.minReps && best!.reps <= target.maxReps,
-    reason: text[action]
+    feasible,
+    reason: feasible ? text[action] : { vi: "Không có mức tạ nào đủ nhẹ cho sức ước tính hôm nay.", en: "No available load is light enough for today's estimated strength." }
   };
 }
 
@@ -347,7 +362,9 @@ export function muscleRecovery(
 ): MuscleRecoveryEstimate[] {
   return (Object.keys(DEFAULT_TAU_HOURS) as RecoveryMuscle[]).map((muscle) => {
     const tau = tauHours[muscle] ?? DEFAULT_TAU_HOURS[muscle];
+    check(tau > 0 && Number.isFinite(tau), "tauHours must be > 0");
     const fatigue = events.reduce((sum, event) => {
+      check(event.units >= 0 && Number.isFinite(event.units), "units must be >= 0");
       const hours = (now.getTime() - new Date(event.at).getTime()) / 3_600_000;
       return event.muscle === muscle && hours >= 0 ? sum + event.units * Math.exp(-hours / tau) : sum;
     }, 0);
@@ -366,6 +383,7 @@ export type SorenessScore = 1 | 2 | 3 | 4;
 
 /** Still sore at the next session lengthens the muscle's time constant by 10%; never sore shortens it by 5%. */
 export function calibrateTau(tauHours: number, soreness: SorenessScore): number {
+  check(tauHours > 0 && Number.isFinite(tauHours), "tauHours must be > 0");
   const factor = soreness === 4 ? 1.1 : soreness === 1 ? 0.95 : 1;
   return round1(clamp(tauHours * factor, AUTOREG.tauBounds));
 }
@@ -386,11 +404,12 @@ export interface ScoredSet {
 
 /**
  * 1 exceeded targets easily, 2 hit targets, 3 struggled, 4 could not match last week.
- * `freshE1rmChange` is today's fresh e1RM over last week's, minus 1.
+ * `freshE1rmChange` is this week's mean fresh e1RM over last week's, minus 1.
  */
 export function performanceScore(sets: ScoredSet[], freshE1rmChange?: number): PerformanceScore {
   check(sets.length > 0, "performanceScore needs at least one set");
-  if (freshE1rmChange !== undefined && freshE1rmChange <= -0.03) return 4;
+  if (freshE1rmChange !== undefined) check(Number.isFinite(freshE1rmChange), "freshE1rmChange must be a number");
+  if (freshE1rmChange !== undefined && freshE1rmChange <= -AUTOREG.e1rmDropForRecovery) return 4;
   const missed = sets.filter((set) => set.reps < set.targetMinReps).length;
   if (missed * 2 > sets.length) return 4;
   const margin = sets.reduce((sum, set) => sum + ((set.rir ?? set.targetRir) - set.targetRir) + Math.max(0, set.reps - set.targetMaxReps), 0) / sets.length;
@@ -428,11 +447,11 @@ export function volumeDecision(input: VolumeDecisionInput): VolumeDecision {
   else if (soreness === 3 || performance === 3) [action, wanted] = ["hold", 0];
   else if (soreness === 1 && performance === 1) [action, wanted] = ["add", 2];
   else [action, wanted] = ["add", 1];
-  const target = action === "recovery_session"
-    ? input.weeklySets + wanted
-    : Math.min(Math.max(input.weeklySets + wanted, bounds.min), Math.max(bounds.max, input.weeklySets + Math.min(wanted, 0)));
-  const setDelta = target - input.weeklySets;
-  if (action === "add" && setDelta <= 0) action = "hold";
+  // Only "add" may raise sets; a muscle already outside the bounds is never pushed up by hold or remove.
+  let setDelta = wanted;
+  if (action === "add") setDelta = Math.max(0, Math.min(Math.max(input.weeklySets + wanted, bounds.min), bounds.max) - input.weeklySets);
+  else if (action === "remove") setDelta = Math.min(0, Math.max(input.weeklySets + wanted, bounds.min) - input.weeklySets);
+  if (setDelta === 0 && (action === "add" || action === "remove")) action = "hold";
   const reasons: Record<VolumeAction, LocalizedText> = {
     add: { vi: `Hồi phục tốt và đạt mục tiêu: thêm ${setDelta} set tuần tới.`, en: `Recovering well and hitting targets: ${setDelta} more set${setDelta === 1 ? "" : "s"} next week.` },
     hold: { vi: "Giữ nguyên số set: đang ở sát giới hạn hồi phục hoặc giới hạn tuần.", en: "Sets unchanged: at the edge of recovery or the weekly limit." },

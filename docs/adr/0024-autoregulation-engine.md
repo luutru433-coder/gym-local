@@ -1,4 +1,4 @@
-# ADR 0023: Autoregulation engine
+# ADR 0024: Autoregulation engine
 
 - Status: Proposed (engine and sample run only; nothing in the app calls it yet)
 - Date: 2026-11-22
@@ -28,7 +28,7 @@ It replaces population data with the owner's own log: every constant is a starti
 | Baseline strength | before | `estimateBaseline` | completed working sets of the exact variant (load, reps, RIR or RPE), session dates, now | e1RM (0.1 kg), sessions used, days since last, detraining factor, confidence |
 | Readiness | before, warm-up | `readinessFactor` | recovery (0-1) of the primary muscles; optional check-in (sleep, energy, soreness, 1-5); optional warm-up feel (worse, expected, better) | factor 0.85-1.05 and its three parts |
 | Capacity for the next set | during | `nextSetCapacity` | prior (baseline × readiness), today's completed sets, rest before the next set, personal drop per set | today's fresh e1RM, e1RM left for the next set, share retained |
-| Prescription | before, during | `prescribeSet` | capacity, rep range, target RIR, loads the equipment allows, current load | load, reps, expected reps to failure, expected RIR, action (start, keep, raise, lower), in-range flag, reason in vi/en |
+| Prescription | before, during | `prescribeSet` | capacity, rep range, target RIR, loads the equipment allows, current load | load, reps, expected reps to failure, expected RIR, action (start, keep, raise, lower), in-range flag, feasible flag (false when no available load allows one rep), reason in vi/en |
 | Personal fatigue | after | `calibrateFatigueDrop` | history of the exact variant | drop per set, number of set pairs behind it |
 | Muscle recovery | after, before | `setFatigueUnits`, `muscleRecovery`, `calibrateTau` | per set: RIR and primary/secondary role; per muscle: load events, time constant; soreness 1-4 | per muscle: fatigue units, recovery 0-1, hours until ready; updated time constant |
 | Performance | weekly | `performanceScore` | each set's targets against reps and RIR logged; change in fresh e1RM since last week | score 1-4 |
@@ -51,7 +51,7 @@ It replaces population data with the owner's own log: every constant is a starti
 | Readiness, check-in: 1.5% per point of the mean answer away from 3 | ±3% | That a questionnaire moves the day's load: published by JuggernautAI. The scale and size are ours. |
 | Readiness, warm-up feel: better +1.3%, worse −2.6% | | Published example by JuggernautAI: 190 kg becomes 192.5 kg or 185 kg. Applying those ratios generally is ours. |
 | Within the session, each of today's sets counts 3 times the pre-session estimate | 3 | That targets are re-derived after every set: published by Alpha Progression. The weight is ours. |
-| Capacity drops per completed set | 3% at 2 RIR and 120 s rest | That the next set may be lower: published by Alpha Progression. The size is ours and is re-learned per exercise once 6 pairs of rated sets exist (median, kept within 1-8%). |
+| Capacity drops per completed set | 3% at 2 RIR and 120 s rest | That the next set may be lower: published by Alpha Progression. The size is ours and is re-learned per exercise once 6 pairs of rated sets exist (median, with the effort and rest multipliers divided out, kept within 1-8%). |
 | Harder sets and shorter rests cost more | ×1.5 at 0 RIR to ×0.6 at 4+ RIR; ×0.75 at 180 s to ×1.75 at 30 s | Ours. No app documents using rest time. |
 | Load choice: among the loads the equipment has, reps at the target RIR must fall in the rep range; keep the current load when it does | switch penalty 0.5 | Published by Alpha Progression (available weights are a hard limit, rep target a soft one, no reload for a negligible gain). The cost function is ours. |
 | Fatigue units per set | 1.25 at 0 RIR to 0.7 at 4+ RIR; secondary muscle half | The half weight for secondary muscles is what the app already uses. The effort weights are ours. |
@@ -59,8 +59,8 @@ It replaces population data with the owner's own log: every constant is a starti
 | Soreness re-learns the time constant | still sore when trained again: +10%; never sore: −5%; within 12-60 h | That people recover at different rates and the model needs correcting: published by Fitbod, which uses manual edits. Learning it from soreness is ours. |
 | Soreness and performance scales, 1-4 | | Published by RP as its manual method (article "Training Volume Landmarks"). |
 | Set change: both 1 → +2; 1-2 mix → +1; soreness 3 or performance 3 → hold; performance 4 → recovery session | | Published RP table (it says +2 to 3 for both 1; the lower value is used). Soreness 4 → −1 set follows the direction RP documents for the app (fewer sets when soreness has not healed); the size is ours. |
-| Performance is computed from the log, not asked | | Ours. RP's app asks for workload; here missed reps, RIR against target and the e1RM trend give the score. A 3% e1RM drop for score 4 is ours. |
-| Weekly sets per muscle stay within 6-20 | 6, 20 | 6: RP's published maintenance volume. 20: top of Fitbod's published 10-20 range. Only RP's quadriceps numbers were verified, so per-muscle bounds stay configurable. |
+| Performance is computed from the log, not asked | | Ours. RP's app asks for workload; here missed reps, RIR against target and the e1RM trend give the score. Score 4 from the e1RM trend needs the week's mean to fall 5%, about two reps, because one rep of RIR error already moves a single estimate about 2.5%; the threshold is ours. |
+| Weekly sets per muscle stay within 6-20 | 6, 20 | 6: RP's published maintenance volume. 20: top of Fitbod's published 10-20 range. Only RP's quadriceps numbers were verified, so per-muscle bounds stay configurable. Only an "add" decision can raise sets; a muscle below 6 is not pushed up while it is sore. |
 | Sets per exercise stay within 2-6 | | Ours. |
 | RIR falls 1 per week to the last hard week; last week is a deload | lowest RIR 1 by default | Published RP method (for example 4, 3, 2, 1). RP ends at 0; ending at 1 is ours. |
 | Deload: half the sets, RIR 5 | | One third-party observation of Alpha Progression (sets halved, 5+ RIR); RP documents fewer sets and lighter weights. |
@@ -84,7 +84,8 @@ Not adopted. It needs bar speed from a sensor or camera, which an offline web ap
 
 Known gaps the run shows:
 
-- On the bench press the engine's e1RM rose about 2% over the block while the lifter's real 1RM rose about 4%: with a fixed Epley curve and RIR logged as the target, the estimate lags. A personal rep-curve constant, learned the same way as the fatigue drop, is the next refinement.
+- The engine's e1RM estimate lags real gains. Over the four hard weeks it rose 3.7% on the bench press (real 4.1%) but only 1.0-1.8% on the other three exercises (real 3.1-3.7%): with a fixed Epley curve and RIR logged as the target, part of the gain is not seen. A personal rep-curve constant, learned the same way as the fatigue drop, is the next refinement.
+- The learned set-to-set drop moved from the 3% default toward each exercise's real value (bench 5.3% against a real 4%, row 1.9% against 2.5%, squat 3.7% against 5%, curl 2.9% against 3%), but is noisy with few sessions: one rep of RIR error moves an estimate about 2.5%.
 - The check-in moved the bad day's load by about 2% against a real 6% loss; the rest was caught after the first set.
 - With a one-value rep target the engine changes the weight where Alpha Progression holds it; with rep ranges it holds the weight.
 

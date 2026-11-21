@@ -2,7 +2,7 @@
 
 ## Unreleased — Autoregulation engine (not yet in the app)
 
-- New `@gym/workouts/autoregulation` module with the formulas for estimating strength on the day, fatigue within a session, muscle recovery, and weekly set changes (ADR 0023). Nothing in the app uses it yet, so workouts, suggestions, the database and backups are unchanged.
+- New `@gym/workouts/autoregulation` module with the formulas for estimating strength on the day, fatigue within a session, muscle recovery, and weekly set changes (ADR 0024). Nothing in the app uses it yet, so workouts, suggestions, the database and backups are unchanged.
 - `pnpm autoregulation:sample` runs the engine against a simulated lifter and writes `docs/autoregulation-sample-run.md`.
 
 ## Unreleased — Add exercises from the downloaded ExerciseDB set

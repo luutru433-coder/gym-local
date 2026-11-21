@@ -19,8 +19,8 @@ Hard weeks only (weeks 1-4), 161 working sets. The lifter's own feel for RIR is 
 
 | Measure | Result |
 | --- | --- |
-| Sets where the reps done were within 1 of the reps prescribed | 76% |
-| Mean gap between prescribed reps and reps done | 0.99 |
+| Sets where the reps done were within 1 of the reps prescribed | 73% |
+| Mean gap between prescribed reps and reps done | 1.07 |
 | Mean gap between the planned RIR and the real RIR | 0.35 |
 | Sets with reps inside the rep range | 93% |
 | Sets that ended at failure without being planned to | 4% |
@@ -42,10 +42,10 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 10 | 76.8 | 80.3 | 3.5% |
-| barbell row | 47.5 kg × 12 | 66.4 | 70 | 1.1% |
-| squat | 75 kg × 10 | 103.9 | 110 | 2.4% |
-| dumbbell curl | 20 kg × 15 | 31.1 | 35 | 2.2% |
+| bench press | 55 kg × 10 | 76.6 | 80.3 | 7.8% |
+| barbell row | 47.5 kg × 12 | 65.6 | 70 | 1.9% |
+| squat | 75 kg × 10 | 103.9 | 110 | 5.3% |
+| dumbbell curl | 20 kg × 15 | 30.9 | 35 | 2.9% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -58,10 +58,10 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 9 | 76.8 | 81.3 | 2.5% |
-| barbell row | 45 kg × 10 | 64.6 | 70.8 | 1.2% |
-| squat | 75 kg × 8 | 104.8 | 111.3 | 2.4% |
-| dumbbell curl | 20 kg × 13 | 30.2 | 35.3 | 2.2% |
+| bench press | 55 kg × 9 | 77.2 | 81.3 | 6.4% |
+| barbell row | 45 kg × 10 | 64.5 | 70.8 | 1.9% |
+| squat | 75 kg × 8 | 105 | 111.3 | 4.7% |
+| dumbbell curl | 20 kg × 13 | 30.4 | 35.3 | 2.2% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -74,10 +74,10 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 9 | 76.3 | 82.3 | 2.5% |
-| barbell row | 45 kg × 10 | 65.6 | 71.7 | 2.3% |
-| squat | 75 kg × 10 | 102.7 | 112.7 | 2.4% |
-| dumbbell curl | 20 kg × 13 | 31.3 | 35.7 | 2.2% |
+| bench press | 55 kg × 9 | 77.5 | 82.3 | 6.1% |
+| barbell row | 45 kg × 10 | 64.9 | 71.7 | 2.3% |
+| squat | 75 kg × 10 | 104.1 | 112.7 | 4% |
+| dumbbell curl | 20 kg × 13 | 30.6 | 35.7 | 2.9% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -90,10 +90,10 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 10 | 76.3 | 83.3 | 2.5% |
-| barbell row | 45 kg × 12 | 66.8 | 72.6 | 2.3% |
-| squat | 75 kg × 10 | 103.2 | 114 | 2.5% |
-| dumbbell curl | 20 kg × 14 | 30.8 | 36.1 | 2.2% |
+| bench press | 55 kg × 10 | 79.4 | 83.3 | 5.3% |
+| barbell row | 45 kg × 12 | 66.4 | 72.6 | 1.9% |
+| squat | 75 kg × 10 | 105.8 | 114 | 3.7% |
+| dumbbell curl | 20 kg × 14 | 31.2 | 36.1 | 2.9% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -106,10 +106,10 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 6 | 78.4 | 83.3 | 2.5% |
-| barbell row | 45 kg × 8 | 67.4 | 72.6 | 2.2% |
-| squat | 75 kg × 7 | 108.1 | 114 | 2.5% |
-| dumbbell curl | 20 kg × 10 | 31.4 | 36.1 | 2.2% |
+| bench press | 55 kg × 6 | 78.5 | 83.3 | 5.2% |
+| barbell row | 45 kg × 8 | 66.1 | 72.6 | 1.9% |
+| squat | 75 kg × 7 | 107.2 | 114 | 4.2% |
+| dumbbell curl | 20 kg × 10 | 31.2 | 36.1 | 2.9% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -125,19 +125,19 @@ Check-in sleep 1, energy 2, soreness 3. Real strength that day is about 6% down.
 | Exercise | Set | Readiness | Prior e1RM | Capacity e1RM | Prescribed | Done | Real RIR |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | bench press | 1 | 0.976 | 74.8 | 74.8 | 55 × 8 @ 2 RIR | 55 × 8 | 2 |
-| bench press | 2 | 0.976 | 74.8 | 72.3 | 55 × 7 @ 2 RIR | 55 × 8 | 1 |
-| bench press | 3 | 0.976 | 74.8 | 71.4 | 55 × 6 @ 2 RIR | 55 × 6 | 2 |
+| bench press | 2 | 0.976 | 74.8 | 70.3 | 55 × 6 @ 2 RIR | 55 × 8 | 1 |
+| bench press | 3 | 0.976 | 74.8 | 68.4 | 52.5 × 7 @ 2 RIR | 52.5 × 7 | 2 |
 | barbell row | 1 | 0.977 | 63.8 | 63.8 | 45 × 10 @ 2 RIR | 45 × 11 | 1 |
-| barbell row | 2 | 0.977 | 63.8 | 63.2 | 45 × 10 @ 2 RIR | 45 × 9 | 2 |
-| barbell row | 3 | 0.977 | 63.8 | 61.4 | 45 × 8 @ 2 RIR | 45 × 8 | 2 |
-| barbell row | 4 | 0.977 | 63.8 | 59.9 | 42.5 × 10 @ 2 RIR | 42.5 × 10 | 1 |
+| barbell row | 2 | 0.977 | 63.8 | 63 | 45 × 10 @ 2 RIR | 45 × 9 | 2 |
+| barbell row | 3 | 0.977 | 63.8 | 61 | 45 × 8 @ 2 RIR | 45 × 8 | 2 |
+| barbell row | 4 | 0.977 | 63.8 | 59.4 | 42.5 × 9 @ 2 RIR | 42.5 × 10 | 1 |
 | squat | 1 | 0.977 | 102.9 | 102.9 | 75 × 9 @ 2 RIR | 75 × 8 | 2 |
-| squat | 2 | 0.977 | 102.9 | 98.9 | 75 × 7 @ 2 RIR | 75 × 7 | 2 |
-| squat | 3 | 0.977 | 102.9 | 96.6 | 75 × 6 @ 2 RIR | 75 × 7 | 1 |
-| dumbbell curl | 1 | 0.981 | 30.4 | 30.4 | 20 × 13 @ 2 RIR | 20 × 12 | 2 |
-| dumbbell curl | 2 | 0.981 | 30.4 | 28.8 | 20 × 11 @ 2 RIR | 20 × 12 | 1 |
-| dumbbell curl | 3 | 0.981 | 30.4 | 28.2 | 20 × 10 @ 2 RIR | 20 × 10 | 2 |
-| dumbbell curl | 4 | 0.981 | 30.4 | 27.4 | 18 × 13 @ 2 RIR | 18 × 11 | 3 |
+| squat | 2 | 0.977 | 102.9 | 97.6 | 75 × 7 @ 2 RIR | 75 × 7 | 2 |
+| squat | 3 | 0.977 | 102.9 | 94.5 | 72.5 × 7 @ 2 RIR | 72.5 × 8 | 1 |
+| dumbbell curl | 1 | 0.981 | 30.2 | 30.2 | 20 × 13 @ 2 RIR | 20 × 12 | 2 |
+| dumbbell curl | 2 | 0.981 | 30.2 | 28.6 | 20 × 10 @ 2 RIR | 20 × 12 | 1 |
+| dumbbell curl | 3 | 0.981 | 30.2 | 28 | 20 × 10 @ 2 RIR | 20 × 10 | 2 |
+| dumbbell curl | 4 | 0.981 | 30.2 | 27.1 | 18 × 13 @ 2 RIR | 18 × 11 | 3 |
 
 ## Alpha Progression's published examples through this engine
 

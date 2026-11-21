@@ -1,5 +1,5 @@
 /**
- * Sample run for the autoregulation engine (ADR 0023): a simulated lifter whose real
+ * Sample run for the autoregulation engine (ADR 0024): a simulated lifter whose real
  * strength, fatigue and recovery are hidden from the engine and deliberately follow
  * different formulas (Brzycki rep curve, slower chest recovery, larger fatigue penalty).
  * Not shipped in the app; `pnpm autoregulation:sample` writes docs/autoregulation-sample-run.md.
@@ -140,6 +140,7 @@ function runEngine(seed: number): { traces: SampleSetTrace[]; weeks: WeekSummary
     const scored: Record<string, ScoredSet[]> = {};
     const worstSoreness: Partial<Record<RecoveryMuscle, SorenessScore>> = {};
     const weeklySets: Partial<Record<RecoveryMuscle, number>> = {};
+    const freshBySession: Record<string, number[]> = {};
     const weekFresh: Record<string, number> = {};
     const firstSets: Record<string, string> = {};
     for (const day of TRAINING_DAYS) {
@@ -192,7 +193,7 @@ function runEngine(seed: number): { traces: SampleSetTrace[]; weeks: WeekSummary
         }
         weeklySets[exercise.primary] = (weeklySets[exercise.primary] ?? 0) + done.length;
         const fresh = nextSetCapacity({ priorE1rmKg: undefined, completedSets: done, fatigueDropPerSet: drop })?.freshE1rmKg;
-        if (fresh && weekFresh[exercise.id] === undefined) weekFresh[exercise.id] = fresh;
+        if (fresh) (freshBySession[exercise.id] ??= []).push(fresh);
         history[exercise.id].push({ finishedAt: at.toISOString(), sets: done });
         const iso = at.toISOString();
         engineEvents.push({ at: iso, muscle: exercise.primary, units: done.reduce((sum, set) => sum + setFatigueUnits(set.rir!, "primary"), 0) });
@@ -200,6 +201,8 @@ function runEngine(seed: number): { traces: SampleSetTrace[]; weeks: WeekSummary
         recordTrueLoad(truth, exercise, at, trueRirs);
       }
     }
+    // The week's mean over its sessions: one session's estimate moves about 2.5% per rep of RIR error.
+    for (const [id, values] of Object.entries(freshBySession)) weekFresh[id] = Math.round(values.reduce((sum, value) => sum + value, 0) / values.length * 10) / 10;
     const summary: WeekSummary = { week, deload: plan.deload, targetRir: plan.targetRir, muscles: [], exercises: [], earlyDeload: false };
     const recoveryMuscles: RecoveryMuscle[] = [];
     for (const exercise of EXERCISES) {
