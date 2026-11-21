@@ -110,6 +110,41 @@ function workingSetsWithout(sets: RoutineSetTarget[], removeCount: number): Rout
   return kept;
 }
 
+/**
+ * Rep and duration progress lives in session targets, not in the routine, so the
+ * latest exact-variant targets are the baseline once they exceed the routine's.
+ */
+function carryProgressedTargets(
+  sets: RoutineSetTarget[],
+  sessions: WorkoutSession[],
+  variantId: string,
+  direction: TrackingProgressDirection
+): RoutineSetTarget[] {
+  if (direction !== "higher_reps" && direction !== "longer_duration") return sets;
+  const latest = sessions
+    .map((session) => session.exercises
+      .filter((exercise) => exercise.variantId === variantId)
+      .flatMap((exercise) => exercise.sets.filter((set) => set.type === "working" && Boolean(set.completedAt))))
+    .find((completed) => completed.length > 0);
+  if (!latest) return sets;
+  const topReps = Math.max(0, ...latest.map((set) => set.targetMaxReps ?? set.targetMinReps ?? 0));
+  const duration = Math.max(0, ...latest.map((set) => set.targetDurationSeconds ?? 0));
+  return sets.map((set) => {
+    if (set.type !== "working") return set;
+    if (direction === "higher_reps") {
+      const top = set.maxReps ?? set.minReps;
+      if (top === undefined || topReps <= top) return set;
+      const step = topReps - top;
+      return {
+        ...set,
+        minReps: set.minReps === undefined ? undefined : set.minReps + step,
+        maxReps: set.maxReps === undefined ? undefined : set.maxReps + step
+      };
+    }
+    return set.durationSeconds !== undefined && duration > set.durationSeconds ? { ...set, durationSeconds: duration } : set;
+  });
+}
+
 function planItem(
   item: RoutineItem,
   sessions: WorkoutSession[],
@@ -122,7 +157,7 @@ function planItem(
   const loaded = direction === "higher_load" || direction === "lower_assistance";
   const suggestion = suggestDoubleProgression(sessions, variantId, rule);
   const base = { itemId: item.id, movementId: item.movementId, variantId };
-  const sets = item.sets.map((set) => ({ ...set }));
+  const sets = carryProgressedTargets(item.sets.map((set) => ({ ...set })), sessions, variantId, direction);
 
   if (suggestion.action === "no_data" || suggestion.currentValue === undefined) {
     return {
@@ -188,13 +223,19 @@ function planItem(
     };
   }
   if (ready && direction === "higher_reps") {
-    const step = suggestion.suggestedValue! - current;
     return {
       ...base,
       action: "progress",
-      sets: sets.map((set) => set.type === "working" && set.maxReps !== undefined
-        ? { ...set, minReps: set.minReps === undefined ? undefined : set.minReps + step, maxReps: set.maxReps + step }
-        : set),
+      sets: sets.map((set) => {
+        const top = set.maxReps ?? set.minReps;
+        if (set.type !== "working" || top === undefined) return set;
+        const step = Math.max(1, suggestion.suggestedValue! - top);
+        return {
+          ...set,
+          minReps: set.minReps === undefined ? undefined : set.minReps + step,
+          maxReps: set.maxReps === undefined ? undefined : set.maxReps + step
+        };
+      }),
       reason: suggestion.explanation
     };
   }
@@ -203,10 +244,14 @@ function planItem(
       ...base,
       action: "progress",
       sets: sets.map((set) => set.type === "working" && set.durationSeconds !== undefined
-        ? { ...set, durationSeconds: suggestion.suggestedValue }
+        ? { ...set, durationSeconds: Math.max(set.durationSeconds + 5, suggestion.suggestedValue!) }
         : set),
       reason: suggestion.explanation
     };
+  }
+  if (ready) {
+    // Distance has no stored target, so the advice carries the longer distance.
+    return { ...base, action: "progress", sets, reason: suggestion.explanation };
   }
   return {
     ...base,

@@ -139,3 +139,96 @@ describe("training week plan", () => {
     expect(complete.completedSessions).toBe(2);
   });
 });
+
+function finishedItem(
+  routine: Routine,
+  movementId: string,
+  id: string,
+  finishedAt: string,
+  values: { reps?: number; durationSeconds?: number; distanceMeters?: number; weightKg?: number },
+  now?: string
+): WorkoutSession {
+  const plan = planAdaptiveSession(routine, history[movementId] ?? [], rule, new Date(now ?? finishedAt));
+  let session = createAdaptiveSessionFromRoutine(routine, plan);
+  const block = session.exercises.find((item) => item.movementId === movementId)!;
+  block.sets.forEach((set) => {
+    session = updateSet(session, block.id, set.id, values, true);
+  });
+  const done = { ...session, id, finishedAt };
+  history[movementId] = [...(history[movementId] ?? []), done];
+  return done;
+}
+let history: Record<string, WorkoutSession[]> = {};
+
+describe("adaptive targets without a load", () => {
+  it("keeps raising rep targets from the last session instead of the routine", () => {
+    history = {};
+    const routine = cloneRoutineTemplate("tpl_full_body_a");
+    const item = routine.items.find((entry) => entry.movementId === "squat")!;
+    const top = (sessions: WorkoutSession[], now: string) => planAdaptiveSession(routine, sessions, rule, new Date(now))
+      .items.find((entry) => entry.itemId === item.id)!;
+    finishedItem(routine, "squat", "a", "2026-08-10T10:00:00.000Z", { reps: 12, weightKg: 10 });
+    finishedItem(routine, "squat", "b", "2026-08-12T10:00:00.000Z", { reps: 12, weightKg: 10 });
+    const first = top(history.squat, "2026-08-14T10:00:00.000Z");
+    expect(first.action).toBe("progress");
+    expect(first.sets.at(-1)).toMatchObject({ minReps: 9, maxReps: 13 });
+
+    finishedItem(routine, "squat", "c", "2026-08-14T10:00:00.000Z", { reps: 10, weightKg: 10 });
+    const held = top(history.squat, "2026-08-15T10:00:00.000Z");
+    expect(held.action).toBe("hold");
+    expect(held.sets.at(-1)).toMatchObject({ minReps: 9, maxReps: 13 });
+
+    finishedItem(routine, "squat", "d", "2026-08-16T10:00:00.000Z", { reps: 13, weightKg: 10 });
+    finishedItem(routine, "squat", "e", "2026-08-18T10:00:00.000Z", { reps: 13, weightKg: 10 });
+    const second = top(history.squat, "2026-08-20T10:00:00.000Z");
+    expect(second.action).toBe("progress");
+    expect(second.sets.at(-1)).toMatchObject({ minReps: 10, maxReps: 14 });
+    expect(item.sets.at(-1)).toMatchObject({ minReps: 8, maxReps: 12 });
+  });
+
+  it("keeps a progressed duration target on hold", () => {
+    history = {};
+    const routine = cloneRoutineTemplate("tpl_full_body_a");
+    const item = routine.items.find((entry) => entry.movementId === "plank")!;
+    finishedItem(routine, "plank", "a", "2026-08-10T10:00:00.000Z", { durationSeconds: 30 });
+    finishedItem(routine, "plank", "b", "2026-08-12T10:00:00.000Z", { durationSeconds: 30 });
+    finishedItem(routine, "plank", "c", "2026-08-14T10:00:00.000Z", { durationSeconds: 20 });
+    const plank = planAdaptiveSession(routine, history.plank, rule, new Date("2026-08-15T10:00:00.000Z"))
+      .items.find((entry) => entry.itemId === item.id)!;
+    expect(plank.action).toBe("hold");
+    expect(plank.sets.at(-1)).toMatchObject({ durationSeconds: 35 });
+  });
+
+  it("reports distance progression instead of a hold", () => {
+    history = {};
+    const routine = cloneRoutineTemplate("tpl_strength_b");
+    const item = routine.items.find((entry) => entry.movementId === "farmer_carry")!;
+    finishedItem(routine, "farmer_carry", "a", "2026-08-10T10:00:00.000Z", { distanceMeters: 40, weightKg: 20 });
+    finishedItem(routine, "farmer_carry", "b", "2026-08-12T10:00:00.000Z", { distanceMeters: 40, weightKg: 20 });
+    const carry = planAdaptiveSession(routine, history.farmer_carry, rule, new Date("2026-08-14T10:00:00.000Z"))
+      .items.find((entry) => entry.itemId === item.id)!;
+    expect(carry.action).toBe("progress");
+    expect(carry.reason.en).toContain("50 meters");
+  });
+
+  it("drops a prefilled load when the equipment is switched", () => {
+    const routine = cloneRoutineTemplate("tpl_full_body_a");
+    const sessions = [
+      finished(routine, "a", "2026-08-10T10:00:00.000Z", 12),
+      finished(routine, "b", "2026-08-12T10:00:00.000Z", 12)
+    ];
+    const plan = planAdaptiveSession(routine, sessions, rule, new Date("2026-08-14T10:00:00.000Z"));
+    let session = createAdaptiveSessionFromRoutine(routine, plan);
+    const block = session.exercises.find((entry) => entry.variantId === PRESS)!;
+    session = switchExerciseVariant(session, block.id, getVariant("chest_press__machine")!);
+    const machine = session.exercises.find((entry) => entry.variantId === "chest_press__machine")!;
+    expect(machine.sets.every((set) => set.weightKg === undefined)).toBe(true);
+
+    session = createAdaptiveSessionFromRoutine(routine, plan);
+    const again = session.exercises.find((entry) => entry.variantId === PRESS)!;
+    session = updateSet(session, again.id, again.sets[0].id, { reps: 12 }, true);
+    session = switchExerciseVariant(session, again.id, getVariant("chest_press__machine")!);
+    expect(session.exercises.find((entry) => entry.variantId === PRESS)!.sets[0].weightKg).toBe(22.5);
+    expect(session.exercises.find((entry) => entry.variantId === "chest_press__machine")!.sets.every((set) => set.weightKg === undefined)).toBe(true);
+  });
+});
