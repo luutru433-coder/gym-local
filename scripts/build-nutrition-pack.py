@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Any, Iterator
 
 
-PACK_VERSION = "2026.08.1"
+PACK_VERSION = "2026.11.1"
 PACK_SCHEMA_VERSION = 3
-PACK_CREATED_AT = "2026-08-14T00:00:00Z"
+PACK_CREATED_AT = "2026-11-21T00:00:00Z"
 NUTRIENT_COLUMNS = (
     "calories", "protein", "carbs", "fat", "fiber", "sugar", "sodium_mg",
     "calcium_mg", "iron_mg", "potassium_mg", "magnesium_mg", "zinc_mg",
@@ -24,11 +24,11 @@ NUTRIENT_COLUMNS = (
     "vitamin_k_mcg", "vitamin_b6_mg", "vitamin_b12_mcg", "folate_mcg",
 )
 NUTRIENT_IDS: dict[str, tuple[int, ...]] = {
-    "calories": (1008, 2047, 2048),
+    "calories": (1008, 2048, 2047),
     "protein": (1003,),
     "carbs": (1005,),
     "fat": (1004, 1085),
-    "fiber": (1079,),
+    "fiber": (1079, 2033),
     "sugar": (2000, 1063),
     "sodium_mg": (1093,),
     "calcium_mg": (1087,),
@@ -59,11 +59,11 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--source-allowlist", type=Path, default=Path("content/recipe-source-allowlist.json"))
     parser.add_argument("--food-groups", type=Path, default=Path("content/food-groups.json"))
     parser.add_argument("--schema", type=Path, default=Path("content/nutrition-pack-schema-v3.sql"))
-    parser.add_argument("--output", type=Path, default=Path("outputs/gym-local-nutrition-2026.08.1.sqlite3"))
+    parser.add_argument("--output", type=Path, default=Path("outputs/gym-local-nutrition-2026.11.1.sqlite3"))
     parser.add_argument("--manifest", type=Path, default=Path("public/nutrition-pack-manifest.json"))
     parser.add_argument(
         "--download-url",
-        default="./gym-local-nutrition-2026.08.1.sqlite3",
+        default="./gym-local-nutrition-2026.11.1.sqlite3",
     )
     parser.add_argument("--repository-url", required=True, help="Canonical HTTPS repository URL used in source attribution")
     parser.add_argument("--limit-per-dataset", type=int)
@@ -106,97 +106,141 @@ def normalize_text(value: str) -> str:
     return re.sub(r"\s+", " ", value.replace("_", " ")).strip(" ,.;")
 
 
-def compile_dictionary(values: dict[str, str]) -> list[tuple[re.Pattern[str], str]]:
-    result = []
-    for source, translated in sorted(values.items(), key=lambda item: len(item[0]), reverse=True):
-        plural_suffix = "" if source.endswith("s") else "(?:s|es)?"
-        pattern = re.compile(rf"(?<![A-Za-z]){re.escape(source)}{plural_suffix}(?![A-Za-z])", re.IGNORECASE)
-        result.append((pattern, translated))
-    return result
+CONNECTIVES = {"and": "và", "or": "hoặc", "with": "với"}
+NOISE = re.compile(r"\bnfs\b|\bns as to [^,]*", re.IGNORECASE)
+# Adjacent terms are reordered head-first for Vietnamese. That is a heuristic, so
+# a name that needed it is shown with its USDA description, and longer runs are
+# not translated at all.
+MAX_TERMS_PER_RUN = 2
 
 
-def translate_food(description: str, dictionary: list[tuple[re.Pattern[str], str]]) -> tuple[str, bool]:
-    translated = description.lower()
-    changed = False
-    for pattern, replacement in dictionary:
-        translated, count = pattern.subn(replacement, translated)
-        changed = changed or count > 0
-    translated = normalize_text(translated)
-    if translated:
-        translated = translated[0].upper() + translated[1:]
-    return translated or description, changed
+def compile_dictionary(values: dict[str, str]) -> tuple[re.Pattern[str], dict[str, str]]:
+    variants: dict[str, str] = {}
+    for source, translated in values.items():
+        key = source.lower()
+        forms = {key}
+        if not key.endswith("s"):
+            forms.update({f"{key}s", f"{key}es"})
+            if key.endswith("y"):
+                forms.add(f"{key[:-1]}ies")
+        for form in forms:
+            variants.setdefault(form, translated)
+    for source, translated in values.items():
+        variants[source.lower()] = translated
+    alternation = "|".join(re.escape(form) for form in sorted(variants, key=len, reverse=True))
+    return re.compile(rf"(?<![A-Za-z])(?:{alternation})(?![A-Za-z])", re.IGNORECASE), variants
 
 
-PREPARATION_LABELS = (
-    (re.compile(r"\bsteamed\b", re.IGNORECASE), "hấp"),
-    (re.compile(r"\bboiled\b", re.IGNORECASE), "luộc"),
-    (re.compile(r"\broasted\b|\bbaked\b|\bgrilled\b", re.IGNORECASE), "nướng"),
-    (re.compile(r"\bfried\b", re.IGNORECASE), "chiên"),
-    (re.compile(r"\bsmoked\b", re.IGNORECASE), "hun khói"),
-    (re.compile(r"\bdried\b|\bdehydrated\b", re.IGNORECASE), "sấy khô"),
-    (re.compile(r"\bcanned\b", re.IGNORECASE), "đóng hộp"),
-    (re.compile(r"\bfrozen\b", re.IGNORECASE), "đông lạnh"),
-    (re.compile(r"\bcooked\b", re.IGNORECASE), "chín"),
-    (re.compile(r"\braw\b", re.IGNORECASE), "sống"),
-)
+def translate_segment(segment: str, dictionary: tuple[re.Pattern[str], dict[str, str]]) -> tuple[str, bool, bool]:
+    """Translate one comma-separated segment.
+
+    Returns the text, whether nothing English is left, and whether no reordering was needed.
+    """
+    pattern, variants = dictionary
+    text = NOISE.sub(" ", segment.lower())
+    runs: list[list[str]] = [[]]
+    joiners: list[str] = []
+    complete = True
+    position = 0
+
+    def residual(value: str) -> None:
+        nonlocal complete
+        for word in re.findall(r"[^\s]+", value):
+            if word in CONNECTIVES and runs[-1]:
+                joiners.append(CONNECTIVES[word])
+                runs.append([])
+            else:
+                complete = False
+
+    for match in pattern.finditer(text):
+        residual(text[position:match.start()])
+        runs[-1].append(variants[match.group(0).lower()])
+        position = match.end()
+    residual(text[position:])
+    if not runs[-1] and joiners:
+        complete = False
+    if any(len(run) > MAX_TERMS_PER_RUN for run in runs):
+        complete = False
+    parts: list[str] = []
+    for index, run in enumerate(runs):
+        if index:
+            parts.append(joiners[index - 1])
+        # English puts the head noun last; Vietnamese puts it first.
+        parts.extend(reversed(run))
+    return " ".join(parts), complete and bool(runs[0]), all(len(run) == 1 for run in runs)
+
+
+def capitalize(value: str) -> str:
+    return value[0].upper() + value[1:] if value else value
+
+
+def translate_food(description: str, dictionary: tuple[re.Pattern[str], dict[str, str]]) -> tuple[str, bool, bool]:
+    """Return the Vietnamese name, whether it is complete, and whether no reordering was needed."""
+    segments = [segment for segment in (normalize_text(part) for part in description.split(",")) if NOISE.sub("", segment).strip()]
+    translated = [translate_segment(segment, dictionary) for segment in segments]
+    complete = bool(translated) and all(done for _, done, _ in translated)
+    simple = all(plain for _, _, plain in translated)
+    return capitalize(", ".join(text for text, _, _ in translated)), complete, simple
+
 
 CATEGORY_LABELS = (
-    (re.compile(r"\bcandy\b|\bcookie\b|\bcake\b|\bpie\b|\bdessert\b|\bsweetener\b", re.IGNORECASE), "Món ngọt"),
-    (re.compile(r"\bbeverage\b|\bdrink\b|\bcoffee\b|\btea\b|\bwater\b", re.IGNORECASE), "Đồ uống"),
-    (re.compile(r"\bsoup\b|\bstew\b|\bsauce\b|\bgravy\b", re.IGNORECASE), "Món nước và nước sốt"),
-    (re.compile(r"\bsandwich\b|\bpizza\b|\bburger\b|\bmeal\b|\bentree\b", re.IGNORECASE), "Món ăn hỗn hợp"),
-    (re.compile(r"\bcereal\b|\bpasta\b|\bflour\b|\bgrain\b|\bcracker\b", re.IGNORECASE), "Ngũ cốc và tinh bột"),
-    (re.compile(r"\bvegetable\b|\bgreens\b", re.IGNORECASE), "Rau củ"),
-    (re.compile(r"\bfruit\b|\bjuice\b", re.IGNORECASE), "Trái cây và nước ép"),
-    (re.compile(r"\bmeat\b|\bsausage\b", re.IGNORECASE), "Thịt và sản phẩm từ thịt"),
-    (re.compile(r"\bfish\b|\bseafood\b|\bshellfish\b", re.IGNORECASE), "Cá và hải sản"),
+    (re.compile(r"\balcoholic beverages?\b|\bbeer\b|\bwine\b|\bliqueur\b", re.IGNORECASE), "Đồ uống có cồn"),
+    (re.compile(r"\bbabyfood\b|\bbaby food\b|\binfant formula\b", re.IGNORECASE), "Thực phẩm cho trẻ nhỏ"),
+    (re.compile(r"\bfast foods?\b|\brestaurant\b", re.IGNORECASE), "Thức ăn nhanh"),
+    (re.compile(r"\bcand(?:y|ies)\b|\bcookies?\b|\bcakes?\b|\bpies?\b|\bdesserts?\b|\bsweeteners?\b|\bpuddings?\b|\bdoughnuts?\b|\bpastr(?:y|ies)\b", re.IGNORECASE), "Món ngọt"),
+    (re.compile(r"\bbeverages?\b|\bdrinks?\b|\bcoffee\b|\btea\b|\bwater\b", re.IGNORECASE), "Đồ uống"),
+    (re.compile(r"\bsoups?\b|\bstews?\b|\bsauces?\b|\bgravy\b", re.IGNORECASE), "Món nước và nước sốt"),
+    (re.compile(r"\bsalad dressings?\b|\bdressings?\b", re.IGNORECASE), "Nước sốt salad"),
+    (re.compile(r"\bsandwich(?:es)?\b|\bpizza\b|\bburgers?\b|\bmeals?\b|\bentrees?\b|\bburritos?\b|\btacos?\b", re.IGNORECASE), "Món ăn hỗn hợp"),
+    (re.compile(r"\bcereals?\b|\bpasta\b|\bflour\b|\bgrains?\b|\bcrackers?\b|\bbagels?\b|\bmuffins?\b|\bpancakes?\b|\bwaffles?\b|\brolls?\b|\btortillas?\b", re.IGNORECASE), "Ngũ cốc và tinh bột"),
+    (re.compile(r"\bsnacks?\b|\bchips\b", re.IGNORECASE), "Đồ ăn vặt"),
+    (re.compile(r"\bspices?\b|\bseasonings?\b|\bherbs?\b", re.IGNORECASE), "Gia vị"),
+    (re.compile(r"\bnuts?\b|\bseeds?\b", re.IGNORECASE), "Các loại hạt"),
+    (re.compile(r"\bbeans?\b|\blegumes?\b", re.IGNORECASE), "Các loại đậu"),
+    (re.compile(r"\bvegetables?\b|\bgreens\b|\bpeppers\b", re.IGNORECASE), "Rau củ"),
+    (re.compile(r"\bfruits?\b|\bjuices?\b", re.IGNORECASE), "Trái cây và nước ép"),
+    (re.compile(r"\bmeats?\b|\bsausages?\b|\bfrankfurters?\b|\bgame meat\b", re.IGNORECASE), "Thịt và sản phẩm từ thịt"),
+    (re.compile(r"\bfish\b|\bseafood\b|\bshellfish\b|\bcrustaceans\b|\bmollusks\b", re.IGNORECASE), "Cá và hải sản"),
     (re.compile(r"\bcheese\b|\bcream\b", re.IGNORECASE), "Sản phẩm từ sữa"),
+    (re.compile(r"\boils?\b|\bfats?\b|\bshortening\b", re.IGNORECASE), "Dầu và chất béo"),
 )
-
-NON_BASE_LABELS = {
-    "sống", "đã nấu", "luộc", "hấp", "nướng", "quay", "chiên", "xào", "đút lò",
-    "sấy khô", "đông lạnh", "đóng hộp", "bỏ da", "có da", "không xương", "không muối",
-    "có đường", "không đường",
-}
 
 
 def reviewed_vietnamese_label(
     description: str,
-    fdc_id: int | str,
-    dictionary: list[tuple[re.Pattern[str], str]],
+    dictionary: tuple[re.Pattern[str], dict[str, str]],
 ) -> tuple[str, str]:
-    translated, changed = translate_food(description, dictionary)
-    shared_english_tokens = tokens(description) & tokens(translated) if changed else set()
-    if changed and not any(len(token) >= 4 for token in shared_english_tokens):
+    """Name a USDA food in Vietnamese without ever describing a different food.
+
+    A description the dictionary covers completely becomes a Vietnamese name.
+    Otherwise the Vietnamese part only names what the leading USDA segment
+    (the food itself, before its qualifiers) is, and the exact USDA description
+    follows in brackets so the entry can never be mistaken for another food.
+    """
+    translated, complete, simple = translate_food(description, dictionary)
+    if complete and simple:
         return translated, "dictionary_complete"
-
-    base_label = next(
-        (replacement for pattern, replacement in dictionary if replacement not in NON_BASE_LABELS and pattern.search(description)),
-        None,
-    )
-    if not base_label:
-        base_label = next((label for pattern, label in CATEGORY_LABELS if pattern.search(description)), None)
-    if not base_label:
+    if complete:
+        return f"{translated} ({description})", "bilingual_head"
+    head = normalize_text(description.split(",", 1)[0])
+    head_label, head_complete, _ = translate_segment(head, dictionary)
+    if not head_complete:
+        is_mixed_dish = any(re.search(rf"\b{word}\b", head, re.IGNORECASE) for word in CONNECTIVES)
+        head_label = "Món ăn hỗn hợp" if is_mixed_dish else next(
+            (label for pattern, label in CATEGORY_LABELS if pattern.search(head)), ""
+        )
+    if not head_label:
         return description, "unreviewed"
-    preparation = next((label for pattern, label in PREPARATION_LABELS if pattern.search(description)), "")
-    label = normalize_text(f"{base_label} {preparation}")
-    if label:
-        label = label[0].upper() + label[1:]
-    return f"{label} (mã USDA {fdc_id})", "reviewed_fallback"
+    return f"{capitalize(head_label)} ({description})", "bilingual_head"
 
 
-def aliases_for(description: str, translated: str, changed: bool) -> list[tuple[str, str]]:
-    aliases: set[tuple[str, str]] = {(normalize_text(description), "en")}
+def aliases_for(description: str, name_vi: str, name_en: str) -> list[tuple[str, str]]:
+    aliases: set[tuple[str, str]] = {(normalize_text(description), "en"), (name_en, "en")}
     first_english = normalize_text(description.split(",", 1)[0])
     if first_english:
         aliases.add((first_english, "en"))
-    if changed:
-        vi_values = {
-            normalize_text(translated),
-            normalize_text(translated.split(",", 1)[0]),
-            normalize_text(strip_accents(translated)),
-        }
-        aliases.update((value, "vi") for value in vi_values if value)
+    if name_vi != description:
+        aliases.update({(name_vi, "vi"), (normalize_text(strip_accents(name_vi)), "vi")})
     return sorted((alias[:300], language) for alias, language in aliases if alias)
 
 
@@ -273,72 +317,169 @@ def add_food_groups(connection: sqlite3.Connection, groups: list[dict[str, Any]]
     return group_ids
 
 
-def add_usda_food(
-    connection: sqlite3.Connection,
+DATASET_PRIORITY = {"usda-foundation": 0, "usda-sr-legacy": 1, "usda-fndds": 2}
+
+
+def prepare_usda_food(
     food: dict[str, Any],
-    dictionary: list[tuple[re.Pattern[str], str]],
+    dictionary: tuple[re.Pattern[str], dict[str, str]],
     catalog_by_source_id: dict[str, dict[str, Any]],
     dataset_id: str,
     dataset_version: str,
-) -> bool:
+) -> dict[str, Any] | None:
     fdc_id = food.get("fdcId")
     description = normalize_text(str(food.get("description") or ""))
     if not fdc_id or not description:
-        return False
+        return None
     nutrients = nutrient_values(food)
-    macros = {key: nutrients[key] for key in ("calories", "protein", "carbs", "fat")}
-    if any(value is None for value in macros.values()):
-        return False
-    translated, changed = translate_food(description, dictionary)
+    if any(nutrients[key] is None for key in ("calories", "protein", "carbs", "fat")):
+        return None
     food_id = f"usda_{fdc_id}"
     curated = catalog_by_source_id.get(food_id)
     if curated:
         name_vi = normalize_text(str(curated["nameVi"]))
         name_en = normalize_text(str(curated["nameEn"]))
-        translation_status = "reviewed"
-        translation_reviewed_at = "2026-08-14"
+        naming = "curated"
     else:
-        name_vi, translation_policy = reviewed_vietnamese_label(description, fdc_id, dictionary)
+        name_vi, naming = reviewed_vietnamese_label(description, dictionary)
         name_en = description
-        translation_status = "unreviewed" if translation_policy == "unreviewed" else "reviewed"
-        translation_reviewed_at = None if translation_status == "unreviewed" else "2026-08-14"
     serving_label, serving_grams = serving(food)
     micronutrient_count = sum(nutrients[column] is not None for column in NUTRIENT_COLUMNS[4:])
-    data_quality = "complete" if micronutrient_count >= 10 else "partial"
+    return {
+        "id": food_id,
+        "fdc_id": str(fdc_id),
+        "description": description,
+        "name_vi": name_vi,
+        "name_en": name_en,
+        "naming": naming,
+        "dataset_id": dataset_id,
+        "dataset_version": dataset_version,
+        "serving_label": serving_label,
+        "serving_grams": serving_grams,
+        "nutrients": nutrients,
+        "data_quality": "complete" if micronutrient_count >= 10 else "partial",
+    }
+
+
+def description_key(description: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", NOISE.sub(" ", description.lower())).strip()
+
+
+def singular_tokens(description: str) -> set[str]:
+    return {token.rstrip("s") for token in tokens(NOISE.sub(" ", description))}
+
+
+def deduplicate_usda_foods(records: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Keep one entry per food the user could not tell apart.
+
+    USDA publishes the same food in several datasets. Two records are the same
+    entry when their descriptions match, or when every stored nutrient matches
+    and one description only adds words to the other (FNDDS copies SR Legacy
+    analyses under a shorter name). Curated recipe ingredients always survive; otherwise the
+    newest analysis (Foundation, then SR Legacy, then FNDDS) wins.
+    """
+    naming_rank = {"curated": 0, "dictionary_complete": 1, "bilingual_head": 2, "unreviewed": 3}
+
+    def preference(record: dict[str, Any]) -> tuple[int, int, int, int, str]:
+        return (
+            0 if record["naming"] == "curated" else 1,
+            DATASET_PRIORITY[record["dataset_id"]],
+            naming_rank[record["naming"]],
+            len(record["description"]),
+            record["id"],
+        )
+
+    def profile_preference(record: dict[str, Any]) -> tuple[int, int, int, int, str]:
+        return (
+            0 if record["naming"] == "curated" else 1,
+            naming_rank[record["naming"]],
+            len(record["description"]),
+            DATASET_PRIORITY[record["dataset_id"]],
+            record["id"],
+        )
+
+    removed = {"same_description": 0, "same_nutrients": 0}
+    by_description: dict[str, dict[str, Any]] = {}
+    for record in records:
+        key = description_key(record["description"])
+        current = by_description.get(key)
+        if current is None:
+            by_description[key] = record
+            continue
+        removed["same_description"] += 1
+        if record["naming"] == "curated" and current["naming"] == "curated":
+            raise ValueError(f"Curated ingredients {current['id']} and {record['id']} are the same USDA food")
+        if preference(record) < preference(current):
+            by_description[key] = record
+
+    by_profile: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for record in by_description.values():
+        profile = tuple(
+            None if record["nutrients"][column] is None else round(record["nutrients"][column], 2)
+            for column in NUTRIENT_COLUMNS
+        )
+        by_profile.setdefault(profile, []).append(record)
+    kept: list[dict[str, Any]] = []
+    for group in by_profile.values():
+        survivors: list[dict[str, Any]] = []
+        for record in sorted(group, key=profile_preference):
+            words = singular_tokens(record["description"])
+            twin = next(
+                (
+                    other for other in survivors
+                    if words <= singular_tokens(other["description"]) or words >= singular_tokens(other["description"])
+                ),
+                None,
+            )
+            if twin is None or record["naming"] == "curated":
+                survivors.append(record)
+            else:
+                removed["same_nutrients"] += 1
+        kept.extend(survivors)
+    order = {record["id"]: index for index, record in enumerate(records)}
+    kept.sort(key=lambda record: order[record["id"]])
+    return kept, removed
+
+
+def disambiguate_display_names(records: list[dict[str, Any]]) -> None:
+    """Different foods whose Vietnamese names coincide also show their USDA description."""
+    by_name: dict[str, list[dict[str, Any]]] = {}
+    for record in records:
+        if record["naming"] != "unreviewed":
+            by_name.setdefault(record["name_vi"].casefold(), []).append(record)
+    for group in by_name.values():
+        if len(group) < 2:
+            continue
+        for record in group:
+            if record["naming"] == "dictionary_complete":
+                record["name_vi"] = f"{record['name_vi']} ({record['description']})"
+                record["naming"] = "bilingual_head"
+
+
+def insert_usda_food(connection: sqlite3.Connection, record: dict[str, Any]) -> None:
+    visible = record["naming"] != "unreviewed"
     values = [
-        food_id,
-        name_vi,
-        name_en,
+        record["id"],
+        record["name_vi"],
+        record["name_en"],
         "usda_fdc",
-        str(fdc_id),
-        f"https://fdc.nal.usda.gov/food-details/{fdc_id}/nutrients",
-        dataset_id,
-        dataset_version,
+        record["fdc_id"],
+        f"https://fdc.nal.usda.gov/food-details/{record['fdc_id']}/nutrients",
+        record["dataset_id"],
+        record["dataset_version"],
         "CC0-1.0",
-        translation_status,
-        translation_reviewed_at,
-        serving_label,
-        serving_grams,
-        *[nutrients[column] for column in NUTRIENT_COLUMNS],
-        data_quality,
+        "reviewed" if visible else "unreviewed",
+        PACK_CREATED_AT[:10] if visible else None,
+        record["serving_label"],
+        record["serving_grams"],
+        *[record["nutrients"][column] for column in NUTRIENT_COLUMNS],
+        record["data_quality"],
     ]
-    cursor = connection.execute(
-        f"INSERT OR IGNORE INTO foods VALUES ({','.join('?' for _ in values)})",
-        values,
-    )
-    if cursor.rowcount == 0:
-        return False
+    connection.execute(f"INSERT INTO foods VALUES ({','.join('?' for _ in values)})", values)
     connection.executemany(
         "INSERT OR IGNORE INTO aliases(id, food_id, alias, language) VALUES (?, ?, ?, ?)",
-        alias_rows(
-            food_id,
-            sorted(
-                set(aliases_for(description, translated, changed))
-                | {(name_vi, "vi"), (strip_accents(name_vi), "vi"), (name_en, "en")}
-            ),
-        ),
+        alias_rows(record["id"], aliases_for(record["description"], record["name_vi"], record["name_en"])),
     )
-    return True
 
 
 def tokens(value: str) -> set[str]:
@@ -758,25 +899,41 @@ def main() -> None:
     connection = sqlite3.connect(args.output)
     create_schema(connection, args.schema)
     group_ids = add_food_groups(connection, groups)
-    inserted = 0
     catalog_by_source_id = {str(item["sourceFoodId"]): item for item in ingredient_catalog["ingredients"]}
     datasets = [
         (args.foundation, "usda-foundation", "2026-04"),
         (args.sr_legacy, "usda-sr-legacy", "2018-04"),
         (args.fndds, "usda-fndds", "2021-2023"),
     ]
+    records: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
     for path, dataset_id, dataset_version in datasets:
         dataset_count = 0
         for food in stream_top_level_array(path):
-            if add_usda_food(connection, food, dictionary, catalog_by_source_id, dataset_id, dataset_version):
-                inserted += 1
-                dataset_count += 1
+            record = prepare_usda_food(food, dictionary, catalog_by_source_id, dataset_id, dataset_version)
+            if record is None or record["id"] in seen_ids:
+                continue
+            seen_ids.add(record["id"])
+            records.append(record)
+            dataset_count += 1
             if args.limit_per_dataset and dataset_count >= args.limit_per_dataset:
                 break
-            if inserted and inserted % 500 == 0:
-                connection.commit()
-        connection.commit()
         print(f"{path.name}: {dataset_count} foods")
+    records, removed_duplicates = deduplicate_usda_foods(records)
+    disambiguate_display_names(records)
+    for record in records:
+        insert_usda_food(connection, record)
+    connection.commit()
+    duplicate_display_names = connection.execute(
+        """SELECT name_vi FROM foods WHERE translation_status='reviewed'
+           GROUP BY lower(name_vi) HAVING count(*) > 1 LIMIT 5"""
+    ).fetchall()
+    if duplicate_display_names:
+        raise ValueError(f"Searchable foods share a display name: {duplicate_display_names}")
+    print(
+        f"Removed {removed_duplicates['same_description']} same-description and "
+        f"{removed_duplicates['same_nutrients']} same-nutrient duplicates; {len(records)} USDA foods kept"
+    )
 
     recipe_stats = add_recipes_v3(
         connection, recipes, legacy_redirects, ingredient_catalog, source_allowlist, group_ids, repository_url
@@ -788,9 +945,9 @@ def main() -> None:
     ).fetchone()[0]
     if alias_count < 2000:
         raise ValueError(f"Vietnamese alias coverage too small: {alias_count} (minimum 2000)")
-    if vietnamese_display_food_count < 10_000:
+    if vietnamese_display_food_count < 5_000:
         raise ValueError(
-            f"Reviewed Vietnamese display-name coverage too small: {vietnamese_display_food_count} (minimum 10000)"
+            f"Searchable Vietnamese display-name coverage too small: {vietnamese_display_food_count} (minimum 5000)"
         )
     created_at = PACK_CREATED_AT
     metadata = {

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-21 — Nutrition pack 2026.11.1: accurate names, no duplicate foods
+
+- Removed the generic `… (mã USDA <id>)` display names that 10,260 foods carried. Such a name was taken from any dictionary word in the description, so an apple pie was listed as "Táo" and an egg bagel as "Trứng". A food is now named in Vietnamese only when the whole USDA description translates; otherwise the Vietnamese part names the leading USDA term or its food category and the exact USDA description follows in brackets, e.g. `Thịt gà (Chicken, back)`.
+- Removed 1,003 duplicate USDA foods: 210 listed under the same description in more than one dataset (Foundation is kept over SR Legacy over FNDDS) and 793 FNDDS/SR Legacy copies with identical values for all 20 nutrients under a longer name. Curated recipe ingredients are always kept. The pack now holds 13,332 foods instead of 14,335.
+- Corrected energy for 180 Foundation foods by preferring Atwater specific factors over general factors (walnuts 730 → 679 kcal/100 g, Brussels sprouts 60 → 49), and filled fibre for 17 Foundation foods that only report the AOAC 2011.25 value.
+- Fixed dictionary translation: plural forms now match (`Strawberries` → `Dâu tây`), compound terms follow Vietnamese word order (`Strawberry milk` is `Sữa dâu tây`, not `Dâu tây sữa`), and leftover English such as `and`, `NFS`, or `oil` no longer appears inside a Vietnamese name. The dictionary grew from 126 to 364 terms.
+- Food search now lists names that begin with the typed words first, then names containing them in order, then other matches, with single foods ahead of composed dishes. This also applies to an already installed pack.
+- Installed packs are unchanged until **Cập nhật kho** is used. Diary history keeps its stored nutrient snapshots.
+
 ## 2026-08-22 — Nutrition planner algorithm 2
 
 - Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.

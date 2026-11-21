@@ -1,3 +1,15 @@
+# Verification report — 2026-11-21
+
+## Nutrition pack 2026.11.1 — food names and duplicates
+
+- Rebuilding the unchanged script from the pinned USDA downloads (Foundation 2026-04-30, SR Legacy 2018-04, FNDDS 2021-2023) reproduced every row of the released 2026.08.1 `foods` table, so the comparison below is against the pack users have.
+- The new pack holds 13,332 foods (12,532 USDA, 800 dishes) and 11,381 searchable names; 1,951 USDA foods without a trustworthy Vietnamese label stay hidden. No display name contains a USDA-code placeholder, no two searchable foods share a display name, and no USDA description is listed twice; `scripts/verify-nutrition-pack.py` now enforces all three.
+- Macronutrients were not re-derived: for every food present in both packs, protein, carbohydrate, and fat are identical to 2026.08.1, and the 800 dish estimates are unchanged. Energy changed for 180 Foundation foods only (Atwater specific factors preferred).
+- The 66 curated recipe ingredients were read one by one against their USDA descriptions and values; all match. The other USDA values are carried over from USDA as published and were not checked against Vietnamese food-composition tables. Vietnamese names produced by the dictionary were sampled, not reviewed one by one.
+- Search ranking was exercised with SQLite FTS5 against the new pack for accented and unaccented queries; the in-browser worker was not run end to end.
+- `pnpm run lint`, `pnpm run typecheck`, `pnpm content:validate`, `pnpm content:audit`, `pnpm test` (153 tests), and `pnpm nutrition:verify-pack` passed.
+- Artifact: `gym-local-nutrition-2026.11.1.sqlite3`, 31,948,800 bytes, SHA-256 `4e7e92c2581816b56ad343f3b2a41f6d01aa2509967f2ca64667e023b9ad39b9`.
+
 # Verification report — 2026-08-22
 
 ## Checkpoint N5 — mobile/offline release candidate
