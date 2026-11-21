@@ -9,7 +9,7 @@ function curl(movementId: "biceps_curl" | "hammer_curl", kind: "bar" | "dumbbell
   const hammer = movementId === "hammer_curl";
   const frame: Frame = { ...standing, grip: { kind, size: 9 } };
   const down: TechniquePose = { ...legs, torso: 90, arm: [-90, -84] };
-  const up: TechniquePose = { ...legs, torso: 90, arm: [-86, 62] };
+  const up: TechniquePose = { ...legs, torso: 90, arm: [-86, 50] };
   return technique(movementId, equipment, frame, {
     setup: [down, [
       cue(hammer ? "Tay: lòng bàn tay hướng vào nhau (ngón cái hướng lên) và giữ nguyên suốt rep." : "Tay: nắm ngửa, rộng bằng vai, cổ tay thẳng.", hammer ? "Hands: palms facing each other (thumbs up) and kept that way all rep." : "Hands: underhand grip at shoulder width, wrists straight.", at("wrist", undefined, [14, 0])),

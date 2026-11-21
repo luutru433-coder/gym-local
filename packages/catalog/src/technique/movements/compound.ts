@@ -26,7 +26,7 @@ function squat(loaded: boolean, equipment: ExerciseTechnique["equipment"]): Exer
         cue("Gót chân luôn chạm sàn.", "Heels stay on the floor.", at("ankle", undefined, [-14, 0]))
       ]],
       [stepTitle.bottom, [bottom], [
-        cue("Nếp gấp hông ngang hoặc thấp hơn đầu gối một chút: đùi song song sàn, gối gập khoảng 70–90°.", "Hip crease level with or just below the knee: thighs parallel, knees bent to about 70–90°.", ang("hip", "knee", "ankle", [10, 6])),
+        cue("Nếp gấp hông ngang hoặc thấp hơn đầu gối một chút: đùi song song sàn, gối gập khoảng 60–70°.", "Hip crease level with or just below the knee: thighs parallel, knees bent to about 60–70°.", ang("hip", "knee", "ankle", [10, 6])),
         cue("Ống chân nghiêng về trước khoảng 20–25°, gối có thể qua mũi chân.", "Shins lean forward about 20–25°; knees may pass the toes.", ang("up", "ankle", "knee", [12, -8])),
         cue(loaded ? "Thanh đòn vẫn nằm thẳng trên giữa bàn chân." : "Tạ và vai vẫn nằm trên giữa bàn chân.", loaded ? "The bar stays stacked over mid-foot." : "The weight and shoulders stay over mid-foot.", at("shoulder", -90, [-16, 0]))
       ]],
@@ -47,7 +47,7 @@ function squat(loaded: boolean, equipment: ExerciseTechnique["equipment"]): Exer
 function deadlift(equipment: ExerciseTechnique["equipment"]): ExerciseTechnique {
   const frame: Frame = { ...standing, grip: { kind: "bar", size: 20 } };
   const start: TechniquePose = { ...stand, torso: 27, leg: [-17, -100], arm: [-88, -88] };
-  const knee: TechniquePose = { ...stand, torso: 40, leg: [-50, -92], arm: [-88, -90] };
+  const knee: TechniquePose = { ...stand, torso: 30, leg: [-50, -92], arm: [-106, -106] };
   const top: TechniquePose = { ...stand, torso: 90, leg: [-89, -91], arm: [-90, -90] };
   return technique("deadlift", equipment, frame, {
     setup: [start, [
@@ -84,7 +84,7 @@ function deadlift(equipment: ExerciseTechnique["equipment"]): ExerciseTechnique 
 function romanianDeadlift(kind: "bar" | "dumbbell", equipment: ExerciseTechnique["equipment"]): ExerciseTechnique {
   const frame: Frame = { ...standing, grip: { kind, size: 15 } };
   const top: TechniquePose = { ...stand, torso: 90, leg: [-87, -93], arm: [-90, -90] };
-  const bottom: TechniquePose = { ...stand, torso: 22, leg: [-70, -97], arm: [-88, -88] };
+  const bottom: TechniquePose = { ...stand, torso: 22, leg: [-70, -97], arm: [-115, -115] };
   return technique("romanian_deadlift", equipment, frame, {
     setup: [top, [
       cue("Chân: rộng bằng hông, gối chùng nhẹ khoảng 15–20° và giữ nguyên góc này.", "Feet: hip width, knees unlocked about 15–20° and held at that angle.", ang("hip", "knee", "ankle", [14, 0])),
@@ -217,7 +217,7 @@ function hanging(movementId: "pull_up" | "lat_pulldown", equipment: ExerciseTech
         cue(pullUp ? "Ngực hướng lên xà, không rướn cằm." : "Ngực nâng lên đón thanh kéo, không giật thân ra sau.", pullUp ? "Chest leads to the bar; do not crane the chin." : "Chest lifts to meet the bar; no jerking the torso back.", at("shoulder", undefined, [0, 14]))
       ]],
       [t("Điểm co cơ", "Peak"), [top], [
-        cue(pullUp ? "Cằm qua xà, khuỷu gập khoảng 60–70° và nằm sát sườn." : "Thanh kéo chạm ngực trên, khuỷu gập khoảng 60–70° và nằm sát sườn.", pullUp ? "Chin over the bar, elbows bent to about 60–70° and close to the ribs." : "Bar touches the upper chest, elbows bent to about 60–70° and close to the ribs.", ang("shoulder1", "elbow", "wrist", [14, 8])),
+        cue(pullUp ? "Cằm qua xà, khuỷu gập khoảng 30–45° và nằm sát sườn." : "Thanh kéo chạm ngực trên, khuỷu gập khoảng 30–45° và nằm sát sườn.", pullUp ? "Chin over the bar, elbows closed to about 30–45° and close to the ribs." : "Bar touches the upper chest, elbows closed to about 30–45° and close to the ribs.", ang("shoulder1", "elbow", "wrist", [14, 8])),
         cue("Cánh tay cách thân khoảng 30–45°.", "Upper arms about 30–45° from the torso.", ang("along", "shoulder2", "elbow2", [-14, 10])),
         cue("Vai vẫn hạ thấp, không nhún về phía tai.", "Shoulders still down, not shrugged toward the ears.", at("shoulder", undefined, [0, 14]))
       ]],

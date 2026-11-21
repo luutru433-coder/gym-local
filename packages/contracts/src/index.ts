@@ -137,7 +137,7 @@ export interface TechniquePose {
 export interface TechniqueFigure {
   view: "side" | "front" | "back" | "top";
   poses: TechniquePose[];
-  grip?: { at?: string; offset?: [number, number]; kind?: "bar" | "dumbbell" | "handle" | "none"; size?: number };
+  grip?: { at?: string; offset?: [number, number]; kind?: "bar" | "dumbbell" | "handle" | "plate" | "none"; size?: number };
   box?: [number, number, number, number];
   floor?: number;
   pads?: [number, number, number, number][];

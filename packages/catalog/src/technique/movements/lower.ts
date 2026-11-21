@@ -5,18 +5,17 @@ import type { Frame } from "./shared";
 const kneeAngle = (shift: [number, number] = [16, 0]) => ang("hip", "knee", "ankle", shift);
 
 function legPress(): ExerciseTechnique {
-  const frame: Frame = { view: "side", box: [6, 40, 160, 124], floor: 160, grip: { kind: "none" }, lines: [[78, 138, 24, 107]], pads: [[62, 138, 30, 6]] };
+  const frame: Frame = { view: "side", box: [6, 40, 160, 124], floor: 160, grip: { kind: "plate" }, lines: [[78, 138, 24, 107]], pads: [[62, 138, 30, 6]] };
   const seat = { hip: [70, 128] as [number, number], torso: 150, arm: [-60, -20] as [number, number], foot: 125 };
   const pose = (foot: [number, number]): TechniquePose => ({ ...seat, leg: { to: foot, bend: 1 } });
   const top = pose([135, 86]);
   const bottom = pose([116, 100]);
-  const plate = (x: number, y: number): Partial<Frame> => ({ lines: [[78, 138, 24, 107], [x + 8, y + 8, x - 6, y - 20]] });
   return technique("leg_press", ["machine"], frame, {
     setup: [top, [
       cue("Chân: đặt rộng bằng vai ở giữa bàn đạp, mũi chân xoay ra 10–20°, cả bàn chân áp sát.", "Feet: shoulder width in the middle of the platform, toes out 10–20°, whole foot flat.", at("ankle", undefined, [14, 6])),
       cue("Lưng: mông và lưng dưới ép sát đệm, gồng bụng.", "Back: glutes and lower back pressed into the pad, abs braced.", at("hip", undefined, [-4, -16])),
       cue("Tay: nắm tay cầm hai bên; gối chùng nhẹ, không khóa thẳng.", "Hands: hold the side handles; knees soft, never locked out.", kneeAngle([0, -16]))
-    ], plate(135, 86)],
+    ]],
     phases: [
       [stepTitle.lower, [top, bottom], [
         cue("Hạ bàn đạp chậm trong 2–3 giây đến khi gối gập khoảng 90°.", "Lower the platform over 2–3 seconds until the knees reach about 90°.", kneeAngle([0, -16])),
@@ -40,7 +39,7 @@ function splitStance(movementId: "split_squat" | "lunge", kind: "none" | "dumbbe
   const lunge = movementId === "lunge";
   const frame: Frame = { ...standing, grip: { kind } };
   const pose = (hip: [number, number], torso = 86, front: [number, number] = [124, 150], back: [number, number] = [62, 140]): TechniquePose => ({ hip, torso, arm: [-90, -88], leg: { to: front, bend: 1 }, leg2: { to: back, bend: 1 }, foot: 0, foot2: -60 });
-  const top = pose([94, 82]);
+  const top = pose([94, 79]);
   const bottom = pose([94, 108]);
   const feetTogether = pose([98, 74], 88, [100, 150], [96, 150]);
   const start = lunge ? { ...feetTogether, foot2: 0 } : top;
@@ -138,7 +137,7 @@ function legCurl(): ExerciseTechnique {
 function legExtension(): ExerciseTechnique {
   const frame: Frame = { view: "side", box: [20, 30, 160, 130], floor: 156, grip: { kind: "none" }, lines: [[72, 108, 62, 58]], pads: [[66, 108, 50, 7], [86, 115, 6, 41]] };
   const pose = (shin: number, extra: Partial<TechniquePose> = {}): TechniquePose => ({ hip: [80, 102], torso: 100, arm: [-80, -10], leg: [0, shin], foot: shin + 90, ...extra });
-  const bent = pose(-100);
+  const bent = pose(-92);
   const straight = pose(-6);
   return technique("leg_extension", ["machine"], frame, {
     setup: [bent, [
@@ -166,7 +165,7 @@ function legExtension(): ExerciseTechnique {
 }
 
 function calfRaise(): ExerciseTechnique {
-  const frame: Frame = { ...standing, box: [10, -22, 180, 190], floor: 164, grip: { kind: "none" }, pads: [[84, 152, 34, 12]] };
+  const frame: Frame = { ...standing, box: [10, -22, 180, 190], floor: 164, grip: { kind: "none" }, pads: [[103, 152, 30, 12]] };
   const pose = (foot: number, leg: [number, number] = [-90, -90]): TechniquePose => ({ pin: ["toe", 108, 150], torso: 90, arm: [-88, -80], leg, foot });
   const low = pose(16);
   const high = pose(-36);

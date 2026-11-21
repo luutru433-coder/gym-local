@@ -69,7 +69,7 @@ function pushUp(): ExerciseTechnique {
   const frame: Frame = { view: "side", box: [10, 40, 180, 124], floor: 157, grip: { kind: "none" } };
   const hand: [number, number] = [147, 151];
   const body = (lean: number, extra: Partial<TechniquePose> = {}): TechniquePose => ({ pin: ["toe", 26, 152], torso: lean, leg: [180 + lean, 180 + lean], foot: -90, arm: { to: hand, bend: -1 }, ...extra });
-  const top = body(18);
+  const top = body(18.7);
   const bottom = body(5);
   return technique("push_up", ["bodyweight"], frame, {
     setup: [top, [
@@ -81,18 +81,18 @@ function pushUp(): ExerciseTechnique {
       [stepTitle.lower, [top, bottom], [
         cue("Khuỷu hướng về sau khoảng 45° so với thân, không xòe ngang.", "Elbows point back at about 45° from the torso, not straight out.", at("elbow", 200, [0, -14])),
         cue("Cả thân hạ xuống cùng lúc như một tấm ván.", "The whole body lowers together like a plank.", ang("shoulder", "hip", "knee", [0, -14])),
-        cue("Dừng khi ngực cách sàn khoảng một nắm tay, khuỷu gập 90° hoặc hơn.", "Stop with the chest about a fist from the floor, elbows bent 90° or more.", ang("shoulder", "elbow", "wrist", [-22, 6]))
+        cue("Dừng khi ngực cách sàn khoảng một nắm tay, khuỷu khép còn khoảng 50–70°.", "Stop with the chest about a fist from the floor, elbows closed to about 50–70°.", ang("shoulder", "elbow", "wrist", [-22, 6]))
       ]],
       [stepTitle.press, [bottom, top], [
         cue("Đẩy sàn ra xa, hông và vai lên cùng lúc.", "Push the floor away; hips and shoulders rise together.", at("shoulder", 90, [12, 0])),
-        cue("Duỗi thẳng tay ở đỉnh, khoảng 180°.", "Straighten the arms at the top, about 180°.", ang("shoulder", "elbow", "wrist", [14, 0])),
+        cue("Duỗi thẳng tay ở đỉnh, khoảng 170–180°.", "Straighten the arms at the top, about 170–180°.", ang("shoulder", "elbow", "wrist", [-24, 4])),
         cue("Hông không võng, không chổng lên.", "Hips neither sag nor pike.", at("hip", undefined, [0, -14]))
       ]]
     ],
     mistakes: [
       [t("Võng hông", "Hips sagging"), t("Siết mông và bụng để giữ thân thẳng 180°; kê tay lên cao nếu chưa giữ được.", "Squeeze glutes and abs to hold a 180° line; elevate the hands if you cannot hold it."), body(4, { torso: 26, round: -10 }), top, ang("shoulder", "hip", "knee", [0, -14])],
       [t("Chổng mông", "Hips piked up"), t("Hạ hông về thẳng hàng vai và gót.", "Bring the hips down in line with shoulders and heels."), body(32, { torso: -2 }), top, ang("shoulder", "hip", "knee", [0, -14])],
-      [t("Hạ nửa chừng", "Half depth"), t("Hạ đến khi khuỷu gập ít nhất 90°; kê tay lên cao nếu chưa đủ sức.", "Lower until the elbows bend at least 90°; elevate the hands if strength is missing."), body(12), bottom, ang("shoulder", "elbow", "wrist", [-22, 6])]
+      [t("Hạ nửa chừng", "Half depth"), t("Hạ đến khi khuỷu khép còn khoảng 50–70°; kê tay lên cao nếu chưa đủ sức.", "Lower until the elbows close to about 50–70°; elevate the hands if strength is missing."), body(12), bottom, ang("shoulder", "elbow", "wrist", [-22, 6])]
     ]
   });
 }
@@ -100,8 +100,8 @@ function pushUp(): ExerciseTechnique {
 function dip(): ExerciseTechnique {
   const frame: Frame = { view: "side", box: [16, 0, 168, 176], lines: [[66, 100, 134, 100]], grip: { kind: "none" } };
   const body = (hip: [number, number], torso: number): TechniquePose => ({ hip, torso, leg: [-92, -165], foot: 180, arm: { to: [100, 96], bend: -1 } });
-  const top = body([91, 90], 79);
-  const bottom = body([84, 113], 68);
+  const top = body([92, 89.3], 79);
+  const bottom = body([84, 102], 68);
   return technique("dip", ["bodyweight"], frame, {
     setup: [top, [
       cue("Tay: nắm hai thanh rộng hơn vai một chút, tay duỗi thẳng, cổ tay ngay dưới vai.", "Hands: bars slightly wider than the shoulders, arms straight, wrists directly under the shoulders.", at("wrist", undefined, [14, 8])),
@@ -115,14 +115,14 @@ function dip(): ExerciseTechnique {
         cue("Thân nghiêng về trước khoảng 20–30° để ngực làm việc.", "Torso leans forward about 20–30° so the chest works.", at("spine", undefined, [14, 0]))
       ]],
       [stepTitle.press, [bottom, top], [
-        cue("Đẩy thẳng xuống hai thanh cho đến khi tay duỗi thẳng 180°.", "Press straight down into the bars until the arms reach 180°.", ang("shoulder", "elbow", "wrist", [-22, 0])),
+        cue("Đẩy thẳng xuống hai thanh cho đến khi tay duỗi thẳng khoảng 170–180°.", "Press straight down into the bars until the arms reach about 170–180°.", ang("shoulder", "elbow", "wrist", [-22, 0])),
         cue("Vai vẫn xa tai, không nhún vai ở đỉnh.", "Shoulders stay away from the ears; no shrug at the top.", at("shoulder", undefined, [14, -6])),
         cue("Chân không đá để lấy đà.", "No kicking the legs for momentum.", at("knee", undefined, [14, 0]))
       ]]
     ],
     mistakes: [
-      [t("Hạ quá sâu, vai tụt dưới khuỷu", "Going too deep, shoulders below the elbows"), t("Dừng khi cánh tay song song sàn (khuỷu khoảng 90°).", "Stop when the upper arms are parallel to the floor (elbows about 90°)."), body([80, 128], 62), bottom, ang("shoulder", "elbow", "wrist", [-22, 0])],
-      [t("Chỉ hạ nửa chừng", "Cutting the depth short"), t("Hạ đến khi khuỷu gập 90°; dùng dây trợ lực nếu chưa đủ sức.", "Lower until the elbows reach 90°; use band assistance if strength is missing."), body([88, 100], 74), bottom, ang("shoulder", "elbow", "wrist", [-22, 0])]
+      [t("Hạ quá sâu, vai tụt dưới khuỷu", "Going too deep, shoulders below the elbows"), t("Dừng khi cánh tay song song sàn (khuỷu khoảng 90°).", "Stop when the upper arms are parallel to the floor (elbows about 90°)."), body([84, 116], 66), bottom, ang("shoulder", "elbow", "wrist", [-22, 0])],
+      [t("Chỉ hạ nửa chừng", "Cutting the depth short"), t("Hạ đến khi khuỷu gập 90°; dùng dây trợ lực nếu chưa đủ sức.", "Lower until the elbows reach 90°; use band assistance if strength is missing."), body([90, 95], 77), bottom, ang("shoulder", "elbow", "wrist", [-22, 0])]
     ]
   });
 }
@@ -131,7 +131,7 @@ function oneArmRow(): ExerciseTechnique {
   const frame: Frame = { ...standing, box: [10, 18, 180, 142], grip: { kind: "dumbbell" }, pads: [[84, 122, 84, 7], [92, 129, 5, 26], [156, 129, 5, 26]] };
   const base = { ...onFloor(70), leg: [-80, -94] as [number, number], leg2: [-72, 172] as [number, number], foot2: 180, arm2: [-88, -90] as [number, number] };
   const hang: TechniquePose = { ...base, torso: 8, arm: [-92, -90] };
-  const top: TechniquePose = { ...base, torso: 8, arm: [158, -82] };
+  const top: TechniquePose = { ...base, torso: 8, arm: [-202, -112] };
   return technique("one_arm_row", ["dumbbell"], frame, {
     setup: [hang, [
       cue("Tay và gối chống: bàn tay ngay dưới vai, gối ngay dưới hông trên ghế.", "Support hand and knee: hand directly under the shoulder, knee directly under the hip on the bench.", at("wrist2", undefined, [14, -8])),
@@ -151,8 +151,8 @@ function oneArmRow(): ExerciseTechnique {
       ]]
     ],
     mistakes: [
-      [t("Kéo tạ về vai, khuỷu xòe ra", "Pulling to the shoulder with the elbow flared"), t("Kéo khuỷu về phía hông để tạ kết thúc cạnh sườn dưới.", "Drive the elbow toward the hip so the weight finishes beside the lower ribs."), { ...base, torso: 8, arm: [120, -120] }, top, at("elbow", undefined, [0, -14])],
-      [t("Dựng người lên để giật tạ", "Lifting the torso to heave the weight"), t("Giữ lưng gần song song sàn; giảm tải nếu phải giật.", "Keep the back near parallel to the floor; reduce the load if you have to heave."), { ...base, torso: 32, arm: [165, -80], arm2: { to: [124, 120] } }, top, ang("fwd", "hip", "shoulder", [0, -14])]
+      [t("Kéo tạ về vai, khuỷu xòe ra", "Pulling to the shoulder with the elbow flared"), t("Kéo khuỷu về phía hông để tạ kết thúc cạnh sườn dưới.", "Drive the elbow toward the hip so the weight finishes beside the lower ribs."), { ...base, torso: 8, arm: [-240, -120] }, top, at("elbow", undefined, [0, -14])],
+      [t("Dựng người lên để giật tạ", "Lifting the torso to heave the weight"), t("Giữ lưng gần song song sàn; giảm tải nếu phải giật.", "Keep the back near parallel to the floor; reduce the load if you have to heave."), { ...base, torso: 32, arm: [-195, -105], arm2: { to: [124, 120] } }, top, ang("fwd", "hip", "shoulder", [0, -14])]
     ]
   });
 }

@@ -51,6 +51,15 @@ function Grip({ figure, joints }: { figure: Figure; joints: Joints }) {
   const hand = joints[figure.grip?.at ?? "wrist"];
   const [x, y] = [hand[0] + (figure.grip?.offset?.[0] ?? 0), hand[1] + (figure.grip?.offset?.[1] ?? 0)];
   const other = joints.wrist2;
+  if (kind === "plate") {
+    // A footplate that follows the sole: a line along ankle→toe, pushed to the side away from the knee.
+    const [ankle, toe, knee] = [joints.ankle, joints.toe, joints.knee];
+    const length = Math.hypot(toe[0] - ankle[0], toe[1] - ankle[1]) || 1;
+    const along = [(toe[0] - ankle[0]) / length, (toe[1] - ankle[1]) / length];
+    const side = (ankle[0] - knee[0]) * -along[1] + (ankle[1] - knee[1]) * along[0] >= 0 ? 1 : -1;
+    const out = [-along[1] * side * 9, along[0] * side * 9];
+    return <line className="tf-bar" x1={ankle[0] - along[0] * 14 + out[0]} y1={ankle[1] - along[1] * 14 + out[1]} x2={toe[0] + along[0] * 12 + out[0]} y2={toe[1] + along[1] * 12 + out[1]} />;
+  }
   if (figure.view === "side") {
     if (kind === "bar") return <g><circle className="tf-plate" cx={x} cy={y} r={figure.grip?.size ?? 13} /><circle className="tf-bar-end" cx={x} cy={y} r={3} /></g>;
     if (kind === "dumbbell") return <g><rect className="tf-weight" x={x - 8} y={y - 5} width={16} height={10} rx={2.5} /></g>;
@@ -99,7 +108,7 @@ function Mark({ mark, joints, target, locale }: { mark: FigureMark; joints: Join
     parts.push(line(start, end, "tf-arrow", "shaft"), <polyline key="head" className="tf-arrow" points={[wing(0.5), end, wing(-0.5)].map((point) => point.join(",")).join(" ")} />);
   }
   const [x, y] = [anchor[0] + shift[0], anchor[1] + shift[1]];
-  const label = [mark.angle ? `${shownAngle(measureAngle(target, mark.angle))}°` : "", mark.tag?.[locale] ?? ""].filter(Boolean).join(" ");
+  const label = [mark.angle ? `${shownAngle(measureAngle(joints, mark.angle))}°` : "", mark.tag?.[locale] ?? ""].filter(Boolean).join(" ");
   return (
     <g>
       {parts}
