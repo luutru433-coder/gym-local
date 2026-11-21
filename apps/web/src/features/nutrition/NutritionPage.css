@@ -298,3 +298,61 @@
     justify-self: end;
   }
 }
+
+.meal-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-meals {
+  display: grid;
+  gap: 12px;
+}
+
+.copy-meals__target {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.copy-meals__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.copy-meals__list label {
+  min-height: 52px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.copy-meals__list input {
+  width: 20px;
+  height: 20px;
+}
+
+.copy-meals__list strong,
+.copy-meals__list small {
+  display: block;
+}
+
+.copy-meals__list strong {
+  font-size: 13px;
+}
+
+.copy-meals__list small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
