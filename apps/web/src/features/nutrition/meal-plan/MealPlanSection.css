@@ -39,8 +39,8 @@
   height: 44px;
   display: grid;
   place-items: center;
-  color: #637419;
-  background: #f0f7d3;
+  color: var(--olive-deep);
+  background: var(--lime-tint);
   border-radius: 12px;
 }
 
@@ -242,8 +242,8 @@
   height: 34px;
   display: grid;
   place-items: center;
-  color: #637419;
-  background: #f0f7d3;
+  color: var(--olive-deep);
+  background: var(--lime-tint);
   border-radius: 9px;
 }
 

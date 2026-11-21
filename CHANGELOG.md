@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Dark theme
+
+- Added a dark theme. The app follows the device's light/dark setting by default; Settings → Appearance switches between System, Light and Dark. The choice is stored on the device only and is not part of backups.
+
 ## Unreleased — Timed routine targets
 
 - Fixed the routine editor saving a hidden 8–12 rep target for timed and distance-tracked exercises (plank, farmer carry): new exercises and added sets now save the 30-second duration target the editor shows, so the workout screen displays it. Existing routines are not rewritten.

@@ -77,9 +77,9 @@
 }
 
 .pantry-groups button:disabled {
-  border-color: #cad6a2;
-  color: #4f6118;
-  background: #f0f7d3;
+  border-color: var(--lime-line-soft);
+  color: var(--olive-deep);
+  background: var(--lime-tint);
   cursor: default;
 }
 
@@ -118,8 +118,8 @@
 }
 
 .pantry-search-results button[aria-pressed="true"] {
-  color: #435311;
-  background: #f0f7d3;
+  color: var(--olive-deep);
+  background: var(--lime-tint);
 }
 
 .pantry-search-results strong,
@@ -136,13 +136,13 @@
 .pantry-add-selected {
   margin-top: 9px;
   padding: 10px;
-  border: 1px solid #cad6a2;
+  border: 1px solid var(--lime-line-soft);
   border-radius: 10px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(130px, .55fr) auto;
   align-items: end;
   gap: 9px;
-  background: #f8fbe9;
+  background: var(--lime-tint);
 }
 
 .pantry-add-selected > div:first-child small,
@@ -179,16 +179,16 @@
 .pantry-list__kind {
   padding: 4px 6px;
   border-radius: 6px;
-  color: #2e6371;
-  background: #e8f5f7;
+  color: var(--info-ink);
+  background: var(--info-bg);
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .pantry-list__kind--group {
-  color: #665818;
-  background: #fbf3cc;
+  color: var(--warn-ink);
+  background: var(--warn-bg);
 }
 
 .pantry-list strong,
@@ -327,16 +327,16 @@
 .menu-match {
   padding: 4px 7px;
   border-radius: 999px;
-  color: #73551d;
-  background: #fff1c7;
+  color: var(--warn-ink);
+  background: var(--warn-bg);
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .menu-match--complete {
-  color: #355213;
-  background: #e7f4c4;
+  color: var(--olive-deep);
+  background: var(--lime-tint);
 }
 
 .menu-suggestion ul {
@@ -355,18 +355,18 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #315a38;
-  background: #edf8ef;
+  color: var(--olive-deep);
+  background: var(--lime-tint);
 }
 
 .ingredient-match--group {
-  color: #64551b;
-  background: #fff7d8;
+  color: var(--warn-ink);
+  background: var(--warn-bg);
 }
 
 .ingredient-match--missing {
-  color: #8c4337;
-  background: #fff0ed;
+  color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .ingredient-match > svg {

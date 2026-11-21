@@ -122,14 +122,14 @@
   min-width: 64px;
   height: 44px;
   padding: 0 9px;
-  border: 1px solid #99b424;
+  border: 1px solid var(--lime-line);
   border-radius: 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
   color: var(--ink);
-  background: #f4fad7;
+  background: var(--lime-tint);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -148,7 +148,7 @@
 }
 
 .favorite-button[aria-pressed="true"] {
-  color: #b84a32;
+  color: var(--danger);
 }
 
 .recipe-section {
@@ -175,8 +175,8 @@
   height: 42px;
   display: grid;
   place-items: center;
-  color: #637419;
-  background: #f0f7d3;
+  color: var(--olive-deep);
+  background: var(--lime-tint);
   border-radius: 10px;
 }
 
