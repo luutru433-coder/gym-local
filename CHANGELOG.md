@@ -7,6 +7,11 @@
 - The workout CSV export now writes text that a spreadsheet would run as a formula as plain text.
 - Schema: database v6 and backup v6 add a `customMovements` collection (ADR 0017). Backups v1–v5 still restore; catalog updates never touch custom exercises.
 
+## Unreleased — Muscle recovery map
+
+- Added a muscle recovery map to the home screen: the front/back body diagram colours each muscle group as fatigued, recovering, or ready, with the estimated time left and this week's working sets per muscle. It works offline from finished sessions only.
+- Recovery estimate: each finished session gives a muscle a window of 36 h + 4 h per completed working set (secondary muscles and full-body movements count half a set), capped at 96 h. Under half the window is fatigued, under the full window recovering. Warm-ups and unfinished sessions are ignored; it is a guide, not programming advice.
+
 ## Unreleased — Self-adjusting training plan
 
 - Added an offline self-adjusting training plan on the home screen: the week's remaining sessions reflow around missed days, and the next session shows per-exercise adjustments with a bilingual reason.
