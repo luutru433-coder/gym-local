@@ -7,10 +7,10 @@
 .training-plan__day span { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; }
 .training-plan__day em { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-style: normal; opacity: .7; }
 .training-plan__day--planned { background: var(--lime, #dbff58); border-color: transparent; color: var(--ink-fixed, #14170f); }
-.training-plan__day--done { background: var(--ink, #14170f); border-color: transparent; color: var(--surface, #fff); }
+.training-plan__day--done { background: var(--surface-2); border-color: var(--line-strong); color: var(--ink); }
 .training-plan__day--rest { opacity: .7; }
 .training-plan__day--past.training-plan__day--rest { opacity: .4; }
-.training-plan__day--today { outline: 2px solid var(--ink, #14170f); outline-offset: 1px; }
+.training-plan__day--today { outline: 2px solid var(--lime); outline-offset: 1px; }
 .training-plan__note { margin: 0; font-size: 12px; line-height: 1.5; opacity: .8; }
 .training-plan__session { display: grid; gap: 10px; padding-top: 14px; border-top: 1px solid var(--line, rgba(0,0,0,.1)); }
 .training-plan__session header { display: flex; gap: 9px; align-items: flex-start; }

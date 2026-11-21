@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — One look for the whole app, larger exercise movements
+
+- Every screen now uses the look of the workout screen: dark background, one orange accent. The cream and lime colours are gone, and so is the Appearance (light / dark / system) setting (ADR 0023).
+- Exercise pictures are easier to see: on a phone the movement fills the width of the exercise page and of the technique dialog during a workout, with the muscle map underneath.
+- All exercise pictures (built-in drawings and ExerciseDB GIFs) sit on the same white plate, so they stand out from the dark screen instead of sinking into it.
+- Only one filled orange button per screen; other buttons are tinted.
+
 ## Unreleased — Add exercises from the downloaded ExerciseDB set
 
 - The exercise library has a new "Add from ExerciseDB" button. It lists the exercises of the downloaded set that the app does not have yet (search by name, filter by body part); add one, or everything listed. An added exercise joins your own exercises with its image, muscles, equipment and steps, and can be picked in routines.
