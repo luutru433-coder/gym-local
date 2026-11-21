@@ -1,10 +1,31 @@
 # Changelog
 
+## Unreleased — Self-adjusting training plan
+
+- Added an offline self-adjusting training plan on the home screen: the week's remaining sessions reflow around missed days, and the next session shows per-exercise adjustments with a bilingual reason.
+- The next session raises the load after the existing double-progression streak, holds it otherwise, lowers it about 10% after two sessions below the minimum target, and eases back about 10% after a 10-day break or 20% with one fewer set after 21 days.
+- Adjustments use exact equipment-variant history only and prefill the new session's working-set loads; routines and history are never rewritten, no set is auto-completed, and the prefill can be switched off before starting.
+
+## Unreleased — Faster set logging
+
+- Faster workout logging: unfinished sets now show the weight and reps (or time/distance) from the last session of the same exact variation, and one tap on ✓ logs them. Typed values always win, warm-ups never borrow working-set history, and nothing is written until the set is completed.
+
+## Unreleased — Accent-insensitive exercise search
+
+- Exercise catalog search now ignores Vietnamese diacritics and letter case, so `keo xa` finds “Kéo xà” and `day nguc` finds “Đẩy ngực ngang”.
+
 ## Unreleased — Faster meal logging
 
 - The add-food dialog now searches the installed offline food pack while you type (accented or unaccented), replacing the separate “Tìm offline” button.
 - Recently logged foods are listed first, ahead of unused favorites, and each has a one-tap button that logs the last amount again.
 - Saved-food search now ignores Vietnamese accents.
+
+## 2026-11-21 — Detailed progress charts
+
+- Added a 4-week / 3-month / 1-year / all-time range filter to the progress page.
+- The exact-variation trend can now chart e1RM, load, assistance, duration, distance, session volume, best reps, or total reps, marks each new record for the chosen metric, and shows latest value, record, and change in range. History is still never mixed between equipment variants.
+- Added weekly charts for external-load volume, working sets, workouts, and duration (local Monday weeks), plus weekly working sets per primary muscle group.
+- Body measurements can chart weight, waist, chest, hips, arm, or thigh.
 
 ## 2026-11-21 — Nutrition pack 2026.11.1: accurate names, no duplicate foods
 
