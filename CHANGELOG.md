@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Faster meal logging
+
+- The add-food dialog now searches the installed offline food pack while you type (accented or unaccented), replacing the separate “Tìm offline” button.
+- Recently logged foods are listed first, ahead of unused favorites, and each has a one-tap button that logs the last amount again.
+- Saved-food search now ignores Vietnamese accents.
+
 ## 2026-11-21 — Nutrition pack 2026.11.1: accurate names, no duplicate foods
 
 - Removed the generic `… (mã USDA <id>)` display names that 10,260 foods carried. Such a name was taken from any dictionary word in the description, so an apple pie was listed as "Táo" and an egg bagel as "Trứng". A food is now named in Vietnamese only when the whole USDA description translates; otherwise the Vietnamese part names the leading USDA term or its food category and the exact USDA description follows in brackets, e.g. `Thịt gà (Chicken, back)`.
