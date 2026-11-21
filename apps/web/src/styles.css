@@ -458,7 +458,7 @@ a { color: inherit; text-decoration: none; }
 .exercise-video--compact figcaption { padding: 9px 11px; }
 
 /* Workout */
-.workout-page { min-height: 100vh; overflow-x: clip; color: white; background: var(--stage); padding-bottom: 110px; }
+.workout-page { min-height: 100vh; overflow-x: clip; color: white; background: var(--stage); padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
 .workout-header { position: sticky; top: 0; z-index: 40; min-height: 72px; padding: 12px max(18px, calc((100vw - 1080px) / 2)); display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 15px; background: rgba(21,23,18,.93); border-bottom: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px); }
 .workout-header__title { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .workout-header__title > div { min-width: 0; }
@@ -476,7 +476,7 @@ a { color: inherit; text-decoration: none; }
 .exercise-jump__item { min-width: 120px; min-height: 54px; padding: 7px 9px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); border-radius: 8px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; color: rgba(255,255,255,.57); text-align: left; cursor: pointer; }
 .exercise-jump__item > span { width: 26px; height: 26px; display: grid; place-items: center; background: rgba(255,255,255,.08); border-radius: 50%; font-size: 11px; font-weight: 800; }
 .exercise-jump__item small { font-size: 10px; line-height: 1.25; }
-.exercise-jump__item--active { border-color: var(--lime); color: white; background: rgba(219,255,88,.09); }
+.exercise-jump__item--active { border-color: var(--lime); color: white; background: color-mix(in srgb, var(--lime) 10%, transparent); }
 .exercise-jump__item--active > span { color: var(--ink-fixed); background: var(--lime); }
 .workout-content { width: 100%; max-width: 1080px; min-width: 0; margin: 0 auto; padding: 0 18px; display: flex; flex-direction: column; gap: 9px; }
 .workout-exercise { min-width: 0; color: var(--ink); background: var(--paper); border: 1px solid rgba(255,255,255,.1); overflow: hidden; scroll-margin-top: 90px; }
@@ -507,13 +507,6 @@ a { color: inherit; text-decoration: none; }
 .set-row--done input { background: var(--lime-tint); border-color: var(--lime-line-soft); }
 .set-row--done .set-complete { color: var(--ink-fixed); background: var(--lime); border-color: var(--lime-dark); }
 .add-set-button { min-height: 44px; width: 100%; margin-top: 9px; border: 1px dashed var(--line-strong); background: transparent; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 740; cursor: pointer; }
-.rest-dock { position: fixed; z-index: 60; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(590px, calc(100vw - 28px)); min-height: 72px; padding: 10px 12px; display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 13px; background: var(--lime); color: var(--ink-fixed); border: 1px solid #b9d93e; border-radius: 15px; box-shadow: 0 17px 50px rgba(0,0,0,.33); }
-.rest-dock--done { color: var(--ink); background: var(--surface); }
-.rest-dock__icon { width: 42px; height: 42px; display: grid; place-items: center; color: var(--lime); background: var(--panel); border-radius: 50%; }
-.rest-dock small, .rest-dock strong { display: block; }
-.rest-dock small { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
-.rest-dock strong { font: 900 23px/1 monospace; }
-.rest-dock button { min-height: 44px; padding: 0 11px; border: 1px solid color-mix(in srgb, currentColor 22%, transparent); background: transparent; border-radius: 8px; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; cursor: pointer; }
 .workout-empty { min-height: 100vh; display: grid; place-items: center; background: var(--paper); }
 .variant-picker > p { color: var(--muted); font-size: 12px; line-height: 1.5; }
 .variant-choice { width: 100%; min-height: 67px; padding: 10px; margin-bottom: 7px; border: 1px solid var(--line); background: var(--surface); border-radius: 9px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; text-align: left; cursor: pointer; }
@@ -785,7 +778,6 @@ a { color: inherit; text-decoration: none; }
   .workout-header__title { grid-column: 2; grid-row: 1; }
   .workout-header__timer { grid-column: 2; grid-row: 2; min-width: 0; display: flex; font-size: 12px; }
   .workout-header > .button { grid-column: 3; grid-row: 1 / 3; padding: 0 10px; }
-  .rest-dock { bottom: calc(10px + env(safe-area-inset-bottom)); grid-template-columns: auto 1fr auto auto; }
   .macro-dashboard { padding: 17px; }
   .meal-layout { grid-template-columns: 1fr; }
   .nutrition-aside { display: grid; grid-template-columns: repeat(2, 1fr); }
@@ -852,9 +844,6 @@ a { color: inherit; text-decoration: none; }
   .set-field--intensity { grid-area: intensity; }
   .set-field__label { min-height: 25px; margin-bottom: 4px; display: flex; align-items: flex-end; justify-content: center; color: var(--muted); font-size: 11px; font-weight: 800; line-height: 1.15; text-align: center; }
   .set-row input { width: 100%; padding-inline: 3px; }
-  .rest-dock { gap: 7px; padding: 8px; }
-  .rest-dock__icon { display: none; }
-  .rest-dock button { padding: 0 8px; }
   .nutrition-aside { grid-template-columns: 1fr; }
   .ring-row--nutrition { grid-template-columns: repeat(3, minmax(76px, 1fr)); }
   .calorie-summary { grid-template-columns: auto 1fr; }
@@ -943,3 +932,6 @@ a { color: inherit; text-decoration: none; }
 .pack-image-picker li button.is-current { border-color: var(--olive-deep); box-shadow: 0 0 0 1px var(--olive-deep); }
 .pack-image-picker li img, .pack-image-thumb-empty { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; border-radius: 6px; }
 .pack-image-picker p { margin: 0; color: var(--muted); font-size: 11px; }
+
+.pack-image-missing { margin: 0; padding: 18px 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.pack-image figcaption a, .image-pack-hint a { color: inherit; text-decoration: underline; }

@@ -24,6 +24,7 @@
       "@gym/catalog": ["packages/catalog/src/index.ts"],
       "@gym/workouts/plan": ["packages/workouts/src/adaptive-plan.ts"],
       "@gym/workouts/superset": ["packages/workouts/src/superset.ts"],
+      "@gym/workouts/set-timer": ["packages/workouts/src/set-timer.ts"],
       "@gym/workouts": ["packages/workouts/src/index.ts"],
       "@gym/nutrition/trends": ["packages/nutrition/src/trends.ts"],
       "@gym/nutrition": ["packages/nutrition/src/index.ts"],
@@ -34,6 +35,7 @@
       "@gym/storage/history": ["packages/storage/src/history-edit.ts"],
       "@gym/storage": ["packages/storage/src/index.ts"],
       "@gym/backup": ["packages/backup/src/index.ts"],
+      "@gym/media/online-gifs": ["packages/media/src/providers/exercisedb-free.ts"],
       "@gym/media/exercise-pack": ["packages/media/src/exercise-pack.ts"],
       "@gym/media": ["packages/media/src/index.ts"],
       "@gym/ui": ["packages/ui/src/index.ts"]

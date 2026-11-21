@@ -7,6 +7,22 @@
 - The figure is a simple schematic; the existing drawings stay as the illustrative loop. Cue text and angle ranges are original guidance marked as draft until reviewed (ADR 0019).
 - No database or backup change; the section loads only when an exercise is opened.
 
+## Unreleased — Free ExerciseDB images, saved on the device
+
+- Settings → Exercise images has a new "Download free ExerciseDB images" button. The device downloads the free ExerciseDB list once, straight from their server, links a 180p GIF to each exercise in the app that has no image yet, and saves those GIFs on the device so they show offline. Used with AscendAPI's permission; the credit to AscendAPI.com is shown in Settings and under each GIF.
+- Nothing from ExerciseDB is in the app, its repository or its website, and nothing is in backups: after a restore on another device, download again there.
+- Only GIFs for exercises in the app are saved. "Change image" on an exercise page searches all 1,500 names; a GIF picked while online is saved too. Images you imported or chose yourself are never replaced.
+- "Remove pack" also deletes the downloaded list and GIFs.
+- No change to the personal database or the backup format (ADR 0021).
+
+## Unreleased — Workout screen redesign and per-set timer
+
+- The live workout screen is redesigned: always dark with one orange accent, and the current set sits at the top with its weight and reps as large numbers and one-tap −/+ buttons.
+- Each set now has a Start and an End button. Start runs a set stopwatch; End logs the set (suggested or target reps are filled in and can be corrected during the rest) and the rest countdown starts by itself. Starting the next set stops the countdown.
+- When rest ends the screen flashes, the three beeps play, and the timer keeps counting how far past the rest you are. The rest controls (±15s, restart, bell, skip) moved from the bottom bar into the rest panel. On iPhone the alert works only while the app is open on screen and the phone is not on silent; there is no vibration on iPhone, and the panel says so when the device cannot keep the screen awake.
+- A timed set's seconds are taken from the stopwatch when none were typed. The ✓ button in the set list still logs a set without timing it.
+- Sets now keep the optional start time, set duration and real rest before the set (ADR 0020); the finish summary shows the average set time and average real rest. No database or backup version change; older backups and sessions are unaffected.
+
 ## Unreleased — Your own exercise image pack
 
 - Settings has a new "Exercise images" card: pick image files (GIF, WebP, PNG, JPG) you hold a licence for, with the pack's JSON file if it has one, or a ZIP of them. The images are stored on this device only; they are uploaded nowhere, are not in the app or its repository, and are not part of backups.

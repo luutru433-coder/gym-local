@@ -2,8 +2,15 @@
 
 ## Technique figures (ADR 0019)
 
-- `pnpm run verify` passed: architecture audit, ESLint, TypeScript, content gates, 270 tests across 33 files, production build and performance budgets (entry 214.1 KiB; the technique records load in five groups, each under the 80 KiB route budget).
+- `pnpm run verify` passed: architecture audit, ESLint, TypeScript, content gates, 284 tests across 33 files, production build and performance budgets (entry 214.1 KiB; the technique records load in five groups, each under the 80 KiB route budget).
 - Every pose of the 30 movements was rendered to a contact sheet and looked at once; the chest press was also opened in the app at 390 px. The cue text and angle ranges are original guidance marked `draft` and have not been reviewed by the owner or checked against a cited source.
+
+## Free ExerciseDB images on the device (ADR 0021)
+
+- Provider tests mock `fetch` and Cache Storage: paged list with retry on 429/503, only `static.exercisedb.dev` addresses accepted, each GIF saved once with `mode: "no-cors"`, failures counted, cache removal.
+- Storage and action tests: remote images are stored without file data, linked only where no image or owner choice exists, and only linked GIFs are saved.
+- Component tests: a downloaded GIF shows with the AscendAPI.com credit, a newly picked one is saved, and a missing one shows a note.
+- Not verified: storage quota use and eviction on iOS Safari, and behaviour on a physical iPhone.
 
 ## Device-only exercise image pack (ADR 0020)
 

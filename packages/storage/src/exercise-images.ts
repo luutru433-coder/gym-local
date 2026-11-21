@@ -7,6 +7,8 @@ export interface ExerciseImage {
   fileName: string;
   type: string;
   size: number;
+  /** Set for an image whose file is kept by the browser cache under this address instead of in `blobs`. */
+  remoteUrl?: string;
 }
 
 export interface ExerciseImageInput extends ExerciseImage {
@@ -24,6 +26,7 @@ export interface ExerciseImagePackSummary {
   imageCount: number;
   linkedCount: number;
   bytes: number;
+  remoteCount: number;
 }
 
 /**
@@ -50,6 +53,32 @@ export async function importExerciseImages(inputs: ExerciseImageInput[], db: Exe
     await db.blobs.bulkPut(inputs.map(({ id, blob }) => ({ id, blob })));
   });
   return inputs.length;
+}
+
+/** Adds or replaces images that have no stored file of their own, only a `remoteUrl`. */
+export async function importRemoteExerciseImages(images: (ExerciseImage & { remoteUrl: string })[], db: ExerciseImageDatabase = exerciseImageDb): Promise<number> {
+  await db.images.bulkPut(images);
+  return images.length;
+}
+
+/** Suggested links for variants that have no link of any kind yet, so nothing already chosen or imported is replaced. */
+export async function applyExerciseImageLinksWhereMissing(suggestions: Record<string, string>, db: ExerciseImageDatabase = exerciseImageDb): Promise<number> {
+  return db.transaction("rw", db.links, db.images, async () => {
+    const images = new Map((await db.images.toArray()).map((image) => [image.id, image]));
+    const taken = new Set((await db.links.toArray()).filter((link) => link.manual || (link.imageId && images.has(link.imageId))).map((link) => link.variantId));
+    const links = Object.entries(suggestions)
+      .filter(([variantId, imageId]) => !taken.has(variantId) && images.has(imageId))
+      .map(([variantId, imageId]) => ({ variantId, imageId, manual: false }));
+    await db.links.bulkPut(links);
+    return links.length;
+  });
+}
+
+/** Addresses of the remote images that an exercise is linked to. */
+export async function listLinkedRemoteExerciseImageUrls(db: ExerciseImageDatabase = exerciseImageDb): Promise<string[]> {
+  const [images, links] = await Promise.all([db.images.toArray(), db.links.toArray()]);
+  const remote = new Map(images.flatMap((image) => (image.remoteUrl ? [[image.id, image.remoteUrl] as const] : [])));
+  return [...new Set(links.flatMap((link) => (link.imageId && remote.has(link.imageId) ? [remote.get(link.imageId)!] : [])))];
 }
 
 export async function listExerciseImages(db: ExerciseImageDatabase = exerciseImageDb): Promise<ExerciseImage[]> {
@@ -79,11 +108,13 @@ export async function linkExerciseImage(variantId: string, imageId: string | und
   await db.links.put({ variantId, manual: true, ...(imageId === undefined ? {} : { imageId }) });
 }
 
-export async function getExerciseImage(variantId: string, db: ExerciseImageDatabase = exerciseImageDb): Promise<(ExerciseImage & { blob: Blob }) | undefined> {
+export async function getExerciseImage(variantId: string, db: ExerciseImageDatabase = exerciseImageDb): Promise<(ExerciseImage & { blob?: Blob }) | undefined> {
   const link = await db.links.get(variantId);
   if (!link?.imageId) return undefined;
   const [image, stored] = await Promise.all([db.images.get(link.imageId), db.blobs.get(link.imageId)]);
-  return image && stored ? { ...image, blob: stored.blob } : undefined;
+  if (!image) return undefined;
+  if (stored) return { ...image, blob: stored.blob };
+  return image.remoteUrl ? image : undefined;
 }
 
 export async function getExerciseImageBlob(imageId: string, db: ExerciseImageDatabase = exerciseImageDb): Promise<Blob | undefined> {
@@ -96,7 +127,8 @@ export async function exerciseImagePackSummary(db: ExerciseImageDatabase = exerc
   return {
     imageCount: images.length,
     linkedCount: links.filter((link) => link.imageId && known.has(link.imageId)).length,
-    bytes: images.reduce((total, image) => total + image.size, 0)
+    bytes: images.reduce((total, image) => total + image.size, 0),
+    remoteCount: images.filter((image) => image.remoteUrl).length
   };
 }
 

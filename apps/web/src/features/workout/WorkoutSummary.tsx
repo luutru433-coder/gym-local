@@ -2,7 +2,9 @@ import { Trophy } from "lucide-react";
 import { Button, Card } from "@gym/ui";
 import type { WorkoutSession } from "@gym/contracts";
 import { sessionVolumeMetrics, type SessionRecordSet } from "@gym/progress";
+import { timingSummary } from "@gym/workouts/set-timer";
 import { localize } from "../../lib/i18n";
+import { clock } from "./clock";
 import { recordKindsLabel } from "./recordLabels";
 
 function setValueLabel(record: Pick<SessionRecordSet, "weightKg" | "reps">): string {
@@ -34,6 +36,9 @@ export function WorkoutSummary({ session, records, locale, onViewProgress, onDon
     { label: vi ? "Khối lượng" : "Volume", value: `${volume.toLocaleString(locale)} kg` },
     { label: vi ? "Kỷ lục mới" : "New records", value: String(records.length) }
   ];
+  const timing = timingSummary(session);
+  if (timing.averageWorkSeconds !== undefined) stats.push({ label: vi ? "TB mỗi set" : "Avg set time", value: clock(timing.averageWorkSeconds) });
+  if (timing.averageRestSeconds !== undefined) stats.push({ label: vi ? "TB nghỉ thực tế" : "Avg real rest", value: clock(timing.averageRestSeconds) });
 
   return (
     <div className="workout-summary">

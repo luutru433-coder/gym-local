@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./exercise-pack": "./src/exercise-pack.ts"
+    "./exercise-pack": "./src/exercise-pack.ts",
+    "./online-gifs": "./src/providers/exercisedb-free.ts"
   }
 }
