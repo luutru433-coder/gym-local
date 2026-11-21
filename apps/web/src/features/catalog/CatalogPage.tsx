@@ -159,7 +159,7 @@ export function CatalogPage() {
             </div>
             <Suspense fallback={null}><ExercisePackImage key={`pack-${activeVariant.id}`} variantId={activeVariant.id} exerciseName={localize(selectedMovement.name, locale)} locale={locale} /></Suspense>
             <ExerciseAnimation key={`${activeVariant.id}-${selectedMovement.contentVersion}`} animation={undefined} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
-            {activeVariant.instructions.length > 1 ? (
+            {activeVariant.instructions.length > 1 || (activeVariant.instructions[0] && activeVariant.instructions[0].en !== selectedMovement.description.en) ? (
               <section>
                 <h3><Target size={19} />{locale === "vi" ? "Cách thực hiện" : "How to perform"}</h3>
                 <ol className="instruction-list">{activeVariant.instructions.map((instruction, index) => <li key={`${activeVariant.id}-${index}`}><span>{index + 1}</span><p>{localize(instruction, locale)}</p></li>)}</ol>

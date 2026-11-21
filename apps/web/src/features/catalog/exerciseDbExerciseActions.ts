@@ -1,3 +1,4 @@
+import { EXERCISE_VARIANTS } from "@gym/catalog";
 import { storeExerciseDbGifs } from "@gym/media/online-gifs";
 import { linkExerciseImage, listExerciseImageLinks, listExerciseImages, type ExerciseImage, type ExerciseImageDetails } from "@gym/storage/exercise-images";
 import { useGymStore } from "../../store/useGymStore";
@@ -11,8 +12,10 @@ const key = (name: string) => name.trim().toLocaleLowerCase().replace(/\s+/g, " 
 /** Downloaded ExerciseDB exercises that no exercise in the app shows yet and that the owner has not added. */
 export async function listAddableExerciseDbExercises(): Promise<AddableExercise[]> {
   const [images, links] = await Promise.all([listExerciseImages(), listExerciseImageLinks()]);
-  const shown = new Set(links.map((link) => link.imageId));
   const state = useGymStore.getState();
+  // A link left behind by an exercise that was deleted since does not count.
+  const live = new Set([...EXERCISE_VARIANTS, ...state.customVariants.filter((variant) => variant.reviewStatus !== "deprecated")].map((variant) => variant.id));
+  const shown = new Set(links.filter((link) => live.has(link.variantId)).map((link) => link.imageId));
   const own = new Set(state.customMovements.filter((movement) => movement.reviewStatus !== "deprecated").map((movement) => key(movement.name.vi)));
   return images.filter((image): image is AddableExercise => Boolean(image.details && image.remoteUrl) && !shown.has(image.id) && !own.has(key(image.name)));
 }

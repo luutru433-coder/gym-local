@@ -43,5 +43,8 @@ describe("adding downloaded ExerciseDB exercises", () => {
     expect(await listAddableExerciseDbExercises()).toEqual([]);
     expect(await addExerciseDbExercises(addable)).toEqual({ added: 0, skipped: 1 });
     expect(useGymStore.getState().customMovements).toHaveLength(1);
+    // Deleted again: its leftover image link no longer hides it from the list.
+    useGymStore.setState({ customMovements: [], customVariants: [] });
+    expect((await listAddableExerciseDbExercises()).map((item) => item.id)).toEqual(["b"]);
   });
 });

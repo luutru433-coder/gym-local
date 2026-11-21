@@ -2,6 +2,8 @@
 import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { clearExerciseImagePack, exerciseImagePackSummary, getExerciseImage, linkExerciseImage } from "@gym/storage/exercise-images";
+import { buildCustomExercise } from "@gym/catalog/custom";
+import { useGymStore } from "../../store/useGymStore";
 import { downloadExerciseDbImages, importExerciseImagePack } from "./exerciseImagePackActions";
 
 const remote = vi.hoisted(() => ({ stored: [] as string[] }));
@@ -80,6 +82,15 @@ describe("exercise image pack import", () => {
     expect(result.suggested).toBeGreaterThanOrEqual(2);
     expect((await getExerciseImage("chest_press__barbell"))?.remoteUrl).toBe("https://static.exercisedb.dev/media/e0.gif");
     expect(remote.stored).toEqual(expect.arrayContaining(["https://static.exercisedb.dev/media/e0.gif", "https://static.exercisedb.dev/media/e1.gif"]));
+  });
+
+  it("gives an exercise he added from the set its image back by name, e.g. after a restore on a new device", async () => {
+    const { movement, variant } = buildCustomExercise({ name: "Wrist Roller", primaryMuscle: "forearms", secondaryMuscles: [], equipment: "bodyweight", loadEntryMode: "reps_only" });
+    useGymStore.setState({ customMovements: [movement], customVariants: [variant] });
+    await downloadExerciseDbImages();
+    expect((await getExerciseImage(variant.id))?.id).toBe("exercisedb:e2");
+    expect(remote.stored).toContain("https://static.exercisedb.dev/media/e2.gif");
+    useGymStore.setState({ customMovements: [], customVariants: [] });
   });
 
   it("reports a selection without images instead of storing anything", async () => {
