@@ -20,10 +20,27 @@ export function nutritionPackSearchQueries(query: string): NutritionPackSearchQu
     .filter(Boolean)
     .slice(0, 8);
   if (!tokens.length) return null;
-  const phrase = `${tokens.map((token) => `"${token}"`).join(" + ")} *`;
+  const phrases = dStrokeSpellings(tokens).map((spelling) => `${spelling.map((token) => `"${token}"`).join(" + ")} *`);
   return {
     match: tokens.map((token) => `"${token}"*`).join(" "),
-    nameStart: `{name_vi name_en} : ^ ${phrase}`,
-    namePhrase: `{name_vi name_en} : ${phrase}`
+    nameStart: `{name_vi name_en} : ${phrases.map((phrase) => `(^ ${phrase})`).join(" OR ")}`,
+    namePhrase: `{name_vi name_en} : ${phrases.map((phrase) => `(${phrase})`).join(" OR ")}`
   };
+}
+
+const MAX_D_STROKE_WORDS = 3;
+
+/**
+ * The tokenizer folds Vietnamese tone and vowel marks but not "đ", so a name
+ * column never matches "dau" against "đậu". Unaccented typing is covered by
+ * also trying "đ" for each word that starts with "d".
+ */
+function dStrokeSpellings(tokens: string[]): string[][] {
+  const positions = tokens.flatMap((token, index) => (/^d/i.test(token) ? [index] : [])).slice(0, MAX_D_STROKE_WORDS);
+  return Array.from({ length: 2 ** positions.length }, (_, mask) =>
+    tokens.map((token, index) => {
+      const bit = positions.indexOf(index);
+      return bit >= 0 && mask & (1 << bit) ? `đ${token.slice(1)}` : token;
+    })
+  );
 }
