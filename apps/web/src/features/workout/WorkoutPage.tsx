@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
+  Bell,
+  BellOff,
   ArrowDown,
   ArrowLeft,
   ArrowUp,
@@ -18,6 +20,7 @@ import {
   Sparkles,
   TimerReset,
   Trash2,
+  Trophy,
   X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -40,11 +43,15 @@ import {
   switchExerciseVariant,
   updateSet
 } from "@gym/workouts";
-import { latestVariantHistory } from "@gym/progress";
+import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
+import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
+import { playRestAlert, primeRestAlert, useScreenWakeLock } from "./restAlert";
+import { recordKindsLabel } from "./recordLabels";
+import { WorkoutSummary } from "./WorkoutSummary";
 import "./WorkoutPage.css";
 
 function durationLabel(startedAt: string, now: number): string {
@@ -115,6 +122,9 @@ export function WorkoutPage() {
   const [failedSession, setFailedSession] = useState<WorkoutSession>();
   const [actionError, setActionError] = useState<string>();
   const [barWeights, setBarWeights] = useState<Record<string, number>>({});
+  const [summary, setSummary] = useState<{ session: WorkoutSession; records: SessionRecordSet[] }>();
+  const [restAlertMuted, setRestAlertMutedState] = useState(isRestAlertMuted);
+  const armedRestEnd = useRef<string | undefined>(undefined);
   const availableEquipment = profile.locations.find((location) => location.id === profile.activeLocationId)?.equipment ?? [];
   const customMovements = useGymStore((state) => state.customMovements);
   const filteredMovements = useMemo(() => {
@@ -135,6 +145,43 @@ export function WorkoutPage() {
 
   const progress = activeSession ? sessionProgress(activeSession) : { completed: 0, total: 0, percent: 0 };
   const restRemaining = restLabel(activeSession?.restTimerEndsAt, now);
+  const restEndsAt = activeSession?.restTimerEndsAt;
+  const restFinished = Boolean(restEndsAt) && restRemaining === 0;
+  const liveRecords = useMemo(
+    () => activeSession ? sessionRecordSets(sessions, activeSession) : [],
+    [sessions, activeSession]
+  );
+
+  useScreenWakeLock(Boolean(activeSession));
+
+  useEffect(() => {
+    // Sound unlocks only inside an activation gesture: touch release, click or key press.
+    const gestures = ["pointerup", "touchend", "click", "keydown"] as const;
+    gestures.forEach((gesture) => window.addEventListener(gesture, primeRestAlert));
+    return () => gestures.forEach((gesture) => window.removeEventListener(gesture, primeRestAlert));
+  }, []);
+
+  // Alert once per countdown that was seen running; an already expired timer stays silent.
+  useEffect(() => {
+    if (!restEndsAt) {
+      armedRestEnd.current = undefined;
+      return;
+    }
+    if (!restFinished) {
+      if (new Date(restEndsAt).getTime() > Date.now()) armedRestEnd.current = restEndsAt;
+      return;
+    }
+    if (armedRestEnd.current === restEndsAt) {
+      armedRestEnd.current = undefined;
+      playRestAlert();
+    }
+  }, [restEndsAt, restFinished]);
+
+  const toggleRestAlert = () => {
+    const muted = !restAlertMuted;
+    setRestAlertMuted(muted);
+    setRestAlertMutedState(muted);
+  };
 
   const persist = async (session: WorkoutSession) => {
     setFailedSession(undefined);
@@ -293,11 +340,16 @@ export function WorkoutPage() {
       ? (locale === "vi" ? `Còn ${incomplete} set chưa hoàn tất. Kết thúc và lưu buổi tập?` : `${incomplete} sets are incomplete. Finish and save anyway?`)
       : (locale === "vi" ? "Hoàn tất và lưu buổi tập?" : "Finish and save this workout?");
     if (!window.confirm(message)) return;
-    await completeWorkout();
-    navigate("/progress");
+    const records = liveRecords;
+    const finished = await completeWorkout();
+    if (finished) setSummary({ session: finished, records });
+    else navigate("/progress");
   };
 
   if (!activeSession) {
+    if (summary) {
+      return <WorkoutSummary session={summary.session} records={summary.records} locale={locale} onViewProgress={() => navigate("/progress")} onDone={() => navigate("/")} />;
+    }
     return (
       <div className="workout-empty">
         <EmptyState
@@ -465,6 +517,7 @@ export function WorkoutPage() {
                         : timedMode
                           ? (set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : "—")
                         : (set.targetMinReps !== undefined || set.targetMaxReps !== undefined ? `${set.targetMinReps ?? "—"}–${set.targetMaxReps ?? "—"}` : "—");
+                      const setRecord = liveRecords.find((record) => record.setId === set.id);
                       const previousLabel = prior
                         ? (distanceMode
                           ? `${prior.distanceMeters ?? "—"}m · ${prior.durationSeconds ?? "—"}s`
@@ -504,7 +557,7 @@ export function WorkoutPage() {
                               {(Object.keys(setTypeLabels) as SetType[]).map((type) => <option key={type} value={type}>{setTypeLabels[type][locale]}</option>)}
                             </select>
                           </label>
-                          <span className="previous-value"><span className="sr-only">{locale === "vi" ? "Trước hoặc mục tiêu: " : "Previous or target: "}</span>{previousLabel}</span>
+                          <span className="previous-value"><span className="sr-only">{locale === "vi" ? "Trước hoặc mục tiêu: " : "Previous or target: "}</span>{previousLabel}{setRecord ? <span className="set-record-badge" title={recordKindsLabel(setRecord.kinds, locale)}><Trophy size={12} aria-hidden="true" />{locale === "vi" ? "Kỷ lục mới" : "New record"}<span className="sr-only">: {recordKindsLabel(setRecord.kinds, locale)}</span></span> : null}</span>
                           <div className="set-field set-field--load">
                             <span className="set-field__label">{loadFieldLabel}</span>
                             {repsOnly ? <span className="set-input-placeholder" aria-hidden="true">—</span> : <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${loadFieldLabel}`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder={String(suggestion?.weightKg ?? 0)} onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
@@ -564,6 +617,7 @@ export function WorkoutPage() {
             <button type="button" aria-label={locale === "vi" ? "Giảm 15 giây nghỉ" : "Remove 15 seconds of rest"} onClick={() => modifyRest(-15)}><Minus size={15} />15s</button>
             <button type="button" aria-label={locale === "vi" ? "Thêm 15 giây nghỉ" : "Add 15 seconds of rest"} onClick={() => modifyRest(15)}><Plus size={15} />15s</button>
             <button type="button" aria-label={locale === "vi" ? "Bắt đầu lại giờ nghỉ" : "Restart rest timer"} onClick={restartRest}><TimerReset size={16} /><span>{locale === "vi" ? "Lại" : "Restart"}</span></button>
+            <button type="button" className="rest-dock__alert-toggle" aria-pressed={!restAlertMuted} aria-label={locale === "vi" ? "Âm báo và rung khi hết giờ nghỉ" : "Sound and vibration when rest ends"} title={restAlertMuted ? (locale === "vi" ? "Đang tắt âm báo" : "Alert is off") : (locale === "vi" ? "Đang bật âm báo" : "Alert is on")} onClick={toggleRestAlert}>{restAlertMuted ? <BellOff size={16} /> : <Bell size={16} />}</button>
             <button type="button" onClick={() => modifyRest(undefined)}>{locale === "vi" ? "Bỏ qua" : "Skip"}<X size={16} /></button>
           </div>
           <span className="sr-only" aria-live="assertive">{restRemaining === 0 ? (locale === "vi" ? "Hết giờ nghỉ, sẵn sàng tập" : "Rest complete, ready") : ""}</span>

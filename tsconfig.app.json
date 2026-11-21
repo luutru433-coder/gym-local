@@ -25,6 +25,7 @@
       "@gym/workouts": ["packages/workouts/src/index.ts"],
       "@gym/nutrition": ["packages/nutrition/src/index.ts"],
       "@gym/progress": ["packages/progress/src/index.ts"],
+      "@gym/storage/device": ["packages/storage/src/device-preferences.ts"],
       "@gym/storage/custom-exercises": ["packages/storage/src/custom-exercises.ts"],
       "@gym/storage/history": ["packages/storage/src/history-edit.ts"],
       "@gym/storage": ["packages/storage/src/index.ts"],
