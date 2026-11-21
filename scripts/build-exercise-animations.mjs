@@ -15,7 +15,7 @@ if (!upstream || !upstreamCommit) {
 // has no figure for that exact equipment; the app labels those as "closest illustration".
 const mapping = {
   chest_press: { dumbbell: "dumbbell-bench-press", barbell: "bench-press", smith: "smith-machine-bench-press", machine: "machine-chest-press", cable: "~machine-chest-press", resistance_band: "~machine-chest-press" },
-  incline_chest_press: { dumbbell: "incline-dumbbell-press", barbell: "incline-bench-press", smith: "~incline-bench-press", machine: "~incline-bench-press", cable: "~incline-cable-fly" },
+  incline_chest_press: { dumbbell: "incline-dumbbell-press", barbell: "incline-bench-press", smith: "~incline-bench-press", machine: "~incline-bench-press", cable: "~incline-dumbbell-press" },
   chest_fly: { dumbbell: "dumbbell-fly", cable: "cable-fly", machine: "pec-deck", resistance_band: "~cable-fly" },
   push_up: { bodyweight: "push-up", resistance_band: "~push-up", smith: "~incline-push-up" },
   dip: { bodyweight: "chest-dip", machine: "assisted-dip", resistance_band: "~assisted-dip" },
@@ -46,7 +46,7 @@ const mapping = {
   lunge: { bodyweight: "forward-lunge", dumbbell: "walking-lunge", barbell: "~forward-lunge", smith: "smith-machine-reverse-lunge", resistance_band: "~forward-lunge" },
   step_up: { bodyweight: "~step-up", dumbbell: "step-up", barbell: "~step-up", resistance_band: "~step-up" },
   leg_extension: { machine: "leg-extension", resistance_band: "~leg-extension", cable: "~leg-extension" },
-  hip_thrust: { bodyweight: "glute-bridge", barbell: "hip-thrust", dumbbell: "dumbbell-hip-thrust", smith: "smith-machine-hip-thrust", machine: "~hip-thrust", resistance_band: "banded-hip-thrust" },
+  hip_thrust: { bodyweight: "~glute-bridge", barbell: "hip-thrust", dumbbell: "dumbbell-hip-thrust", smith: "smith-machine-hip-thrust", machine: "~hip-thrust", resistance_band: "banded-hip-thrust" },
   glute_kickback: { cable: "cable-kickback", machine: "machine-glute-kickback", resistance_band: "banded-kickback", bodyweight: "donkey-kick" },
   hip_abduction: { machine: "hip-abduction-machine", cable: "cable-standing-hip-abduction", resistance_band: "banded-standing-hip-abduction", bodyweight: "side-lying-hip-abduction" },
   hip_adduction: { machine: "hip-adduction-machine", cable: "cable-standing-hip-adduction", resistance_band: "~cable-standing-hip-adduction", bodyweight: "~cable-standing-hip-adduction" },
@@ -73,6 +73,9 @@ await rm(outputDirectory, { recursive: true, force: true });
 
 // Compact shape (the catalog ships in the entry chunk): drawings maps slug -> exercise drawn,
 // variants maps variant id -> slug, prefixed with "~" for a closest match.
+// Upstream frames whose vector trace is broken (dotted, near-invisible); the loop plays the remaining poses.
+const unusableFrames = { "pallof-press": [2] };
+const frameOverrides = {};
 const drawings = {};
 const variantSlugs = {};
 for (const [movementId, variants] of Object.entries(mapping)) {
@@ -83,7 +86,9 @@ for (const [movementId, variants] of Object.entries(mapping)) {
     if (entry.frames.length !== 3) throw new Error(`${slug} does not have 3 frames`);
     if (!drawings[slug]) {
       await mkdir(join(outputDirectory, slug), { recursive: true });
-      for (const frame of entry.frames) {
+      const skipped = unusableFrames[slug] ?? [];
+      if (skipped.length) frameOverrides[slug] = entry.frames.map((frame) => frame.index).filter((index) => !skipped.includes(index));
+      for (const frame of entry.frames.filter((item) => !skipped.includes(item.index))) {
         await cp(join(upstream, "packages/workout-guide", frame.path), join(outputDirectory, slug, `frame-${frame.index}.svg`));
       }
       drawings[slug] = entry.name;
@@ -98,6 +103,7 @@ await writeFile("content/exercise-animations.json", `${JSON.stringify({
   upstreamCommit,
   frameCount: 3,
   reviewedAt: new Date().toISOString().slice(0, 10),
+  frameOverrides,
   drawings,
   variants: variantSlugs
 }, null, 2)}\n`);

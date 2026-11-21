@@ -4,6 +4,12 @@
   "upstreamCommit": "aac599224bb9780305239607ef98540b7e0ce389",
   "frameCount": 3,
   "reviewedAt": "2026-11-21",
+  "frameOverrides": {
+    "pallof-press": [
+      1,
+      3
+    ]
+  },
   "drawings": {
     "dumbbell-bench-press": "Dumbbell Bench Press",
     "bench-press": "Bench Press",
@@ -11,7 +17,6 @@
     "machine-chest-press": "Machine Chest Press",
     "incline-dumbbell-press": "Incline Dumbbell Press",
     "incline-bench-press": "Incline Bench Press",
-    "incline-cable-fly": "Incline Cable Fly",
     "dumbbell-fly": "Dumbbell Fly",
     "cable-fly": "Cable Fly",
     "pec-deck": "Pec Deck",
@@ -129,7 +134,7 @@
     "incline_chest_press__barbell": "incline-bench-press",
     "incline_chest_press__smith": "~incline-bench-press",
     "incline_chest_press__machine": "~incline-bench-press",
-    "incline_chest_press__cable": "~incline-cable-fly",
+    "incline_chest_press__cable": "~incline-dumbbell-press",
     "chest_fly__dumbbell": "dumbbell-fly",
     "chest_fly__cable": "cable-fly",
     "chest_fly__machine": "pec-deck",
@@ -249,7 +254,7 @@
     "leg_extension__machine": "leg-extension",
     "leg_extension__resistance_band": "~leg-extension",
     "leg_extension__cable": "~leg-extension",
-    "hip_thrust__bodyweight": "glute-bridge",
+    "hip_thrust__bodyweight": "~glute-bridge",
     "hip_thrust__barbell": "hip-thrust",
     "hip_thrust__dumbbell": "dumbbell-hip-thrust",
     "hip_thrust__smith": "smith-machine-hip-thrust",

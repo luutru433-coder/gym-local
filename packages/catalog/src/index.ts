@@ -65,16 +65,6 @@ export const CONTENT_SOURCES: ContentSource[] = [
     reviewedAt: "2026-08-10"
   },
   {
-    id: "free-exercise-db",
-    label: "Free Exercise DB",
-    sourceUrl: "https://github.com/yuhonas/free-exercise-db",
-    author: "Free Exercise DB contributors",
-    licenseId: "unlicense",
-    licenseUrl: "https://github.com/yuhonas/free-exercise-db/blob/main/LICENSE.md",
-    attribution: "Public-domain exercise reference images served from the Free Exercise DB repository.",
-    reviewedAt: "2026-08-10"
-  },
-  {
     id: "workout-guide",
     label: "Workout Guide exercise artwork",
     sourceUrl: "https://github.com/bryllim/workout-guide",
@@ -95,23 +85,6 @@ export const CONTENT_SOURCES: ContentSource[] = [
     reviewedAt: "2026-11-21"
   }
 ];
-
-const freeExerciseMedia: Partial<Record<string, { path: string; title: string }>> = {
-  "chest_press__barbell": { path: "Barbell_Bench_Press_-_Medium_Grip/0.jpg", title: "Barbell Bench Press - Medium Grip" },
-  "chest_press__dumbbell": { path: "Dumbbell_Bench_Press/0.jpg", title: "Dumbbell Bench Press" },
-  "chest_press__smith": { path: "Smith_Machine_Bench_Press/0.jpg", title: "Smith Machine Bench Press" },
-  "chest_press__cable": { path: "Cable_Chest_Press/0.jpg", title: "Cable Chest Press" },
-  "chest_press__machine": { path: "Machine_Bench_Press/0.jpg", title: "Machine Bench Press" },
-  "squat__barbell": { path: "Barbell_Full_Squat/0.jpg", title: "Barbell Full Squat" },
-  "squat__dumbbell": { path: "Dumbbell_Squat/0.jpg", title: "Dumbbell Squat" },
-  "horizontal_row__cable": { path: "Seated_Cable_Rows/0.jpg", title: "Seated Cable Rows" },
-  "romanian_deadlift__barbell": { path: "Romanian_Deadlift/0.jpg", title: "Romanian Deadlift" },
-  "overhead_press__cable": { path: "Seated_Cable_Shoulder_Press/0.jpg", title: "Seated Cable Shoulder Press" },
-  "hip_thrust__barbell": { path: "Barbell_Hip_Thrust/0.jpg", title: "Barbell Hip Thrust" },
-  "biceps_curl__machine": { path: "Machine_Bicep_Curl/0.jpg", title: "Machine Bicep Curl" },
-  "biceps_curl__cable": { path: "Standing_Biceps_Cable_Curl/0.jpg", title: "Standing Biceps Cable Curl" },
-  "seated_calf_raise__machine": { path: "Seated_Calf_Raise/0.jpg", title: "Seated Calf Raise" }
-};
 
 interface VideoGuideManifestEntry {
   variantId: string;
@@ -399,7 +372,6 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
   seed.equipment.map((equipment) => {
     const name = variantName(seed, equipment);
     const variantId = `${seed.id}__${equipment}`;
-    const referenceImage = freeExerciseMedia[variantId];
     return {
       id: variantId,
       movementId: seed.id,
@@ -417,19 +389,9 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
         { vi: seed.safetyVi, en: seed.safetyEn },
         { vi: "Dừng ngay nếu xuất hiện đau nhói, tê hoặc chóng mặt.", en: "Stop immediately for sharp pain, numbness, or dizziness." }
       ],
-      media: [
-        ...(referenceImage ? [{
-          id: `media_${seed.id}_${equipment}_image`,
-          type: "image" as const,
-          url: `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${referenceImage.path}`,
-          sourceId: "free-exercise-db",
-          title: { vi: `Hình tham khảo: ${referenceImage.title}`, en: `Reference: ${referenceImage.title}` },
-          onlineOnly: true,
-          reviewStatus: "reviewed" as const
-        }] : [])
-      ],
+      media: [],
       videoGuides: [videoGuide(variantId, name)],
-      sourceIds: referenceImage ? ["gym-local-original", "free-exercise-db", "youtube-video-guides"] : ["gym-local-original", "youtube-video-guides"],
+      sourceIds: ["gym-local-original", "workout-guide", "youtube-video-guides"],
       reviewStatus: "reviewed",
       contentVersion: 1
     } satisfies ExerciseVariant;
@@ -437,12 +399,14 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
 );
 
 const animationDrawings: Record<string, string> = animationManifest.drawings;
+const animationFrameOverrides: Record<string, number[]> = animationManifest.frameOverrides;
+const defaultAnimationFrames = Array.from({ length: animationManifest.frameCount }, (_, index) => index + 1);
 
 export const EXERCISE_ANIMATIONS: ExerciseAnimation[] = Object.entries(animationManifest.variants as Record<string, string>).map(([variantId, target]) => {
   const slug = target.replace(/^~/, "");
   return {
     variantId,
-    frames: Array.from({ length: animationManifest.frameCount }, (_, index) => `exercise-animations/${slug}/frame-${index + 1}.svg`),
+    frames: (animationFrameOverrides[slug] ?? defaultAnimationFrames).map((frame) => `exercise-animations/${slug}/frame-${frame}.svg`),
     frameDurationMs: 650,
     shownExercise: animationDrawings[slug],
     match: target.startsWith("~") ? "closest" : "exact",

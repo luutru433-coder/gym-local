@@ -4,6 +4,7 @@
 
 - Every reviewed exercise variant (199) now has a bundled three-frame drawn animation that plays without a network connection, in the exercise library and in the in-workout quick guide. Variants without a drawing for their exact equipment show the closest drawing and name it.
 - Added a front/back muscle diagram that highlights the primary and secondary muscles of each movement.
+- Removed the 14 remote reference photos; no exercise image needs the network any more.
 - Library cards show the movement drawing instead of a generic dumbbell icon.
 - Rich-media policy changed (ADR 0016): licensed drawings are bundled and precached; YouTube guides remain optional and online-only.
 

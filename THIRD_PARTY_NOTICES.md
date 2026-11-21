@@ -9,13 +9,6 @@ The optional nutrition pack includes normalized records from Foundation Foods 04
 - Source: https://fdc.nal.usda.gov/download-datasets/
 - License: https://creativecommons.org/publicdomain/zero/1.0/
 
-## Free Exercise DB
-
-Selected remote reference images point to Free Exercise DB. The upstream project is released under the Unlicense. Gym Local does not copy those image files into its offline bundle.
-
-- Source: https://github.com/yuhonas/free-exercise-db
-- License: https://github.com/yuhonas/free-exercise-db/blob/main/LICENSE.md
-
 ## YouTube instructional videos
 
 The repository stores only direct video identifiers and review metadata. Playback is provided by YouTube's privacy-enhanced embed after user interaction. Gym Local does not redistribute, download, cache, or claim ownership of any creator's audiovisual work.
