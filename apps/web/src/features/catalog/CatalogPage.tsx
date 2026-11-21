@@ -12,6 +12,7 @@ import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
 
 const ExercisePackImage = lazy(() => import("../../components/ExercisePackImage"));
+const OnlineExerciseGif = lazy(() => import("../../components/OnlineExerciseGif"));
 import { frameUrl, muscleLabels } from "../../lib/exercise-visuals";
 
 
@@ -171,7 +172,7 @@ export function CatalogPage() {
               })}</div>
             </section>
 
-            <Suspense fallback={null}><ExercisePackImage key={`pack-${activeVariant.id}`} variantId={activeVariant.id} exerciseName={localize(selectedMovement.name, locale)} locale={locale} /></Suspense>
+            <Suspense fallback={null}><ExercisePackImage key={`pack-${activeVariant.id}`} variantId={activeVariant.id} exerciseName={localize(selectedMovement.name, locale)} locale={locale} fallback={<OnlineExerciseGif variant={activeVariant} exerciseName={localize(selectedMovement.name, locale)} locale={locale} />} /></Suspense>
             <ExerciseAnimation key={activeVariant.id} animation={getExerciseAnimation(activeVariant.id)} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
 
 

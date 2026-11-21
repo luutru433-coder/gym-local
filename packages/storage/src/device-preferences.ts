@@ -59,3 +59,23 @@ export function setThemePreference(preference: ThemePreference): void {
     // The preference only lasts for this visit when storage is unavailable.
   }
 }
+
+const ONLINE_EXERCISE_GIFS_KEY = "gym-local.online-exercise-gifs";
+
+/** Off until the owner turns it on: showing them asks a third-party server for each opened exercise. */
+export function isOnlineExerciseGifsEnabled(): boolean {
+  try {
+    return globalThis.localStorage?.getItem(ONLINE_EXERCISE_GIFS_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setOnlineExerciseGifsEnabled(enabled: boolean): void {
+  try {
+    if (enabled) globalThis.localStorage?.setItem(ONLINE_EXERCISE_GIFS_KEY, "1");
+    else globalThis.localStorage?.removeItem(ONLINE_EXERCISE_GIFS_KEY);
+  } catch {
+    // The preference only lasts for this visit when storage is unavailable.
+  }
+}

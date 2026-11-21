@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Online exercise GIFs
+
+- Settings has a new "Online exercise GIFs" switch, off by default. When it is on and the device is online, the exercise page shows a GIF for the exercise fetched live from the free ExerciseDB service, with the "ExerciseDB by AscendAPI" credit under it. Opening an exercise then sends its name to that service.
+- Nothing from that service is kept: no GIF, link or search result is stored on the device, in backups, in the app or in its repository. Offline, or when no GIF fits, the page shows the bundled drawings as before.
+- An image from your own imported pack takes priority over the online GIF for that exercise.
+- No database or backup change (ADR 0021).
+
 ## Unreleased — Your own exercise image pack
 
 - Settings has a new "Exercise images" card: pick image files (GIF, WebP, PNG, JPG) you hold a licence for, with the pack's JSON file if it has one, or a ZIP of them. The images are stored on this device only; they are uploaded nowhere, are not in the app or its repository, and are not part of backups.

@@ -895,3 +895,15 @@ a { color: inherit; text-decoration: none; }
 .pack-image-picker li button.is-current { border-color: var(--olive-deep); box-shadow: 0 0 0 1px var(--olive-deep); }
 .pack-image-picker li img, .pack-image-thumb-empty { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; border-radius: 6px; }
 .pack-image-picker p { margin: 0; color: var(--muted); font-size: 11px; }
+
+/* Online exercise GIF (fetched live, never stored) */
+.online-gif { margin: 0; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 13px; }
+.online-gif img { display: block; width: 100%; max-height: 420px; object-fit: contain; }
+.online-gif figcaption { display: grid; gap: 3px; padding: 10px 14px; background: var(--surface-3); border-top: 1px solid var(--line); }
+.online-gif figcaption span { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.online-gif figcaption strong { font-size: 11px; text-transform: capitalize; }
+.online-gif figcaption small { color: var(--muted); font-size: 10px; line-height: 1.5; }
+.online-gif figcaption a, .image-pack-hint a { color: inherit; text-decoration: underline; }
+.online-gif-card { margin-top: 12px; }
+.online-gif-toggle { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.online-gif-toggle input { width: 18px; height: 18px; accent-color: var(--olive-deep); }

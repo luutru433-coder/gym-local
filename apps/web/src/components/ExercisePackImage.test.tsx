@@ -54,6 +54,25 @@ describe("ExercisePackImage", () => {
     expect(screen.getByRole("button", { name: "Choose an image from your pack" })).toBeInTheDocument();
   });
 
+  it("shows the fallback only when the exercise has no imported image", async () => {
+    const fallback = <p>online gif</p>;
+    const none = render(<ExercisePackImage variantId="chest_press__barbell" exerciseName="Chest Press" locale="en" fallback={fallback} />);
+    expect(await screen.findByText("online gif")).toBeInTheDocument();
+    none.unmount();
+
+    store.images = [image("a", "barbell bench press")];
+    const unlinked = render(<ExercisePackImage variantId="squat__barbell" exerciseName="Squat" locale="en" fallback={fallback} />);
+    expect(await screen.findByText("online gif")).toBeInTheDocument();
+    expect(unlinked.container.querySelector("button")).toHaveTextContent("Choose an image from your pack");
+    unlinked.unmount();
+
+    store.links.set("chest_press__barbell", "a");
+    const linked = render(<ExercisePackImage variantId="chest_press__barbell" exerciseName="Chest Press" locale="en" fallback={fallback} />);
+    expect(await screen.findByRole("img", { name: "Chest Press: barbell bench press" })).toBeInTheDocument();
+    expect(screen.queryByText("online gif")).not.toBeInTheDocument();
+    linked.unmount();
+  });
+
   it("offers the picker in Vietnamese for an exercise without an image", async () => {
     store.images = [image("a", "barbell bench press")];
     render(<ExercisePackImage variantId="squat__barbell" exerciseName="Squat" locale="vi" />);

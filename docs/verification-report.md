@@ -1,5 +1,12 @@
 # Verification report — 2026-11-21
 
+## Online exercise GIFs (ADR 0021)
+
+- Provider tests mock `fetch`: every lookup uses `cache: "no-store"`, only GIF addresses on `static.exercisedb.dev` are accepted, unknown movements make no request, and server or malformed responses fail closed.
+- Component tests: GIF and AscendAPI credit shown when online and switched on; no request when switched off or offline; nothing shown when no GIF fits or the lookup fails; an imported pack image takes priority.
+- No service-worker runtime cache rule exists for the ExerciseDB hosts, and nothing from the service is written to IndexedDB or localStorage (only the on/off switch is stored).
+- Not verified: behaviour on a physical iPhone, and how well the name matching picks the right GIF across all 199 variants.
+
 ## Device-only exercise image pack (ADR 0020)
 
 - Storage, pack reading, name suggestions, the import action and the exercise-page picker are covered by unit and component tests (fake IndexedDB; ZIP, loose files, size variants, JSON names by id and by file reference).

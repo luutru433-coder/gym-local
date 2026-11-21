@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => ({
       "@gym/storage/history": fromRoot("./packages/storage/src/history-edit.ts"),
       "@gym/storage": fromRoot("./packages/storage/src/index.ts"),
       "@gym/backup": fromRoot("./packages/backup/src/index.ts"),
+      "@gym/media/online-gifs": fromRoot("./packages/media/src/providers/exercisedb-free.ts"),
       "@gym/media/exercise-pack": fromRoot("./packages/media/src/exercise-pack.ts"),
       "@gym/media": fromRoot("./packages/media/src/index.ts"),
       "@gym/ui": fromRoot("./packages/ui/src/index.tsx")
