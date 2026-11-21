@@ -8,6 +8,7 @@ import {
   type FoodPreference,
   type FoodItem,
   type MealEntry,
+  type Movement,
   type NutritionPackRecord,
   type PantryItem,
   type PersonalDataSnapshot,
@@ -50,6 +51,7 @@ export class GymDatabase extends Dexie {
   pantryItems!: EntityTable<PantryItem, "id">;
   mealPlans!: EntityTable<SavedMealPlan, "id">;
   bodyMetrics!: EntityTable<BodyMetric, "id">;
+  customMovements!: EntityTable<Movement, "id">;
   customVariants!: EntityTable<ExerciseVariant, "id">;
   settings!: EntityTable<AppSettings, "id">;
   nutritionPacks!: EntityTable<NutritionPackRecord, "id">;
@@ -59,6 +61,7 @@ export class GymDatabase extends Dexie {
     beforeV3Commit?: () => void | Promise<void>;
     beforeV4Commit?: () => void | Promise<void>;
     beforeV5Commit?: () => void | Promise<void>;
+    beforeV6Commit?: () => void | Promise<void>;
   } = {}) {
     super(name);
     this.version(1).stores({
@@ -250,6 +253,32 @@ export class GymDatabase extends Dexie {
         };
       });
       await migrationHooks.beforeV5Commit?.();
+    });
+    this.version(6).stores({
+      customMovements: "id"
+    }).upgrade(async (transaction) => {
+      const settingsTable = transaction.table<AppSettings>("settings");
+      const recoveryTable = transaction.table<RecoveryPoint>("recoveryPoints");
+      const settings = await settingsTable.get("app");
+      if (settings) {
+        await settingsTable.put({
+          ...settings,
+          dbSchemaVersion: 6,
+          backupVersion: 6
+        });
+      }
+      await recoveryTable.toCollection().modify((recoveryPoint) => {
+        recoveryPoint.snapshot = {
+          ...recoveryPoint.snapshot,
+          customMovements: recoveryPoint.snapshot.customMovements ?? [],
+          settings: {
+            ...recoveryPoint.snapshot.settings,
+            dbSchemaVersion: 6,
+            backupVersion: 6
+          }
+        };
+      });
+      await migrationHooks.beforeV6Commit?.();
     });
   }
 }
@@ -762,6 +791,11 @@ export async function saveBodyMetric(metric: BodyMetric, db: GymDatabase = gymDb
   await db.bodyMetrics.put(metric);
 }
 
+export async function listCustomExercises(db: GymDatabase = gymDb): Promise<{ movements: Movement[]; variants: ExerciseVariant[] }> {
+  const [movements, variants] = await Promise.all([db.customMovements.toArray(), db.customVariants.toArray()]);
+  return { movements, variants };
+}
+
 export async function getSettings(db: GymDatabase = gymDb): Promise<AppSettings> {
   return (await db.settings.get("app")) ?? defaultSettings;
 }
@@ -797,6 +831,7 @@ const personalTableNames = [
   "pantryItems",
   "mealPlans",
   "bodyMetrics",
+  "customMovements",
   "customVariants",
   "settings"
 ] as const;
@@ -806,7 +841,7 @@ function personalTables(db: GymDatabase) {
 }
 
 async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<PersonalDataSnapshot> {
-  const [profile, routines, programs, sessions, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, customVariants, settings] = await Promise.all([
+  const [profile, routines, programs, sessions, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, customMovements, customVariants, settings] = await Promise.all([
     db.profiles.toCollection().first(),
     db.routines.toArray(),
     db.programs.toArray(),
@@ -819,6 +854,7 @@ async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<Person
     db.pantryItems.toArray(),
     db.mealPlans.toArray(),
     db.bodyMetrics.toArray(),
+    db.customMovements.toArray(),
     db.customVariants.toArray(),
     db.settings.get("app")
   ]);
@@ -835,6 +871,7 @@ async function readSnapshotInCurrentTransaction(db: GymDatabase): Promise<Person
     pantryItems,
     mealPlans,
     bodyMetrics,
+    customMovements,
     customVariants,
     settings: settings ?? defaultSettings
   };
@@ -854,6 +891,7 @@ async function putSnapshotInCurrentTransaction(data: PersonalDataSnapshot, db: G
   await db.pantryItems.bulkPut(data.pantryItems);
   await db.mealPlans.bulkPut(data.mealPlans);
   await db.bodyMetrics.bulkPut(data.bodyMetrics);
+  await db.customMovements.bulkPut(data.customMovements ?? []);
   await db.customVariants.bulkPut(data.customVariants);
   await db.settings.put(data.settings);
 }

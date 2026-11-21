@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Custom exercises
+
+- You can now create your own exercises from the exercise library (name, primary and secondary muscles, equipment, how sets are logged, optional note), then edit or delete them. They appear first in the library, the routine editor, and the workout exercise picker, and are logged, charted, and given records like catalog variations.
+- Deleting a custom exercise keeps every logged workout and its place in muscle totals; it is blocked while a routine or the workout in progress still uses it. Once an exercise has logged sets, its equipment and load entry can no longer be changed, so old loads are never reused for a different setup.
+- The workout CSV export now writes text that a spreadsheet would run as a formula as plain text.
+- Schema: database v6 and backup v6 add a `customMovements` collection (ADR 0017). Backups v1–v5 still restore; catalog updates never touch custom exercises.
+
 ## Unreleased — Bug fixes and phone/desktop polish
 
 - Finishing onboarding now confirms the calorie and macro estimate shown on its last step, so the nutrition target is usable straight away instead of asking for a review in Settings. Targets that were never confirmed now say so instead of claiming the body details changed.

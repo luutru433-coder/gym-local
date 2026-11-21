@@ -2,9 +2,12 @@ import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { BodyMetric, PersonalDataSnapshot, Profile, Program, Routine, SavedMealPlan, WorkoutSession } from "@gym/contracts";
+import { buildCustomExercise } from "@gym/catalog/custom";
+import { deleteCustomExercise, saveCustomExercise } from "./custom-exercises";
 import {
   GymDatabase,
   defaultSettings,
+  listCustomExercises,
   exportAllData,
   getActiveSession,
   getProfile,
@@ -127,6 +130,7 @@ function snapshot(displayName: string): PersonalDataSnapshot {
     pantryItems: [],
     mealPlans: [],
     bodyMetrics: [],
+    customMovements: [],
     customVariants: [],
     settings: { ...defaultSettings }
   };
@@ -233,6 +237,32 @@ const v4Stores = {
   pantryItems: "id, kind, foodId, groupId, updatedAt"
 };
 
+const v5Stores = {
+  ...v4Stores,
+  mealPlans: "id, durationDays, startDate, createdAt, updatedAt"
+};
+
+async function createV5Database(name: string): Promise<void> {
+  const legacy = new Dexie(name);
+  legacy.version(5).stores(v5Stores);
+  await legacy.open();
+  await legacy.table("settings").put({ ...defaultSettings, dbSchemaVersion: 5, backupVersion: 5 });
+  await legacy.table("routines").put(routine());
+  await legacy.table("customVariants").put({ id: "custom_variant_legacy", movementId: "squat", reviewStatus: "draft" });
+  const legacySnapshot = snapshot("Before schema v6");
+  Reflect.deleteProperty(legacySnapshot, "customMovements");
+  await legacy.table("recoveryPoints").put({
+    id: "recovery_v5",
+    reason: "before_restore",
+    createdAt: "2026-08-15T00:00:00.000Z",
+    snapshot: {
+      ...legacySnapshot,
+      settings: { ...legacySnapshot.settings, dbSchemaVersion: 5, backupVersion: 5 }
+    }
+  });
+  legacy.close();
+}
+
 async function createV2Database(name: string): Promise<void> {
   const legacy = new Dexie(name);
   legacy.version(1).stores(v1Stores);
@@ -323,7 +353,7 @@ describe("IndexedDB schema and recovery", () => {
     expect(await db.routines.count()).toBe(0);
   });
 
-  it("initializes schema v5 and round-trips every personal-data collection", async () => {
+  it("initializes schema v6 and round-trips every personal-data collection", async () => {
     const source = makeDatabase();
     await initializeDatabase(source);
     await saveProfile(profile(), source);
@@ -359,8 +389,8 @@ describe("IndexedDB schema and recovery", () => {
     await saveMealPlan(savedMealPlan(), source);
     const exported = await exportAllData(source);
 
-    expect(source.verno).toBe(5);
-    expect(exported.settings.dbSchemaVersion).toBe(5);
+    expect(source.verno).toBe(6);
+    expect(exported.settings.dbSchemaVersion).toBe(6);
     expect(exported.profile?.displayName).toBe("Local lifter");
     expect(exported).toMatchObject({
       programs: [{ id: "program_starter" }],
@@ -401,7 +431,7 @@ describe("IndexedDB schema and recovery", () => {
     const db = new GymDatabase(name);
     databases.push(db);
     await initializeDatabase(db);
-    expect((await db.settings.get("app"))?.dbSchemaVersion).toBe(5);
+    expect((await db.settings.get("app"))?.dbSchemaVersion).toBe(6);
 
     await saveNutritionPackRecord({ id: "nutrition-pack", status: "ready", version: "2026.04", bytesDownloaded: 123, installedAt: "2026-08-10T00:00:00.000Z" }, db);
     const data = await exportAllData(db);
@@ -448,7 +478,7 @@ describe("IndexedDB schema and recovery", () => {
     databases.push(db);
     await db.open();
 
-    expect(db.verno).toBe(5);
+    expect(db.verno).toBe(6);
     expect(await db.routines.count()).toBe(1);
     expect((await db.profiles.get("profile"))?.nutritionTarget).toMatchObject({
       source: "estimated",
@@ -500,11 +530,11 @@ describe("IndexedDB schema and recovery", () => {
     const recovered = new GymDatabase(name);
     databases.push(recovered);
     await recovered.open();
-    expect(recovered.verno).toBe(5);
+    expect(recovered.verno).toBe(6);
     expect(await recovered.routines.count()).toBe(1);
   });
 
-  it("migrates v3 through v5 additively and upgrades recovery snapshots", async () => {
+  it("migrates v3 through v6 additively and upgrades recovery snapshots", async () => {
     const name = `gym-local-v3-migration-${crypto.randomUUID()}`;
     await createV3Database(name, true);
 
@@ -512,15 +542,15 @@ describe("IndexedDB schema and recovery", () => {
     databases.push(db);
     await db.open();
 
-    expect(db.verno).toBe(5);
+    expect(db.verno).toBe(6);
     expect(await db.routines.count()).toBe(1);
     expect(await db.pantryItems.toArray()).toEqual([]);
     expect(await db.mealPlans.toArray()).toEqual([]);
-    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 6, backupVersion: 6 });
     expect((await db.recoveryPoints.get("recovery_v3"))?.snapshot).toMatchObject({
       pantryItems: [],
       mealPlans: [],
-      settings: { dbSchemaVersion: 5, backupVersion: 5 }
+      settings: { dbSchemaVersion: 6, backupVersion: 6 }
     });
   });
 
@@ -549,11 +579,11 @@ describe("IndexedDB schema and recovery", () => {
     const recovered = new GymDatabase(name);
     databases.push(recovered);
     await recovered.open();
-    expect(recovered.verno).toBe(5);
+    expect(recovered.verno).toBe(6);
     expect(await recovered.routines.count()).toBe(1);
   });
 
-  it("migrates v4 to v5 additively and gives recovery snapshots an empty meal-plan list", async () => {
+  it("migrates v4 through v6 additively and gives recovery snapshots an empty meal-plan list", async () => {
     const name = `gym-local-v4-migration-${crypto.randomUUID()}`;
     await createV4Database(name, true);
 
@@ -561,13 +591,13 @@ describe("IndexedDB schema and recovery", () => {
     databases.push(db);
     await db.open();
 
-    expect(db.verno).toBe(5);
+    expect(db.verno).toBe(6);
     expect(await db.routines.count()).toBe(1);
     expect(await db.mealPlans.toArray()).toEqual([]);
-    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 6, backupVersion: 6 });
     expect((await db.recoveryPoints.get("recovery_v4"))?.snapshot).toMatchObject({
       mealPlans: [],
-      settings: { dbSchemaVersion: 5, backupVersion: 5 }
+      settings: { dbSchemaVersion: 6, backupVersion: 6 }
     });
   });
 
@@ -597,8 +627,92 @@ describe("IndexedDB schema and recovery", () => {
     const recovered = new GymDatabase(name);
     databases.push(recovered);
     await recovered.open();
-    expect(recovered.verno).toBe(5);
+    expect(recovered.verno).toBe(6);
     expect(await recovered.routines.count()).toBe(1);
+  });
+
+  it("migrates v5 to v6 additively, keeping custom variants and upgrading recovery snapshots", async () => {
+    const name = `gym-local-v5-migration-${crypto.randomUUID()}`;
+    await createV5Database(name);
+
+    const db = new GymDatabase(name);
+    databases.push(db);
+    await db.open();
+
+    expect(db.verno).toBe(6);
+    expect(await db.routines.count()).toBe(1);
+    expect(await db.customVariants.count()).toBe(1);
+    expect(await db.customMovements.toArray()).toEqual([]);
+    expect(await db.settings.get("app")).toMatchObject({ dbSchemaVersion: 6, backupVersion: 6 });
+    expect((await db.recoveryPoints.get("recovery_v5"))?.snapshot).toMatchObject({
+      customMovements: [],
+      settings: { dbSchemaVersion: 6, backupVersion: 6 }
+    });
+  });
+
+  it("rolls the entire v5-to-v6 upgrade back when its transaction fails", async () => {
+    const name = `gym-local-failed-v6-migration-${crypto.randomUUID()}`;
+    await createV5Database(name);
+
+    const failing = new GymDatabase(name, {
+      beforeV6Commit: () => {
+        throw new Error("simulated v6 migration failure");
+      }
+    });
+    await expect(failing.open()).rejects.toThrow("simulated v6 migration failure");
+    failing.close();
+
+    const verifier = new Dexie(name);
+    verifier.version(5).stores(v5Stores);
+    await verifier.open();
+    expect(verifier.verno).toBe(5);
+    expect(await verifier.table("customVariants").count()).toBe(1);
+    expect(await verifier.table("settings").get("app")).toMatchObject({ dbSchemaVersion: 5, backupVersion: 5 });
+    verifier.close();
+
+    const recovered = new GymDatabase(name);
+    databases.push(recovered);
+    await recovered.open();
+    expect(recovered.verno).toBe(6);
+    expect(await recovered.customVariants.count()).toBe(1);
+  });
+
+  it("saves, restores, and deletes a custom exercise without touching logged history", async () => {
+    const db = makeDatabase();
+    await db.open();
+    const { movement, variant } = buildCustomExercise({ name: "Kéo cáp một tay", primaryMuscle: "back", secondaryMuscles: [], equipment: "cable", loadEntryMode: "per_hand" });
+
+    await saveCustomExercise(movement, variant, db);
+    await expect(saveCustomExercise({ ...movement, id: "squat" }, { ...variant, movementId: "squat" }, db)).rejects.toThrow("catalog IDs");
+    const exported = await exportAllData(db);
+    expect(exported.customMovements).toEqual([movement]);
+    expect(exported.customVariants).toEqual([variant]);
+
+    const usedBy = { ...routine(), items: [{ id: "item_custom", movementId: movement.id, preferredVariantId: variant.id, restSeconds: 90, sets: [] }] };
+    await db.routines.put(usedBy);
+    await expect(deleteCustomExercise(movement.id, db)).rejects.toThrow("used by a routine");
+    expect(await db.customMovements.count()).toBe(1);
+
+    await db.routines.delete(usedBy.id);
+    await expect(deleteCustomExercise(movement.id, db)).resolves.toBe(false);
+    expect(await listCustomExercises(db)).toEqual({ movements: [], variants: [] });
+
+    await saveCustomExercise(movement, variant, db);
+    const logged: WorkoutSession = {
+      id: "session_custom",
+      startedAt: "2026-08-10T01:00:00.000Z",
+      finishedAt: "2026-08-10T02:00:00.000Z",
+      exercises: [{ id: "block_custom", movementId: movement.id, variantId: variant.id, movementNameSnapshot: movement.name, variantNameSnapshot: variant.name, loadEntryModeSnapshot: variant.loadEntryMode, restSeconds: 90, sets: [] }]
+    };
+    await db.sessions.put(logged);
+    await expect(deleteCustomExercise(movement.id, db)).resolves.toBe(false);
+
+    await saveCustomExercise(movement, variant, db);
+    logged.exercises[0].sets = [{ id: "set_custom", type: "working", weightKg: 20, reps: 8, completedAt: "2026-08-10T01:10:00.000Z" }];
+    await db.sessions.put(logged);
+    await expect(deleteCustomExercise(movement.id, db)).resolves.toBe(true);
+    expect(await listCustomExercises(db)).toMatchObject({ movements: [{ id: movement.id, reviewStatus: "deprecated" }], variants: [{ id: variant.id, reviewStatus: "deprecated" }] });
+    expect(await db.sessions.get(logged.id)).toEqual(logged);
   });
 
   it("blocks restore while a workout is active without changing data or recovery points", async () => {
