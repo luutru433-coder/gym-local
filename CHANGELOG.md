@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Supersets in live workouts
+
+- Exercises that share a superset label in a routine now run as a superset during the workout: finishing a set moves straight to the next exercise in the group with no rest, and the rest timer starts only after the last exercise of the round. Each grouped exercise shows a "Superset" badge and what comes next.
+- During a workout, "Superset next" in the exercise edit tools groups an exercise with the one after it, and "Ungroup" takes it out. This changes the current workout only, not the routine.
+- Sessions now keep the optional superset label (ADR 0018). No database or backup version change; older backups and sessions are unaffected.
+
 ## Unreleased — Timed routine targets
 
 - Fixed the routine editor saving a hidden 8–12 rep target for timed and distance-tracked exercises (plank, farmer carry): new exercises and added sets now save the 30-second duration target the editor shows, so the workout screen displays it. Existing routines are not rewritten.

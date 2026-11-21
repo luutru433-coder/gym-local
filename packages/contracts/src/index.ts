@@ -233,6 +233,7 @@ export interface SessionExercise {
   sets: SetLog[];
   restSeconds: number;
   note?: string;
+  supersetGroup?: string;
 }
 
 export interface WorkoutSession {

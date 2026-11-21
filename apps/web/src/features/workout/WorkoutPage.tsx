@@ -11,6 +11,7 @@ import {
   CircleHelp,
   Clock3,
   Dumbbell,
+  Link2,
   Minus,
   Pause,
   Play,
@@ -43,6 +44,7 @@ import {
   switchExerciseVariant,
   updateSet
 } from "@gym/workouts";
+import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
 import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -222,8 +224,14 @@ export function WorkoutPage() {
       updated.restTimerEndsAt = undefined;
       save(updated);
     } else {
-      save(updateSet(activeSession, exerciseId, setId, applySetSuggestion(set, suggestion), true));
+      const updated = advanceSuperset(updateSet(activeSession, exerciseId, setId, applySetSuggestion(set, suggestion), true), exerciseId);
+      save(updated);
       syncClock();
+      if (updated.activeExerciseId !== exerciseId) {
+        const nextId = updated.activeExerciseId;
+        setExpandedId(nextId);
+        if (nextId) window.requestAnimationFrame(() => document.getElementById(nextId)?.scrollIntoView?.({ behavior: "smooth", block: "start" }));
+      }
     }
   };
 
@@ -282,6 +290,15 @@ export function WorkoutPage() {
       const updated = removeExerciseBlock(activeSession, exerciseId);
       save(updated);
       setExpandedId(updated.activeExerciseId);
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : String(error));
+    }
+  };
+
+  const toggleSuperset = (exerciseId: string, grouped: boolean) => {
+    if (!activeSession) return;
+    try {
+      save(grouped ? unlinkSuperset(activeSession, exerciseId) : linkSupersetWithNext(activeSession, exerciseId));
     } catch (error) {
       setActionError(error instanceof Error ? error.message : String(error));
     }
@@ -409,7 +426,7 @@ export function WorkoutPage() {
       <nav className="exercise-jump" aria-label={locale === "vi" ? "Các bài trong buổi tập" : "Workout exercises"}>
         {activeSession.exercises.map((exercise, index) => {
           const done = exercise.sets.every((set) => set.completedAt);
-          return <button type="button" key={exercise.id} className={expandedId === exercise.id ? "exercise-jump__item exercise-jump__item--active" : "exercise-jump__item"} aria-pressed={expandedId === exercise.id} onClick={() => { setExpandedId(exercise.id); document.getElementById(exercise.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><span>{done ? <Check size={14} /> : index + 1}</span><small>{localize(exercise.movementNameSnapshot, locale)}</small></button>;
+          return <button type="button" key={exercise.id} className={expandedId === exercise.id ? "exercise-jump__item exercise-jump__item--active" : "exercise-jump__item"} aria-pressed={expandedId === exercise.id} onClick={() => { setExpandedId(exercise.id); document.getElementById(exercise.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><span>{done ? <Check size={14} /> : index + 1}</span><small>{localize(exercise.movementNameSnapshot, locale)}</small>{supersetMembers(activeSession, exercise.id).length ? <b className="exercise-jump__superset" aria-label={`Superset ${exercise.supersetGroup}`}>{exercise.supersetGroup}</b> : null}</button>;
         })}
         <button type="button" className="exercise-jump__add" onClick={() => { setExercisePicker({ mode: "add" }); setExerciseQuery(""); }}><Plus size={17} />{locale === "vi" ? "Thêm bài" : "Add exercise"}</button>
       </nav>
@@ -428,6 +445,9 @@ export function WorkoutPage() {
            const variant = getVariant(exercise.variantId);
            const previous = latestVariantHistory(sessions.filter((session) => session.id !== activeSession.id), exercise.variantId);
            const doneCount = exercise.sets.filter((set) => set.completedAt).length;
+           const superset = supersetMembers(activeSession, exercise.id);
+           const supersetNext = superset.length ? nextInSupersetRound(activeSession, exercise.id) : undefined;
+           const supersetPartners = superset.filter((member) => member.id !== exercise.id).map((member) => localize(member.variantNameSnapshot, locale)).join(" + ");
            const trackingProfile = exercise.trackingProfileSnapshot
              ?? getTrackingProfile(exercise.variantId)
              ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
@@ -462,7 +482,7 @@ export function WorkoutPage() {
             <Card id={exercise.id} key={exercise.id} className={expanded ? "workout-exercise workout-exercise--expanded" : "workout-exercise"}>
               <button type="button" className="workout-exercise__header" aria-expanded={expanded} aria-controls={`${exercise.id}-details`} onClick={() => setExpandedId(expanded ? undefined : exercise.id)}>
                 <span className="workout-exercise__index">{String(exerciseIndex + 1).padStart(2, "0")}</span>
-                <div><span className="eyebrow">{localize(exercise.movementNameSnapshot, locale)}</span><h2>{localize(exercise.variantNameSnapshot, locale)}</h2><p>{doneCount}/{exercise.sets.length} sets · {exercise.restSeconds}s {locale === "vi" ? "nghỉ" : "rest"}</p></div>
+                <div><span className="eyebrow">{localize(exercise.movementNameSnapshot, locale)}{superset.length ? <b className="superset-badge">Superset {exercise.supersetGroup}</b> : null}</span><h2>{localize(exercise.variantNameSnapshot, locale)}</h2><p>{doneCount}/{exercise.sets.length} sets · {exercise.restSeconds}s {locale === "vi" ? "nghỉ" : "rest"}</p></div>
                 <span className="workout-exercise__chevron"><ChevronDown size={20} /></span>
               </button>
 
@@ -477,8 +497,19 @@ export function WorkoutPage() {
                   <div className="exercise-edit-tools" role="group" aria-label={locale === "vi" ? `Sắp xếp ${localize(exercise.variantNameSnapshot, locale)}` : `Arrange ${localize(exercise.variantNameSnapshot, locale)}`}>
                     <button type="button" disabled={exerciseIndex === 0} onClick={() => moveExercise(exercise.id, exerciseIndex - 1)} aria-label={locale === "vi" ? "Đưa bài lên trước" : "Move exercise earlier"}><ArrowUp size={17} />{locale === "vi" ? "Lên" : "Up"}</button>
                     <button type="button" disabled={exerciseIndex === activeSession.exercises.length - 1} onClick={() => moveExercise(exercise.id, exerciseIndex + 1)} aria-label={locale === "vi" ? "Đưa bài xuống sau" : "Move exercise later"}><ArrowDown size={17} />{locale === "vi" ? "Xuống" : "Down"}</button>
+                    <button type="button" aria-pressed={superset.length > 0} disabled={!superset.length && exerciseIndex === activeSession.exercises.length - 1} onClick={() => toggleSuperset(exercise.id, superset.length > 0)} title={!superset.length && exerciseIndex === activeSession.exercises.length - 1 ? (locale === "vi" ? "Cần có bài phía sau để ghép" : "Needs an exercise after this one") : undefined}><Link2 size={17} />{superset.length ? (locale === "vi" ? "Tách superset" : "Ungroup") : (locale === "vi" ? "Ghép bài sau" : "Superset next")}</button>
                     <button type="button" className="exercise-edit-tools__remove" disabled={exercise.sets.some((set) => Boolean(set.completedAt))} onClick={() => deleteExercise(exercise.id)} title={exercise.sets.some((set) => Boolean(set.completedAt)) ? (locale === "vi" ? "Không thể xóa bài đã có set hoàn tất" : "Completed exercise blocks cannot be removed") : undefined}><Trash2 size={17} />{locale === "vi" ? "Xóa bài" : "Remove"}</button>
                   </div>
+
+                  {superset.length ? (
+                    <p className="superset-note" role="note">
+                      <Link2 size={16} aria-hidden="true" />
+                      <span><strong>Superset {exercise.supersetGroup}</strong> · {locale === "vi" ? `với ${supersetPartners}. ` : `with ${supersetPartners}. `}
+                        {supersetNext
+                          ? (locale === "vi" ? `Xong set này chuyển ngay sang ${localize(supersetNext.variantNameSnapshot, locale)}, không nghỉ.` : `After this set go straight to ${localize(supersetNext.variantNameSnapshot, locale)}, no rest.`)
+                          : (locale === "vi" ? `Xong set này là hết lượt: nghỉ ${exercise.restSeconds}s.` : `This set ends the round: rest ${exercise.restSeconds}s.`)}</span>
+                    </p>
+                  ) : null}
 
                   <aside className="progression-advice" aria-label={locale === "vi" ? "Gợi ý tăng tiến theo đúng biến thể" : "Exact-variation progression advice"}>
                     <Sparkles size={18} aria-hidden="true" />

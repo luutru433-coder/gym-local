@@ -173,6 +173,7 @@ function sessionExercise(item: RoutineItem) {
     trackingProfileSnapshot: trackingProfile,
     restSeconds: item.restSeconds,
     note: item.note,
+    supersetGroup: item.supersetGroup,
     sets: item.sets.map((target) => ({
       id: createId("set"),
       type: target.type,

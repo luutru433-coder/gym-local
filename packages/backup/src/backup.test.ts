@@ -621,4 +621,16 @@ describe("backup", () => {
     }));
     expect(csv).toContain(`"' =HYPERLINK(1)","' =HYPERLINK(1)","working","20","8","-1",""`);
   });
+
+  it("round-trips a session's superset label and rejects a non-text one", async () => {
+    const name = { vi: "Đẩy ngực", en: "Chest press" };
+    const block = (id: string, supersetGroup: unknown) => ({ id, movementId: "chest_press", variantId: "chest_press__dumbbell", movementNameSnapshot: name, variantNameSnapshot: name, loadEntryModeSnapshot: "per_hand" as const, restSeconds: 90, supersetGroup, sets: [] });
+    const sessions = [{ id: "session_superset", startedAt: "2026-08-10T01:00:00.000Z", exercises: [block("block_a", "A"), block("block_b", "A")] }];
+
+    const restored = await readBackup(await createBackup(emptyData({ sessions } as never)));
+    expect(restored.data.sessions[0].exercises.map((exercise) => exercise.supersetGroup)).toEqual(["A", "A"]);
+
+    sessions[0].exercises[0] = block("block_a", 7);
+    await expect(createBackup(emptyData({ sessions } as never))).rejects.toThrow();
+  });
 });
