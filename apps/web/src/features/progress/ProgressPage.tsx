@@ -122,7 +122,7 @@ function rangeStartDate(days: number | undefined): Date | undefined {
 function weeksSince(isoDate: string | undefined): number {
   if (!isoDate) return 4;
   const weeks = Math.ceil((Date.now() - new Date(isoDate).getTime()) / (7 * 86_400_000)) + 1;
-  return Math.min(104, Math.max(4, weeks));
+  return Math.max(4, weeks);
 }
 
 type WeeklyMetricKey = keyof Pick<WeeklyTrainingSummary, "sessions" | "completedWorkingSets" | "externalLoadVolumeKg" | "durationMinutes">;
@@ -216,7 +216,10 @@ export function ProgressPage() {
   const variantChangePercent = variantChange !== undefined && firstVariantValue ? (variantChange / firstVariantValue) * 100 : undefined;
   const rangePrCount = variantTrendData.filter((point) => point.isMetricPr).length;
 
-  const weekly = weeklyTrainingSummary(sessions, range.weeks ?? weeksSince(sessions.map((session) => session.finishedAt!).sort()[0]));
+  const weekly = weeklyTrainingSummary(
+    sessions.filter((session) => session.finishedAt && inRange(session.finishedAt)),
+    range.weeks ? range.weeks + 1 : weeksSince(sessions.flatMap((session) => session.finishedAt ?? []).sort()[0])
+  );
   const weeklyMetric = WEEKLY_METRICS.find((item) => item.key === weeklyMetricKey)!;
   const weeklyData = weekly.map((week) => ({
     ...week,
