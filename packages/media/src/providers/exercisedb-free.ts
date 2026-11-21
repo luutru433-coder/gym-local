@@ -12,15 +12,36 @@ const MAX_PAGES = 200;
 const RETRIES = 4;
 const PARALLEL = 4;
 
+const words = z.array(z.string()).catch([]).default([]);
+
 const pageSchema = z.object({
   meta: z.object({ total: z.number().optional(), nextCursor: z.string().nullish(), hasNextPage: z.boolean().optional() }).optional(),
-  data: z.array(z.object({ exerciseId: z.string(), name: z.string(), gifUrl: z.string() }))
+  data: z.array(z.object({
+    exerciseId: z.string(),
+    name: z.string(),
+    gifUrl: z.string(),
+    bodyParts: words,
+    equipments: words,
+    targetMuscles: words,
+    secondaryMuscles: words,
+    instructions: words
+  }))
 });
 
 export interface ExerciseDbImage {
   id: string;
   name: string;
   gifUrl: string;
+  details: ExerciseDbDetails;
+}
+
+/** What the service says about one exercise, in its own English vocabulary. */
+export interface ExerciseDbDetails {
+  bodyParts: string[];
+  equipments: string[];
+  targetMuscles: string[];
+  secondaryMuscles: string[];
+  instructions: string[];
 }
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -57,7 +78,12 @@ export async function listExerciseDbImages(onProgress?: (done: number, total: nu
   let cursor: string | undefined;
   for (let index = 0; index < MAX_PAGES; index++) {
     const result = await page(cursor, signal, pause);
-    for (const item of result.data) if (isMediaUrl(item.gifUrl)) images.set(item.exerciseId, { id: item.exerciseId, name: item.name, gifUrl: item.gifUrl });
+    for (const item of result.data) if (isMediaUrl(item.gifUrl)) images.set(item.exerciseId, {
+        id: item.exerciseId,
+        name: item.name,
+        gifUrl: item.gifUrl,
+        details: { bodyParts: item.bodyParts, equipments: item.equipments, targetMuscles: item.targetMuscles, secondaryMuscles: item.secondaryMuscles, instructions: item.instructions }
+      });
     onProgress?.(images.size, Math.max(result.meta?.total ?? 0, images.size));
     const next = result.meta?.nextCursor ?? undefined;
     if (!next || next === cursor || result.meta?.hasNextPage === false || result.data.length === 0) break;

@@ -43,7 +43,7 @@ export interface ExerciseDbDownload {
  */
 export async function downloadExerciseDbImages(onProgress?: (step: "list" | "gifs", done: number, total: number) => void, signal?: AbortSignal): Promise<ExerciseDbDownload> {
   const listed = await listExerciseDbImages((done, total) => onProgress?.("list", done, total), signal);
-  const images = listed.map((item) => ({ id: `exercisedb:${item.id}`, name: item.name, fileName: `${item.id}.gif`, type: "image/gif", size: 0, remoteUrl: item.gifUrl }));
+  const images = listed.map((item) => ({ id: `exercisedb:${item.id}`, name: item.name, fileName: `${item.id}.gif`, type: "image/gif", size: 0, remoteUrl: item.gifUrl, details: item.details }));
   await importRemoteExerciseImages(images);
   const suggestions = suggestExerciseImageLinks(images, EXERCISE_VARIANTS.map((variant) => ({ id: variant.id, movementId: variant.movementId, equipment: variant.equipment })));
   const suggested = await applyExerciseImageLinksWhereMissing(suggestions);

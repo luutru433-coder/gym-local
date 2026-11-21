@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Add exercises from the downloaded ExerciseDB set
+
+- The exercise library has a new "Add from ExerciseDB" button. It lists the exercises of the downloaded set that the app does not have yet (search by name, filter by body part); add one, or everything listed. An added exercise joins your own exercises with its image, muscles, equipment and steps, and can be picked in routines.
+- Names and steps are in English. If you downloaded the set before this update, press "Download free ExerciseDB images" once more to get the exercise details.
+- Added exercises are saved like exercises you create yourself, so they are in your backups; their images are not, and come back after downloading the set again. Nothing from ExerciseDB is bundled with the app (ADR 0022).
+
 ## Unreleased — Free ExerciseDB images, saved on the device
 
 - Settings → Exercise images has a new "Download free ExerciseDB images" button. The device downloads the free ExerciseDB list once, straight from their server, links a 180p GIF to each exercise in the app that has no image yet, and saves those GIFs on the device so they show offline. Used with AscendAPI's permission; the credit to AscendAPI.com is shown in Settings and under each GIF.

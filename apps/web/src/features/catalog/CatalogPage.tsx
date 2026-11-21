@@ -12,6 +12,7 @@ import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
 
 const ExercisePackImage = lazy(() => import("../../components/ExercisePackImage"));
+const ExerciseDbExercisePicker = lazy(() => import("./ExerciseDbExercisePicker"));
 import { frameUrl, muscleLabels } from "../../lib/exercise-visuals";
 
 
@@ -41,6 +42,7 @@ export function CatalogPage() {
   const customMovements = useGymStore((state) => state.customMovements);
   const [formMode, setFormMode] = useState<"create" | "edit">();
   const [deleteError, setDeleteError] = useState<string>();
+  const [addingFromSet, setAddingFromSet] = useState(false);
 
   const movements = useMemo(() => listMovements(customMovements), [customMovements]);
   const results = useMemo(() => searchCatalog(query, muscle, equipment, movements), [equipment, movements, muscle, query]);
@@ -88,7 +90,10 @@ export function CatalogPage() {
     <div className="page catalog-page">
       <header className="page-header">
         <div><span className="eyebrow">{movementCount} {locale === "vi" ? "nhóm động tác" : "movement families"}</span><h1>{locale === "vi" ? "Thư viện bài tập" : "Exercise library"}</h1><p>{locale === "vi" ? "Một động tác, nhiều cách tập. Chọn theo dụng cụ bạn đang có." : "One movement, many ways to train. Choose what fits your equipment."}</p></div>
-        <Button variant="secondary" onClick={() => setFormMode("create")}><Plus size={18} />{locale === "vi" ? "Tạo bài tập" : "Create exercise"}</Button>
+        <div className="catalog-header-actions">
+          <Button variant="secondary" onClick={() => setFormMode("create")}><Plus size={18} />{locale === "vi" ? "Tạo bài tập" : "Create exercise"}</Button>
+          <Button variant="secondary" onClick={() => setAddingFromSet(true)}><Plus size={18} />{locale === "vi" ? "Thêm bài từ ExerciseDB" : "Add from ExerciseDB"}</Button>
+        </div>
       </header>
 
       <Card className="catalog-toolbar">
@@ -139,6 +144,10 @@ export function CatalogPage() {
         {formMode === "create" ? <CustomExerciseForm locale={locale} onSave={submitCustomExercise} onCancel={() => setFormMode(undefined)} /> : null}
       </Modal>
 
+      <Modal open={addingFromSet} title={locale === "vi" ? "Thêm bài từ ExerciseDB" : "Add exercises from ExerciseDB"} onClose={() => setAddingFromSet(false)}>
+        {addingFromSet ? <Suspense fallback={null}><ExerciseDbExercisePicker locale={locale} /></Suspense> : null}
+      </Modal>
+
       <Modal open={Boolean(selectedMovement) && formMode !== "create"} title={selectedMovement ? localize(selectedMovement.name, locale) : ""} onClose={closeMovement} className="modal--exercise">
         {selectedMovement && activeVariant && formMode === "edit" ? (
           <CustomExerciseForm locale={locale} movement={selectedMovement} variant={activeVariant} onSave={submitCustomExercise} onCancel={() => setFormMode(undefined)} />
@@ -148,7 +157,14 @@ export function CatalogPage() {
               <div><span className="eyebrow">{selectedMovement.primaryMuscles.map((item) => muscleLabels[item][locale]).join(", ")} · {activeVariant.equipment.map((item) => EQUIPMENT_OPTIONS.find((entry) => entry.id === item)?.name[locale]).join(" + ")}</span><p>{localize(selectedMovement.description, locale)}</p></div>
               <span className="review-badge"><UserRound size={16} />{locale === "vi" ? "Bài tự tạo" : "Your exercise"}</span>
             </div>
+            <Suspense fallback={null}><ExercisePackImage key={`pack-${activeVariant.id}`} variantId={activeVariant.id} exerciseName={localize(selectedMovement.name, locale)} locale={locale} /></Suspense>
             <ExerciseAnimation key={`${activeVariant.id}-${selectedMovement.contentVersion}`} animation={undefined} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
+            {activeVariant.instructions.length > 1 ? (
+              <section>
+                <h3><Target size={19} />{locale === "vi" ? "Cách thực hiện" : "How to perform"}</h3>
+                <ol className="instruction-list">{activeVariant.instructions.map((instruction, index) => <li key={`${activeVariant.id}-${index}`}><span>{index + 1}</span><p>{localize(instruction, locale)}</p></li>)}</ol>
+              </section>
+            ) : null}
             {deleteError ? <Notice tone="warning">{deleteError}</Notice> : null}
             <div className="custom-exercise-actions">
               <Button variant="secondary" onClick={() => { setDeleteError(undefined); setFormMode("edit"); }}><Pencil size={17} />{locale === "vi" ? "Sửa" : "Edit"}</Button>

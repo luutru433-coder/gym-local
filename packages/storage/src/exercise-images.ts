@@ -9,6 +9,16 @@ export interface ExerciseImage {
   size: number;
   /** Set for an image whose file is kept by the browser cache under this address instead of in `blobs`. */
   remoteUrl?: string;
+  /** What the image's source says about the exercise it shows; used to add that exercise to the owner's list. */
+  details?: ExerciseImageDetails;
+}
+
+export interface ExerciseImageDetails {
+  bodyParts: string[];
+  equipments: string[];
+  targetMuscles: string[];
+  secondaryMuscles: string[];
+  instructions: string[];
 }
 
 export interface ExerciseImageInput extends ExerciseImage {
