@@ -334,6 +334,8 @@ export function switchExerciseVariant(session: WorkoutSession, exerciseId: strin
     ?? trackingProfileForLoadMode(variant.id, variant.loadEntryMode);
   const completed = current.sets.filter((set) => set.completedAt);
   const remaining = current.sets.filter((set) => !set.completedAt);
+  // A load entered or prefilled for one equipment variant is not valid for another.
+  for (const set of remaining) delete set.weightKg;
   if (completed.length === 0) {
     current.variantId = variant.id;
     current.variantNameSnapshot = variant.name;
