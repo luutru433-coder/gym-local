@@ -127,7 +127,7 @@ interface GymState {
   saveUserProgram: (program: Program) => Promise<Program>;
   removeProgram: (programId: string) => Promise<void>;
   selectUserProgram: (programId?: string) => Promise<void>;
-  startWorkout: (routine: Routine, programId?: string) => Promise<void>;
+  startWorkout: (routine: Routine, programId?: string, createSession?: (routine: Routine, locationId?: string) => WorkoutSession) => Promise<void>;
   startFreestyleWorkout: () => Promise<void>;
   setActiveSession: (session: WorkoutSession) => Promise<void>;
   completeWorkout: () => Promise<WorkoutSession | undefined>;
@@ -508,10 +508,14 @@ export const useGymStore = create<GymState>((set, get) => ({
     }));
   },
 
-  async startWorkout(routine, programId) {
+  async startWorkout(routine, programId, createSession = createSessionFromRoutine) {
     const active = get().activeSession;
     if (active) throw new Error(get().profile?.locale === "en" ? "You already have an unfinished workout" : "Bạn đang có một buổi tập chưa hoàn tất");
-    const session = { ...createSessionFromRoutine(routine, get().profile?.activeLocationId), programId };
+    const locationId = get().profile?.activeLocationId;
+    const session = {
+      ...createSession(routine, locationId),
+      programId
+    };
     await saveStartedSession(session);
     lastPersistedActiveSession = session;
     set((state) => ({

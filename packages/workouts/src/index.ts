@@ -375,6 +375,8 @@ export function switchExerciseVariant(session: WorkoutSession, exerciseId: strin
     ?? trackingProfileForLoadMode(variant.id, variant.loadEntryMode);
   const completed = current.sets.filter((set) => set.completedAt);
   const remaining = current.sets.filter((set) => !set.completedAt);
+  // A load entered or prefilled for one equipment variant is not valid for another.
+  for (const set of remaining) delete set.weightKg;
   if (completed.length === 0) {
     current.variantId = variant.id;
     current.variantNameSnapshot = variant.name;
@@ -594,7 +596,7 @@ export function suggestDoubleProgression(
     successStreak,
     requiredSuccessSessions: rule.successSessions,
     explanation: {
-      vi: `${successStreak} buổi liên tiếp đạt đầu trên của khoảng mục tiêu; có thể ${directionText.vi} từ ${current} ${action === "decrease_assistance" ? "xuống" : "lên"} ${suggestedValue} ${unit}.`,
+      vi: `${successStreak} buổi liên tiếp đạt đầu trên của khoảng mục tiêu; có thể ${directionText.vi} từ ${current} ${action === "decrease_assistance" ? "xuống" : "lên"} ${suggestedValue} ${unit === "reps" ? "lần" : unit === "seconds" ? "giây" : unit === "meters" ? "mét" : unit}.`,
       en: `${successStreak} consecutive sessions reached the top of the target range; ${directionText.en} from ${current} to ${suggestedValue} ${unit}.`
     },
     evidence
