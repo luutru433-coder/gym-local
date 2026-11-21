@@ -63,4 +63,4 @@ Release gate: offline install/search/update failure E2E, nutrition persistence/b
 
 - Accounts, cloud sync, social feed, coaching marketplace, wearables, and multiple user profiles.
 - Physical-machine identity or gym-location-specific PR separation. Equipment-variant separation remains mandatory.
-- Bundled or scraped third-party video. Rich media stays online-only with explicit source and license/review metadata.
+- Bundled or scraped third-party video. Video stays online-only with explicit source and license/review metadata; licensed exercise drawings are bundled for offline animation (ADR 0016).

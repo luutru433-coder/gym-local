@@ -9,19 +9,27 @@ The optional nutrition pack includes normalized records from Foundation Foods 04
 - Source: https://fdc.nal.usda.gov/download-datasets/
 - License: https://creativecommons.org/publicdomain/zero/1.0/
 
-## Free Exercise DB
-
-Selected remote reference images point to Free Exercise DB. The upstream project is released under the Unlicense. Gym Local does not copy those image files into its offline bundle.
-
-- Source: https://github.com/yuhonas/free-exercise-db
-- License: https://github.com/yuhonas/free-exercise-db/blob/main/LICENSE.md
-
 ## YouTube instructional videos
 
 The repository stores only direct video identifiers and review metadata. Playback is provided by YouTube's privacy-enhanced embed after user interaction. Gym Local does not redistribute, download, cache, or claim ownership of any creator's audiovisual work.
 
 - Provider terms: https://developers.google.com/youtube/terms/developer-policies
 - Per-video creator/title attribution: `content/exercise-video-guides.json`
+
+## Workout Guide exercise artwork
+
+The three-frame exercise drawings in `public/exercise-animations/` are copied unmodified from Workout Guide and are licensed under CC BY-SA 4.0. Copyright (c) 2026 Bryl Lim; 76 first-pose frames upstream are vector-traced adaptations of Everkinetic artwork (CC BY-SA 4.0). The app plays the frames in sequence and shows this credit under every animation.
+
+- Source: https://github.com/bryllim/workout-guide (commit pinned in `content/exercise-animations.json`)
+- Upstream attribution: https://github.com/bryllim/workout-guide/blob/main/ATTRIBUTION.md
+- Everkinetic: https://github.com/everkinetic/data
+- License: https://creativecommons.org/licenses/by-sa/4.0/
+
+## React Muscle Map body artwork
+
+The front and back body outlines in `apps/web/src/components/BodyArtwork.tsx` are ported from React Muscle Map, released into the public domain under the Unlicense.
+
+- Source: https://github.com/Josep1992/react-muscle-map
 
 ## Open Food Facts
 
