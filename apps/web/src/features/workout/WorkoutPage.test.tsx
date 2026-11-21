@@ -144,4 +144,39 @@ describe("live workout editing", () => {
     expect(screen.getByText("Chỉ tính số bánh mỗi bên; không thay đổi tải của set.")).toBeInTheDocument();
     expect(screen.getByRole("spinbutton", { name: "Khối lượng thanh hoặc Smith, kg" })).toHaveValue(20);
   });
+
+  it("completes a set in one tap with last time's weight and reps for the exact variant", async () => {
+    const user = userEvent.setup();
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    const lastTime: WorkoutSession = {
+      ...session(),
+      id: "session-last",
+      restTimerEndsAt: undefined,
+      finishedAt: "2026-08-10T10:00:00.000Z"
+    };
+    lastTime.exercises[0].sets = [
+      { id: "last-one", type: "working", weightKg: 40, reps: 10, completedAt: "2026-08-10T09:30:00.000Z" },
+      { id: "last-two", type: "working", weightKg: 40, reps: 8, completedAt: "2026-08-10T09:35:00.000Z" }
+    ];
+    arrange(live);
+    useGymStore.setState({ sessions: [live, lastTime] });
+
+    const reps = await screen.findByRole("textbox", { name: "Set 1, Số lần" });
+    expect(reps).toHaveValue("");
+    expect(reps).toHaveAttribute("placeholder", "10");
+
+    await user.click(screen.getByRole("button", { name: "Hoàn tất set 1 với 40 kg × 10" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.exercises[0]?.sets[0]).toMatchObject({ weightKg: 40, reps: 10 }));
+    expect(useGymStore.getState().activeSession?.exercises[0]?.sets[0]?.completedAt).toBeTruthy();
+
+    await user.type(screen.getByRole("textbox", { name: "Set 2, Số lần" }), "9");
+    await user.click(screen.getByRole("button", { name: "Hoàn tất set 2 với 40 kg × 9" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.exercises[0]?.sets[1]).toMatchObject({ weightKg: 40, reps: 9 }));
+  });
+
+  it("keeps completion disabled when there is nothing to suggest", () => {
+    arrange(session());
+    expect(screen.getByRole("button", { name: "Set 1: nhập số lần, quãng đường hoặc thời gian trước" })).toBeDisabled();
+  });
 });

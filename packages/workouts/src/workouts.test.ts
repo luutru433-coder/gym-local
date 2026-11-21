@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getVariant } from "@gym/catalog";
 import {
   addExerciseBlock,
+  applySetSuggestion,
   calculatePlateLoading,
   cloneRoutineTemplate,
   createFreestyleSession,
@@ -10,6 +11,7 @@ import {
   removeSet,
   reorderExerciseBlock,
   suggestDoubleProgression,
+  suggestSetValues,
   switchExerciseVariant,
   updateSet
 } from "./index";
@@ -197,5 +199,31 @@ describe("workout sessions", () => {
       remainderKg: 1,
       exact: false
     });
+  });
+});
+
+describe("set suggestions from last time", () => {
+  const lastTime = [{ weightKg: 40, reps: 10 }, { weightKg: 40, reps: 8 }];
+  const block = () => addExerciseBlock(createFreestyleSession(), getVariant("chest_press__dumbbell")!, { setCount: 4 }).exercises[0];
+
+  it("matches each working set to the same set last time and skips warm-ups", () => {
+    const exercise = block();
+    exercise.sets[0].type = "warmup";
+    expect(suggestSetValues(exercise, exercise.sets[0].id, lastTime)).toBeUndefined();
+    expect(suggestSetValues(exercise, exercise.sets[1].id, lastTime)).toEqual({ weightKg: 40, reps: 10 });
+    expect(suggestSetValues(exercise, exercise.sets[2].id, lastTime)).toEqual({ weightKg: 40, reps: 8 });
+  });
+
+  it("falls back to the completed set above, then to the final set last time", () => {
+    const exercise = block();
+    expect(suggestSetValues(exercise, exercise.sets[3].id, lastTime)).toEqual({ weightKg: 40, reps: 8 });
+    Object.assign(exercise.sets[2], { weightKg: 42.5, reps: 7, completedAt: "2026-08-13T10:00:00.000Z" });
+    expect(suggestSetValues(exercise, exercise.sets[3].id, lastTime)).toEqual({ weightKg: 42.5, reps: 7 });
+    expect(suggestSetValues(exercise, exercise.sets[0].id, [])).toBeUndefined();
+  });
+
+  it("never replaces values the user typed", () => {
+    expect(applySetSuggestion({ id: "set", type: "working", weightKg: 45 }, { weightKg: 40, reps: 10 })).toEqual({ reps: 10 });
+    expect(applySetSuggestion({ id: "set", type: "working" }, undefined)).toEqual({});
   });
 });

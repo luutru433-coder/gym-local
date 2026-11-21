@@ -212,6 +212,17 @@
   cursor: pointer;
 }
 
+.set-suggestion-hint {
+  margin: 0 0 10px;
+  color: #5d6652;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.set-complete svg { opacity: 0.38; }
+.set-complete:disabled svg { opacity: 0.2; }
+.set-row--done .set-complete svg { opacity: 1; }
+
 .set-type--warmup { color: #645c39; background: #f2e9ba; }
 .set-type--working { color: #3f5416; background: #e7f4ae; }
 .set-type--drop { color: #673e1b; background: #f6d9ad; }
@@ -408,12 +419,17 @@
   .set-row__actions {
     width: 100%;
     grid-area: actions;
-    grid-template-columns: repeat(2, minmax(44px, 1fr));
+    grid-template-columns: minmax(0, 1fr) 64px;
   }
 
   .set-row__actions .set-complete,
   .set-row__actions .set-remove {
     width: 100%;
+  }
+
+  .set-row__actions .set-complete {
+    grid-area: auto;
+    justify-self: stretch;
   }
 
   .session-note-card {
