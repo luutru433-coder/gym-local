@@ -1,3 +1,15 @@
+# Verification report — 2026-11-21
+
+## Nutrition pack 2026.11.1 — food names and duplicates
+
+- Rebuilding the unchanged script from the pinned USDA downloads (Foundation 2026-04-30, SR Legacy 2018-04, FNDDS 2021-2023) reproduced every row of the released 2026.08.1 `foods` table, so the comparison below is against the pack users have.
+- The new pack holds 13,332 foods (12,532 USDA, 800 dishes) and 11,420 searchable names; 1,912 USDA foods without a trustworthy Vietnamese label stay hidden. No display name contains a USDA-code placeholder, no two searchable foods share a display name, and no USDA description is listed twice; `scripts/verify-nutrition-pack.py` now enforces all three.
+- Macronutrients were not re-derived: for every food present in both packs, protein, carbohydrate, and fat are identical to 2026.08.1, and the 800 dish estimates are unchanged. Energy changed for 180 Foundation foods only (Atwater specific factors preferred).
+- The 66 curated recipe ingredients were read one by one against their USDA descriptions and values; all match. The other USDA values are carried over from USDA as published and were not checked against Vietnamese food-composition tables. Vietnamese names produced by the dictionary were sampled, not reviewed one by one.
+- Search ranking was run in Chromium with the real SQLite worker and OPFS against both the 2026.11.1 and the 2026.08.1 pack ("thit ga", "thịt gà", "dau phong", "com", "trứng", "chuoi", "chicken breast"), online and with the network disabled. That run used the build before the last naming change (meat-free and imitation foods, "rang" for roasted nuts); the final pack was checked with `scripts/verify-nutrition-pack.py` and SQLite queries only.
+- `pnpm run lint`, `pnpm run typecheck`, `pnpm content:validate`, `pnpm content:audit`, `pnpm test` (154 tests), and `pnpm nutrition:verify-pack` passed.
+- Artifact: `gym-local-nutrition-2026.11.1.sqlite3`, 31,985,664 bytes, SHA-256 `04247b6e55f714d0429e67cbd322c5e3f72ae118800cf906be7c2cb61f9ba9c9`.
+
 # Verification report — 2026-08-22
 
 ## Checkpoint N5 — mobile/offline release candidate

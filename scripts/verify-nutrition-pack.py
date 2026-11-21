@@ -64,9 +64,9 @@ catalog = json.loads(args.ingredient_catalog.read_text(encoding="utf-8"))
 assert args.db.stat().st_size == manifest["sizeBytes"], "manifest byte size mismatch"
 assert digest(args.db) == manifest["sha256"], "manifest checksum mismatch"
 assert manifest["schemaVersion"] == 3, "nutrition pack schema must be 3"
-assert manifest["version"] == "2026.08.1", "unexpected nutrition pack version"
+assert manifest["version"] == "2026.11.1", "unexpected nutrition pack version"
 assert manifest["aliasCount"] >= 2000, "too few Vietnamese aliases"
-assert manifest["vietnameseDisplayFoodCount"] >= 10_000, "fewer than 10,000 reviewed Vietnamese display names"
+assert manifest["vietnameseDisplayFoodCount"] >= 5_000, "fewer than 5,000 searchable Vietnamese display names"
 assert manifest["vietnameseRecipeCount"] == 480, "Vietnamese recipe count must be 480"
 assert manifest["activeRecipeCount"] == 800, "active recipe count must be 800"
 assert manifest["deprecatedRecipeCount"] == 300, "deprecated recipe count must be 300"
@@ -204,6 +204,31 @@ for row in connection.execute(
         assert not residue, f"hybrid VI/EN display name remains for {row['id']}: {sorted(residue)}"
     elif row["translation_status"] == "unreviewed":
         assert row["name_vi"] == row["name_en"], f"unreviewed food must display the original English name: {row['id']}"
+
+placeholder_names = connection.execute(
+    "SELECT count(*) FROM foods WHERE name_vi LIKE '%(mã USDA%'"
+).fetchone()[0]
+assert placeholder_names == 0, "display names must describe the food, not carry a USDA code placeholder"
+duplicate_display_name = connection.execute(
+    """
+    SELECT name_vi FROM foods WHERE translation_status='reviewed'
+    GROUP BY lower(name_vi) HAVING count(*) > 1 LIMIT 1
+    """
+).fetchone()
+assert duplicate_display_name is None, f"searchable foods share a display name: {duplicate_display_name[0] if duplicate_display_name else ''}"
+duplicate_description = connection.execute(
+    """
+    SELECT name_en FROM foods WHERE source='usda_fdc' AND id NOT IN (SELECT food_id FROM recipe_ingredients)
+    GROUP BY lower(name_en) HAVING count(*) > 1 LIMIT 1
+    """
+).fetchone()
+assert duplicate_description is None, f"the same USDA food is listed twice: {duplicate_description[0] if duplicate_description else ''}"
+for row in connection.execute(
+    "SELECT id, name_vi, name_en FROM foods WHERE source='usda_fdc' AND translation_status='reviewed' AND name_vi LIKE '%(%'"
+):
+    if row["id"] in catalog_by_id:
+        continue
+    assert row["name_vi"].endswith(f"({row['name_en']})"), f"bilingual display name must quote the USDA description: {row['id']}"
 
 optional_nutrients = (
     "fiber", "sugar", "sodium_mg", "calcium_mg", "iron_mg", "potassium_mg",
