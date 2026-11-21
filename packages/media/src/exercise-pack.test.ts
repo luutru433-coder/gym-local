@@ -29,9 +29,11 @@ describe("exercise image pack reading", () => {
       file("abc.gif"),
       file("zzz.gif"),
       data("exercises.json", { exercises: [{ id: "0025", name: "Barbell Bench Press" }, { exerciseId: 7, name: "Cable Pulldown", gif360: "media/360/ABC.gif?v=2" }] }),
+      file("0100.gif"),
+      data("named-wrapper.json", { name: "My pack", version: 2, exercises: [{ id: "0100", name: "Barbell Deadlift" }] }),
       data("broken.json", "not a list")
     ]);
-    expect(Object.fromEntries(images.map((image) => [image.id, image.name]))).toEqual({ "0025": "barbell bench press", abc: "cable pulldown", zzz: "zzz" });
+    expect(Object.fromEntries(images.map((image) => [image.id, image.name]))).toEqual({ "0025": "barbell bench press", "0100": "barbell deadlift", abc: "cable pulldown", zzz: "zzz" });
   });
 
   it("reads images and data out of a ZIP and leaves loose files alone", async () => {

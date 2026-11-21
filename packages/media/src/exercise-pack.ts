@@ -62,7 +62,8 @@ function collectRecords(value: unknown, records: Record<string, unknown>[], dept
   }
   const record = value as Record<string, unknown>;
   if (["name", "exerciseName", "title"].some((key) => typeof record[key] === "string")) records.push(record);
-  else for (const item of Object.values(record)) collectRecords(item, records, depth + 1);
+  // A named wrapper ({ name: "My pack", exercises: [...] }) still holds the exercise records below it.
+  for (const item of Object.values(record)) collectRecords(item, records, depth + 1);
 }
 
 /** Maps an image file stem to the exercise name a pack's JSON data gives it (by file reference or by id). */
