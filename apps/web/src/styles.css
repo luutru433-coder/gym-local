@@ -507,7 +507,7 @@ a { color: inherit; text-decoration: none; }
 .barcode-card h3 { margin: 5px 0 8px; font-size: 20px; }
 .barcode-card p { color: var(--muted); font-size: 10px; line-height: 1.55; margin-bottom: 16px; }
 .food-picker { display: flex; flex-direction: column; gap: 14px; }
-.food-picker__tabs { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; }
+.food-picker__tabs { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
 .barcode-manual { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; padding: 12px; background: #e8e5dc; border-radius: 10px; }
 .input-action { display: flex; gap: 7px; }
 .food-results { max-height: 310px; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }

@@ -124,3 +124,53 @@ describe("nutrition recipe flows", () => {
     expect(screen.getByRole("button", { name: "Xóa gói" })).toBeVisible();
   });
 });
+
+describe("fast meal logging", () => {
+  const packFood: FoodItem = {
+    id: "pack-pho",
+    name: { vi: "Phở bò", en: "Beef pho" },
+    per100g: { calories: 90, protein: 6, carbs: 12, fat: 2 },
+    source: "vietnamese_recipe",
+    dataQuality: "estimated_recipe",
+    updatedAt: "2026-08-13T00:00:00.000Z"
+  };
+  const rice: FoodItem = { ...food, id: "food-rice", name: { vi: "Cơm trắng", en: "White rice" } };
+
+  it("searches the offline pack while typing, without a search button", async () => {
+    const user = userEvent.setup();
+    const search = vi.fn().mockResolvedValue([packFood]);
+    useGymStore.setState({
+      nutritionPackRecord: { id: "nutrition-pack", status: "ready", version: "2026.08.1", bytesDownloaded: 1 },
+      searchOfflineNutritionFoods: search
+    });
+    render(<NutritionPage />);
+
+    await user.click(screen.getByRole("button", { name: "Add lunch" }));
+    expect(screen.queryByRole("button", { name: "Tìm offline" })).toBeNull();
+    await user.type(screen.getByRole("searchbox", { name: "Tìm thực phẩm" }), "pho");
+
+    expect(await screen.findByText("Phở bò")).toBeVisible();
+    expect(search).toHaveBeenLastCalledWith("pho");
+    expect(search).toHaveBeenCalledTimes(1);
+  });
+
+  it("lists recently logged foods first and logs the last amount in one tap", async () => {
+    const user = userEvent.setup();
+    useGymStore.setState({
+      foods: [food, rice],
+      foodPreferences: [{ id: "preference-rice", foodId: rice.id, favorite: false, defaultServingGrams: 150, lastUsedAt: "2026-08-13T01:00:00.000Z", useCount: 3 }]
+    });
+    render(<NutritionPage />);
+
+    await user.click(screen.getByRole("button", { name: "Add dinner" }));
+    const names = Array.from(document.querySelectorAll(".food-result__select strong")).map((node) => node.textContent);
+    expect(names).toEqual(["Cơm trắng", "Yến mạch"]);
+
+    await user.click(screen.getByRole("button", { name: "Ghi nhanh 150g Cơm trắng" }));
+
+    await waitFor(() => expect(useGymStore.getState().addMeal).toHaveBeenCalledTimes(1));
+    const entry = vi.mocked(useGymStore.getState().addMeal).mock.calls[0]?.[0];
+    expect(entry).toMatchObject({ foodId: rice.id, grams: 150, meal: "dinner" });
+    await waitFor(() => expect(screen.queryByRole("searchbox", { name: "Tìm thực phẩm" })).toBeNull());
+  });
+});

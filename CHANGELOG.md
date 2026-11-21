@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Faster meal logging
+
+- The add-food dialog now searches the installed offline food pack while you type (accented or unaccented), replacing the separate “Tìm offline” button.
+- Recently logged foods are listed first, ahead of unused favorites, and each has a one-tap button that logs the last amount again.
+- Saved-food search now ignores Vietnamese accents.
+
 ## 2026-08-22 — Nutrition planner algorithm 2
 
 - Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.
