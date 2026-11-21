@@ -411,7 +411,7 @@ export function WorkoutPage() {
       onStep: (delta) => patch({ weightKg: Math.max(0, (filled.weightKg ?? 0) + delta) })
     };
     const effort: FocusNumber = mode === "reps"
-      ? { value: filled.reps ?? repRange ?? 0, unit: locale === "vi" ? "lần" : "reps", label: locale === "vi" ? "lần" : "reps", step: 1, onStep: (delta) => patch({ reps: Math.max(0, (filled.reps ?? targetReps ?? 0) + (filled.reps === undefined && targetReps !== undefined ? 0 : delta)) }) }
+      ? { value: filled.reps ?? repRange ?? 0, unit: locale === "vi" ? "lần" : "reps", label: locale === "vi" ? "lần" : "reps", step: 1, onStep: (delta) => patch({ reps: Math.max(0, (filled.reps ?? targetReps ?? 0) + delta) }) }
       : mode === "timed"
         ? { value: filled.durationSeconds ?? set.targetDurationSeconds ?? "—", unit: locale === "vi" ? "giây" : "sec", label: locale === "vi" ? "giây" : "sec", step: 5, onStep: (delta) => patch({ durationSeconds: Math.max(0, (filled.durationSeconds ?? set.targetDurationSeconds ?? 0) + delta) }) }
         : { value: filled.distanceMeters ?? "—", unit: "m", label: "m" };
@@ -471,8 +471,10 @@ export function WorkoutPage() {
     const extra: SetSuggestion = {};
     // Reps are prefilled so one tap ends the set; they stay editable during the rest.
     if (mode === "reps" && filled.reps === undefined) extra.reps = targetReps;
-    if (mode === "timed" && filled.durationSeconds === undefined) extra.durationSeconds = elapsed;
-    if (mode === "distance" && !((filled.distanceMeters ?? 0) > 0 || (filled.durationSeconds ?? 0) > 0)) extra.durationSeconds = elapsed;
+    // Only seconds the user entered beat the stopwatch; a suggestion from history does not.
+    const entered = running.set;
+    if (mode === "timed" && entered.durationSeconds === undefined) extra.durationSeconds = elapsed;
+    if (mode === "distance" && !((entered.distanceMeters ?? 0) > 0 || (entered.durationSeconds ?? 0) > 0)) extra.durationSeconds = elapsed;
     completeSet(running.exercise.id, running.set.id, suggestion, extra);
   };
 
