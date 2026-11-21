@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Timed routine targets
+
+- Fixed the routine editor saving a hidden 8–12 rep target for timed and distance-tracked exercises (plank, farmer carry): new exercises and added sets now save the 30-second duration target the editor shows, so the workout screen displays it. Existing routines are not rewritten.
+
 ## Unreleased — Rest alert and workout summary
 
 - The rest timer now beeps and, where the device supports it (not iPhone), vibrates when the rest ends; a bell button in the rest bar turns the alert off. The alert needs the app open in the foreground.
