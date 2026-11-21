@@ -441,8 +441,8 @@ export function WorkoutPage() {
 
                   {previous.length > 0 ? (
                     <p className="set-suggestion-hint">{locale === "vi"
-                      ? "Số mờ là kết quả lần trước của đúng biến thể này. Chạm ✓ để ghi lại y như vậy, hoặc nhập số mới."
-                      : "Greyed numbers are your last result for this exact variation. Tap ✓ to log them as-is, or type new values."}</p>
+                      ? "Số mờ là gợi ý từ lần trước của đúng biến thể này, hoặc từ set vừa xong. Chạm ✓ để ghi đúng số đó, hoặc nhập số mới."
+                      : "Greyed numbers come from last time on this exact variation, or from the set you just finished. Tap ✓ to log them as-is, or type new values."}</p>
                   ) : null}
 
                   <div className="set-table" role="group" aria-label={`${locale === "vi" ? "Các set của" : "Sets for"} ${localize(exercise.variantNameSnapshot, locale)}`}>
@@ -522,7 +522,7 @@ export function WorkoutPage() {
                             : <input disabled={Boolean(set.completedAt)} aria-label={`Set ${setNumber}, RIR`} inputMode="numeric" min="0" max="10" step="1" value={set.rir ?? ""} placeholder={String(set.targetRir ?? 2)} onChange={(event) => patchSet(exercise.id, set.id, { rir: nonNegativeInteger(event.target.value, 10) })} />}
                           </label>
                           <div className="set-row__actions">
-                            <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id, suggestion)} aria-label={completeLabel} aria-pressed={Boolean(set.completedAt)} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập số lần, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}>{set.completedAt ? <Check size={19} /> : null}</button>
+                            <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id, suggestion)} aria-label={completeLabel} aria-pressed={Boolean(set.completedAt)} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập số lần, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}><Check size={19} aria-hidden="true" /></button>
                             <button type="button" className="set-remove" disabled={Boolean(set.completedAt)} onClick={() => deleteSet(exercise.id, set.id)} aria-label={locale === "vi" ? `Xóa set ${setNumber}` : `Remove set ${setNumber}`} title={set.completedAt ? (locale === "vi" ? "Bỏ hoàn tất trước khi xóa set" : "Undo completion before removing this set") : undefined}><Trash2 size={17} /></button>
                           </div>
                         </div>
