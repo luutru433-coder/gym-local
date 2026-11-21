@@ -32,7 +32,7 @@
 
 .water-card--interactive strong small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .water-controls {
@@ -138,13 +138,13 @@
 .food-results__label {
   margin: 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .search-box__status {
   flex: 0 0 auto;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .favorite-button[aria-pressed="true"] {
@@ -194,13 +194,13 @@
   display: block;
   margin-top: 4px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .recipe-card strong {
   display: block;
   margin-top: 7px;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .recipe-card__actions {

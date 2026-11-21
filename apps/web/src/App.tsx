@@ -3,10 +3,10 @@ import { AlertTriangle, CheckCircle2, Dumbbell, X } from "lucide-react";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { UpdatePrompt } from "./components/UpdatePrompt";
-import { Onboarding } from "./features/onboarding/Onboarding";
 import { useDocumentLanguage } from "./lib/i18n";
 import { useGymStore } from "./store/useGymStore";
 
+const Onboarding = lazy(() => import("./features/onboarding/Onboarding").then((module) => ({ default: module.Onboarding })));
 const HomePage = lazy(() => import("./features/home/HomePage").then((module) => ({ default: module.HomePage })));
 const RoutinesPage = lazy(() => import("./features/routines/RoutinesPage").then((module) => ({ default: module.RoutinesPage })));
 const CatalogPage = lazy(() => import("./features/catalog/CatalogPage").then((module) => ({ default: module.CatalogPage })));
@@ -37,7 +37,7 @@ export function App() {
     return <div className="boot-screen"><span className="boot-screen__mark"><Dumbbell size={30} /></span><strong>GYMLOCAL</strong><div className="boot-loader"><i /><i /><i /></div><p>Loading your local data…</p></div>;
   }
 
-  if (!profile?.onboardingComplete) return <><Onboarding />{error ? <GlobalMessage tone="error" message={error} /> : null}</>;
+  if (!profile?.onboardingComplete) return <><Suspense fallback={<RouteLoader />}><Onboarding /></Suspense>{error ? <GlobalMessage tone="error" message={error} /> : null}</>;
 
   return (
     <HashRouter>
