@@ -36,10 +36,17 @@ function isMediaUrl(url: string): boolean {
 async function page(cursor: string | undefined, signal: AbortSignal | undefined, pause: (ms: number) => Promise<void>) {
   const url = `${LIST_URL}?limit=${PAGE_SIZE}${cursor ? `&after=${encodeURIComponent(cursor)}` : ""}`;
   for (let attempt = 0; ; attempt++) {
-    const response = await fetch(url, { signal });
-    if (response.ok) return pageSchema.parse(await response.json());
-    // The free service answers 429 or 503 when it is busy; wait and ask again a few times.
-    if (attempt >= RETRIES || ![429, 502, 503].includes(response.status)) throw new Error(`ExerciseDB list request failed (${response.status})`);
+    // A busy answer (429, 502, 503) can arrive without cross-origin headers, which the browser reports as a
+    // failed request instead of a status; both are worth waiting for and asking again.
+    let status = 0;
+    try {
+      const response = await fetch(url, { signal });
+      if (response.ok) return pageSchema.parse(await response.json());
+      status = response.status;
+    } catch (error) {
+      if (signal?.aborted || !(error instanceof TypeError)) throw error;
+    }
+    if (attempt >= RETRIES || ![0, 429, 502, 503].includes(status)) throw new Error(status ? `ExerciseDB list request failed (${status})` : "ExerciseDB could not be reached");
     await pause(2000 * 2 ** attempt);
   }
 }
@@ -55,7 +62,7 @@ export async function listExerciseDbImages(onProgress?: (done: number, total: nu
     const next = result.meta?.nextCursor ?? undefined;
     if (!next || next === cursor || result.meta?.hasNextPage === false || result.data.length === 0) break;
     cursor = next;
-    await pause(150);
+    await pause(400);
   }
   return [...images.values()];
 }

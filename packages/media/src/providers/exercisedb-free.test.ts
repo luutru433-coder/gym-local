@@ -30,10 +30,12 @@ describe("free ExerciseDB download", () => {
 
   it("waits and asks again when the service is busy, and gives up on other errors", async () => {
     const pauses: number[] = [];
-    const answers = [reply([], undefined, 429), reply([], undefined, 503), reply([gif("a", "plank")])];
-    vi.stubGlobal("fetch", vi.fn(async () => answers.shift()!));
+    const answers = [reply([], undefined, 429), new TypeError("Failed to fetch"), reply([], undefined, 503), reply([gif("a", "plank")])];
+    vi.stubGlobal("fetch", vi.fn(async () => { const answer = answers.shift()!; if (answer instanceof Error) throw answer; return answer; }));
     expect(await listExerciseDbImages(undefined, undefined, async (ms) => void pauses.push(ms))).toHaveLength(1);
-    expect(pauses).toEqual([2000, 4000]);
+    expect(pauses).toEqual([2000, 4000, 8000]);
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("Failed to fetch"); }));
+    await expect(listExerciseDbImages(undefined, undefined, noPause)).rejects.toThrow("could not be reached");
     vi.stubGlobal("fetch", vi.fn(async () => reply([], undefined, 500)));
     await expect(listExerciseDbImages(undefined, undefined, noPause)).rejects.toThrow("500");
     vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ nope: true }) }) as Response));
