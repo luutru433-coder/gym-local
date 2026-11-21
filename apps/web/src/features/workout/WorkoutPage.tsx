@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
-  Bell,
-  BellOff,
   ArrowDown,
   ArrowLeft,
   ArrowUp,
@@ -12,14 +10,10 @@ import {
   Clock3,
   Dumbbell,
   Link2,
-  Minus,
-  Pause,
-  Play,
   Plus,
   RotateCcw,
   Search,
   Sparkles,
-  TimerReset,
   Trash2,
   Trophy,
   X
@@ -44,6 +38,7 @@ import {
   switchExerciseVariant,
   updateSet
 } from "@gym/workouts";
+import { cancelRunningSet, lastFinishedSet, nextOpenSet, reopenSet, runningSeconds, runningSet, stampWorkSeconds, startSet, type SetRef } from "@gym/workouts/set-timer";
 import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, restingExercise, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
 import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
@@ -54,6 +49,8 @@ import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
 import { playRestAlert, primeRestAlert, useScreenWakeLock } from "./restAlert";
 import { recordKindsLabel } from "./recordLabels";
 import { WorkoutSummary } from "./WorkoutSummary";
+import { clock } from "./clock";
+import { SetFocus, type FocusNumber, type FocusSet, type FocusState } from "./SetFocus";
 import "./WorkoutPage.css";
 
 function durationLabel(startedAt: string, now: number): string {
@@ -142,7 +139,13 @@ export function WorkoutPage() {
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
+    // iOS freezes timers in the background: catch up as soon as the app is visible again.
+    const resume = () => { if (document.visibilityState === "visible") setNow(Date.now()); };
+    document.addEventListener("visibilitychange", resume);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", resume);
+    };
   }, []);
 
   const progress = activeSession ? sessionProgress(activeSession) : { completed: 0, total: 0, percent: 0 };
@@ -212,27 +215,27 @@ export function WorkoutPage() {
     save(updateSet(activeSession, exerciseId, setId, values));
   };
 
+  const completeSet = (exerciseId: string, setId: string, suggestion?: SetSuggestion, extra: SetSuggestion = {}) => {
+    if (!activeSession) return;
+    const set = activeSession.exercises.find((item) => item.id === exerciseId)?.sets.find((item) => item.id === setId);
+    if (!set) return;
+    const completed = updateSet(activeSession, exerciseId, setId, { ...applySetSuggestion(set, suggestion), ...extra }, true);
+    const updated = advanceSuperset(stampWorkSeconds(completed, exerciseId, setId), exerciseId);
+    save(updated);
+    syncClock();
+    if (updated.activeExerciseId !== exerciseId) {
+      const nextId = updated.activeExerciseId;
+      setExpandedId(nextId);
+      if (nextId) window.requestAnimationFrame(() => document.getElementById(nextId)?.scrollIntoView?.({ behavior: "smooth", block: "start" }));
+    }
+  };
+
   const toggleComplete = (exerciseId: string, setId: string, suggestion?: SetSuggestion) => {
     if (!activeSession) return;
-    const exercise = activeSession.exercises.find((item) => item.id === exerciseId);
-    const set = exercise?.sets.find((item) => item.id === setId);
+    const set = activeSession.exercises.find((item) => item.id === exerciseId)?.sets.find((item) => item.id === setId);
     if (!set) return;
-    if (set.completedAt) {
-      const updated = structuredClone(activeSession);
-      const target = updated.exercises.find((item) => item.id === exerciseId)?.sets.find((item) => item.id === setId);
-      if (target) target.completedAt = undefined;
-      updated.restTimerEndsAt = undefined;
-      save(updated);
-    } else {
-      const updated = advanceSuperset(updateSet(activeSession, exerciseId, setId, applySetSuggestion(set, suggestion), true), exerciseId);
-      save(updated);
-      syncClock();
-      if (updated.activeExerciseId !== exerciseId) {
-        const nextId = updated.activeExerciseId;
-        setExpandedId(nextId);
-        if (nextId) window.requestAnimationFrame(() => document.getElementById(nextId)?.scrollIntoView?.({ behavior: "smooth", block: "start" }));
-      }
-    }
+    if (set.completedAt) save(reopenSet(activeSession, exerciseId, setId));
+    else completeSet(exerciseId, setId, suggestion);
   };
 
   const modifyRest = (seconds?: number) => {
@@ -383,6 +386,98 @@ export function WorkoutPage() {
     );
   }
 
+  const describeSet = ({ exercise, set, setNumber }: SetRef) => {
+    const tracking = exercise.trackingProfileSnapshot
+      ?? getTrackingProfile(exercise.variantId)
+      ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
+    const mode = tracking.effortKind === "distance_duration" ? "distance" as const : tracking.effortKind === "duration" ? "timed" as const : "reps" as const;
+    const previous = latestVariantHistory(sessions.filter((session) => session.id !== activeSession.id), exercise.variantId);
+    const suggestion = set.completedAt ? undefined : suggestSetValues(exercise, set.id, previous);
+    const filled = { ...set, ...applySetSuggestion(set, suggestion) };
+    const patch = (values: SetSuggestion & Pick<SetLog, "rir">) => set.completedAt
+      // Correcting a finished set must not move the workout back to its block (supersets).
+      ? save({ ...updateSet(activeSession, exercise.id, set.id, values), activeExerciseId: activeSession.activeExerciseId })
+      : patchSet(exercise.id, set.id, values);
+    const targetReps = set.targetMaxReps ?? set.targetMinReps;
+    const repRange = set.targetMinReps !== undefined && set.targetMaxReps !== undefined && set.targetMinReps !== set.targetMaxReps
+      ? `${set.targetMinReps}–${set.targetMaxReps}`
+      : targetReps !== undefined ? String(targetReps) : undefined;
+    const loadMode = tracking.loadEntryMode;
+    const load: FocusNumber | undefined = loadMode === "reps_only" || mode === "distance" ? undefined : {
+      value: filled.weightKg ?? 0,
+      unit: "kg",
+      label: loadMode === "per_hand" ? (locale === "vi" ? "kg/tay" : "kg/hand") : loadMode === "per_side" ? (locale === "vi" ? "kg/bên" : "kg/side") : loadMode === "assisted" ? (locale === "vi" ? "kg trợ lực" : "assist kg") : loadMode === "bodyweight_plus" ? (locale === "vi" ? "kg thêm" : "added kg") : "kg",
+      step: loadMode === "total_weight" ? 2.5 : 1,
+      onStep: (delta) => patch({ weightKg: Math.max(0, (filled.weightKg ?? 0) + delta) })
+    };
+    const effort: FocusNumber = mode === "reps"
+      ? { value: filled.reps ?? repRange ?? 0, unit: locale === "vi" ? "lần" : "reps", label: locale === "vi" ? "lần" : "reps", step: 1, onStep: (delta) => patch({ reps: Math.max(0, (filled.reps ?? targetReps ?? 0) + delta) }) }
+      : mode === "timed"
+        ? { value: filled.durationSeconds ?? set.targetDurationSeconds ?? "—", unit: locale === "vi" ? "giây" : "sec", label: locale === "vi" ? "giây" : "sec", step: 5, onStep: (delta) => patch({ durationSeconds: Math.max(0, (filled.durationSeconds ?? set.targetDurationSeconds ?? 0) + delta) }) }
+        : { value: filled.distanceMeters ?? "—", unit: "m", label: "m" };
+    const workingIndex = exercise.sets.slice(0, setNumber).filter((candidate) => candidate.type !== "warmup").length - 1;
+    const prior = set.type === "warmup" ? undefined : previous[workingIndex];
+    const view: FocusSet = {
+      exerciseName: localize(exercise.variantNameSnapshot, locale),
+      exercisePosition: `${locale === "vi" ? "Bài" : "Exercise"} ${activeSession.exercises.findIndex((item) => item.id === exercise.id) + 1}/${activeSession.exercises.length}`,
+      setNumber,
+      setCount: exercise.sets.length,
+      doneCount: exercise.sets.filter((item) => item.completedAt).length,
+      targetLabel: mode === "reps" ? (repRange ? `${repRange} ${locale === "vi" ? "lần" : "reps"}` : undefined) : set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : undefined,
+      previousLabel: prior ? (mode === "distance" ? `${prior.distanceMeters ?? "—"} m · ${prior.durationSeconds ?? "—"} s` : mode === "timed" ? `${prior.weightKg ? `${prior.weightKg} kg · ` : ""}${prior.durationSeconds ?? "—"} s` : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`) : undefined,
+      load,
+      effort
+    };
+    const rir: FocusNumber = { value: set.rir ?? "–", unit: "RIR", label: "RIR", step: 1, onStep: (delta) => patch({ rir: Math.min(10, Math.max(0, (set.rir ?? set.targetRir ?? 2) + (set.rir === undefined ? 0 : delta))) }) };
+    return { view, mode, suggestion, filled, targetReps, rir };
+  };
+
+  const running = runningSet(activeSession);
+  const upcoming = nextOpenSet(activeSession);
+  const justDone = lastFinishedSet(activeSession);
+  const runningInfo = running ? describeSet(running) : undefined;
+  const runningElapsed = running ? runningSeconds(running.set, now) : 0;
+  let focusState: FocusState;
+  if (running && runningInfo) {
+    focusState = { phase: "running", set: runningInfo.view, elapsed: runningElapsed, canEnd: runningInfo.mode !== "reps" || (runningInfo.filled.reps ?? runningInfo.targetReps ?? 0) > 0 };
+  } else if (restEndsAt) {
+    const planned = restingExercise(activeSession)?.restSeconds ?? 90;
+    const doneInfo = justDone ? describeSet(justDone) : undefined;
+    focusState = {
+      phase: "rest",
+      remaining: restRemaining,
+      total: Math.max(planned, restRemaining),
+      overtime: Math.max(0, Math.floor((now - new Date(restEndsAt).getTime()) / 1000)),
+      done: doneInfo && justDone ? { ...doneInfo.view, workSeconds: justDone.set.workSeconds, rir: doneInfo.rir } : undefined,
+      next: upcoming ? describeSet(upcoming).view : undefined
+    };
+  } else if (upcoming) {
+    focusState = { phase: "ready", set: describeSet(upcoming).view };
+  } else {
+    focusState = { phase: "finished" };
+  }
+
+  const startFocusSet = () => {
+    if (!upcoming) return;
+    save(startSet(activeSession, upcoming.exercise.id, upcoming.set.id));
+    setExpandedId(upcoming.exercise.id);
+    syncClock();
+  };
+
+  const endFocusSet = () => {
+    if (!running || !runningInfo) return;
+    const { mode, filled, targetReps, suggestion } = runningInfo;
+    const elapsed = Math.max(1, runningSeconds(running.set));
+    const extra: SetSuggestion = {};
+    // Reps are prefilled so one tap ends the set; they stay editable during the rest.
+    if (mode === "reps" && filled.reps === undefined) extra.reps = targetReps;
+    // Only seconds the user entered beat the stopwatch; a suggestion from history does not.
+    const entered = running.set;
+    if (mode === "timed" && entered.durationSeconds === undefined) extra.durationSeconds = elapsed;
+    if (mode === "distance" && !((entered.distanceMeters ?? 0) > 0 || (entered.durationSeconds ?? 0) > 0)) extra.durationSeconds = elapsed;
+    completeSet(running.exercise.id, running.set.id, suggestion, extra);
+  };
+
   const pickerExercise = exercisePicker?.mode === "replace"
     ? activeSession.exercises.find((exercise) => exercise.id === exercisePicker.exerciseId)
     : undefined;
@@ -421,6 +516,20 @@ export function WorkoutPage() {
           <button type="button" aria-label={locale === "vi" ? "Đóng thông báo lỗi" : "Dismiss error"} onClick={() => setActionError(undefined)}><X size={17} /></button>
         </div>
       ) : null}
+
+      <SetFocus
+        locale={locale}
+        state={focusState}
+        alertMuted={restAlertMuted}
+        wakeLockSupported={"wakeLock" in navigator}
+        onStart={startFocusSet}
+        onEnd={endFocusSet}
+        onCancelSet={() => save(cancelRunningSet(activeSession))}
+        onFinish={() => void finish()}
+        onRest={modifyRest}
+        onRestartRest={restartRest}
+        onToggleAlert={toggleRestAlert}
+      />
 
       <nav className="exercise-jump" aria-label={locale === "vi" ? "Các bài trong buổi tập" : "Workout exercises"}>
         {activeSession.exercises.map((exercise, index) => {
@@ -580,14 +689,14 @@ export function WorkoutPage() {
                             : (locale === "vi" ? `Hoàn tất set ${setNumber}` : `Complete set ${setNumber}`))
                           : (locale === "vi" ? `Set ${setNumber}: nhập số lần, quãng đường hoặc thời gian trước` : `Set ${setNumber}: enter reps, distance, or duration first`);
                       return (
-                        <div className={set.completedAt ? "set-row set-row--done" : "set-row"} key={set.id}>
+                        <div className={set.completedAt ? "set-row set-row--done" : set.startedAt ? "set-row set-row--running" : "set-row"} key={set.id}>
                           <label className="set-type-field">
                             <span className="sr-only">{setTypeLabel}</span>
                             <select className={`set-type set-type--${set.type}`} aria-label={setTypeLabel} value={set.type} disabled={Boolean(set.completedAt)} onChange={(event) => patchSet(exercise.id, set.id, { type: event.target.value as SetType })}>
                               {(Object.keys(setTypeLabels) as SetType[]).map((type) => <option key={type} value={type}>{setTypeLabels[type][locale]}</option>)}
                             </select>
                           </label>
-                          <span className="previous-value"><span className="sr-only">{locale === "vi" ? "Trước hoặc mục tiêu: " : "Previous or target: "}</span>{previousLabel}{setRecord ? <span className="set-record-badge" title={recordKindsLabel(setRecord.kinds, locale)}><Trophy size={12} aria-hidden="true" />{locale === "vi" ? "Kỷ lục mới" : "New record"}<span className="sr-only">: {recordKindsLabel(setRecord.kinds, locale)}</span></span> : null}</span>
+                          <span className="previous-value"><span className="sr-only">{locale === "vi" ? "Trước hoặc mục tiêu: " : "Previous or target: "}</span>{previousLabel}{set.completedAt && set.workSeconds !== undefined ? <span className="set-time" title={locale === "vi" ? "Thời gian set và nghỉ thực tế trước set" : "Set time and real rest before the set"}>{clock(set.workSeconds)}{set.restBeforeSeconds !== undefined ? ` · ${locale === "vi" ? "nghỉ" : "rest"} ${clock(set.restBeforeSeconds)}` : ""}</span> : null}{setRecord ? <span className="set-record-badge" title={recordKindsLabel(setRecord.kinds, locale)}><Trophy size={12} aria-hidden="true" />{locale === "vi" ? "Kỷ lục mới" : "New record"}<span className="sr-only">: {recordKindsLabel(setRecord.kinds, locale)}</span></span> : null}</span>
                           <div className="set-field set-field--load">
                             <span className="set-field__label">{loadFieldLabel}</span>
                             {repsOnly ? <span className="set-input-placeholder" aria-hidden="true">—</span> : <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${loadFieldLabel}`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder={String(suggestion?.weightKg ?? 0)} onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
@@ -638,21 +747,6 @@ export function WorkoutPage() {
           </label>
         </Card>
       </main>
-
-      {activeSession.restTimerEndsAt ? (
-        <div className={restRemaining === 0 ? "rest-dock rest-dock--done" : "rest-dock"} role="region" aria-label={locale === "vi" ? "Bộ đếm thời gian nghỉ" : "Rest timer controls"}>
-          <span className="rest-dock__icon">{restRemaining ? <Pause size={20} /> : <Play size={20} />}</span>
-          <div role="timer" aria-label={`${locale === "vi" ? "Thời gian nghỉ còn lại" : "Rest time remaining"}: ${restRemaining} ${locale === "vi" ? "giây" : "seconds"}`}><small>{restRemaining ? (locale === "vi" ? "Đang nghỉ" : "Rest timer") : (locale === "vi" ? "Sẵn sàng" : "Ready")}</small><strong>{String(Math.floor(restRemaining / 60)).padStart(2, "0")}:{String(restRemaining % 60).padStart(2, "0")}</strong></div>
-          <div className="rest-dock__controls">
-            <button type="button" aria-label={locale === "vi" ? "Giảm 15 giây nghỉ" : "Remove 15 seconds of rest"} onClick={() => modifyRest(-15)}><Minus size={15} />15s</button>
-            <button type="button" aria-label={locale === "vi" ? "Thêm 15 giây nghỉ" : "Add 15 seconds of rest"} onClick={() => modifyRest(15)}><Plus size={15} />15s</button>
-            <button type="button" aria-label={locale === "vi" ? "Bắt đầu lại giờ nghỉ" : "Restart rest timer"} onClick={restartRest}><TimerReset size={16} /><span>{locale === "vi" ? "Lại" : "Restart"}</span></button>
-            <button type="button" className="rest-dock__alert-toggle" aria-pressed={!restAlertMuted} aria-label={locale === "vi" ? "Âm báo và rung khi hết giờ nghỉ" : "Sound and vibration when rest ends"} title={restAlertMuted ? (locale === "vi" ? "Đang tắt âm báo" : "Alert is off") : (locale === "vi" ? "Đang bật âm báo" : "Alert is on")} onClick={toggleRestAlert}>{restAlertMuted ? <BellOff size={16} /> : <Bell size={16} />}</button>
-            <button type="button" onClick={() => modifyRest(undefined)}>{locale === "vi" ? "Bỏ qua" : "Skip"}<X size={16} /></button>
-          </div>
-          <span className="sr-only" aria-live="assertive">{restRemaining === 0 ? (locale === "vi" ? "Hết giờ nghỉ, sẵn sàng tập" : "Rest complete, ready") : ""}</span>
-        </div>
-      ) : null}
 
       <Modal open={Boolean(exercisePicker)} title={exercisePicker?.mode === "add" ? (locale === "vi" ? "Thêm bài tập" : "Add exercise") : (locale === "vi" ? "Đổi máy / dụng cụ" : "Switch equipment")} onClose={() => { setExercisePicker(undefined); setExerciseQuery(""); }}>
         {exercisePicker ? (

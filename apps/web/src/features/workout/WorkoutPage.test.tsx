@@ -269,4 +269,33 @@ describe("live workout editing", () => {
     expect(screen.getByText("40 kg × 10")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Xem tiến độ" })).toBeInTheDocument();
   });
+
+  it("starts and ends a set from the focus panel, then rests and lets the reps be corrected", async () => {
+    const user = userEvent.setup();
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    live.exercises[0].sets[0] = { id: "set-one", type: "working", targetMinReps: 8, targetMaxReps: 10, weightKg: 20 };
+    arrange(live);
+
+    await user.click(screen.getByRole("button", { name: "Bắt đầu set 1" }));
+    const started = useGymStore.getState().activeSession!.exercises[0].sets[0];
+    expect(started.startedAt).toBeDefined();
+    expect(screen.getByRole("timer", { name: /Thời gian set/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Kết thúc set" }));
+    const ended = useGymStore.getState().activeSession!;
+    expect(ended.exercises[0].sets[0]).toMatchObject({ reps: 10, weightKg: 20 });
+    expect(ended.exercises[0].sets[0].completedAt).toBeDefined();
+    expect(ended.exercises[0].sets[0].workSeconds).toBeGreaterThanOrEqual(0);
+    expect(ended.restTimerEndsAt).toBeDefined();
+    expect(screen.getByRole("timer", { name: /Thời gian nghỉ còn lại/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Giảm lần" }));
+    expect(useGymStore.getState().activeSession!.exercises[0].sets[0].reps).toBe(9);
+
+    await user.click(screen.getByRole("button", { name: "Bắt đầu set 2" }));
+    const next = useGymStore.getState().activeSession!;
+    expect(next.restTimerEndsAt).toBeUndefined();
+    expect(next.exercises[0].sets[1].restBeforeSeconds).toBeGreaterThanOrEqual(0);
+  });
 });
