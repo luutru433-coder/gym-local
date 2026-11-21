@@ -10,17 +10,17 @@ describe("nutritionPackSearchQueries", () => {
   it("matches every typed word as a prefix and ranks names that follow the typed order", () => {
     expect(nutritionPackSearchQueries("thịt gà")).toEqual({
       match: "\"thịt\"* \"gà\"*",
-      nameStart: "{name_vi name_en} : (^ \"thịt\" + \"gà\" *)",
-      namePhrase: "{name_vi name_en} : (\"thịt\" + \"gà\" *)"
+      nameStart: "{name_vi name_en} : ((^ \"thịt\" + \"gà\" *))",
+      namePhrase: "{name_vi name_en} : ((\"thịt\" + \"gà\" *))"
     });
   });
 
   it("also tries đ for unaccented words starting with d, which the tokenizer does not fold", () => {
     expect(nutritionPackSearchQueries("dau do")?.nameStart).toBe(
-      "{name_vi name_en} : (^ \"dau\" + \"do\" *) OR (^ \"đau\" + \"do\" *) OR (^ \"dau\" + \"đo\" *) OR (^ \"đau\" + \"đo\" *)"
+      "{name_vi name_en} : ((^ \"dau\" + \"do\" *) OR (^ \"đau\" + \"do\" *) OR (^ \"dau\" + \"đo\" *) OR (^ \"đau\" + \"đo\" *))"
     );
     expect(nutritionPackSearchQueries("da ga")?.namePhrase).toBe(
-      "{name_vi name_en} : (\"da\" + \"ga\" *) OR (\"đa\" + \"ga\" *)"
+      "{name_vi name_en} : ((\"da\" + \"ga\" *) OR (\"đa\" + \"ga\" *))"
     );
   });
 

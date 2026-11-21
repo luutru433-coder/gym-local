@@ -23,8 +23,9 @@ export function nutritionPackSearchQueries(query: string): NutritionPackSearchQu
   const phrases = dStrokeSpellings(tokens).map((spelling) => `${spelling.map((token) => `"${token}"`).join(" + ")} *`);
   return {
     match: tokens.map((token) => `"${token}"*`).join(" "),
-    nameStart: `{name_vi name_en} : ${phrases.map((phrase) => `(^ ${phrase})`).join(" OR ")}`,
-    namePhrase: `{name_vi name_en} : ${phrases.map((phrase) => `(${phrase})`).join(" OR ")}`
+    // The outer brackets keep the column filter on every spelling, not only the first.
+    nameStart: `{name_vi name_en} : (${phrases.map((phrase) => `(^ ${phrase})`).join(" OR ")})`,
+    namePhrase: `{name_vi name_en} : (${phrases.map((phrase) => `(${phrase})`).join(" OR ")})`
   };
 }
 
