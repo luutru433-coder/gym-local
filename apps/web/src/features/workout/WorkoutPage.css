@@ -212,6 +212,13 @@
   cursor: pointer;
 }
 
+.set-suggestion-hint {
+  margin: 0 0 10px;
+  color: #5d6652;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
 .set-type--warmup { color: #645c39; background: #f2e9ba; }
 .set-type--working { color: #3f5416; background: #e7f4ae; }
 .set-type--drop { color: #673e1b; background: #f6d9ad; }

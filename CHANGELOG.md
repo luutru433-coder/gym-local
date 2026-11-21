@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Faster workout logging: unfinished sets now show the weight and reps (or time/distance) from the last session of the same exact variation, and one tap on ✓ logs them. Typed values always win, warm-ups never borrow working-set history, and nothing is written until the set is completed.
+
 ## 2026-08-22 — Nutrition planner algorithm 2
 
 - Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.

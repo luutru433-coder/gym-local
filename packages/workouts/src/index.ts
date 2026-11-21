@@ -313,6 +313,47 @@ export function updateSet(
   return updated;
 }
 
+export type SetSuggestion = Pick<SetLog, "weightKg" | "reps" | "durationSeconds" | "distanceMeters">;
+
+function suggestionFrom(values: SetSuggestion | undefined): SetSuggestion | undefined {
+  if (!values) return undefined;
+  const suggestion: SetSuggestion = {};
+  for (const key of ["weightKg", "reps", "durationSeconds", "distanceMeters"] as const) {
+    if (values[key] !== undefined) suggestion[key] = values[key];
+  }
+  return Object.keys(suggestion).length ? suggestion : undefined;
+}
+
+/**
+ * Values to offer for an unfinished set. `lastTime` must hold the completed working sets of the
+ * same exact variant, in order. Falls back to the closest earlier completed set of the same type
+ * in this block, then to the final set from last time.
+ */
+export function suggestSetValues(
+  exercise: SessionExercise,
+  setId: string,
+  lastTime: SetSuggestion[]
+): SetSuggestion | undefined {
+  const index = exercise.sets.findIndex((item) => item.id === setId);
+  if (index < 0) return undefined;
+  const set = exercise.sets[index];
+  const earlier = exercise.sets.slice(0, index);
+  const sameSetAbove = suggestionFrom([...earlier].reverse().find((item) => item.completedAt && item.type === set.type));
+  if (set.type === "warmup") return sameSetAbove;
+  const workingIndex = earlier.filter((item) => item.type !== "warmup").length;
+  return suggestionFrom(lastTime[workingIndex]) ?? sameSetAbove ?? suggestionFrom(lastTime.at(-1));
+}
+
+/** Fills only the fields the user left empty, so typed values always win. */
+export function applySetSuggestion(set: SetLog, suggestion: SetSuggestion | undefined): SetSuggestion {
+  const values: SetSuggestion = {};
+  if (!suggestion) return values;
+  for (const key of ["weightKg", "reps", "durationSeconds", "distanceMeters"] as const) {
+    if (set[key] === undefined && suggestion[key] !== undefined) values[key] = suggestion[key];
+  }
+  return values;
+}
+
 export function addSet(session: WorkoutSession, exerciseId: string, type: SetLog["type"] = "working"): WorkoutSession {
   const updated = structuredClone(session);
   const exercise = updated.exercises.find((item) => item.id === exerciseId);

@@ -23,10 +23,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Button, Card, EmptyState, Modal, ProgressBar } from "@gym/ui";
 import type { ExerciseVariant, LoadEntryMode, ProgressionRule, SetLog, SetType, WorkoutSession } from "@gym/contracts";
+import type { SetSuggestion } from "@gym/workouts";
 import { EQUIPMENT_OPTIONS, MOVEMENTS, getTrackingProfile, getVariant, rankVariantsForEquipment, trackingProfileForLoadMode } from "@gym/catalog";
 import {
   addExerciseBlock,
   addSet,
+  applySetSuggestion,
   calculatePlateLoading,
   createFreestyleSession,
   removeExerciseBlock,
@@ -34,6 +36,7 @@ import {
   reorderExerciseBlock,
   sessionProgress,
   suggestDoubleProgression,
+  suggestSetValues,
   switchExerciseVariant,
   updateSet
 } from "@gym/workouts";
@@ -154,7 +157,7 @@ export function WorkoutPage() {
     save(updateSet(activeSession, exerciseId, setId, values));
   };
 
-  const toggleComplete = (exerciseId: string, setId: string) => {
+  const toggleComplete = (exerciseId: string, setId: string, suggestion?: SetSuggestion) => {
     if (!activeSession) return;
     const exercise = activeSession.exercises.find((item) => item.id === exerciseId);
     const set = exercise?.sets.find((item) => item.id === setId);
@@ -166,7 +169,7 @@ export function WorkoutPage() {
       updated.restTimerEndsAt = undefined;
       save(updated);
     } else {
-      save(updateSet(activeSession, exerciseId, setId, {}, true));
+      save(updateSet(activeSession, exerciseId, setId, applySetSuggestion(set, suggestion), true));
     }
   };
 
@@ -436,6 +439,12 @@ export function WorkoutPage() {
                     </div>
                   ) : null}
 
+                  {previous.length > 0 ? (
+                    <p className="set-suggestion-hint">{locale === "vi"
+                      ? "Số mờ là kết quả lần trước của đúng biến thể này. Chạm ✓ để ghi lại y như vậy, hoặc nhập số mới."
+                      : "Greyed numbers are your last result for this exact variation. Tap ✓ to log them as-is, or type new values."}</p>
+                  ) : null}
+
                   <div className="set-table" role="group" aria-label={`${locale === "vi" ? "Các set của" : "Sets for"} ${localize(exercise.variantNameSnapshot, locale)}`}>
                     <div className="set-table__head" aria-hidden="true"><span>{locale === "vi" ? "LOẠI SET" : "SET TYPE"}</span><span>{locale === "vi" ? "TRƯỚC / MỤC TIÊU" : "PREV / TARGET"}</span><span>{weightHeading}</span><span>{distanceMode ? "M" : timedMode ? (locale === "vi" ? "GIÂY" : "SEC") : "REPS"}</span><span>{distanceMode ? (locale === "vi" ? "GIÂY" : "SEC") : "RIR"}</span><span /></div>
                     {exercise.sets.map((set, setIndex) => {
@@ -454,11 +463,19 @@ export function WorkoutPage() {
                             ? `${prior.weightKg ? `${prior.weightKg}kg · ` : ""}${prior.durationSeconds ?? "—"}s`
                             : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`)
                         : targetLabel;
+                      const suggestion = set.completedAt ? undefined : suggestSetValues(exercise, set.id, previous);
+                      const filled = { ...set, ...applySetSuggestion(set, suggestion) };
                       const canComplete = distanceMode
-                        ? Boolean((set.distanceMeters ?? 0) > 0 || (set.durationSeconds ?? 0) > 0)
+                        ? Boolean((filled.distanceMeters ?? 0) > 0 || (filled.durationSeconds ?? 0) > 0)
                         : timedMode
-                          ? Boolean((set.durationSeconds ?? 0) > 0)
-                        : Boolean((set.reps ?? 0) > 0);
+                          ? Boolean((filled.durationSeconds ?? 0) > 0)
+                        : Boolean((filled.reps ?? 0) > 0);
+                      const usesSuggestion = canComplete && Object.keys(applySetSuggestion(set, suggestion)).length > 0;
+                      const filledLabel = distanceMode
+                        ? `${filled.distanceMeters ?? "—"} m · ${filled.durationSeconds ?? "—"} s`
+                        : timedMode
+                          ? `${filled.weightKg ? `${filled.weightKg} kg · ` : ""}${filled.durationSeconds} s`
+                          : `${filled.weightKg !== undefined ? `${filled.weightKg} kg × ` : ""}${filled.reps}`;
                       const plateGuide = plateEligible && (set.weightKg ?? 0) > 0
                         ? calculatePlateLoading(set.weightKg!, { barWeightKg })
                         : undefined;
@@ -466,7 +483,9 @@ export function WorkoutPage() {
                       const completeLabel = set.completedAt
                         ? (locale === "vi" ? `Bỏ hoàn tất set ${setNumber}` : `Undo set ${setNumber}`)
                         : canComplete
-                          ? (locale === "vi" ? `Hoàn tất set ${setNumber}` : `Complete set ${setNumber}`)
+                          ? (usesSuggestion
+                            ? (locale === "vi" ? `Hoàn tất set ${setNumber} với ${filledLabel}` : `Complete set ${setNumber} with ${filledLabel}`)
+                            : (locale === "vi" ? `Hoàn tất set ${setNumber}` : `Complete set ${setNumber}`))
                           : (locale === "vi" ? `Set ${setNumber}: nhập số lần, quãng đường hoặc thời gian trước` : `Set ${setNumber}: enter reps, distance, or duration first`);
                       return (
                         <div className={set.completedAt ? "set-row set-row--done" : "set-row"} key={set.id}>
@@ -479,7 +498,7 @@ export function WorkoutPage() {
                           <span className="previous-value"><span className="sr-only">{locale === "vi" ? "Trước hoặc mục tiêu: " : "Previous or target: "}</span>{previousLabel}</span>
                           <div className="set-field set-field--load">
                             <span className="set-field__label">{loadFieldLabel}</span>
-                            {repsOnly ? <span className="set-input-placeholder" aria-hidden="true">—</span> : <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${loadFieldLabel}`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
+                            {repsOnly ? <span className="set-input-placeholder" aria-hidden="true">—</span> : <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${loadFieldLabel}`} inputMode="decimal" min="0" step="0.5" value={set.weightKg ?? ""} placeholder={String(suggestion?.weightKg ?? 0)} onChange={(event) => patchSet(exercise.id, set.id, { weightKg: nonNegativeNumber(event.target.value) })} />}
                             {plateGuide ? (
                               <small className="plate-hint" aria-label={locale === "vi"
                                 ? `Set ${setNumber}: mỗi bên ${plateGuide.platesPerSideKg.join(" cộng ") || "không thêm bánh"}; thanh ${plateGuide.barWeightKg} kg${plateGuide.exact ? "" : `; xếp gần nhất ${plateGuide.achievedTotalKg} kg`}`
@@ -491,19 +510,19 @@ export function WorkoutPage() {
                           <label className="set-field set-field--effort">
                             <span className="set-field__label">{effortFieldLabel}</span>
                           {distanceMode
-                            ? <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="decimal" min="0" step="1" value={set.distanceMeters ?? ""} placeholder="m" onChange={(event) => patchSet(exercise.id, set.id, { distanceMeters: nonNegativeNumber(event.target.value) })} />
+                            ? <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="decimal" min="0" step="1" value={set.distanceMeters ?? ""} placeholder={String(suggestion?.distanceMeters ?? "m")} onChange={(event) => patchSet(exercise.id, set.id, { distanceMeters: nonNegativeNumber(event.target.value) })} />
                             : timedMode
-                              ? <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
-                            : <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.reps ?? ""} placeholder="0" onChange={(event) => patchSet(exercise.id, set.id, { reps: nonNegativeInteger(event.target.value) })} />}
+                              ? <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder={String(suggestion?.durationSeconds ?? "s")} onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
+                            : <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${effortFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.reps ?? ""} placeholder={String(suggestion?.reps ?? 0)} onChange={(event) => patchSet(exercise.id, set.id, { reps: nonNegativeInteger(event.target.value) })} />}
                           </label>
                           <label className="set-field set-field--intensity">
                             <span className="set-field__label">{intensityFieldLabel}</span>
                           {distanceMode
-                            ? <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${intensityFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder="s" onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
+                            ? <input disabled={Boolean(set.completedAt)} aria-label={`${locale === "vi" ? "Set" : "Set"} ${setNumber}, ${intensityFieldLabel}`} inputMode="numeric" min="0" step="1" value={set.durationSeconds ?? ""} placeholder={String(suggestion?.durationSeconds ?? "s")} onChange={(event) => patchSet(exercise.id, set.id, { durationSeconds: nonNegativeInteger(event.target.value) })} />
                             : <input disabled={Boolean(set.completedAt)} aria-label={`Set ${setNumber}, RIR`} inputMode="numeric" min="0" max="10" step="1" value={set.rir ?? ""} placeholder={String(set.targetRir ?? 2)} onChange={(event) => patchSet(exercise.id, set.id, { rir: nonNegativeInteger(event.target.value, 10) })} />}
                           </label>
                           <div className="set-row__actions">
-                            <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id)} aria-label={completeLabel} aria-pressed={Boolean(set.completedAt)} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập số lần, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}>{set.completedAt ? <Check size={19} /> : null}</button>
+                            <button type="button" className="set-complete" disabled={!set.completedAt && !canComplete} onClick={() => toggleComplete(exercise.id, set.id, suggestion)} aria-label={completeLabel} aria-pressed={Boolean(set.completedAt)} title={!set.completedAt && !canComplete ? (locale === "vi" ? "Nhập số lần, quãng đường hoặc thời gian trước" : "Enter reps, distance, or duration first") : undefined}>{set.completedAt ? <Check size={19} /> : null}</button>
                             <button type="button" className="set-remove" disabled={Boolean(set.completedAt)} onClick={() => deleteSet(exercise.id, set.id)} aria-label={locale === "vi" ? `Xóa set ${setNumber}` : `Remove set ${setNumber}`} title={set.completedAt ? (locale === "vi" ? "Bỏ hoàn tất trước khi xóa set" : "Undo completion before removing this set") : undefined}><Trash2 size={17} /></button>
                           </div>
                         </div>
