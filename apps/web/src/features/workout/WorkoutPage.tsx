@@ -128,6 +128,13 @@ export function WorkoutPage() {
     return () => window.clearInterval(timer);
   }, []);
 
+  const restTimerEndsAt = activeSession?.restTimerEndsAt;
+  useEffect(() => {
+    // Resync the 1s clock when a rest starts or changes so it never reads a second too long.
+    const timer = window.setTimeout(() => setNow(Date.now()), 0);
+    return () => window.clearTimeout(timer);
+  }, [restTimerEndsAt]);
+
   const progress = activeSession ? sessionProgress(activeSession) : { completed: 0, total: 0, percent: 0 };
   const restRemaining = restLabel(activeSession?.restTimerEndsAt, now);
 
@@ -145,8 +152,6 @@ export function WorkoutPage() {
   };
 
   const save = (session: WorkoutSession) => {
-    // Keep the 1s clock in step with the edit so a new rest never reads a second too long.
-    setNow(Date.now());
     void persist(session);
   };
 
