@@ -349,6 +349,9 @@ describe("custom exercises", () => {
     await useGymStore.getState().hydrate();
     await expect(saveUserCustomExercise({ ...input, loadEntryMode: "total_weight" }, created.id)).resolves.toMatchObject({ id: created.id });
     await saveUserCustomExercise(input, created.id);
+    useGymStore.setState({ activeSession: logged });
+    await expect(saveUserCustomExercise({ ...input, loadEntryMode: "total_weight" }, created.id)).rejects.toThrow();
+    useGymStore.setState({ activeSession: undefined });
 
     const completedSet = { id: "set_done", type: "working" as const, weightKg: 20, reps: 8, completedAt: "2026-08-12T10:30:00.000Z" };
     await saveSession({ ...logged, finishedAt: "2026-08-12T11:00:00.000Z", exercises: logged.exercises.map((exercise) => ({ ...exercise, sets: [completedSet] })) });

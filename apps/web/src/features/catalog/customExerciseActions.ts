@@ -15,9 +15,11 @@ export async function saveUserCustomExercise(input: CustomExerciseInput, movemen
     throw new Error(state.profile?.locale === "en" ? "You already have a custom exercise with this name." : "Bạn đã có bài tập tự tạo trùng tên này.");
   }
   const setupChanged = previousVariant && (previousVariant.loadEntryMode !== input.loadEntryMode || previousVariant.equipment[0] !== input.equipment);
-  const logged = [...state.sessions, ...(state.activeSession ? [state.activeSession] : [])]
+  const logged = state.sessions
     .some((session) => session.exercises.some((exercise) => exercise.movementId === movementId && exercise.sets.some((set) => set.completedAt)));
-  if (setupChanged && logged) {
+  // The workout in progress already holds this exercise's tracking snapshot, even before its first completed set.
+  const inActiveWorkout = state.activeSession?.exercises.some((exercise) => exercise.movementId === movementId);
+  if (setupChanged && (logged || inActiveWorkout)) {
     // Same variant ID means same history: old loads must not carry over to different equipment or load entry.
     throw new Error(state.profile?.locale === "en"
       ? "This exercise already has logged sets, so its equipment and load entry cannot change. Create a new exercise instead."
