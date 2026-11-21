@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { isRestAlertMuted } from "@gym/storage";
+import { isRestAlertMuted } from "@gym/storage/device";
 
 type AudioContextConstructor = typeof AudioContext;
 let audioContext: AudioContext | undefined;

@@ -48,7 +48,7 @@ import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
-import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage";
+import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
 import { playRestAlert, primeRestAlert, useScreenWakeLock } from "./restAlert";
 import { recordKindsLabel } from "./recordLabels";
 import { WorkoutSummary } from "./WorkoutSummary";

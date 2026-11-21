@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Profile, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, getVariant } from "@gym/catalog";
 import { WorkoutPage } from "./WorkoutPage";
-import { setRestAlertMuted } from "@gym/storage";
+import { setRestAlertMuted } from "@gym/storage/device";
 import { useGymStore } from "../../store/useGymStore";
 
 const timestamp = "2026-08-13T10:00:00.000Z";
