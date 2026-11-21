@@ -347,6 +347,12 @@ describe("custom exercises", () => {
     const logged = addExerciseBlock(createFreestyleSession(), variant);
     await saveSession({ ...logged, finishedAt: "2026-08-12T11:00:00.000Z" });
     await useGymStore.getState().hydrate();
+    await expect(saveUserCustomExercise({ ...input, loadEntryMode: "total_weight" }, created.id)).resolves.toMatchObject({ id: created.id });
+    await saveUserCustomExercise(input, created.id);
+
+    const completedSet = { id: "set_done", type: "working" as const, weightKg: 20, reps: 8, completedAt: "2026-08-12T10:30:00.000Z" };
+    await saveSession({ ...logged, finishedAt: "2026-08-12T11:00:00.000Z", exercises: logged.exercises.map((exercise) => ({ ...exercise, sets: [completedSet] })) });
+    await useGymStore.getState().hydrate();
 
     await expect(saveUserCustomExercise({ ...input, loadEntryMode: "total_weight" }, created.id)).rejects.toThrow();
     await expect(saveUserCustomExercise({ ...input, equipment: "dumbbell" }, created.id)).rejects.toThrow();

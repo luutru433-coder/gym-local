@@ -28,7 +28,7 @@ export async function deleteCustomExercise(movementId: string, db: GymDatabase =
     if (active && !active.finishedAt && active.exercises.some((exercise) => exercise.movementId === movementId)) {
       throw new Error("Custom exercise is used by the active workout");
     }
-    const logged = (await db.sessions.toArray()).some((session) => session.exercises.some((exercise) => exercise.movementId === movementId));
+    const logged = (await db.sessions.toArray()).some((session) => session.exercises.some((exercise) => exercise.movementId === movementId && exercise.sets.some((set) => set.completedAt)));
     if (logged) {
       await db.customMovements.update(movementId, { reviewStatus: "deprecated" });
       await db.customVariants.where("movementId").equals(movementId).modify({ reviewStatus: "deprecated" });

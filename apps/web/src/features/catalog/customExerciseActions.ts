@@ -16,7 +16,7 @@ export async function saveUserCustomExercise(input: CustomExerciseInput, movemen
   }
   const setupChanged = previousVariant && (previousVariant.loadEntryMode !== input.loadEntryMode || previousVariant.equipment[0] !== input.equipment);
   const logged = [...state.sessions, ...(state.activeSession ? [state.activeSession] : [])]
-    .some((session) => session.exercises.some((exercise) => exercise.movementId === movementId));
+    .some((session) => session.exercises.some((exercise) => exercise.movementId === movementId && exercise.sets.some((set) => set.completedAt)));
   if (setupChanged && logged) {
     // Same variant ID means same history: old loads must not carry over to different equipment or load entry.
     throw new Error(state.profile?.locale === "en"

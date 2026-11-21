@@ -701,6 +701,11 @@ describe("IndexedDB schema and recovery", () => {
       exercises: [{ id: "block_custom", movementId: movement.id, variantId: variant.id, movementNameSnapshot: movement.name, variantNameSnapshot: variant.name, loadEntryModeSnapshot: variant.loadEntryMode, restSeconds: 90, sets: [] }]
     };
     await db.sessions.put(logged);
+    await expect(deleteCustomExercise(movement.id, db)).resolves.toBe(false);
+
+    await saveCustomExercise(movement, variant, db);
+    logged.exercises[0].sets = [{ id: "set_custom", type: "working", weightKg: 20, reps: 8, completedAt: "2026-08-10T01:10:00.000Z" }];
+    await db.sessions.put(logged);
     await expect(deleteCustomExercise(movement.id, db)).resolves.toBe(true);
     expect(await listCustomExercises(db)).toMatchObject({ movements: [{ id: movement.id, reviewStatus: "deprecated" }], variants: [{ id: variant.id, reviewStatus: "deprecated" }] });
     expect(await db.sessions.get(logged.id)).toEqual(logged);

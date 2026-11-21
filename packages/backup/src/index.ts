@@ -731,7 +731,7 @@ export function downloadBlob(blob: Blob, filename: string): void {
 function csvCell(value: unknown): string {
   const raw = value == null ? "" : String(value);
   // Text a spreadsheet would run as a formula is exported as plain text.
-  const text = /^[=+\-@\t\r]/.test(raw) && !Number.isFinite(Number(raw)) ? `'${raw}` : raw;
+  const text = /^\s*[=+\-@]/.test(raw) && !Number.isFinite(Number(raw)) ? `'${raw}` : raw;
   return `"${text.replaceAll('"', '""')}"`;
 }
 
