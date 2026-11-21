@@ -81,16 +81,28 @@ export function newSetDraft(previous?: SetDraft): SetDraft {
 
 function draftHasEffort(set: SetDraft, profile: ExerciseTrackingProfile): boolean {
   if (profile.effortKind === "duration") return (parsed(set.durationSeconds, true) ?? 0) > 0;
-  if (profile.effortKind === "distance_duration") return (parsed(set.distanceMeters) ?? 0) > 0;
+  if (profile.effortKind === "distance_duration") return (parsed(set.distanceMeters) ?? 0) > 0 || (parsed(set.durationSeconds, true) ?? 0) > 0;
   return (parsed(set.reps, true) ?? 0) > 0;
 }
 
-export function draftProblem(session: WorkoutSession, draft: SessionDraft): "date" | "duration" | "set" | undefined {
+function hasUnreadableNumber(set: SetDraft): boolean {
+  return [set.weightKg, set.reps, set.durationSeconds, set.distanceMeters, set.rir].some((raw) => raw.trim() !== "" && parsed(raw) === undefined);
+}
+
+function timingUnchanged(session: WorkoutSession, draft: SessionDraft): boolean {
+  const initial = sessionDraft(session);
+  return initial.date === draft.date && initial.time === draft.time && initial.durationMinutes === draft.durationMinutes;
+}
+
+export type DraftProblem = "date" | "duration" | "set" | "number";
+
+export function draftProblem(session: WorkoutSession, draft: SessionDraft): DraftProblem | undefined {
+  if (draft.exercises.some((exercise) => exercise.sets.some(hasUnreadableNumber))) return "number";
   const start = new Date(`${draft.date}T${draft.time || "00:00"}`);
   if (!draft.date || Number.isNaN(start.getTime())) return "date";
   const minutes = parsed(draft.durationMinutes, true);
   if (minutes === undefined || minutes > 24 * 60) return "duration";
-  if (start.getTime() + minutes * 60_000 > Date.now()) return "date";
+  if (!timingUnchanged(session, draft) && start.getTime() + minutes * 60_000 > Date.now()) return "date";
   for (const exercise of draft.exercises) {
     const original = session.exercises.find((item) => item.id === exercise.id);
     if (!original) continue;
@@ -105,14 +117,17 @@ export function draftProblem(session: WorkoutSession, draft: SessionDraft): "dat
  * snapshot) is never changed, so records stay within their equipment variant.
  */
 export function applySessionDraft(session: WorkoutSession, draft: SessionDraft): WorkoutSession {
-  const start = new Date(`${draft.date}T${draft.time || "00:00"}`);
-  const minutes = parsed(draft.durationMinutes, true) ?? 0;
+  // Untouched timing keeps the stored timestamps exactly; the form only shows minutes.
+  const keepTiming = Boolean(session.finishedAt) && timingUnchanged(session, draft);
+  const start = keepTiming ? new Date(session.startedAt) : new Date(`${draft.date}T${draft.time || "00:00"}`);
+  const end = keepTiming ? new Date(session.finishedAt!) : new Date(start.getTime() + (parsed(draft.durationMinutes, true) ?? 0) * 60_000);
   const shiftMs = start.getTime() - new Date(session.startedAt).getTime();
-  const startedAt = start.toISOString();
-  const finishedAt = new Date(start.getTime() + minutes * 60_000).toISOString();
+  const startedAt = keepTiming ? session.startedAt : start.toISOString();
+  const finishedAt = keepTiming ? session.finishedAt! : end.toISOString();
   const withinSession = (iso: string) => {
+    if (keepTiming) return iso;
     const shifted = new Date(iso).getTime() + shiftMs;
-    return new Date(Math.min(Math.max(shifted, start.getTime()), start.getTime() + minutes * 60_000)).toISOString();
+    return new Date(Math.min(Math.max(shifted, start.getTime()), end.getTime())).toISOString();
   };
 
   const exercises = draft.exercises.flatMap((exerciseDraft): SessionExercise[] => {

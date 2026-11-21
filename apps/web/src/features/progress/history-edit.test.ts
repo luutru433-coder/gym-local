@@ -72,6 +72,35 @@ describe("history edit drafts", () => {
     expect(draftProblem(original, long)).toBe("duration");
   });
 
+  it("keeps exact timestamps when only sets change and flags unreadable numbers", () => {
+    const original = session();
+    original.startedAt = new Date(2026, 7, 10, 23, 30, 40).toISOString();
+    original.finishedAt = new Date(2026, 7, 11, 0, 0, 20).toISOString();
+    original.exercises[0]!.sets[0]!.completedAt = new Date(2026, 7, 10, 23, 40, 5).toISOString();
+    const draft = sessionDraft(original);
+    draft.exercises[0]!.sets[0]!.reps = "9";
+    expect(draftProblem(original, draft)).toBeUndefined();
+    const updated = applySessionDraft(original, draft);
+    expect(updated.startedAt).toBe(original.startedAt);
+    expect(updated.finishedAt).toBe(original.finishedAt);
+    expect(updated.exercises[0]!.sets[0]!.completedAt).toBe(original.exercises[0]!.sets[0]!.completedAt);
+
+    draft.exercises[0]!.sets[0]!.weightKg = "-5";
+    expect(draftProblem(original, draft)).toBe("number");
+    draft.exercises[0]!.sets[0]!.weightKg = "abc";
+    expect(draftProblem(original, draft)).toBe("number");
+  });
+
+  it("accepts a carry logged with time alone", () => {
+    const original = session();
+    const exercise = original.exercises[0]!;
+    exercise.trackingProfileSnapshot = { variantId: exercise.variantId, effortKind: "distance_duration", loadEntryMode: "per_hand", laterality: "bilateral", volumeMetric: "none", e1rmMetric: "none", progressDirection: "greater_distance" };
+    exercise.sets = [{ id: "set_1", type: "working", weightKg: 20, durationSeconds: 45, completedAt: exercise.sets[0]!.completedAt! }];
+    const draft = sessionDraft(original);
+    expect(draftProblem(original, draft)).toBeUndefined();
+    expect(applySessionDraft(original, draft)).toEqual(original);
+  });
+
   it("drops an exercise removed from the draft", () => {
     const original = session();
     const draft = sessionDraft(original);

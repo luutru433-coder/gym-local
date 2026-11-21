@@ -4,7 +4,7 @@ import { Button, Field, Modal, Notice } from "@gym/ui";
 import type { BodyMetric, SetType, WorkoutSession } from "@gym/contracts";
 import { formatDate, formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
-import { applySessionDraft, draftProblem, exerciseProfile, newSetDraft, sessionDraft, type SessionDraft, type SetDraft } from "./history-edit";
+import { applySessionDraft, draftProblem, type DraftProblem, exerciseProfile, newSetDraft, sessionDraft, type SessionDraft, type SetDraft } from "./history-edit";
 import "./HistoryEditors.css";
 
 type Locale = "vi" | "en";
@@ -16,7 +16,8 @@ const setTypeLabels: Record<SetType, { vi: string; en: string }> = {
   failure: { vi: "Tới ngưỡng", en: "To failure" }
 };
 
-const problemText: Record<"date" | "duration" | "set", { vi: string; en: string }> = {
+const problemText: Record<DraftProblem, { vi: string; en: string }> = {
+  number: { vi: "Có ô số không hợp lệ. Chỉ nhập số từ 0 trở lên, hoặc để trống.", en: "A number field is invalid. Enter a number of 0 or more, or leave it empty." },
   date: { vi: "Ngày giờ không hợp lệ hoặc nằm trong tương lai.", en: "The date and time are invalid or in the future." },
   duration: { vi: "Thời lượng phải từ 0 đến 1440 phút.", en: "Duration must be between 0 and 1440 minutes." },
   set: { vi: "Mỗi set cần số lần, thời gian hoặc quãng đường lớn hơn 0. Xóa set nếu bạn không tập set đó.", en: "Each set needs reps, time, or distance above 0. Remove a set you did not do." }
