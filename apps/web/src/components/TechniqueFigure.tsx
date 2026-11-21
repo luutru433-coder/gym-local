@@ -75,7 +75,7 @@ function Grip({ figure, joints }: { figure: Figure; joints: Joints }) {
     : <circle key={index} className="tf-bar-end" cx={point[0]} cy={point[1]} r={3} />)}</g>;
 }
 
-function Mark({ mark, joints, target, locale }: { mark: FigureMark; joints: Joints; target: Joints; locale: "vi" | "en" }) {
+function Mark({ mark, joints, locale }: { mark: FigureMark; joints: Joints; locale: "vi" | "en" }) {
   const shift = mark.shift ?? [0, 0];
   const parts = [];
   let anchor: Point = joints[mark.at ?? "hip"];
@@ -123,7 +123,6 @@ export function TechniqueFigure({ figure, marks = [], locale, tone, label }: { f
   const last = figure.poses[figure.poses.length - 1];
   const pose = figure.poses.length > 1 ? blendPose(figure.poses[0], last, progress) : last;
   const joints = resolvePose(pose, figure.view);
-  const target = resolvePose(last, figure.view);
   const symmetric = figure.view !== "side";
   return (
     <svg className={`technique-figure${tone ? ` technique-figure--${tone}` : ""}`} viewBox={(figure.box ?? [0, 0, 200, 170]).join(" ")} role="img" aria-label={label}>
@@ -139,7 +138,7 @@ export function TechniqueFigure({ figure, marks = [], locale, tone, label }: { f
       <Limbs joints={joints} suffix="" />
       {symmetric ? <Limbs joints={joints} suffix="2" /> : null}
       <Grip figure={figure} joints={joints} />
-      {marks.map((mark, index) => <Mark key={index} mark={mark} joints={joints} target={target} locale={locale} />)}
+      {marks.map((mark, index) => <Mark key={index} mark={mark} joints={joints} locale={locale} />)}
     </svg>
   );
 }
