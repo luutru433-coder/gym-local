@@ -7,7 +7,7 @@ const source = await readFile(catalogPath, "utf8");
 const videoGuides = JSON.parse(await readFile(videoManifestPath, "utf8"));
 const httpsUrls = [...source.matchAll(/https:\/\/[^`"'\s]+/g)].map((match) => match[0]);
 const insecure = [...source.matchAll(/http:\/\/[^`"'\s]+/g)].map((match) => match[0]);
-const sourceIds = [...source.matchAll(/id:\s*"(gym-local-original|free-exercise-db|youtube-video-guides)"/g)].map((match) => match[1]);
+const sourceIds = [...source.matchAll(/id:\s*"(gym-local-original|workout-guide|react-muscle-map|youtube-video-guides)"/g)].map((match) => match[1]);
 const licenseIds = [...source.matchAll(/licenseId:\s*"([^"]+)"/g)].map((match) => match[1]);
 const reviewedDates = [...source.matchAll(/reviewedAt:\s*"([^"]+)"/g)].map((match) => match[1]);
 const invalidDates = reviewedDates.filter((value) => Number.isNaN(Date.parse(value)));
