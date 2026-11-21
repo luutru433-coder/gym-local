@@ -1,6 +1,7 @@
 import type {
   ContentSource,
   EquipmentType,
+  ExerciseAnimation,
   ExerciseLaterality,
   ExerciseTrackingProfile,
   ExerciseVideoGuide,
@@ -15,6 +16,7 @@ import type {
   TrackingVolumeMetric
 } from "@gym/contracts";
 import videoGuideManifest from "../../../content/exercise-video-guides.json";
+import animationManifest from "../../../content/exercise-animations.json";
 
 type Pattern = Movement["pattern"];
 
@@ -63,33 +65,26 @@ export const CONTENT_SOURCES: ContentSource[] = [
     reviewedAt: "2026-08-10"
   },
   {
-    id: "free-exercise-db",
-    label: "Free Exercise DB",
-    sourceUrl: "https://github.com/yuhonas/free-exercise-db",
-    author: "Free Exercise DB contributors",
+    id: "workout-guide",
+    label: "Workout Guide exercise artwork",
+    sourceUrl: "https://github.com/bryllim/workout-guide",
+    author: "Bryl Lim; first-pose frames adapted from Everkinetic",
+    licenseId: "cc-by-sa-4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    attribution: "Three-frame exercise drawings by Bryl Lim (CC BY-SA 4.0), partly adapted from Everkinetic (CC BY-SA 4.0); bundled unmodified for offline playback.",
+    reviewedAt: "2026-11-21"
+  },
+  {
+    id: "react-muscle-map",
+    label: "React Muscle Map body artwork",
+    sourceUrl: "https://github.com/Josep1992/react-muscle-map",
+    author: "React Muscle Map contributors",
     licenseId: "unlicense",
-    licenseUrl: "https://github.com/yuhonas/free-exercise-db/blob/main/LICENSE.md",
-    attribution: "Public-domain exercise reference images served from the Free Exercise DB repository.",
-    reviewedAt: "2026-08-10"
+    licenseUrl: "https://github.com/Josep1992/react-muscle-map/blob/main/LICENSE",
+    attribution: "Public-domain front and back body outlines used for the worked-muscle diagram.",
+    reviewedAt: "2026-11-21"
   }
 ];
-
-const freeExerciseMedia: Partial<Record<string, { path: string; title: string }>> = {
-  "chest_press__barbell": { path: "Barbell_Bench_Press_-_Medium_Grip/0.jpg", title: "Barbell Bench Press - Medium Grip" },
-  "chest_press__dumbbell": { path: "Dumbbell_Bench_Press/0.jpg", title: "Dumbbell Bench Press" },
-  "chest_press__smith": { path: "Smith_Machine_Bench_Press/0.jpg", title: "Smith Machine Bench Press" },
-  "chest_press__cable": { path: "Cable_Chest_Press/0.jpg", title: "Cable Chest Press" },
-  "chest_press__machine": { path: "Machine_Bench_Press/0.jpg", title: "Machine Bench Press" },
-  "squat__barbell": { path: "Barbell_Full_Squat/0.jpg", title: "Barbell Full Squat" },
-  "squat__dumbbell": { path: "Dumbbell_Squat/0.jpg", title: "Dumbbell Squat" },
-  "horizontal_row__cable": { path: "Seated_Cable_Rows/0.jpg", title: "Seated Cable Rows" },
-  "romanian_deadlift__barbell": { path: "Romanian_Deadlift/0.jpg", title: "Romanian Deadlift" },
-  "overhead_press__cable": { path: "Seated_Cable_Shoulder_Press/0.jpg", title: "Seated Cable Shoulder Press" },
-  "hip_thrust__barbell": { path: "Barbell_Hip_Thrust/0.jpg", title: "Barbell Hip Thrust" },
-  "biceps_curl__machine": { path: "Machine_Bicep_Curl/0.jpg", title: "Machine Bicep Curl" },
-  "biceps_curl__cable": { path: "Standing_Biceps_Cable_Curl/0.jpg", title: "Standing Biceps Cable Curl" },
-  "seated_calf_raise__machine": { path: "Seated_Calf_Raise/0.jpg", title: "Seated Calf Raise" }
-};
 
 interface VideoGuideManifestEntry {
   variantId: string;
@@ -377,7 +372,6 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
   seed.equipment.map((equipment) => {
     const name = variantName(seed, equipment);
     const variantId = `${seed.id}__${equipment}`;
-    const referenceImage = freeExerciseMedia[variantId];
     return {
       id: variantId,
       movementId: seed.id,
@@ -395,24 +389,44 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
         { vi: seed.safetyVi, en: seed.safetyEn },
         { vi: "Dừng ngay nếu xuất hiện đau nhói, tê hoặc chóng mặt.", en: "Stop immediately for sharp pain, numbness, or dizziness." }
       ],
-      media: [
-        ...(referenceImage ? [{
-          id: `media_${seed.id}_${equipment}_image`,
-          type: "image" as const,
-          url: `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${referenceImage.path}`,
-          sourceId: "free-exercise-db",
-          title: { vi: `Hình tham khảo: ${referenceImage.title}`, en: `Reference: ${referenceImage.title}` },
-          onlineOnly: true,
-          reviewStatus: "reviewed" as const
-        }] : [])
-      ],
+      media: [],
       videoGuides: [videoGuide(variantId, name)],
-      sourceIds: referenceImage ? ["gym-local-original", "free-exercise-db", "youtube-video-guides"] : ["gym-local-original", "youtube-video-guides"],
+      sourceIds: ["gym-local-original", "workout-guide", "youtube-video-guides"],
       reviewStatus: "reviewed",
       contentVersion: 1
     } satisfies ExerciseVariant;
   })
 );
+
+const animationDrawings: Record<string, LocalizedText> = animationManifest.drawings;
+const animationFrameOverrides: Record<string, number[]> = animationManifest.frameOverrides;
+const defaultAnimationFrames = Array.from({ length: animationManifest.frameCount }, (_, index) => index + 1);
+
+export const EXERCISE_ANIMATIONS: ExerciseAnimation[] = Object.entries(animationManifest.variants as Record<string, string>).map(([variantId, target]) => {
+  const slug = target.replace(/^~/, "");
+  return {
+    variantId,
+    frames: (animationFrameOverrides[slug] ?? defaultAnimationFrames).map((frame) => `exercise-animations/${slug}/frame-${frame}.svg`),
+    frameDurationMs: 650,
+    shownExercise: animationDrawings[slug],
+    match: target.startsWith("~") ? "closest" : "exact",
+    sourceId: animationManifest.sourceId,
+    onlineOnly: false,
+    reviewStatus: "reviewed",
+    reviewedAt: animationManifest.reviewedAt
+  };
+});
+
+const animationByVariant = new Map(EXERCISE_ANIMATIONS.map((animation) => [animation.variantId, animation]));
+
+export function getExerciseAnimation(variantId: string): ExerciseAnimation | undefined {
+  return animationByVariant.get(variantId);
+}
+
+export function getMovementAnimation(movementId: string): ExerciseAnimation | undefined {
+  const candidates = EXERCISE_VARIANTS.filter((variant) => variant.movementId === movementId).map((variant) => animationByVariant.get(variant.id));
+  return candidates.find((animation) => animation?.match === "exact") ?? candidates.find(Boolean);
+}
 
 export const EQUIPMENT_OPTIONS = Object.entries(equipmentName).map(([id, name]) => ({
   id: id as EquipmentType,

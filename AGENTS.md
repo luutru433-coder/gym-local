@@ -6,7 +6,7 @@
 - Workout, nutrition, catalog, progress, media, storage, backup, and UI are separate modules.
 - Never mix performance history or PR values between equipment variants.
 - Never overwrite user routines, sessions, custom exercises, or nutrition history during catalog updates.
-- Rich media is online-only; core text, routines, logs, and backups must work offline.
+- Exercise animations and muscle diagrams are bundled and must work offline (ADR 0016); remote video stays online-only. Core text, routines, logs, and backups must work offline.
 - Never scrape or bundle media without an explicit source and license.
 
 ## Architecture rules
