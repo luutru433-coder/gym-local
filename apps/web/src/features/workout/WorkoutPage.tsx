@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowDown,
@@ -123,17 +123,13 @@ export function WorkoutPage() {
       .some((candidate) => candidate.toLocaleLowerCase(locale).includes(query)));
   }, [exerciseQuery, locale]);
 
+  // Event handlers resync the 1s clock so a rest that just started never reads a second too long.
+  const syncClock = useCallback(() => setNow(Date.now()), []);
+
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
-
-  const restTimerEndsAt = activeSession?.restTimerEndsAt;
-  useEffect(() => {
-    // Resync the 1s clock when a rest starts or changes so it never reads a second too long.
-    const timer = window.setTimeout(() => setNow(Date.now()), 0);
-    return () => window.clearTimeout(timer);
-  }, [restTimerEndsAt]);
 
   const progress = activeSession ? sessionProgress(activeSession) : { completed: 0, total: 0, percent: 0 };
   const restRemaining = restLabel(activeSession?.restTimerEndsAt, now);
@@ -167,6 +163,7 @@ export function WorkoutPage() {
 
   const toggleComplete = (exerciseId: string, setId: string, suggestion?: SetSuggestion) => {
     if (!activeSession) return;
+    syncClock();
     const exercise = activeSession.exercises.find((item) => item.id === exerciseId);
     const set = exercise?.sets.find((item) => item.id === setId);
     if (!set) return;
@@ -183,6 +180,7 @@ export function WorkoutPage() {
 
   const modifyRest = (seconds?: number) => {
     if (!activeSession) return;
+    syncClock();
     if (seconds === undefined) {
       save({ ...activeSession, restTimerEndsAt: undefined });
       return;
@@ -193,6 +191,7 @@ export function WorkoutPage() {
 
   const restartRest = () => {
     if (!activeSession) return;
+    syncClock();
     const activeExercise = activeSession.exercises.find((exercise) => exercise.id === activeSession.activeExerciseId);
     const seconds = activeExercise?.restSeconds ?? 90;
     save({ ...activeSession, restTimerEndsAt: new Date(Date.now() + seconds * 1000).toISOString() });
