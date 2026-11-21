@@ -239,8 +239,9 @@ export function NutritionPage() {
 
   const quickAddFood = async (food: FoodItem, servingGrams: number) => {
     try {
+      const entry = createMealEntry(food, servingGrams, date, mealType);
       if (!foods.some((saved) => saved.id === food.id)) await addFood(food);
-      await addMeal(createMealEntry(food, servingGrams, date, mealType));
+      await addMeal(entry);
       setAddOpen(false);
       setSelectedFood(undefined);
     } catch (error) {
