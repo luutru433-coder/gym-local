@@ -399,3 +399,8 @@
 .chart-grid--weekly .variant-trend-picker select {
   max-width: 100%;
 }
+
+/* A hidden Recharts tooltip keeps its last position after a resize; keep it from widening the page. */
+.progress-page .chart-wrap {
+  overflow: clip;
+}
