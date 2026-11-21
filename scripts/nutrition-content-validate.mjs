@@ -159,7 +159,7 @@ const checks = [
   ["Meal-slot coverage", sameCountMap(mealSlotCounts, expectedMealSlotCounts)],
   ["Vegetarian and vegan coverage", vegetarianCount >= 160 && veganCount >= 80],
   ["Exactly 300 immutable legacy redirects", redirects.length === 300 && redirectIds.size === 300 && [...expectedLegacyIds].every((id) => redirectIds.has(id)) && redirects.every((redirect) => redirect.status === "deprecated" && recipeIds.has(redirect.supersededBy) && redirect.sourceId === "gym-local-project-authored-asian-recipes" && redirect.licenseId === "project-content" && redirect.reviewStatus === "reviewed")],
-  ["Pack schema", manifest.id === "gym-local-nutrition" && manifest.schemaVersion === 3 && manifest.version === "2026.08.1"],
+  ["Pack schema", manifest.id === "gym-local-nutrition" && manifest.schemaVersion === 3 && manifest.version === "2026.11.1"],
   ["Pack checksum metadata", /^[a-f0-9]{64}$/.test(manifest.sha256) && manifest.sizeBytes > 0],
   ["Pack coverage metadata", manifest.foodCount >= 10_000 && manifest.aliasCount >= 2_000 && manifest.vietnameseDisplayFoodCount >= 10_000 && manifest.vietnameseRecipeCount === 480 && manifest.activeRecipeCount === 800 && manifest.deprecatedRecipeCount === 300 && manifest.recipeRedirectCount === 300 && manifest.foodGroupCount === 10 && manifest.recipeIngredientCount === recipeIngredientCount && manifest.recipeStepCount === recipeStepCount && manifest.uniqueRecipeSignatureCount === 800 && manifest.vegetarianRecipeCount === vegetarianCount && manifest.veganRecipeCount === veganCount],
   ["Manifest corpus counts", sameCountMap(manifest.cuisineCounts, expectedCuisineCounts) && sameCountMap(manifest.mealSlotCounts, expectedMealSlotCounts)],
