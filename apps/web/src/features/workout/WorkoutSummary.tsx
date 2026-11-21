@@ -68,7 +68,7 @@ export function WorkoutSummary({ session, records, locale, onViewProgress, onDon
               {exercises.map(({ exercise, done }) => (
                 <li key={exercise.id}>
                   <span><strong>{localize(exercise.variantNameSnapshot, locale)}</strong></span>
-                  <em>{done.length} set</em>
+                  <em>{done.length} {vi || done.length === 1 ? "set" : "sets"}</em>
                 </li>
               ))}
             </ul>
