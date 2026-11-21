@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip, Modal, ProgressBar, ToggleGroup, ToggleGroupItem } from "@gym/ui";
 import type { NutritionPackRecord, Profile, WorkoutSession } from "@gym/contracts";
 import { defaultSettings, exportAllData, getProfile, gymDb, initializeDatabase, listRoutines, saveProfile, saveSession } from "@gym/storage";
+import { getTrackingProfile, getVariant, getVariantsForMovement, searchCatalog, type CustomExerciseInput } from "@gym/catalog";
+import { addExerciseBlock, createFreestyleSession } from "@gym/workouts";
 import { App } from "./App";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { nutritionPackRecordAfterFailedInstall, useGymStore } from "./store/useGymStore";
@@ -295,6 +297,7 @@ describe("restore recovery state", () => {
       pantryItems: [],
       mealPlans: [],
       bodyMetrics: [],
+      customMovements: [],
       customVariants: [],
       settings: defaultSettings
     });
@@ -302,5 +305,34 @@ describe("restore recovery state", () => {
     expect(useGymStore.getState()).toMatchObject({ recoveryAvailable: true, profile: { displayName: "After restore" } });
     await expect(useGymStore.getState().undoRestore()).resolves.toBe(true);
     expect(useGymStore.getState()).toMatchObject({ recoveryAvailable: false, profile: { displayName: "Before restore" } });
+  });
+});
+
+describe("custom exercises", () => {
+  it("creates, edits, logs, and deletes a custom exercise through the same lookups as the catalog", async () => {
+    await initializeDatabase();
+    await useGymStore.getState().hydrate();
+    const input: CustomExerciseInput = { name: "  Kéo cáp một tay ", primaryMuscle: "back", secondaryMuscles: ["biceps"], equipment: "cable", loadEntryMode: "per_hand" };
+
+    const created = await useGymStore.getState().saveCustomExercise(input);
+    const variant = getVariantsForMovement(created.id)[0];
+
+    expect(created.name).toEqual({ vi: "Kéo cáp một tay", en: "Kéo cáp một tay" });
+    expect(searchCatalog("keo cap", "back", "cable")[0]?.id).toBe(created.id);
+    expect(getTrackingProfile(variant.id)).toMatchObject({ loadEntryMode: "per_hand", effortKind: "reps" });
+    await expect(useGymStore.getState().saveCustomExercise(input)).rejects.toThrow();
+
+    const session = addExerciseBlock(createFreestyleSession(), variant);
+    expect(session.exercises[0]).toMatchObject({ movementId: created.id, variantId: variant.id, variantNameSnapshot: created.name });
+
+    const edited = await useGymStore.getState().saveCustomExercise({ ...input, name: "Kéo cáp", loadEntryMode: "reps_only" }, created.id);
+    expect(edited).toMatchObject({ id: created.id, contentVersion: 2 });
+    expect(getVariant(variant.id)).toMatchObject({ id: variant.id, loadEntryMode: "reps_only" });
+    await expect(exportAllData()).resolves.toMatchObject({ customMovements: [{ id: created.id }], customVariants: [{ id: variant.id }] });
+
+    await useGymStore.getState().removeCustomExercise(created.id);
+    expect(getVariant(variant.id)).toBeUndefined();
+    expect(useGymStore.getState().customMovements).toEqual([]);
+    await expect(exportAllData()).resolves.toMatchObject({ customMovements: [], customVariants: [] });
   });
 });

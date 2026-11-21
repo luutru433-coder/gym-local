@@ -1,3 +1,4 @@
+import { createId, CUSTOM_MOVEMENT_ID_PREFIX, CUSTOM_VARIANT_ID_PREFIX } from "@gym/contracts";
 import type {
   ContentSource,
   EquipmentType,
@@ -433,20 +434,114 @@ export const EQUIPMENT_OPTIONS = Object.entries(equipmentName).map(([id, name]) 
   name
 }));
 
+let customMovements: Movement[] = [];
+let customVariants: ExerciseVariant[] = [];
+
+/** Makes the user's own exercises resolvable through the same lookups as the bundled catalog. */
+export function setCustomExercises(movements: Movement[], variants: ExerciseVariant[]): void {
+  const catalogMovementIds = new Set(MOVEMENTS.map((movement) => movement.id));
+  const catalogVariantIds = new Set(EXERCISE_VARIANTS.map((variant) => variant.id));
+  customMovements = movements.filter((movement) => !catalogMovementIds.has(movement.id));
+  const movementIds = new Set(customMovements.map((movement) => movement.id));
+  customVariants = variants.filter((variant) => !catalogVariantIds.has(variant.id) && movementIds.has(variant.movementId));
+}
+
+export function isCustomMovement(id: string): boolean {
+  return customMovements.some((movement) => movement.id === id);
+}
+
+/** Custom exercises first; pass `custom` from UI state so memoized lists follow edits. */
+export function listMovements(custom: Movement[] = customMovements): Movement[] {
+  return [...custom, ...MOVEMENTS];
+}
+
+export interface CustomExerciseInput {
+  name: string;
+  primaryMuscle: MuscleGroup;
+  secondaryMuscles: MuscleGroup[];
+  equipment: EquipmentType;
+  loadEntryMode: LoadEntryMode;
+  note?: string;
+}
+
+const customPattern: Partial<Record<MuscleGroup, Pattern>> = {
+  chest: "push",
+  shoulders: "push",
+  triceps: "isolation",
+  back: "pull",
+  biceps: "isolation",
+  forearms: "isolation",
+  quadriceps: "squat",
+  hamstrings: "hinge",
+  glutes: "hinge",
+  calves: "isolation",
+  core: "core",
+  full_body: "carry"
+};
+
+/** Builds (or rebuilds, keeping `existing` IDs) one custom movement with its single variant. */
+export function buildCustomExercise(
+  input: CustomExerciseInput,
+  existing?: { movementId: string; variantId: string; contentVersion: number }
+): { movement: Movement; variant: ExerciseVariant } {
+  const name = input.name.trim().replace(/\s+/g, " ");
+  if (!name) throw new Error("Custom exercise name is required");
+  if (name.length > 80) throw new Error("Custom exercise name is too long");
+  const note = input.note?.trim() ?? "";
+  if (note.length > 500) throw new Error("Custom exercise note is too long");
+  const movementId = existing?.movementId ?? createId(CUSTOM_MOVEMENT_ID_PREFIX.slice(0, -1));
+  const variantId = existing?.variantId ?? createId(CUSTOM_VARIANT_ID_PREFIX.slice(0, -1));
+  const contentVersion = (existing?.contentVersion ?? 0) + 1;
+  const localizedName = { vi: name, en: name };
+  return {
+    movement: {
+      id: movementId,
+      name: localizedName,
+      aliases: [name.toLowerCase()],
+      primaryMuscles: [input.primaryMuscle],
+      secondaryMuscles: [...new Set(input.secondaryMuscles)].filter((muscle) => muscle !== input.primaryMuscle),
+      pattern: customPattern[input.primaryMuscle] ?? "isolation",
+      description: { vi: note || "Bài tập do bạn tự tạo.", en: note || "An exercise you created." },
+      reviewStatus: "draft",
+      contentVersion
+    },
+    variant: {
+      id: variantId,
+      movementId,
+      name: localizedName,
+      equipment: [input.equipment],
+      difficulty: "beginner",
+      loadEntryMode: input.loadEntryMode,
+      instructions: note ? [{ vi: note, en: note }] : [],
+      cues: [],
+      commonMistakes: [],
+      safety: [],
+      media: [],
+      videoGuides: [],
+      sourceIds: [],
+      reviewStatus: "draft",
+      contentVersion
+    }
+  };
+}
+
 export function getMovement(id: string): Movement | undefined {
-  return MOVEMENTS.find((movement) => movement.id === id);
+  return MOVEMENTS.find((movement) => movement.id === id) ?? customMovements.find((movement) => movement.id === id);
 }
 
 export function getVariant(id: string): ExerciseVariant | undefined {
-  return EXERCISE_VARIANTS.find((variant) => variant.id === id);
+  return EXERCISE_VARIANTS.find((variant) => variant.id === id) ?? customVariants.find((variant) => variant.id === id);
 }
 
 export function getTrackingProfile(variantId: string): ExerciseTrackingProfile | undefined {
-  return EXERCISE_TRACKING_PROFILES.find((profile) => profile.variantId === variantId);
+  const reviewed = EXERCISE_TRACKING_PROFILES.find((profile) => profile.variantId === variantId);
+  if (reviewed) return reviewed;
+  const custom = customVariants.find((variant) => variant.id === variantId);
+  return custom ? trackingProfileForLoadMode(custom.id, custom.loadEntryMode) : undefined;
 }
 
 export function getVariantsForMovement(movementId: string): ExerciseVariant[] {
-  return EXERCISE_VARIANTS.filter((variant) => variant.movementId === movementId);
+  return [...EXERCISE_VARIANTS, ...customVariants].filter((variant) => variant.movementId === movementId);
 }
 
 function foldSearchText(value: string): string {
@@ -459,9 +554,9 @@ function foldSearchText(value: string): string {
     .trim();
 }
 
-export function searchCatalog(query: string, muscle?: MuscleGroup, equipment?: EquipmentType): Movement[] {
+export function searchCatalog(query: string, muscle?: MuscleGroup, equipment?: EquipmentType, movements: Movement[] = listMovements()): Movement[] {
   const normalized = foldSearchText(query);
-  return MOVEMENTS.filter((movement) => {
+  return movements.filter((movement) => {
     const variants = getVariantsForMovement(movement.id);
     const matchesText = !normalized || [movement.name.vi, movement.name.en, ...movement.aliases]
       .some((value) => foldSearchText(value).includes(normalized));

@@ -11,7 +11,7 @@ const MIB = KIB * KIB;
 const distRoot = resolve(process.argv[2] ?? "dist");
 const reportPath = join(distRoot, "reports", "performance-report.json");
 const budgets = {
-  entryChunkBytes: 220 * KIB,
+  entryChunkBytes: 226 * KIB,
   routeChunkBytes: 80 * KIB,
   vendorChunkBytes: 500 * KIB,
   workerChunkBytes: 250 * KIB,

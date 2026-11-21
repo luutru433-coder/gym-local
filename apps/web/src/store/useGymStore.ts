@@ -34,6 +34,7 @@ import {
 } from "@gym/nutrition";
 import {
   defaultSettings,
+  deleteCustomExercise,
   deleteMeal,
   deleteProgram as deleteProgramFromDb,
   deleteRoutine as deleteRoutineFromDb,
@@ -43,6 +44,7 @@ import {
   getSettings,
   initializeDatabase,
   listBodyMetrics,
+  listCustomExercises,
   listFoods,
   listFoodPreferences,
   listMeals,
@@ -56,6 +58,7 @@ import {
   listWaterEntries,
   replaceAllData,
   saveBodyMetric,
+  saveCustomExercise,
   saveFood,
   saveFoodPreference,
   saveMeal,
@@ -83,7 +86,8 @@ import {
   logMealPlanDays,
   undoLatestRestore
 } from "@gym/storage";
-import type { BackupPayload } from "@gym/contracts";
+import type { BackupPayload, ExerciseVariant, Movement } from "@gym/contracts";
+import { buildCustomExercise, setCustomExercises, type CustomExerciseInput } from "@gym/catalog";
 
 interface GymState {
   ready: boolean;
@@ -112,6 +116,8 @@ interface GymState {
   nutritionPackManifest?: NutritionPackManifest;
   nutritionPackError?: string;
   bodyMetrics: BodyMetric[];
+  customMovements: Movement[];
+  customVariants: ExerciseVariant[];
   settings: AppSettings;
   recoveryAvailable: boolean;
   sessionSaveStatus: "idle" | "saving" | "saved" | "error";
@@ -124,6 +130,8 @@ interface GymState {
   installTemplate: (templateId: string) => Promise<Routine>;
   saveUserRoutine: (routine: Routine) => Promise<Routine>;
   removeRoutine: (routineId: string) => Promise<void>;
+  saveCustomExercise: (input: CustomExerciseInput, movementId?: string) => Promise<Movement>;
+  removeCustomExercise: (movementId: string) => Promise<void>;
   saveUserProgram: (program: Program) => Promise<Program>;
   removeProgram: (programId: string) => Promise<void>;
   selectUserProgram: (programId?: string) => Promise<void>;
@@ -185,7 +193,7 @@ export function nutritionPackRecordAfterFailedInstall(
 }
 
 async function loadSnapshot() {
-  const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, settings, recoveryPoints] = await Promise.all([
+  const [profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, customExercises, settings, recoveryPoints] = await Promise.all([
     getProfile(),
     listRoutines(),
     listPrograms(),
@@ -199,10 +207,12 @@ async function loadSnapshot() {
     listPantryItems(),
     listMealPlans(),
     listBodyMetrics(),
+    listCustomExercises(),
     getSettings(),
     listRecoveryPoints()
   ]);
-  return { profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, settings, recoveryAvailable: recoveryPoints.length > 0 };
+  setCustomExercises(customExercises.movements, customExercises.variants);
+  return { profile, routines, programs, sessions, activeSession, foods, meals, recipes, waterEntries, foodPreferences, pantryItems, mealPlans, bodyMetrics, customMovements: customExercises.movements, customVariants: customExercises.variants, settings, recoveryAvailable: recoveryPoints.length > 0 };
 }
 
 let lastPersistedActiveSession: WorkoutSession | undefined;
@@ -225,6 +235,8 @@ export const useGymStore = create<GymState>((set, get) => ({
   menuSuggestionStatus: "idle",
   nutritionPackRecord: { id: "nutrition-pack", status: "not_installed", bytesDownloaded: 0 },
   bodyMetrics: [],
+  customMovements: [],
+  customVariants: [],
   settings: defaultSettings,
   recoveryAvailable: false,
   sessionSaveStatus: "idle",
@@ -476,6 +488,49 @@ export const useGymStore = create<GymState>((set, get) => ({
       routines: state.routines.filter((routine) => routine.id !== routineId),
       notice: state.profile?.locale === "en" ? "Routine deleted. Workout history was preserved." : "Đã xóa lịch tập. Lịch sử buổi tập vẫn được giữ."
     }));
+  },
+
+  async saveCustomExercise(input, movementId) {
+    const state = get();
+    const previousMovement = movementId ? state.customMovements.find((movement) => movement.id === movementId) : undefined;
+    const previousVariant = previousMovement ? state.customVariants.find((variant) => variant.movementId === previousMovement.id) : undefined;
+    const name = input.name.trim().toLocaleLowerCase();
+    if (state.customMovements.some((movement) => movement.id !== movementId && movement.name.vi.trim().toLocaleLowerCase() === name)) {
+      throw new Error(state.profile?.locale === "en" ? "You already have a custom exercise with this name." : "Bạn đã có bài tập tự tạo trùng tên này.");
+    }
+    const { movement, variant } = buildCustomExercise(input, previousMovement && previousVariant
+      ? { movementId: previousMovement.id, variantId: previousVariant.id, contentVersion: previousMovement.contentVersion }
+      : undefined);
+    await saveCustomExercise(movement, variant);
+    const customMovements = [movement, ...get().customMovements.filter((item) => item.id !== movement.id)];
+    const customVariants = [variant, ...get().customVariants.filter((item) => item.id !== variant.id)];
+    setCustomExercises(customMovements, customVariants);
+    set((current) => ({
+      customMovements,
+      customVariants,
+      notice: current.profile?.locale === "en" ? "Custom exercise saved." : "Đã lưu bài tập tự tạo."
+    }));
+    return movement;
+  },
+
+  async removeCustomExercise(movementId) {
+    const state = get();
+    const en = state.profile?.locale === "en";
+    if (state.routines.some((routine) => routine.items.some((item) => item.movementId === movementId))) {
+      throw new Error(en ? "Remove this exercise from your routines before deleting it." : "Hãy gỡ bài này khỏi các lịch tập trước khi xóa.");
+    }
+    if (state.activeSession?.exercises.some((exercise) => exercise.movementId === movementId)) {
+      throw new Error(en ? "This exercise is in the workout in progress." : "Bài này đang nằm trong buổi tập đang diễn ra.");
+    }
+    await deleteCustomExercise(movementId);
+    const customMovements = get().customMovements.filter((movement) => movement.id !== movementId);
+    const customVariants = get().customVariants.filter((variant) => variant.movementId !== movementId);
+    setCustomExercises(customMovements, customVariants);
+    set({
+      customMovements,
+      customVariants,
+      notice: en ? "Custom exercise deleted. Workout history was preserved." : "Đã xóa bài tập tự tạo. Lịch sử buổi tập vẫn được giữ."
+    });
   },
 
   async saveUserProgram(program) {

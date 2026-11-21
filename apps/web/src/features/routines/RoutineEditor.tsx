@@ -12,13 +12,15 @@ import {
   type SetType
 } from "@gym/contracts";
 import {
+  getMovement,
   getTrackingProfile,
   getVariant,
   getVariantsForMovement,
-  MOVEMENTS,
+  listMovements,
   rankVariantsForEquipment
 } from "@gym/catalog";
 import { localize } from "../../lib/i18n";
+import { useGymStore } from "../../store/useGymStore";
 
 interface RoutineEditorProps {
   routine?: Routine;
@@ -75,11 +77,12 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>();
   const availableEquipment = profile.locations.find((location) => location.id === profile.activeLocationId)?.equipment ?? [];
+  const customMovements = useGymStore((state) => state.customMovements);
   const movementResults = useMemo(() => {
     const term = search.trim().toLocaleLowerCase(locale);
-    return MOVEMENTS.filter((movement) => !term || [movement.name.vi, movement.name.en, ...movement.aliases]
+    return listMovements(customMovements).filter((movement) => !term || [movement.name.vi, movement.name.en, ...movement.aliases]
       .some((name) => name.toLocaleLowerCase(locale).includes(term))).slice(0, 16);
-  }, [locale, search]);
+  }, [customMovements, locale, search]);
 
   const updateItem = (itemId: string, update: (item: RoutineItem) => RoutineItem) => {
     setDraft((current) => ({
@@ -185,7 +188,7 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
           </div>
           {draft.items.length ? <ol className="routine-item-editor-list">
             {draft.items.map((item, index) => {
-              const movement = MOVEMENTS.find((entry) => entry.id === item.movementId);
+              const movement = getMovement(item.movementId);
               const variants = getVariantsForMovement(item.movementId);
               const tracking = getTrackingProfile(item.preferredVariantId);
               const timed = tracking?.effortKind === "duration" || tracking?.effortKind === "distance_duration";

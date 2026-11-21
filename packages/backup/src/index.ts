@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { APP_VERSIONS, FOOD_GROUP_IDS, type BackupPayload } from "@gym/contracts";
+import { APP_VERSIONS, CUSTOM_VARIANT_ID_PREFIX, FOOD_GROUP_IDS, type BackupPayload } from "@gym/contracts";
 import { z } from "zod";
 
 const manifestSchema = z.object({
@@ -376,6 +376,20 @@ const customVariantSchema = z.object({
   supersededBy: idSchema.optional()
 }).passthrough();
 
+const muscleGroupSchema = z.enum(["chest", "back", "shoulders", "biceps", "triceps", "quadriceps", "hamstrings", "glutes", "calves", "core", "forearms", "full_body"]);
+
+const customMovementSchema = z.object({
+  id: idSchema,
+  name: localizedTextSchema,
+  aliases: z.array(z.string()),
+  primaryMuscles: z.array(muscleGroupSchema).min(1),
+  secondaryMuscles: z.array(muscleGroupSchema),
+  pattern: z.enum(["push", "pull", "squat", "hinge", "lunge", "isolation", "core", "carry"]),
+  description: localizedTextSchema,
+  reviewStatus: z.enum(["draft", "reviewed", "deprecated"]),
+  contentVersion: z.number().int().positive()
+}).passthrough();
+
 const nutritionTargetSchema = z.object({
   calories: nonNegativeNumber,
   protein: nonNegativeNumber,
@@ -451,18 +465,36 @@ const backupV3DataSchema = legacyBackupDataSchema.extend({
 const backupV4DataSchema = backupV3DataSchema.extend({
   pantryItems: z.array(pantryItemSchema)
 });
-const backupDataSchema = backupV4DataSchema.extend({
+const backupV5DataSchema = backupV4DataSchema.extend({
   mealPlans: z.array(savedMealPlanSchema)
+});
+const backupDataSchema = backupV5DataSchema.extend({
+  customMovements: z.array(customMovementSchema)
 });
 
 const v3CollectionKeys = ["routines", "programs", "sessions", "foods", "meals", "recipes", "waterEntries", "foodPreferences", "bodyMetrics", "customVariants"] as const;
 const v4CollectionKeys = [...v3CollectionKeys, "pantryItems"] as const;
-const collectionKeys = [...v4CollectionKeys, "mealPlans"] as const;
+const v5CollectionKeys = [...v4CollectionKeys, "mealPlans"] as const;
+const collectionKeys = [...v5CollectionKeys, "customMovements"] as const;
 type LegacyBackupData = z.infer<typeof legacyBackupDataSchema>;
 type BackupV3Data = z.infer<typeof backupV3DataSchema>;
 type BackupV4Data = z.infer<typeof backupV4DataSchema>;
+type BackupV5Data = z.infer<typeof backupV5DataSchema>;
 
-function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "programs" | "settings" | "meals" | "mealPlans">): void {
+function validateBackupRelations(data: Pick<BackupPayload["data"], "sessions" | "programs" | "settings" | "meals" | "mealPlans"> & {
+  customMovements: Array<{ id: string }>;
+  customVariants: Array<{ id: string; movementId: string }>;
+}): void {
+  const customMovementIds = new Set<string>();
+  for (const movement of data.customMovements) {
+    if (customMovementIds.has(movement.id)) throw new Error("Backup custom exercise is duplicated");
+    customMovementIds.add(movement.id);
+  }
+  for (const variant of data.customVariants) {
+    if (variant.id.startsWith(CUSTOM_VARIANT_ID_PREFIX) && !customMovementIds.has(variant.movementId)) {
+      throw new Error("Backup custom exercise relationship is invalid");
+    }
+  }
   const sessionIds = new Set(data.sessions.map((session) => session.id));
   if (data.settings.activeSessionId) {
     const active = data.sessions.find((session) => session.id === data.settings.activeSessionId);
@@ -567,21 +599,26 @@ function migrateV3ToV4(raw: unknown): BackupV4Data {
   return backupV4DataSchema.parse({ ...previous, pantryItems: [] });
 }
 
-function migrateV4ToV5(raw: unknown): BackupPayload["data"] {
+function migrateV4ToV5(raw: unknown): BackupV5Data {
   const previous = backupV4DataSchema.parse(raw);
-  return validateBackupData({ ...previous, mealPlans: [] });
+  return backupV5DataSchema.parse({ ...previous, mealPlans: [] });
+}
+
+function migrateV5ToV6(raw: unknown): BackupPayload["data"] {
+  const previous = backupV5DataSchema.parse(raw);
+  return validateBackupData({ ...previous, customMovements: [] });
 }
 
 function validateDetailedManifest(
   manifest: BackupPayload["manifest"],
   data: BackupPayload["data"],
   serializedBytes: number,
-  version: 3 | 4 | 5
+  version: 3 | 4 | 5 | 6
 ): void {
   if (manifest.format !== "gym-local-backup") throw new Error(`Backup v${version} format identifier is missing`);
   if (manifest.dbSchemaVersion !== version) throw new Error("Backup database schema metadata is invalid");
   if (manifest.dataBytes !== serializedBytes) throw new Error("Backup data byte count does not match");
-  const keys = version === 3 ? v3CollectionKeys : version === 4 ? v4CollectionKeys : collectionKeys;
+  const keys = version === 3 ? v3CollectionKeys : version === 4 ? v4CollectionKeys : version === 5 ? v5CollectionKeys : collectionKeys;
   const allowedKeys = new Set<string>(keys);
   const expected = backupCounts(data, keys);
   const countKeys = manifest.counts ? Object.keys(manifest.counts) : [];
@@ -642,18 +679,21 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
   let parsed: BackupPayload["data"];
   switch (manifest.backupVersion) {
     case 1:
-      parsed = migrateV4ToV5(migrateV3ToV4(migrateV2ToV3(migrateV1ToV2(raw))));
+      parsed = migrateV5ToV6(migrateV4ToV5(migrateV3ToV4(migrateV2ToV3(migrateV1ToV2(raw)))));
       break;
     case 2:
-      parsed = migrateV4ToV5(migrateV3ToV4(migrateV2ToV3(raw)));
+      parsed = migrateV5ToV6(migrateV4ToV5(migrateV3ToV4(migrateV2ToV3(raw))));
       break;
     case 3:
-      parsed = migrateV4ToV5(migrateV3ToV4(raw));
+      parsed = migrateV5ToV6(migrateV4ToV5(migrateV3ToV4(raw)));
       break;
     case 4:
-      parsed = migrateV4ToV5(raw);
+      parsed = migrateV5ToV6(migrateV4ToV5(raw));
       break;
     case 5:
+      parsed = migrateV5ToV6(raw);
+      break;
+    case 6:
       parsed = validateBackupData(raw);
       break;
     default:
@@ -672,7 +712,7 @@ export async function readBackup(file: Blob): Promise<BackupPayload> {
     }
   } satisfies BackupPayload["data"];
   validateBackupRelations(data);
-  if (manifest.backupVersion === 3 || manifest.backupVersion === 4 || manifest.backupVersion === 5) {
+  if (manifest.backupVersion === 3 || manifest.backupVersion === 4 || manifest.backupVersion === 5 || manifest.backupVersion === 6) {
     validateDetailedManifest(manifest, data, serializedBytes, manifest.backupVersion);
   }
   return { manifest, data };
