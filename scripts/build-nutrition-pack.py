@@ -206,6 +206,19 @@ CATEGORY_LABELS = (
 )
 
 
+# "Chicken, meatless" is not chicken: a meat-free or imitation food is never
+# named after what it replaces.
+SUBSTITUTE_LABELS = (
+    (re.compile(r"\bmeatless\b", re.IGNORECASE), "Món không thịt"),
+    (re.compile(r"\bimitation\b|\bsubstitutes?\b|\banalog\b", re.IGNORECASE), "Thực phẩm thay thế"),
+)
+DRY_ROASTED_FOODS = re.compile(
+    r"^(?:nuts|seeds|peanuts?|almonds?|cashews?|walnuts?|pistachios?|pecans?|hazelnuts?|macadamia|chestnuts?|"
+    r"sesame|sunflower|pumpkin seeds?|soybeans?|chickpeas?|coffee)\b",
+    re.IGNORECASE,
+)
+
+
 def reviewed_vietnamese_label(
     description: str,
     dictionary: tuple[re.Pattern[str], dict[str, str]],
@@ -217,7 +230,13 @@ def reviewed_vietnamese_label(
     (the food itself, before its qualifiers) is, and the exact USDA description
     follows in brackets so the entry can never be mistaken for another food.
     """
+    substitute_label = next((label for pattern, label in SUBSTITUTE_LABELS if pattern.search(description)), None)
+    if substitute_label:
+        return f"{substitute_label} ({description})", "bilingual_head"
     translated, complete, simple = translate_food(description, dictionary)
+    if DRY_ROASTED_FOODS.search(description):
+        # Nuts, seeds and beans are "rang"; "quay" is for meat.
+        translated = re.sub(r"\bquay\b", "rang", translated)
     if complete and simple:
         return translated, "dictionary_complete"
     if complete:
