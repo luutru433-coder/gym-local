@@ -1,4 +1,4 @@
-import type { MuscleGroup, SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
+import type { BodyMetric, MuscleGroup, SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, trackingProfileForLoadMode } from "@gym/catalog";
 
 export interface VariantHistoryEntry {
@@ -38,6 +38,7 @@ export interface VariantTrendPoint {
   bestE1rmKg?: number;
   externalLoadVolumeKg: number;
   completedWorkingSets: number;
+  totalReps: number;
   isLoadPr: boolean;
   isE1rmPr: boolean;
   isAssistancePr: boolean;
@@ -270,6 +271,7 @@ export function exactVariantTrend(sessions: WorkoutSession[], variantId: string)
         bestE1rmKg,
         externalLoadVolumeKg: Math.round(externalLoadVolumeKg * 10) / 10,
         completedWorkingSets: sets.length,
+        totalReps: sets.reduce((sum, set) => sum + (set.reps ?? 0), 0),
         isLoadPr,
         isE1rmPr,
         isAssistancePr
@@ -299,4 +301,77 @@ export function variantVolumeSummary(sessions: WorkoutSession[]): VariantVolumeS
     .sort((left, right) => right.externalLoadVolumeKg - left.externalLoadVolumeKg
       || right.completedWorkingSets - left.completedWorkingSets
       || left.variantId.localeCompare(right.variantId));
+}
+
+export interface WeeklyTrainingSummary {
+  /** Local Monday of the week, as YYYY-MM-DD. */
+  weekStart: string;
+  sessions: number;
+  completedWorkingSets: number;
+  externalLoadVolumeKg: number;
+  durationMinutes: number;
+  muscleSets: Partial<Record<MuscleGroup, number>>;
+}
+
+function localWeekStart(value: Date): Date {
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() - ((date.getDay() || 7) - 1));
+  return date;
+}
+
+/** One entry per local Monday-based week, oldest first, ending with the week containing `now`. Empty weeks are kept. */
+export function weeklyTrainingSummary(sessions: WorkoutSession[], weeks: number, now: Date = new Date()): WeeklyTrainingSummary[] {
+  const count = Math.max(1, Math.floor(weeks));
+  const currentWeek = localWeekStart(now);
+  const byWeek = new Map<string, WeeklyTrainingSummary>();
+  const result: WeeklyTrainingSummary[] = [];
+  for (let index = count - 1; index >= 0; index -= 1) {
+    const start = new Date(currentWeek);
+    start.setDate(start.getDate() - index * 7);
+    const summary: WeeklyTrainingSummary = {
+      weekStart: localDateKey(start.toISOString()),
+      sessions: 0,
+      completedWorkingSets: 0,
+      externalLoadVolumeKg: 0,
+      durationMinutes: 0,
+      muscleSets: {}
+    };
+    byWeek.set(summary.weekStart, summary);
+    result.push(summary);
+  }
+  orderedFinishedSessions(sessions).forEach((session) => {
+    const finished = new Date(session.finishedAt!);
+    const summary = byWeek.get(localDateKey(localWeekStart(finished).toISOString()));
+    if (!summary) return;
+    summary.sessions += 1;
+    summary.externalLoadVolumeKg += sessionExternalVolume(session);
+    summary.durationMinutes += Math.max(0, Math.round((finished.getTime() - new Date(session.startedAt).getTime()) / 60_000));
+    session.exercises.forEach((exercise) => {
+      const workingSets = completedWorkingSets(exercise).length;
+      summary.completedWorkingSets += workingSets;
+      if (!workingSets) return;
+      getMovement(exercise.movementId)?.primaryMuscles.forEach((muscle) => {
+        summary.muscleSets[muscle] = (summary.muscleSets[muscle] ?? 0) + workingSets;
+      });
+    });
+  });
+  return result.map((summary) => ({ ...summary, externalLoadVolumeKg: Math.round(summary.externalLoadVolumeKg * 10) / 10 }));
+}
+
+export type BodyMetricKey = keyof Pick<BodyMetric, "weightKg" | "waistCm" | "chestCm" | "hipsCm" | "armCm" | "thighCm">;
+
+export interface BodyMetricPoint {
+  date: string;
+  value: number;
+}
+
+/** Entries that recorded the given measurement, oldest first. */
+export function bodyMetricSeries(metrics: BodyMetric[], key: BodyMetricKey): BodyMetricPoint[] {
+  return metrics
+    .flatMap((entry) => {
+      const value = entry[key];
+      return value !== undefined && value > 0 ? [{ date: entry.date, value }] : [];
+    })
+    .sort((left, right) => left.date.localeCompare(right.date));
 }

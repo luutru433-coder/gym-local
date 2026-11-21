@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-21 — Detailed progress charts
+
+- Added a 4-week / 3-month / 1-year / all-time range filter to the progress page.
+- The exact-variation trend can now chart e1RM, load, assistance, duration, distance, session volume, best reps, or total reps, marks each new record for the chosen metric, and shows latest value, record, and change in range. History is still never mixed between equipment variants.
+- Added weekly charts for external-load volume, working sets, workouts, and duration (local Monday weeks), plus weekly working sets per primary muscle group.
+- Body measurements can chart weight, waist, chest, hips, arm, or thigh.
+
 ## 2026-08-22 — Nutrition planner algorithm 2
 
 - Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.
