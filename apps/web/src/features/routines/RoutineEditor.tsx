@@ -35,8 +35,14 @@ const setTypeLabels: Record<SetType, { vi: string; en: string }> = {
   failure: { vi: "Tới ngưỡng", en: "Failure" }
 };
 
-function newSet(type: SetType = "working"): RoutineSetTarget {
-  return { id: createId("target"), type, minReps: 8, maxReps: 12, targetRir: 2 };
+function isTimedVariant(variantId: string): boolean {
+  const effortKind = getTrackingProfile(variantId)?.effortKind;
+  return effortKind === "duration" || effortKind === "distance_duration";
+}
+
+function newSet(variantId: string): RoutineSetTarget {
+  const base = { id: createId("target"), type: "working" as const, targetRir: 2 };
+  return isTimedVariant(variantId) ? { ...base, durationSeconds: 30 } : { ...base, minReps: 8, maxReps: 12 };
 }
 
 function makeDraft(routine: Routine | undefined, profile: Profile): Routine {
@@ -98,7 +104,7 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
         movementId,
         preferredVariantId: variant.id,
         restSeconds: 90,
-        sets: [newSet(), newSet(), newSet()]
+        sets: [newSet(variant.id), newSet(variant.id), newSet(variant.id)]
       }]
     }));
   };
@@ -187,8 +193,7 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
             {draft.items.map((item, index) => {
               const movement = MOVEMENTS.find((entry) => entry.id === item.movementId);
               const variants = getVariantsForMovement(item.movementId);
-              const tracking = getTrackingProfile(item.preferredVariantId);
-              const timed = tracking?.effortKind === "duration" || tracking?.effortKind === "distance_duration";
+              const timed = isTimedVariant(item.preferredVariantId);
               return <li className="routine-item-editor" key={item.id}>
                 <div className="routine-item-editor__head">
                   <span className="routine-item-editor__order">{index + 1}</span>
@@ -204,8 +209,7 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
                   <Field label={locale === "vi" ? "Biến thể dụng cụ" : "Equipment variant"}>
                     <select value={item.preferredVariantId} onChange={(event) => updateItem(item.id, (current) => {
                       const variantId = event.target.value;
-                      const effortKind = getTrackingProfile(variantId)?.effortKind;
-                      const timedVariant = effortKind === "duration" || effortKind === "distance_duration";
+                      const timedVariant = isTimedVariant(variantId);
                       return {
                         ...current,
                         preferredVariantId: variantId,
@@ -250,7 +254,7 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
                     </Field>
                     <button type="button" className="icon-button routine-editor__delete-icon" disabled={item.sets.length === 1} onClick={() => updateItem(item.id, (current) => ({ ...current, sets: current.sets.filter((entry) => entry.id !== set.id) }))} aria-label={`${locale === "vi" ? "Xóa set" : "Delete set"} ${setIndex + 1}`}><Trash2 size={16} /></button>
                   </div>)}
-                  <Button variant="ghost" size="sm" onClick={() => updateItem(item.id, (current) => ({ ...current, sets: [...current.sets, newSet()] }))}><Plus size={16} />{locale === "vi" ? "Thêm set" : "Add set"}</Button>
+                  <Button variant="ghost" size="sm" onClick={() => updateItem(item.id, (current) => ({ ...current, sets: [...current.sets, newSet(current.preferredVariantId)] }))}><Plus size={16} />{locale === "vi" ? "Thêm set" : "Add set"}</Button>
                 </div>
               </li>;
             })}

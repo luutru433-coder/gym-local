@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Timed routine targets
+
+- Fixed the routine editor saving a hidden 8–12 rep target for timed and distance-tracked exercises (plank, farmer carry): new exercises and added sets now save the 30-second duration target the editor shows, so the workout screen displays it. Existing routines are not rewritten.
+
 ## Unreleased — Self-adjusting training plan
 
 - Added an offline self-adjusting training plan on the home screen: the week's remaining sessions reflow around missed days, and the next session shows per-exercise adjustments with a bilingual reason.
