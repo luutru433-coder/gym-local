@@ -10,12 +10,9 @@ import {
   getProfile,
   initializeDatabase,
   deleteProgram,
-  deleteBodyMetric,
-  deleteFinishedSession,
   listBodyMetrics,
   listSessions,
   saveBodyMetric,
-  updateFinishedSession,
   deleteFood,
   deleteFoodPreference,
   deletePantryItem,
@@ -53,6 +50,7 @@ import {
   logMealPlanDays,
   undoLatestRestore
 } from "./index";
+import { deleteBodyMetric, deleteFinishedSession, updateFinishedSession } from "./history-edit";
 
 const databases: GymDatabase[] = [];
 

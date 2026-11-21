@@ -21,7 +21,7 @@ const bodyRegions: Record<MuscleGroup, string[]> = {
 
 const regionsFor = (muscles: MuscleGroup[]) => [...new Set(muscles.flatMap((muscle) => bodyRegions[muscle]))];
 
-function MuscleMap({ primaryMuscles, secondaryMuscles, title }: { primaryMuscles: MuscleGroup[]; secondaryMuscles: MuscleGroup[]; title: string }) {
+export function MuscleMap({ primaryMuscles, secondaryMuscles, title }: { primaryMuscles: MuscleGroup[]; secondaryMuscles: MuscleGroup[]; title: string }) {
   const idPrefix = `muscle-map-${useId().replaceAll(":", "")}`;
   const primary = regionsFor(primaryMuscles);
   const secondary = regionsFor(secondaryMuscles).filter((region) => !primary.includes(region));

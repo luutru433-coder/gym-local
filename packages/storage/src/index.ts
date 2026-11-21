@@ -23,7 +23,7 @@ import {
 
 export * from "./nutrition-pack-client";
 
-function assertFiniteRecord(value: unknown, path = "record"): void {
+export function assertFiniteRecord(value: unknown, path = "record"): void {
   if (typeof value === "number") {
     if (!Number.isFinite(value)) throw new Error(`${path} must contain only finite numbers`);
     return;
@@ -258,7 +258,7 @@ export const gymDb = new GymDatabase();
 let sessionWriteQueue: Promise<void> = Promise.resolve();
 
 /** Runs session writes one at a time, in call order, even after a failed write. */
-function queueSessionWrite(commit: () => PromiseLike<unknown>): Promise<unknown> {
+export function queueSessionWrite(commit: () => PromiseLike<unknown>): Promise<unknown> {
   const operation = sessionWriteQueue.then(commit, commit);
   sessionWriteQueue = operation.then(() => undefined, () => undefined);
   return operation;
@@ -477,29 +477,6 @@ export async function saveCompletedSessionAndAdvanceProgram(
   });
   await queueSessionWrite(commit);
   return programs;
-}
-
-/**
- * Rewrites a workout that is already finished. The active-session pointer and
- * program day are left alone, so correcting history never disturbs a live workout.
- */
-export async function updateFinishedSession(session: WorkoutSession, db: GymDatabase = gymDb): Promise<void> {
-  assertFiniteRecord(session, "session");
-  await queueSessionWrite(() => db.transaction("rw", db.sessions, async () => {
-    const existing = await db.sessions.get(session.id);
-    if (!existing?.finishedAt || !session.finishedAt) throw new Error("Only finished workouts can be edited");
-    if (session.finishedAt < session.startedAt) throw new Error("Workout cannot finish before it starts");
-    await db.sessions.put(session);
-  }));
-}
-
-/** Deletes one finished workout. An unfinished workout must be finished first. */
-export async function deleteFinishedSession(id: string, db: GymDatabase = gymDb): Promise<void> {
-  await queueSessionWrite(() => db.transaction("rw", db.sessions, async () => {
-    const existing = await db.sessions.get(id);
-    if (existing && !existing.finishedAt) throw new Error("An unfinished workout cannot be deleted");
-    await db.sessions.delete(id);
-  }));
 }
 
 export async function getActiveSession(db: GymDatabase = gymDb): Promise<WorkoutSession | undefined> {
@@ -783,10 +760,6 @@ export async function listBodyMetrics(db: GymDatabase = gymDb): Promise<BodyMetr
 export async function saveBodyMetric(metric: BodyMetric, db: GymDatabase = gymDb): Promise<void> {
   assertFiniteRecord(metric, "body metric");
   await db.bodyMetrics.put(metric);
-}
-
-export async function deleteBodyMetric(id: string, db: GymDatabase = gymDb): Promise<void> {
-  await db.bodyMetrics.delete(id);
 }
 
 export async function getSettings(db: GymDatabase = gymDb): Promise<AppSettings> {

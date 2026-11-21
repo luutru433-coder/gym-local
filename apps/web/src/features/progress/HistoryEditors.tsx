@@ -3,7 +3,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button, Field, Modal, Notice } from "@gym/ui";
 import type { BodyMetric, SetType, WorkoutSession } from "@gym/contracts";
 import { formatDate, formatNumber, localize } from "../../lib/i18n";
-import { useGymStore } from "../../store/useGymStore";
+import { removeBodyMetric, updatePastSession } from "./history-actions";
 import { applySessionDraft, draftProblem, type DraftProblem, exerciseProfile, newSetDraft, sessionDraft, type SessionDraft, type SetDraft } from "./history-edit";
 import "./HistoryEditors.css";
 
@@ -28,7 +28,6 @@ function messageFrom(error: unknown, locale: Locale): string {
 }
 
 export function SessionEditModal({ session, locale, onClose }: { session: WorkoutSession; locale: Locale; onClose: () => void }) {
-  const updatePastSession = useGymStore((state) => state.updatePastSession);
   const [draft, setDraft] = useState<SessionDraft>(() => sessionDraft(session));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>();
@@ -164,7 +163,6 @@ const METRIC_FIELDS: { key: keyof Omit<BodyMetric, "id" | "date">; label: { vi: 
 ];
 
 export function BodyMetricLog({ metrics, locale, onEdit }: { metrics: BodyMetric[]; locale: Locale; onEdit: (metric: BodyMetric) => void }) {
-  const removeBodyMetric = useGymStore((state) => state.removeBodyMetric);
   const [showAll, setShowAll] = useState(false);
   const [deleting, setDeleting] = useState<BodyMetric>();
   if (!metrics.length) return null;

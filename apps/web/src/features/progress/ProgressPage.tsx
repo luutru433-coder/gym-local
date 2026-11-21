@@ -20,6 +20,7 @@ import {
 } from "@gym/progress";
 import { formatDate, formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
+import { removePastSession } from "./history-actions";
 import { BodyMetricLog, ConfirmDeleteModal, SessionEditModal } from "./HistoryEditors";
 import "./ProgressPage.css";
 
@@ -179,7 +180,6 @@ export function ProgressPage() {
   const bodyMetrics = useGymStore((state) => state.bodyMetrics);
   const addBodyMetric = useGymStore((state) => state.addBodyMetric);
   const locale = profile.locale;
-  const removePastSession = useGymStore((state) => state.removePastSession);
   const [metricOpen, setMetricOpen] = useState(false);
   const [editingMetricId, setEditingMetricId] = useState<string>();
   const [editingSession, setEditingSession] = useState<WorkoutSession>();

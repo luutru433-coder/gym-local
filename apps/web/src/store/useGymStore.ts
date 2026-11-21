@@ -74,10 +74,7 @@ import {
   saveSettings,
   saveWaterEntry,
   selectProgram,
-  deleteBodyMetric,
-  deleteFinishedSession,
   deleteFoodPreference,
-  updateFinishedSession,
   deletePantryItem,
   deleteRecipe,
   deleteWaterEntry,
@@ -158,9 +155,6 @@ interface GymState {
   searchOfflineNutritionFoods: (query: string) => Promise<FoodItem[]>;
   lookupBarcodeFood: (barcode: string) => Promise<FoodLookupCandidate | undefined>;
   addBodyMetric: (metric: BodyMetric) => Promise<void>;
-  removeBodyMetric: (id: string) => Promise<void>;
-  updatePastSession: (session: WorkoutSession) => Promise<void>;
-  removePastSession: (id: string) => Promise<void>;
   restore: (data: BackupPayload["data"]) => Promise<void>;
   undoRestore: () => Promise<boolean>;
   markBackup: () => Promise<void>;
@@ -774,21 +768,6 @@ export const useGymStore = create<GymState>((set, get) => ({
       bodyMetrics: [...state.bodyMetrics.filter((item) => item.id !== metric.id), metric]
         .sort((a, b) => a.date.localeCompare(b.date))
     }));
-  },
-
-  async removeBodyMetric(id) {
-    await deleteBodyMetric(id);
-    set({ bodyMetrics: await listBodyMetrics() });
-  },
-
-  async updatePastSession(session) {
-    await updateFinishedSession(session);
-    set({ sessions: await listSessions() });
-  },
-
-  async removePastSession(id) {
-    await deleteFinishedSession(id);
-    set({ sessions: await listSessions() });
   },
 
   async restore(data) {
