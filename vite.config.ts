@@ -74,6 +74,13 @@ export default defineConfig(({ mode }) => ({
               expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 },
               networkTimeoutSeconds: 4
             }
+          },
+          {
+            // GIFs the owner downloaded on this device (ADR 0021). The cache name matches EXERCISEDB_GIF_CACHE;
+            // status 0 is the opaque answer of an image host that sends no cross-origin headers.
+            urlPattern: /^https:\/\/static\.exercisedb\.dev\/media\//,
+            handler: "CacheFirst",
+            options: { cacheName: "exercisedb-gifs", cacheableResponse: { statuses: [0, 200] } }
           }
         ]
       },

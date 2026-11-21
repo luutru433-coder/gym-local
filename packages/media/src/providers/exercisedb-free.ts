@@ -1,49 +1,97 @@
 import { z } from "zod";
-import { exerciseSearchPhrases, suggestExerciseImageLinks, type PackVariant } from "../exercise-pack";
 
-/**
- * Free ExerciseDB tier by AscendAPI: personal, non-commercial use with credit. Their caching policy forbids
- * storing what the API returns and media URLs rotate weekly, so every lookup is live and nothing is kept:
- * no cache, no database, no service-worker rule, no id or URL in the repository.
- */
-export const ONLINE_GIF_CREDIT = { name: "ExerciseDB by AscendAPI", url: "https://ascendapi.com" } as const;
+export const EXERCISEDB_CREDIT = { name: "AscendAPI.com", url: "https://ascendapi.com" } as const;
 
-const SEARCH_URL = "https://oss.exercisedb.dev/api/v1/exercises/search";
+/** Must match the runtime cache name for this host in vite.config.ts, so the service worker serves what is saved here. */
+export const EXERCISEDB_GIF_CACHE = "exercisedb-gifs";
+
+const LIST_URL = "https://oss.exercisedb.dev/api/v1/exercises";
 const MEDIA_ORIGIN = "https://static.exercisedb.dev";
+const PAGE_SIZE = 25;
+const MAX_PAGES = 200;
+const RETRIES = 4;
+const PARALLEL = 4;
 
-const searchSchema = z.object({
+const pageSchema = z.object({
+  meta: z.object({ total: z.number().optional(), nextCursor: z.string().nullish(), hasNextPage: z.boolean().optional() }).optional(),
   data: z.array(z.object({ exerciseId: z.string(), name: z.string(), gifUrl: z.string() }))
 });
 
-export interface OnlineExerciseGif {
+export interface ExerciseDbImage {
+  id: string;
   name: string;
   gifUrl: string;
 }
 
-async function search(phrase: string, signal?: AbortSignal): Promise<{ id: string; name: string; gifUrl: string }[]> {
-  const response = await fetch(`${SEARCH_URL}?search=${encodeURIComponent(phrase)}&threshold=0.3`, { signal, cache: "no-store" });
-  if (!response.ok) throw new Error("Online exercise images are unavailable");
-  return searchSchema
-    .parse(await response.json())
-    .data.filter((item) => {
-      try {
-        return new URL(item.gifUrl).origin === MEDIA_ORIGIN;
-      } catch {
-        return false;
-      }
-    })
-    .map((item) => ({ id: item.exerciseId, name: item.name, gifUrl: item.gifUrl }));
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+function isMediaUrl(url: string): boolean {
+  try {
+    return new URL(url).origin === MEDIA_ORIGIN;
+  } catch {
+    return false;
+  }
+}
+
+async function page(cursor: string | undefined, signal: AbortSignal | undefined, pause: (ms: number) => Promise<void>) {
+  const url = `${LIST_URL}?limit=${PAGE_SIZE}${cursor ? `&after=${encodeURIComponent(cursor)}` : ""}`;
+  for (let attempt = 0; ; attempt++) {
+    const response = await fetch(url, { signal });
+    if (response.ok) return pageSchema.parse(await response.json());
+    // The free service answers 429 or 503 when it is busy; wait and ask again a few times.
+    if (attempt >= RETRIES || ![429, 502, 503].includes(response.status)) throw new Error(`ExerciseDB list request failed (${response.status})`);
+    await pause(2000 * 2 ** attempt);
+  }
+}
+
+/** Every exercise name with its GIF address from the free ExerciseDB list, read page by page. */
+export async function listExerciseDbImages(onProgress?: (done: number, total: number) => void, signal?: AbortSignal, pause: (ms: number) => Promise<void> = sleep): Promise<ExerciseDbImage[]> {
+  const images = new Map<string, ExerciseDbImage>();
+  let cursor: string | undefined;
+  for (let index = 0; index < MAX_PAGES; index++) {
+    const result = await page(cursor, signal, pause);
+    for (const item of result.data) if (isMediaUrl(item.gifUrl)) images.set(item.exerciseId, { id: item.exerciseId, name: item.name, gifUrl: item.gifUrl });
+    onProgress?.(images.size, Math.max(result.meta?.total ?? 0, images.size));
+    const next = result.meta?.nextCursor ?? undefined;
+    if (!next || next === cursor || result.meta?.hasNextPage === false || result.data.length === 0) break;
+    cursor = next;
+    await pause(150);
+  }
+  return [...images.values()];
 }
 
 /**
- * Looks one catalog variant up live and returns the GIF whose name fits the movement and its equipment,
- * or nothing. At most two requests, one per likely name.
+ * Saves GIFs in the browser's cache storage on this device. The image server sends no cross-origin permission,
+ * so the files cannot be read into the app's database; they are kept as the browser fetched them and the
+ * service worker hands them back offline.
  */
-export async function findOnlineExerciseGif(variant: PackVariant, signal?: AbortSignal): Promise<OnlineExerciseGif | undefined> {
-  for (const phrase of exerciseSearchPhrases(variant).slice(0, 2)) {
-    const results = await search(phrase, signal);
-    const match = results.find((item) => item.id === suggestExerciseImageLinks(results, [variant])[variant.id]);
-    if (match) return { name: match.name, gifUrl: match.gifUrl };
+export async function storeExerciseDbGifs(urls: string[], onProgress?: (done: number, total: number) => void, signal?: AbortSignal): Promise<{ stored: number; failed: number }> {
+  const wanted = [...new Set(urls.filter(isMediaUrl))];
+  const cache = await caches.open(EXERCISEDB_GIF_CACHE);
+  let stored = 0;
+  let failed = 0;
+  let next = 0;
+  async function worker() {
+    while (next < wanted.length && !signal?.aborted) {
+      const url = wanted[next++];
+      try {
+        if (!(await cache.match(url))) {
+          const response = await fetch(url, { mode: "no-cors", signal });
+          if (response.type !== "opaque" && !response.ok) throw new Error("not saved");
+          await cache.put(url, response);
+        }
+        stored++;
+      } catch {
+        failed++;
+      }
+      onProgress?.(stored + failed, wanted.length);
+    }
   }
-  return undefined;
+  await Promise.all(Array.from({ length: PARALLEL }, worker));
+  return { stored, failed };
+}
+
+/** Removes every saved ExerciseDB GIF from this device. */
+export async function clearExerciseDbGifs(): Promise<void> {
+  if (typeof caches !== "undefined") await caches.delete(EXERCISEDB_GIF_CACHE);
 }

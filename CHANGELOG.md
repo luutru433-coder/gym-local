@@ -1,11 +1,12 @@
 # Changelog
 
-## Unreleased — Online exercise GIFs
+## Unreleased — Free ExerciseDB images, saved on the device
 
-- Settings has a new "Online exercise GIFs" switch, off by default. When it is on and the device is online, the exercise page shows a GIF for the exercise fetched live from the free ExerciseDB service, with the "ExerciseDB by AscendAPI" credit under it. Opening an exercise then sends its name to that service.
-- Nothing from that service is kept: no GIF, link or search result is stored on the device, in backups, in the app or in its repository. Offline, or when no GIF fits, the page shows the bundled drawings as before.
-- An image from your own imported pack takes priority over the online GIF for that exercise.
-- No database or backup change (ADR 0021).
+- Settings → Exercise images has a new "Download free ExerciseDB images" button. The device downloads the free ExerciseDB list once, straight from their server, links a 180p GIF to each exercise in the app that has no image yet, and saves those GIFs on the device so they show offline. Used with AscendAPI's permission; the credit to AscendAPI.com is shown in Settings and under each GIF.
+- Nothing from ExerciseDB is in the app, its repository or its website, and nothing is in backups: after a restore on another device, download again there.
+- Only GIFs for exercises in the app are saved. "Change image" on an exercise page searches all 1,500 names; a GIF picked while online is saved too. Images you imported or chose yourself are never replaced.
+- "Remove pack" also deletes the downloaded list and GIFs.
+- No change to the personal database or the backup format (ADR 0021).
 
 ## Unreleased — Workout screen redesign and per-set timer
 
