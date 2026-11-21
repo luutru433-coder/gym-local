@@ -8,6 +8,7 @@ import { formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { PantryMenuSection } from "./PantryMenuSection";
 import { MealPlanSection } from "./meal-plan/MealPlanSection";
+import { NutritionTrendsSection } from "./NutritionTrendsSection";
 import "./NutritionPage.css";
 
 const mealLabels: Record<MealEntry["meal"], { vi: string; en: string }> = {
@@ -472,6 +473,8 @@ export function NutritionPage() {
       ) : <Notice tone="warning">{profile.nutritionTarget && !targetIsCurrent ? (!profile.nutritionTarget.confirmedAt ? (locale === "vi" ? "Mục tiêu ước tính chưa được xác nhận. Mở Cài đặt, xem lại con số rồi lưu để bắt đầu dùng." : "Your estimated target has not been confirmed yet. Open Settings, check the numbers, and save to start using it.") : (locale === "vi" ? "Mục tiêu cũ không còn khớp thông tin cơ thể hiện tại. Hãy kiểm tra và lưu lại trong Cài đặt." : "The previous target no longer matches your current body details. Review and save them in Settings.")) : (locale === "vi" ? "Chưa có mục tiêu dinh dưỡng. Bạn có thể thêm số đo trong Cài đặt để app ước tính calories và macro." : "No nutrition target yet. Add body details in Settings for an estimate.")}</Notice>}
 
       {dayMeals.length && !micronutrientCompleteness.complete ? <Notice tone="warning">{locale === "vi" ? `Nhật ký hôm nay có dữ liệu cho ${micronutrientCompleteness.availableCount}/${micronutrientCompleteness.totalCount} vi chất. Phần còn thiếu được để trống, không tự tính là 0.` : `Today's diary covers ${micronutrientCompleteness.availableCount}/${micronutrientCompleteness.totalCount} micronutrients. Missing values remain unknown and are not counted as zero.`}</Notice> : null}
+
+      <NutritionTrendsSection meals={meals} date={date} target={target} locale={profile.locale} />
 
       <section className="recipe-section">
         <SectionTitle eyebrow={`${recipes.length} ${locale === "vi" ? "công thức" : "recipes"}`} title={locale === "vi" ? "Món tự nấu" : "My recipes"} action={<Button size="sm" variant="secondary" disabled={!foods.length} onClick={() => openRecipeEditor()}><Plus size={16} />{locale === "vi" ? "Tạo công thức" : "Create recipe"}</Button>} />

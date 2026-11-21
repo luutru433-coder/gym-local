@@ -24,6 +24,7 @@
       "@gym/workouts/plan": ["packages/workouts/src/adaptive-plan.ts"],
       "@gym/workouts/superset": ["packages/workouts/src/superset.ts"],
       "@gym/workouts": ["packages/workouts/src/index.ts"],
+      "@gym/nutrition/trends": ["packages/nutrition/src/trends.ts"],
       "@gym/nutrition": ["packages/nutrition/src/index.ts"],
       "@gym/progress": ["packages/progress/src/index.ts"],
       "@gym/storage/device": ["packages/storage/src/device-preferences.ts"],
