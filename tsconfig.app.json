@@ -23,6 +23,7 @@
       "@gym/catalog": ["packages/catalog/src/index.ts"],
       "@gym/workouts/plan": ["packages/workouts/src/adaptive-plan.ts"],
       "@gym/workouts/superset": ["packages/workouts/src/superset.ts"],
+      "@gym/workouts/set-timer": ["packages/workouts/src/set-timer.ts"],
       "@gym/workouts": ["packages/workouts/src/index.ts"],
       "@gym/nutrition/trends": ["packages/nutrition/src/trends.ts"],
       "@gym/nutrition": ["packages/nutrition/src/index.ts"],

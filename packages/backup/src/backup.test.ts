@@ -633,4 +633,16 @@ describe("backup", () => {
     sessions[0].exercises[0] = block("block_a", 7);
     await expect(createBackup(emptyData({ sessions } as never))).rejects.toThrow();
   });
+
+  it("round-trips a set's timer fields and rejects a malformed start time", async () => {
+    const name = { vi: "Đẩy ngực", en: "Chest press" };
+    const timedSet = (startedAt: unknown) => ({ id: "set_timed", type: "working" as const, weightKg: 20, reps: 8, startedAt, completedAt: "2026-08-10T01:03:47.000Z", workSeconds: 47, restBeforeSeconds: 124 });
+    const sessions = [{ id: "session_timed", startedAt: "2026-08-10T01:00:00.000Z", exercises: [{ id: "block_a", movementId: "chest_press", variantId: "chest_press__dumbbell", movementNameSnapshot: name, variantNameSnapshot: name, loadEntryModeSnapshot: "per_hand" as const, restSeconds: 90, sets: [timedSet("2026-08-10T01:03:00.000Z")] }] }];
+
+    const restored = await readBackup(await createBackup(emptyData({ sessions } as never)));
+    expect(restored.data.sessions[0].exercises[0].sets[0]).toMatchObject({ startedAt: "2026-08-10T01:03:00.000Z", workSeconds: 47, restBeforeSeconds: 124 });
+
+    sessions[0].exercises[0].sets[0] = timedSet("not a time");
+    await expect(createBackup(emptyData({ sessions } as never))).rejects.toThrow();
+  });
 });
