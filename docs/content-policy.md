@@ -11,7 +11,10 @@ Project-authored guidance points to this policy through `sourcePath`; external m
 - The review gate checks that title/creator metadata corresponds to the exercise and equipment variant. It is a content review, not a medical endorsement.
 - Videos are embedded only after a click through `youtube-nocookie.com`; autoplay, download, offline caching, and YouTube search pages are prohibited.
 - Missing, blocked, or removed videos fall back to project-authored setup, execution, breathing, and safety cues plus a direct source link.
-- Reference images come from the public-domain Free Exercise DB under the Unlicense and remain remote/online-only.
+- Every reviewed equipment variant has one bundled animation (three frames; a frame whose upstream trace is unusable is skipped and listed in `frameOverrides`) listed in `content/exercise-animations.json`, with frames under `public/exercise-animations/`. Frames are unmodified Workout Guide drawings (Bryl Lim, partly adapted from Everkinetic, CC BY-SA 4.0) pinned to an upstream commit and regenerated with `scripts/build-exercise-animations.mjs`. They are precached by the PWA and never fetched from a remote host.
+- When upstream has no drawing for the exact equipment, the entry is marked `closest` and the app names the exercise actually shown.
+- The worked-muscle diagram uses the public-domain React Muscle Map body artwork (Unlicense), bundled in the app.
+- No exercise image is loaded from a remote host. The earlier hot-linked Free Exercise DB photos were removed; the bundled drawings replace them.
 
 Every new media host must be added to the allowlist in `packages/media`, carry a source record, and add an allowlist test. Automated checks validate direct-video coverage, unique variant IDs, creator metadata, URLs, translations, equipment references, sources, licenses/terms, review dates, and routine-template references.
 

@@ -23,7 +23,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Button, Card, EmptyState, Modal, ProgressBar } from "@gym/ui";
 import type { ExerciseVariant, LoadEntryMode, ProgressionRule, SetLog, SetType, WorkoutSession } from "@gym/contracts";
-import { EQUIPMENT_OPTIONS, MOVEMENTS, getTrackingProfile, getVariant, rankVariantsForEquipment, trackingProfileForLoadMode } from "@gym/catalog";
+import { EQUIPMENT_OPTIONS, MOVEMENTS, getExerciseAnimation, getMovement, getTrackingProfile, getVariant, rankVariantsForEquipment, trackingProfileForLoadMode } from "@gym/catalog";
 import {
   addExerciseBlock,
   addSet,
@@ -40,6 +40,7 @@ import {
 import { latestVariantHistory } from "@gym/progress";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
+import { ExerciseAnimation } from "../../components/ExerciseAnimation";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
 import "./WorkoutPage.css";
 
@@ -584,7 +585,7 @@ export function WorkoutPage() {
       </Modal>
 
       <Modal open={Boolean(guideVariant)} title={guideVariant ? localize(guideVariant.name, locale) : ""} onClose={() => setGuideVariant(undefined)}>
-        {guideVariant ? <div className="quick-guide">{guideVariant.videoGuides[0] ? <ExerciseVideoPlayer guide={guideVariant.videoGuides[0]} locale={locale} compact /> : null}<ol>{guideVariant.instructions.map((instruction, index) => <li key={index}><span>{index + 1}</span><p>{localize(instruction, locale)}</p></li>)}</ol><div className="cue-box"><h4>{locale === "vi" ? "Cue chính" : "Key cue"}</h4>{guideVariant.cues.map((cue, index) => <p key={index}>{localize(cue, locale)}</p>)}</div><div className="safety-box"><h4>{locale === "vi" ? "An toàn" : "Safety"}</h4>{guideVariant.safety.map((item, index) => <p key={index}>{localize(item, locale)}</p>)}</div></div> : null}
+        {guideVariant ? <div className="quick-guide"><ExerciseAnimation key={guideVariant.id} animation={getExerciseAnimation(guideVariant.id)} primaryMuscles={getMovement(guideVariant.movementId)?.primaryMuscles ?? []} secondaryMuscles={getMovement(guideVariant.movementId)?.secondaryMuscles ?? []} locale={locale} compact />{guideVariant.videoGuides[0] ? <ExerciseVideoPlayer guide={guideVariant.videoGuides[0]} locale={locale} compact /> : null}<ol>{guideVariant.instructions.map((instruction, index) => <li key={index}><span>{index + 1}</span><p>{localize(instruction, locale)}</p></li>)}</ol><div className="cue-box"><h4>{locale === "vi" ? "Cue chính" : "Key cue"}</h4>{guideVariant.cues.map((cue, index) => <p key={index}>{localize(cue, locale)}</p>)}</div><div className="safety-box"><h4>{locale === "vi" ? "An toàn" : "Safety"}</h4>{guideVariant.safety.map((item, index) => <p key={index}>{localize(item, locale)}</p>)}</div></div> : null}
       </Modal>
     </div>
   );
