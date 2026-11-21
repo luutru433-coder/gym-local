@@ -199,6 +199,21 @@ describe("adaptive targets without a load", () => {
     expect(plank.sets.at(-1)).toMatchObject({ durationSeconds: 35 });
   });
 
+  it("keeps unequal set targets unequal on hold", () => {
+    history = {};
+    const routine = cloneRoutineTemplate("tpl_full_body_a");
+    const item = routine.items.find((entry) => entry.movementId === "plank")!;
+    const working = item.sets.filter((set) => set.type === "working");
+    working[0].durationSeconds = 30;
+    working.at(-1)!.durationSeconds = 60;
+    const expected = item.sets.map((set) => set.durationSeconds);
+    finishedItem(routine, "plank", "a", "2026-08-10T10:00:00.000Z", { durationSeconds: 20 });
+    const plank = planAdaptiveSession(routine, history.plank, rule, new Date("2026-08-12T10:00:00.000Z"))
+      .items.find((entry) => entry.itemId === item.id)!;
+    expect(plank.action).toBe("hold");
+    expect(plank.sets.map((set) => set.durationSeconds)).toEqual(expected);
+  });
+
   it("reports distance progression instead of a hold", () => {
     history = {};
     const routine = cloneRoutineTemplate("tpl_strength_b");

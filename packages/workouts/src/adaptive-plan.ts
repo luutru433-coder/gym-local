@@ -124,24 +124,30 @@ function carryProgressedTargets(
   const latest = sessions
     .map((session) => session.exercises
       .filter((exercise) => exercise.variantId === variantId)
-      .flatMap((exercise) => exercise.sets.filter((set) => set.type === "working" && Boolean(set.completedAt))))
-    .find((completed) => completed.length > 0);
+      .flatMap((exercise) => exercise.sets.filter((set) => set.type === "working")))
+    .find((working) => working.some((set) => Boolean(set.completedAt)));
   if (!latest) return sets;
-  const topReps = Math.max(0, ...latest.map((set) => set.targetMaxReps ?? set.targetMinReps ?? 0));
-  const duration = Math.max(0, ...latest.map((set) => set.targetDurationSeconds ?? 0));
+  let workingIndex = -1;
   return sets.map((set) => {
     if (set.type !== "working") return set;
+    workingIndex += 1;
+    // Targets are carried set by set so unequal targets keep their shape.
+    const previous = latest[workingIndex];
+    if (!previous) return set;
     if (direction === "higher_reps") {
       const top = set.maxReps ?? set.minReps;
-      if (top === undefined || topReps <= top) return set;
-      const step = topReps - top;
+      const previousTop = previous.targetMaxReps ?? previous.targetMinReps;
+      if (top === undefined || previousTop === undefined || previousTop <= top) return set;
+      const step = previousTop - top;
       return {
         ...set,
         minReps: set.minReps === undefined ? undefined : set.minReps + step,
         maxReps: set.maxReps === undefined ? undefined : set.maxReps + step
       };
     }
-    return set.durationSeconds !== undefined && duration > set.durationSeconds ? { ...set, durationSeconds: duration } : set;
+    return set.durationSeconds !== undefined && (previous.targetDurationSeconds ?? 0) > set.durationSeconds
+      ? { ...set, durationSeconds: previous.targetDurationSeconds }
+      : set;
   });
 }
 
@@ -406,7 +412,7 @@ export function planTrainingWeek(options: {
   const note: LocalizedText = remaining === 0
     ? { vi: "Đã đủ số buổi tuần này. Các ngày còn lại để hồi phục.", en: "Weekly target reached. The remaining days are for recovery." }
     : droppedSessions > 0
-      ? { vi: `Tuần này chỉ còn chỗ cho ${plannedSessions}/${remaining} buổi còn lại; lịch đã dồn lại và ${droppedSessions} buổi chuyển sang tuần sau.`, en: `Only ${plannedSessions} of the ${remaining} remaining sessions still fit this week; ${droppedSessions} roll over to next week.` }
-      : { vi: `Còn ${remaining} buổi, đã xếp lại vào các ngày còn trống trong tuần.`, en: `${remaining} sessions left, re-spread over the open days this week.` };
+      ? { vi: `Tuần này chỉ còn chỗ cho ${plannedSessions}/${remaining} buổi còn lại; lịch đã dồn lại và ${droppedSessions} buổi chuyển sang tuần sau.`, en: `Only ${plannedSessions} of the ${remaining} remaining sessions still fit this week; ${droppedSessions} ${droppedSessions === 1 ? "rolls" : "roll"} over to next week.` }
+      : { vi: `Còn ${remaining} buổi, đã xếp lại vào các ngày còn trống trong tuần.`, en: `${remaining} ${remaining === 1 ? "session" : "sessions"} left, re-spread over the open days this week.` };
   return { days, targetSessions: target, completedSessions, plannedSessions, droppedSessions, nextTrainingDate, note };
 }
