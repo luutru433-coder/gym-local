@@ -125,6 +125,9 @@ describe("prescription", () => {
     // Every load is above today's capacity: the lightest is shown and flagged, never the heaviest.
     expect(prescribeSet({ capacityE1rmKg: 50, target, availableLoadsKg: [60, 80, 100] })).toMatchObject({ loadKg: 60, feasible: false, inRange: false });
     expect(prescribeSet({ capacityE1rmKg: 50, target, availableLoadsKg: [60, 80, 100], currentLoadKg: 100 })).toMatchObject({ loadKg: 60, feasible: false });
+    // Sparse loads: the only liftable one is far too light, but it is still the one to use.
+    expect(prescribeSet({ capacityE1rmKg: 20, target, availableLoadsKg: [10, 20] })).toMatchObject({ loadKg: 10, reps: 12, feasible: true, inRange: false });
+    expect(prescribeSet({ capacityE1rmKg: 20, target, availableLoadsKg: [20, 10], currentLoadKg: 20 })).toMatchObject({ loadKg: 10, feasible: true, action: "lower_load" });
     expect(() => prescribeSet({ capacityE1rmKg: 100, target: { minReps: 10, maxReps: 8, rir: 2 }, availableLoadsKg: loads })).toThrow(RangeError);
   });
 });

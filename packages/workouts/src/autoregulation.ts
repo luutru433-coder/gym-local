@@ -303,7 +303,9 @@ export function prescribeSet(input: PrescribeSetInput): SetPrescription {
     const outside = reps < target.minReps ? target.minReps - reps : reps > target.maxReps ? reps - target.maxReps : 0;
     const cost = outside * outside
       + (input.currentLoadKg === undefined ? Math.abs(reps - middle) * 0.01 : load === input.currentLoadKg ? 0 : AUTOREG.switchLoadPenalty);
-    if (!best || cost < best.cost - 1e-9 || (Math.abs(cost - best.cost) <= 1e-9 && load > best.load)) best = { load, reps, cost, toFailure };
+    // A load that allows at least one rep always beats one that allows none, however far it is from the range.
+    if (best && best.reps >= 1 && reps < 1) continue;
+    if (!best || (best.reps < 1 && reps >= 1) || cost < best.cost - 1e-9 || (Math.abs(cost - best.cost) <= 1e-9 && load > best.load)) best = { load, reps, cost, toFailure };
   }
   const feasible = best!.reps >= 1;
   const reps = Math.min(target.maxReps, Math.max(1, best!.reps));
