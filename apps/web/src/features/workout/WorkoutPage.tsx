@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowDown,
@@ -125,6 +125,9 @@ export function WorkoutPage() {
       .some((candidate) => candidate.toLocaleLowerCase(locale).includes(query)));
   }, [customMovements, exerciseQuery, locale]);
 
+  // Rest handlers call this after computing the new end time, so the 1s clock is never behind it (no 02:01 for a 120s rest).
+  const syncClock = useCallback(() => setNow(Date.now()), []);
+
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
@@ -173,6 +176,7 @@ export function WorkoutPage() {
       save(updated);
     } else {
       save(updateSet(activeSession, exerciseId, setId, applySetSuggestion(set, suggestion), true));
+      syncClock();
     }
   };
 
@@ -184,6 +188,7 @@ export function WorkoutPage() {
     }
     const currentEnd = new Date(activeSession.restTimerEndsAt ?? Date.now()).getTime();
     save({ ...activeSession, restTimerEndsAt: new Date(Math.max(Date.now(), currentEnd + seconds * 1000)).toISOString() });
+    syncClock();
   };
 
   const restartRest = () => {
@@ -191,6 +196,7 @@ export function WorkoutPage() {
     const activeExercise = activeSession.exercises.find((exercise) => exercise.id === activeSession.activeExerciseId);
     const seconds = activeExercise?.restSeconds ?? 90;
     save({ ...activeSession, restTimerEndsAt: new Date(Date.now() + seconds * 1000).toISOString() });
+    syncClock();
   };
 
   const patchExerciseNote = (exerciseId: string, note: string) => {

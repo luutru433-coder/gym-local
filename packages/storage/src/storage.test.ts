@@ -1,7 +1,7 @@
 import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { PersonalDataSnapshot, Profile, Program, Routine, SavedMealPlan, WorkoutSession } from "@gym/contracts";
+import type { BodyMetric, PersonalDataSnapshot, Profile, Program, Routine, SavedMealPlan, WorkoutSession } from "@gym/contracts";
 import { buildCustomExercise } from "@gym/catalog/custom";
 import { deleteCustomExercise, saveCustomExercise } from "./custom-exercises";
 import {
@@ -13,6 +13,9 @@ import {
   getProfile,
   initializeDatabase,
   deleteProgram,
+  listBodyMetrics,
+  listSessions,
+  saveBodyMetric,
   deleteFood,
   deleteFoodPreference,
   deletePantryItem,
@@ -50,6 +53,7 @@ import {
   logMealPlanDays,
   undoLatestRestore
 } from "./index";
+import { deleteBodyMetric, deleteFinishedSession, updateFinishedSession } from "./history-edit";
 
 const databases: GymDatabase[] = [];
 
@@ -798,6 +802,44 @@ describe("IndexedDB schema and recovery", () => {
     await saveSession({ ...session, finishedAt: "2026-08-10T02:00:00.000Z" }, db);
     expect(await getActiveSession(db)).toBeUndefined();
     expect((await db.settings.get("app")) ?? defaultSettings).toMatchObject({ activeSessionId: undefined });
+  });
+
+  it("edits and deletes finished workouts without touching the active workout", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    const past: WorkoutSession = { id: "session_past", startedAt: "2026-08-09T01:00:00.000Z", finishedAt: "2026-08-09T02:00:00.000Z", exercises: [] };
+    const active: WorkoutSession = { id: "session_active", startedAt: "2026-08-10T01:00:00.000Z", exercises: [] };
+    await saveSession(past, db);
+    await saveSession(active, db);
+
+    await updateFinishedSession({ ...past, startedAt: "2026-08-08T01:00:00.000Z", finishedAt: "2026-08-08T01:45:00.000Z", notes: "fixed" }, db);
+    expect((await db.sessions.get(past.id))).toMatchObject({ startedAt: "2026-08-08T01:00:00.000Z", notes: "fixed" });
+    expect((await getActiveSession(db))?.id).toBe(active.id);
+
+    await expect(updateFinishedSession({ ...active, finishedAt: "2026-08-10T02:00:00.000Z" }, db)).rejects.toThrow("Only finished workouts");
+    await expect(updateFinishedSession(active, db)).rejects.toThrow("Only finished workouts");
+    await expect(updateFinishedSession({ ...past, finishedAt: "2026-08-09T00:00:00.000Z" }, db)).rejects.toThrow("cannot finish before");
+    await expect(updateFinishedSession({ ...past, id: "session_missing" }, db)).rejects.toThrow("Only finished workouts");
+    await expect(deleteFinishedSession(active.id, db)).rejects.toThrow("unfinished workout");
+    expect((await db.sessions.get(active.id))?.finishedAt).toBeUndefined();
+
+    await deleteFinishedSession(past.id, db);
+    await deleteFinishedSession(past.id, db);
+    expect((await listSessions(db)).map((session) => session.id)).toEqual([active.id]);
+    expect((await getActiveSession(db))?.id).toBe(active.id);
+  });
+
+  it("updates a body measurement in place and deletes it", async () => {
+    const db = makeDatabase();
+    await initializeDatabase(db);
+    const metric: BodyMetric = { id: "metric_1", date: "2026-08-10", weightKg: 70 };
+    await saveBodyMetric(metric, db);
+    await saveBodyMetric({ ...metric, date: "2026-08-09", weightKg: 69.5, waistCm: 80 }, db);
+    expect(await listBodyMetrics(db)).toEqual([{ id: "metric_1", date: "2026-08-09", weightKg: 69.5, waistCm: 80 }]);
+
+    await deleteBodyMetric(metric.id, db);
+    await deleteBodyMetric("metric_missing", db);
+    expect(await listBodyMetrics(db)).toEqual([]);
   });
 
   it("creates, updates, lists, and deletes programs without changing routines", async () => {
