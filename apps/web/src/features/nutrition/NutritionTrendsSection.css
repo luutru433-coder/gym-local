@@ -1,0 +1,88 @@
+.nutrition-trends { margin: 26px 0; }
+.nutrition-trends__card { padding: 18px 20px; display: grid; gap: 16px; }
+
+.nutrition-trends__chart {
+  position: relative;
+  height: 150px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  gap: 4px;
+}
+
+.nutrition-trends__week {
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  display: grid;
+  grid-template-rows: 1fr 26px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.nutrition-trends__week:hover,
+.nutrition-trends__week[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); }
+.nutrition-trends__week small { align-self: center; font-size: 11px; font-weight: 700; }
+
+.nutrition-trends__bar-area { display: flex; align-items: flex-end; justify-content: center; }
+.nutrition-trends__bar { width: min(26px, 60%); border-radius: 6px 6px 2px 2px; background: var(--lime-dark); }
+.nutrition-trends__bar.is-over { background: var(--coral); }
+.nutrition-trends__bar.is-empty { height: 3px; background: var(--line); }
+.nutrition-trends__week[aria-pressed="true"] .nutrition-trends__bar:not(.is-empty) { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+.nutrition-trends__target {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-top: 1px dashed var(--ink-soft);
+  pointer-events: none;
+}
+
+.nutrition-trends__target em {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  color: var(--ink-soft);
+  background: var(--surface);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.nutrition-trends__detail { display: grid; gap: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.nutrition-trends__detail header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.nutrition-trends__icon { width: 42px; height: 42px; display: grid; place-items: center; color: #4d5d0b; background: #eefac0; border-radius: 12px 4px 12px 4px; }
+.nutrition-trends__detail header span { color: var(--muted); font-size: 11px; }
+.nutrition-trends__detail header strong { display: block; margin-top: 2px; font-size: 22px; }
+.nutrition-trends__detail header strong.is-empty { font-size: 15px; }
+.nutrition-trends__detail header strong small { color: var(--muted); font-size: 11px; font-weight: 600; }
+.nutrition-trends__detail header em { font-style: normal; font-weight: 850; text-align: center; color: #b84a32; }
+.nutrition-trends__detail header em.is-on-target { color: #4d5d0b; }
+.nutrition-trends__detail header em small { display: block; color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+
+.nutrition-trends__macros { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.nutrition-trends__macro { display: grid; gap: 5px; min-width: 0; }
+.nutrition-trends__macro > span { color: var(--muted); font-size: 11px; }
+.nutrition-trends__macro strong { font-size: 15px; }
+.nutrition-trends__macro small { color: var(--muted); font-size: 11px; font-weight: 600; }
+.nutrition-trends__macro--coral .progress-track > span { background: var(--coral); }
+.nutrition-trends__macro--sky .progress-track > span { background: var(--sky); }
+.nutrition-trends__macro--gold .progress-track > span { background: var(--gold); }
+
+.nutrition-trends__note,
+.nutrition-trends__empty { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+@media (max-width: 560px) {
+  .nutrition-trends__card { padding: 16px; }
+  .nutrition-trends__detail header { grid-template-columns: auto 1fr; }
+  .nutrition-trends__detail header em { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 6px; text-align: left; }
+  .nutrition-trends__macros { grid-template-columns: 1fr; gap: 10px; }
+  .nutrition-trends__macro { grid-template-columns: 1fr auto; align-items: baseline; }
+  .nutrition-trends__macro .progress-track { grid-column: 1 / -1; }
+  .nutrition-trends__macro > small { grid-column: 1 / -1; }
+}
