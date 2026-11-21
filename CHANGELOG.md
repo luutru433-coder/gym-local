@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Rest alert and workout summary
+
+- The rest timer now beeps and, where the device supports it (not iPhone), vibrates when the rest ends; a bell button in the rest bar turns the alert off. The alert needs the app open in the foreground.
+- The screen stays awake during a live workout on browsers that support the Screen Wake Lock API.
+- A completed set that beats the exact-variation record (estimated 1RM, heaviest load, or least assistance) gets a “New record” badge straight away. Variations without earlier history get no badge.
+- Finishing a workout now shows a summary (duration, sets done, volume, new records, exercises) instead of jumping to Progress.
+
 ## Unreleased — Self-adjusting training plan
 
 - Added an offline self-adjusting training plan on the home screen: the week's remaining sessions reflow around missed days, and the next session shows per-exercise adjustments with a bilingual reason.

@@ -22,6 +22,7 @@ import {
 } from "@gym/contracts";
 
 export * from "./nutrition-pack-client";
+export * from "./device-preferences";
 
 function assertFiniteRecord(value: unknown, path = "record"): void {
   if (typeof value === "number") {

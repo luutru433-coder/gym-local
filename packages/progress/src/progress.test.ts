@@ -7,6 +7,7 @@ import {
   exactVariantTrend,
   latestVariantHistory,
   personalRecord,
+  sessionRecordSets,
   sessionVolumeMetrics,
   setPerformanceMetrics,
   variantHistory,
@@ -228,5 +229,28 @@ describe("progress calculations", () => {
     expect(bodyMetricSeries(metrics, "weightKg")).toEqual([{ date: "2026-08-01", value: 73 }, { date: "2026-08-20", value: 71.5 }]);
     expect(bodyMetricSeries(metrics, "waistCm")).toEqual([{ date: "2026-08-10", value: 82 }, { date: "2026-08-20", value: 80 }]);
     expect(bodyMetricSeries(metrics, "armCm")).toEqual([]);
+  });
+
+  it("flags live sets that beat the exact-variant record only", () => {
+    const earlier = session("earlier", "2026-08-01T10:00:00.000Z", [
+      exercise("chest_press__dumbbell", [completedSet("old", { weightKg: 40, reps: 8 })])
+    ]);
+    const liveExercise = exercise("chest_press__dumbbell", [
+      completedSet("warm", { type: "warmup", weightKg: 60, reps: 5 }),
+      completedSet("same", { weightKg: 40, reps: 8 }),
+      completedSet("more-reps", { weightKg: 40, reps: 10 }),
+      completedSet("heavier", { weightKg: 42.5, reps: 6 }),
+      { id: "open", type: "working", weightKg: 80, reps: 8 }
+    ]);
+    const firstTime = exercise("chest_press__barbell", [completedSet("first", { weightKg: 100, reps: 5 })]);
+    const live = session("live", undefined, [liveExercise, firstTime]);
+
+    const records = sessionRecordSets([live, earlier], live);
+
+    expect(records.map((record) => [record.setId, record.kinds])).toEqual([
+      ["more-reps", ["e1rm"]],
+      ["heavier", ["load"]]
+    ]);
+    expect(records[0]).toMatchObject({ exerciseId: liveExercise.id, variantId: "chest_press__dumbbell", weightKg: 40, reps: 10 });
   });
 });

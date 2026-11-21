@@ -370,7 +370,7 @@
   .rest-dock__controls {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 44px minmax(0, 1fr);
   }
 
   .rest-dock__controls button {
@@ -449,4 +449,127 @@
   .variant-choice em {
     grid-column: 2;
   }
+}
+
+.rest-dock__alert-toggle {
+  justify-content: center;
+}
+
+.rest-dock__alert-toggle[aria-pressed="false"] {
+  opacity: .55;
+}
+
+.set-record-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 2px 6px;
+  color: var(--ink);
+  background: var(--lime);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.workout-summary {
+  min-height: 100vh;
+  padding: 24px 14px calc(24px + env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+}
+
+.workout-summary__card {
+  width: min(560px, 100%);
+  display: grid;
+  gap: 18px;
+}
+
+.workout-summary__card header small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.workout-summary__card h1 {
+  margin: 2px 0 0;
+  font-size: 26px;
+}
+
+.workout-summary__card h2 {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.workout-summary__stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.workout-summary__stats div {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.workout-summary__stats dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.workout-summary__stats dd {
+  margin: 2px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.workout-summary__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workout-summary__list li {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.workout-summary__list small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.workout-summary__list em {
+  font-style: normal;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.workout-summary__empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.workout-summary__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.workout-summary__actions > * {
+  flex: 1 1 160px;
 }
