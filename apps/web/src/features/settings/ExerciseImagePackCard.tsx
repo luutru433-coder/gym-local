@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Globe, Images, Trash2, Upload } from "lucide-react";
+import { Images, Trash2, Upload } from "lucide-react";
 import { Button, Card, Notice } from "@gym/ui";
 import { clearExerciseImagePack, exerciseImagePackSummary, type ExerciseImagePackSummary } from "@gym/storage/exercise-images";
-import { ONLINE_GIF_CREDIT } from "@gym/media/online-gifs";
-import { isOnlineExerciseGifsEnabled, setOnlineExerciseGifsEnabled } from "@gym/storage/device";
 import { importExerciseImagePack } from "./exerciseImagePackActions";
 
 const megabytes = (bytes: number) => (bytes / 1_048_576).toFixed(bytes < 10_485_760 ? 1 : 0);
@@ -64,21 +62,6 @@ export function ExerciseImagePackCard({ locale }: { locale: "vi" | "en" }) {
       <input ref={fileRef} type="file" multiple hidden accept=".zip,.json,.gif,.webp,.png,.apng,.jpg,.jpeg,.avif" aria-label={vi ? "File gói hình" : "Image pack files"} onChange={(event) => { const files = [...(event.target.files ?? [])]; if (files.length) void importFiles(files); }} />
       <small className="image-pack-hint">{vi ? "Chọn nhiều file hình cùng file JSON đi kèm (nếu có) để có tên bài tập, hoặc một file ZIP. Với gói lớn, hãy chọn các file hình bên trong một thư mục kích thước cùng file JSON, thay vì ZIP toàn bộ." : "Pick the image files together with the pack's JSON file (if it has one) to get exercise names, or one ZIP. For a large pack, select the image files inside one size folder together with the JSON file rather than a ZIP of everything."}</small>
       {message ? <Notice tone={message.tone}>{message.text}</Notice> : null}
-    </Card>
-  );
-}
-
-export function OnlineExerciseGifCard({ locale }: { locale: "vi" | "en" }) {
-  const vi = locale === "vi";
-  const [enabled, setEnabled] = useState(isOnlineExerciseGifsEnabled);
-  return (
-    <Card className="settings-card online-gif-card">
-      <div className="settings-card__heading"><span><Globe size={20} /></span><div><h3>{vi ? "Hình động trực tuyến" : "Online exercise GIFs"}</h3><p>{vi ? "Khi có mạng, trang bài tập hiện hình động lấy trực tiếp từ ExerciseDB. Không có mạng thì chỉ còn hình vẽ có sẵn trong app." : "While online, the exercise page shows a GIF fetched live from ExerciseDB. Offline, only the drawings bundled with the app are shown."}</p></div></div>
-      <label className="online-gif-toggle">
-        <input type="checkbox" checked={enabled} onChange={(event) => { setOnlineExerciseGifsEnabled(event.target.checked); setEnabled(event.target.checked); }} />
-        <span>{vi ? "Hiện hình động trực tuyến" : "Show online GIFs"}</span>
-      </label>
-      <small className="image-pack-hint">{vi ? "Mỗi lần mở một bài tập, app gửi tên bài tập tới máy chủ ExerciseDB. Hình không được lưu trên máy này và không nằm trong app. Hình trong gói của bạn (nếu có) được ưu tiên. Nguồn: " : "Each time an exercise is opened, the app sends its name to the ExerciseDB server. The GIFs are not stored on this device and are not part of the app. An image from your own pack, when there is one, takes priority. Source: "}<a href={ONLINE_GIF_CREDIT.url} target="_blank" rel="noopener noreferrer">{ONLINE_GIF_CREDIT.name}</a>{vi ? " (chỉ dùng cá nhân, phi thương mại)." : " (personal, non-commercial use only)."}</small>
     </Card>
   );
 }

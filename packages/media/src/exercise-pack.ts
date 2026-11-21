@@ -222,14 +222,3 @@ export function suggestExerciseImageLinks(images: Pick<PackImage, "id" | "name">
   }
   return suggestions;
 }
-
-/**
- * The phrases to look a variant up by in an exercise library, most likely first: its equipment word plus
- * each usual name of the movement. Empty for a movement there is no naming for (custom exercises).
- */
-export function exerciseSearchPhrases(variant: PackVariant): string[] {
-  const movement = MOVEMENT_NAMES[variant.movementId];
-  if (!movement) return [];
-  const equipment = EQUIPMENT_WORDS[variant.equipment[0]]?.[0];
-  return movement.any.map((phrase) => (equipment && !phrase.includes(equipment) ? `${equipment} ${phrase}` : phrase));
-}

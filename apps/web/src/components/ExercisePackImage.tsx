@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ImagePlus, Search, X } from "lucide-react";
 import { getExerciseImage, getExerciseImageBlob, linkExerciseImage, listExerciseImages, type ExerciseImage } from "@gym/storage/exercise-images";
 
@@ -22,14 +22,10 @@ function PickerThumb({ imageId, alt }: { imageId: string; alt: string }) {
   return url ? <img src={url} alt={alt} loading="lazy" /> : <span className="pack-image-thumb-empty" />;
 }
 
-/**
- * The owner's own imported image for this exercise, with a picker to choose or change it. `fallback` is shown
- * in its place once it is known that this exercise has no imported image.
- */
-export default function ExercisePackImage({ variantId, exerciseName, locale, fallback = null }: { variantId: string; exerciseName: string; locale: "vi" | "en"; fallback?: ReactNode }) {
+/** The owner's own imported image for this exercise, with a picker to choose or change it. Renders nothing without a pack. */
+export default function ExercisePackImage({ variantId, exerciseName, locale }: { variantId: string; exerciseName: string; locale: "vi" | "en" }) {
   const vi = locale === "vi";
-  const [images, setImages] = useState<ExerciseImage[]>();
-  const [looked, setLooked] = useState(false);
+  const [images, setImages] = useState<ExerciseImage[]>([]);
   const [shown, setShown] = useState<{ id: string; name: string; url: string }>();
   const [picking, setPicking] = useState(false);
   const [query, setQuery] = useState("");
@@ -37,7 +33,7 @@ export default function ExercisePackImage({ variantId, exerciseName, locale, fal
 
   useEffect(() => {
     let current = true;
-    void listExerciseImages().then((list) => { if (current) setImages(list); }).catch(() => { if (current) setImages([]); });
+    void listExerciseImages().then((list) => { if (current) setImages(list); }).catch(() => undefined);
     return () => { current = false; };
   }, []);
 
@@ -46,11 +42,10 @@ export default function ExercisePackImage({ variantId, exerciseName, locale, fal
     let current = true;
     void getExerciseImage(variantId).then((image) => {
       if (!current) return;
-      setLooked(true);
       if (!image) return setShown(undefined);
       created = URL.createObjectURL(image.blob);
       setShown({ id: image.id, name: image.name, url: created });
-    }).catch(() => { if (current) setLooked(true); });
+    }).catch(() => undefined);
     return () => {
       current = false;
       if (created) URL.revokeObjectURL(created);
@@ -59,11 +54,10 @@ export default function ExercisePackImage({ variantId, exerciseName, locale, fal
 
   const results = useMemo(() => {
     const wanted = query.toLowerCase().split(/\s+/).filter(Boolean);
-    return (images ?? []).filter((image) => wanted.every((word) => image.name.includes(word))).slice(0, MAX_RESULTS);
+    return images.filter((image) => wanted.every((word) => image.name.includes(word))).slice(0, MAX_RESULTS);
   }, [images, query]);
 
-  if (!images || !looked) return null;
-  if (!images.length) return <>{fallback}</>;
+  if (!images.length) return null;
 
   async function choose(imageId: string | undefined) {
     await linkExerciseImage(variantId, imageId);
@@ -79,7 +73,7 @@ export default function ExercisePackImage({ variantId, exerciseName, locale, fal
           <img src={shown.url} alt={`${exerciseName}: ${shown.name}`} />
           <figcaption><span>{vi ? "Hình từ gói của bạn" : "From your image pack"}</span><strong>{shown.name}</strong></figcaption>
         </figure>
-      ) : fallback}
+      ) : null}
       <div className="pack-image-actions">
         <button type="button" onClick={() => setPicking((value) => !value)} aria-expanded={picking}><ImagePlus size={15} />{shown ? (vi ? "Đổi hình" : "Change image") : (vi ? "Chọn hình từ gói của bạn" : "Choose an image from your pack")}</button>
         {shown ? <button type="button" onClick={() => void choose(undefined)}><X size={15} />{vi ? "Bỏ hình" : "Remove image"}</button> : null}
