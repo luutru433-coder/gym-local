@@ -34,6 +34,13 @@ describe("suggestCalorieTarget", () => {
     expect(nutritionTargetNeedsConfirmation(confirmNutritionTarget(result.suggestedTarget))).toBe(false);
   });
 
+  it("keeps protein and fat within the suggested calories for a high-protein target", () => {
+    const result = suggestCalorieTarget({ trend: flat, meals: meals(everyDay, 1100), target: { ...target, calories: 1500, protein: 250 }, goal: "fat_loss", today: day(21) });
+    expect(result).toMatchObject({ suggestedCalories: 1200, suggestedTarget: { protein: 250, fat: 22, carbs: 1 } });
+    const extreme = suggestCalorieTarget({ trend: flat, meals: meals(everyDay, 1100), target: { ...target, calories: 1500, protein: 320 }, goal: "fat_loss", today: day(21) });
+    expect(extreme).toMatchObject({ suggestedTarget: { protein: 300, fat: 0, carbs: 0 } });
+  });
+
   it("limits one suggestion to 300 kcal", () => {
     const result = suggestCalorieTarget({ trend: flat, meals: meals(everyDay, 1800), target, goal: "general", today: day(21) });
     expect(result).toMatchObject({ status: "adjust", suggestedCalories: 2200, limited: true });

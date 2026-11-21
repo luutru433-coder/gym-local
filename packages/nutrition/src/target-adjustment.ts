@@ -104,11 +104,13 @@ export function suggestCalorieTarget(input: TargetAdjustmentInput): TargetAdjust
   const stepped = Math.min(currentCalories + TARGET_ADJUSTMENT_MAX_STEP_KCAL, Math.max(currentCalories - TARGET_ADJUSTMENT_MAX_STEP_KCAL, ideal));
   // The floor never pushes a target that is already lower back up.
   const suggestedCalories = stepped < currentCalories ? Math.max(stepped, Math.min(currentCalories, TARGET_ADJUSTMENT_MIN_CALORIES)) : stepped;
-  const fat = Math.round((suggestedCalories * 0.25) / 9);
+  // Protein is kept; fat, then protein, gives way when the kept protein no longer fits the calories.
+  const protein = Math.min(input.target.protein, Math.floor(suggestedCalories / 4));
+  const fat = Math.min(Math.round((suggestedCalories * 0.25) / 9), Math.floor((suggestedCalories - protein * 4) / 9));
   const suggestedTarget: NutritionTarget = {
     calories: suggestedCalories,
-    protein: input.target.protein,
-    carbs: Math.max(0, Math.round((suggestedCalories - input.target.protein * 4 - fat * 9) / 4)),
+    protein,
+    carbs: Math.max(0, Math.round((suggestedCalories - protein * 4 - fat * 9) / 4)),
     fat,
     waterMl: input.target.waterMl,
     formulaVersion: input.target.formulaVersion,

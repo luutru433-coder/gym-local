@@ -3,7 +3,7 @@
 ## Unreleased — Weight trend and calorie target check
 
 - The body weight chart now draws a smoothed trend line over the scale readings (each day moves the trend 10% toward the reading, several readings on one day are averaged), so day-to-day water swings stop hiding the direction.
-- Progress has a new calorie target check: from the last 21 days of logged meals and the weight trend it estimates daily energy use (7,700 kcal per kg of trend change) and suggests a calorie target for the current goal. It needs at least 3 weigh-ins 14 days apart and 10 logged days, moves the target by at most 300 kcal at a time, never suggests under 1,200 kcal, and keeps protein and water unchanged.
+- Progress has a new calorie target check: from the last 21 days of logged meals and the weight trend it estimates daily energy use (7,700 kcal per kg of trend change) and suggests a calorie target for the current goal. It needs at least 3 weigh-ins 14 days apart and 10 logged days, moves the target by at most 300 kcal at a time, never suggests under 1,200 kcal, and keeps protein and water unchanged (fat, then protein, is reduced only when the kept protein no longer fits the new calories).
 - The suggestion is never applied on its own: "Use new target" saves it as a manual target, "Ignore" hides it for 7 days on this device. Changing body details in Settings afterwards asks for the estimate to be reviewed again.
 - No database or backup schema change.
 

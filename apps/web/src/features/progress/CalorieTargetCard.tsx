@@ -66,6 +66,7 @@ export function CalorieTargetCard({ trend }: { trend: WeightTrendPoint[] }) {
     }
   };
 
+  const proteinKept = result.status !== "insufficient" && result.suggestedTarget.protein === profile?.nutritionTarget?.protein;
   let body;
   if (result.status === "insufficient") {
     const have = vi
@@ -94,8 +95,8 @@ export function CalorieTargetCard({ trend }: { trend: WeightTrendPoint[] }) {
             : <div className="calorie-check__suggestion">
               <p><span>{vi ? "Gợi ý mục tiêu" : "Suggested target"}</span><strong>{formatNumber(result.currentCalories, locale, 0)} → {formatNumber(result.suggestedCalories, locale, 0)} kcal</strong></p>
               <small>{vi
-                ? `Đạm ${result.suggestedTarget.protein} g (giữ nguyên) · bột đường ${result.suggestedTarget.carbs} g · béo ${result.suggestedTarget.fat} g`
-                : `Protein ${result.suggestedTarget.protein} g (unchanged) · carbs ${result.suggestedTarget.carbs} g · fat ${result.suggestedTarget.fat} g`}</small>
+                ? `Đạm ${result.suggestedTarget.protein} g${proteinKept ? " (giữ nguyên)" : ""} · bột đường ${result.suggestedTarget.carbs} g · béo ${result.suggestedTarget.fat} g`
+                : `Protein ${result.suggestedTarget.protein} g${proteinKept ? " (unchanged)" : ""} · carbs ${result.suggestedTarget.carbs} g · fat ${result.suggestedTarget.fat} g`}</small>
               <div className="calorie-check__actions">
                 <Button size="sm" disabled={saving} onClick={() => void accept()}>{vi ? "Dùng mục tiêu mới" : "Use new target"}</Button>
                 <Button size="sm" variant="secondary" disabled={saving} onClick={snooze}>{vi ? "Bỏ qua" : "Ignore"}</Button>
