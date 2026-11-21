@@ -6,3 +6,4 @@
 .calorie-check__suggestion small { color: var(--muted); font-size: 12px; }
 .calorie-check__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .calorie-check .fine-print { margin: 10px 0 0; }
+.calorie-check .chart-facts dd { overflow: visible; white-space: normal; overflow-wrap: anywhere; }
