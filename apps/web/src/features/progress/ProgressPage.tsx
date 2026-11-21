@@ -219,7 +219,12 @@ export function ProgressPage() {
   const weekly = weeklyTrainingSummary(
     sessions.filter((session) => session.finishedAt && inRange(session.finishedAt)),
     range.weeks ? range.weeks + 1 : weeksSince(sessions.flatMap((session) => session.finishedAt ?? []).sort()[0])
-  );
+  ).filter((week) => {
+    if (!rangeStart) return true;
+    const weekEnd = new Date(`${week.weekStart}T12:00:00`);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    return weekEnd >= rangeStart;
+  });
   const weeklyMetric = WEEKLY_METRICS.find((item) => item.key === weeklyMetricKey)!;
   const weeklyData = weekly.map((week) => ({
     ...week,
