@@ -2,8 +2,13 @@
 
 ## Technique figures (ADR 0019)
 
-- `pnpm run verify` passed: architecture audit, ESLint, TypeScript, content gates, 253 tests across 29 files, production build and performance budgets (entry 214.1 KiB; the technique records load in five groups, each under the 80 KiB route budget).
+- `pnpm run verify` passed: architecture audit, ESLint, TypeScript, content gates, 270 tests across 33 files, production build and performance budgets (entry 214.1 KiB; the technique records load in five groups, each under the 80 KiB route budget).
 - Every pose of the 30 movements was rendered to a contact sheet and looked at once; the chest press was also opened in the app at 390 px. The cue text and angle ranges are original guidance marked `draft` and have not been reviewed by the owner or checked against a cited source.
+
+## Device-only exercise image pack (ADR 0020)
+
+- Storage, pack reading, name suggestions, the import action and the exercise-page picker are covered by unit and component tests (fake IndexedDB; ZIP, loose files, size variants, JSON names by id and by file reference).
+- No vendor pack was available. The import was exercised with a test pack built from the app's own bundled drawings (30 GIFs in two sizes plus a JSON name list); a real pack's layout and the import on an iPhone are unverified.
 
 ## Nutrition pack 2026.11.1 — food names and duplicates
 
