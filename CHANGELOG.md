@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Editable history
+
+- Past workouts can now be corrected from Progress → Recent workouts: change the date, start time, duration, notes, and each logged set (type, load, reps/RIR, time, distance), add a forgotten set, or remove a set or exercise. Charts, records, and load suggestions recalculate from the corrected numbers; an exercise's equipment variant never changes.
+- Past workouts and body measurements can be deleted after a confirmation. A workout that is still in progress cannot be edited or deleted from history.
+- Body measurements are listed under the trend chart and can be edited in place; the workout history list can load older workouts beyond the latest eight.
+
 ## Unreleased — Muscle recovery map
 
 - Added a muscle recovery map to the home screen: the front/back body diagram colours each muscle group as fatigued, recovering, or ready, with the estimated time left and this week's working sets per muscle. It works offline from finished sessions only.

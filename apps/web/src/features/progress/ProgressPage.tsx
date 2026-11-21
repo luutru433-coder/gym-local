@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Activity, BarChart3, CalendarDays, ChevronDown, Dumbbell, Plus, Scale, Target, TrendingUp, Trophy } from "lucide-react";
+import { Activity, BarChart3, CalendarDays, ChevronDown, Dumbbell, Pencil, Plus, Scale, Target, Trash2, TrendingUp, Trophy } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button, Card, Chip, EmptyState, Field, Modal, SectionTitle } from "@gym/ui";
-import { createId, type BodyMetric, type MuscleGroup, type SessionExercise } from "@gym/contracts";
+import { createId, type BodyMetric, type MuscleGroup, type SessionExercise, type WorkoutSession } from "@gym/contracts";
 import { EQUIPMENT_OPTIONS, getTrackingProfile, getVariant, trackingProfileForLoadMode } from "@gym/catalog";
 import {
   bodyMetricSeries,
@@ -20,6 +20,8 @@ import {
 } from "@gym/progress";
 import { formatDate, formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
+import { removePastSession } from "./history-actions";
+import { BodyMetricLog, ConfirmDeleteModal, SessionEditModal } from "./HistoryEditors";
 import "./ProgressPage.css";
 
 const muscleLabels: Record<MuscleGroup, { vi: string; en: string }> = {
@@ -40,7 +42,10 @@ function completedPerformanceLabel(exercise: SessionExercise, locale: "vi" | "en
     ?? getTrackingProfile(exercise.variantId)
     ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
   if (profile.effortKind === "duration") return `${Math.max(0, ...sets.map((set) => set.durationSeconds ?? 0))}s`;
-  if (profile.effortKind === "distance_duration") return `${Math.max(0, ...sets.map((set) => set.distanceMeters ?? 0))}m`;
+  if (profile.effortKind === "distance_duration") {
+    const distance = Math.max(0, ...sets.map((set) => set.distanceMeters ?? 0));
+    return distance > 0 ? `${distance}m` : `${Math.max(0, ...sets.map((set) => set.durationSeconds ?? 0))}s`;
+  }
   if (profile.loadEntryMode === "assisted") {
     const values = sets.map((set) => set.weightKg).filter((value): value is number => value !== undefined);
     return values.length ? `${locale === "vi" ? "trợ lực" : "assist"} ${Math.min(...values)} kg` : "—";
@@ -176,6 +181,10 @@ export function ProgressPage() {
   const addBodyMetric = useGymStore((state) => state.addBodyMetric);
   const locale = profile.locale;
   const [metricOpen, setMetricOpen] = useState(false);
+  const [editingMetricId, setEditingMetricId] = useState<string>();
+  const [editingSession, setEditingSession] = useState<WorkoutSession>();
+  const [deletingSession, setDeletingSession] = useState<WorkoutSession>();
+  const [historyLimit, setHistoryLimit] = useState(8);
   const [expandedSession, setExpandedSession] = useState<string>();
   const variantSummaries = variantVolumeSummary(sessions);
   const [requestedVariantId, setRequestedVariantId] = useState(variantSummaries[0]?.variantId ?? "");
@@ -270,7 +279,7 @@ export function ProgressPage() {
 
   const saveMetric = async () => {
     const bodyMetric: BodyMetric = {
-      id: createId("metric"), date: metric.date,
+      id: editingMetricId ?? createId("metric"), date: metric.date,
       weightKg: optionalPositiveMetric(metric.weightKg),
       waistCm: optionalPositiveMetric(metric.waistCm),
       chestCm: optionalPositiveMetric(metric.chestCm),
@@ -282,11 +291,23 @@ export function ProgressPage() {
     setMetricOpen(false);
   };
 
+  const metricText = (value: number | undefined) => value === undefined ? "" : String(value);
+  const openNewMetric = () => {
+    setEditingMetricId(undefined);
+    setMetric({ date: new Date().toISOString().slice(0, 10), weightKg: profile.weightKg ? String(profile.weightKg) : "", waistCm: "", chestCm: "", hipsCm: "", armCm: "", thighCm: "" });
+    setMetricOpen(true);
+  };
+  const openMetricEdit = (entry: BodyMetric) => {
+    setEditingMetricId(entry.id);
+    setMetric({ date: entry.date, weightKg: metricText(entry.weightKg), waistCm: metricText(entry.waistCm), chestCm: metricText(entry.chestCm), hipsCm: metricText(entry.hipsCm), armCm: metricText(entry.armCm), thighCm: metricText(entry.thighCm) });
+    setMetricOpen(true);
+  };
+
   return (
     <div className="page progress-page">
       <header className="page-header">
         <div><span className="eyebrow">{locale === "vi" ? "Dữ liệu của riêng bạn" : "Your data, your trend"}</span><h1>{locale === "vi" ? "Tiến độ" : "Progress"}</h1><p>{locale === "vi" ? "Mức tạ và PR được tách riêng theo đúng máy hoặc dụng cụ bạn đã dùng." : "Loads and PRs stay separate for the exact machine or equipment used."}</p></div>
-        <Button onClick={() => setMetricOpen(true)}><Plus size={18} />{locale === "vi" ? "Thêm số đo" : "Add measurement"}</Button>
+        <Button onClick={openNewMetric}><Plus size={18} />{locale === "vi" ? "Thêm số đo" : "Add measurement"}</Button>
       </header>
 
       <div className="progress-stats">
@@ -416,7 +437,7 @@ export function ProgressPage() {
           </> : <EmptyState icon={<BarChart3 />} title={locale === "vi" ? "Chưa có volume" : "No volume data"} body={locale === "vi" ? "Hoàn tất set có mức tạ và số lần để xem biểu đồ." : "Complete weighted sets to see this chart."} />}
         </Card>
         <Card className="chart-card">
-          <SectionTitle eyebrow={locale === "vi" ? `Cơ thể · ${range.label.vi}` : `Body · ${range.label.en}`} title={locale === "vi" ? "Số đo cơ thể" : "Body measurements"} action={<button type="button" className="text-link" onClick={() => setMetricOpen(true)}><Plus size={15} />{locale === "vi" ? "Ghi số đo" : "Log"}</button>} />
+          <SectionTitle eyebrow={locale === "vi" ? `Cơ thể · ${range.label.vi}` : `Body · ${range.label.en}`} title={locale === "vi" ? "Số đo cơ thể" : "Body measurements"} action={<button type="button" className="text-link" onClick={openNewMetric}><Plus size={15} />{locale === "vi" ? "Ghi số đo" : "Log"}</button>} />
           <div className="chart-chips" role="group" aria-label={locale === "vi" ? "Loại số đo" : "Measurement"}>
             {BODY_METRICS.map((item) => <Chip key={item.key} active={item.key === bodyMetricKey} onClick={() => setBodyMetricKey(item.key)}>{item.label[locale]}</Chip>)}
           </div>
@@ -430,6 +451,7 @@ export function ProgressPage() {
             <div className="chart-wrap chart-wrap--compact" aria-hidden="true"><ResponsiveContainer width="100%" height="100%"><LineChart data={bodyData} margin={{ left: -15, right: 14, top: 12 }}><CartesianGrid strokeDasharray="3 5" vertical={false} stroke="#d7d4ca" /><XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} minTickGap={18} /><YAxis domain={["dataMin - 2", "dataMax + 2"]} axisLine={false} tickLine={false} tick={axisTick} /><Tooltip contentStyle={tooltipStyle} /><Line type="monotone" dataKey="value" name={`${bodyMetric.label[locale]} (${bodyMetric.unit})`} stroke="#ff6c4a" strokeWidth={2.5} dot={{ r: 4, fill: "#ff6c4a", strokeWidth: 0 }} isAnimationActive={false} /></LineChart></ResponsiveContainer></div>
             <table className="sr-only"><caption>{locale === "vi" ? `Dữ liệu ${bodyMetric.label.vi}` : `${bodyMetric.label.en} data`}</caption><thead><tr><th scope="col">{locale === "vi" ? "Ngày" : "Date"}</th><th scope="col">{bodyMetric.label[locale]} ({bodyMetric.unit})</th></tr></thead><tbody>{bodyData.map((entry, index) => <tr key={`${entry.date}-${index}`}><th scope="row">{entry.label}</th><td>{formatNumber(entry.value, locale, 1)}</td></tr>)}</tbody></table>
           </> : <EmptyState icon={<Scale />} title={locale === "vi" ? `Chưa có số đo ${bodyMetric.label.vi.toLowerCase()} trong kỳ` : `No ${bodyMetric.label.en.toLowerCase()} entries in range`} body={locale === "vi" ? "Thêm số đo để tạo đường xu hướng." : "Add a measurement to start the trend."} />}
+          <BodyMetricLog metrics={bodyMetrics} locale={locale} onEdit={openMetricEdit} />
         </Card>
       </div>
 
@@ -445,17 +467,20 @@ export function ProgressPage() {
         <section>
           <SectionTitle eyebrow={locale === "vi" ? "Lịch sử" : "History"} title={locale === "vi" ? "Các buổi gần đây" : "Recent workouts"} />
           <div className="history-list">
-            {sessions.slice(0, 8).map((session) => {
+            {sessions.slice(0, historyLimit).map((session) => {
               const open = expandedSession === session.id;
               const sessionName = session.routineNameSnapshot ? localize(session.routineNameSnapshot, locale) : (locale === "vi" ? "Buổi tập" : "Workout");
-              return <Card className={open ? "history-card history-card--open" : "history-card"} key={session.id}><button type="button" className="history-card__head" aria-expanded={open} aria-controls={`${session.id}-details`} onClick={() => setExpandedSession(open ? undefined : session.id)}><span className="history-card__date"><strong>{new Date(session.finishedAt!).getDate()}</strong><small>{formatDate(session.finishedAt!, locale, { month: "short" })}</small></span><div><h3>{sessionName}</h3><p>{session.exercises.length} {locale === "vi" ? "động tác" : "exercises"} · {formatNumber(sessionExternalVolume(session), locale, 0)} kg·reps</p></div><ChevronDown size={19} /></button>{open ? <ul id={`${session.id}-details`}>{session.exercises.map((exercise) => <li key={exercise.id}><div><strong>{localize(exercise.variantNameSnapshot, locale)}</strong><small>{exercise.sets.filter((set) => set.completedAt && set.type !== "warmup").length} sets</small></div><span>{completedPerformanceLabel(exercise, locale)}</span></li>)}</ul> : null}</Card>;
+              return <Card className={open ? "history-card history-card--open" : "history-card"} key={session.id}><button type="button" className="history-card__head" aria-expanded={open} aria-controls={`${session.id}-details`} onClick={() => setExpandedSession(open ? undefined : session.id)}><span className="history-card__date"><strong>{new Date(session.finishedAt!).getDate()}</strong><small>{formatDate(session.finishedAt!, locale, { month: "short" })}</small></span><div><h3>{sessionName}</h3><p>{session.exercises.length} {locale === "vi" ? "động tác" : "exercises"} · {formatNumber(sessionExternalVolume(session), locale, 0)} kg·reps</p></div><ChevronDown size={19} /></button>{open ? <ul id={`${session.id}-details`}>{session.exercises.map((exercise) => <li key={exercise.id}><div><strong>{localize(exercise.variantNameSnapshot, locale)}</strong><small>{exercise.sets.filter((set) => set.completedAt && set.type !== "warmup").length} sets</small></div><span>{completedPerformanceLabel(exercise, locale)}</span></li>)}</ul> : null}{open && session.notes ? <p className="history-card__note">{session.notes}</p> : null}{open ? <div className="history-card__actions"><Button variant="secondary" size="sm" onClick={() => setEditingSession(session)}><Pencil size={15} aria-hidden="true" />{locale === "vi" ? "Sửa buổi tập" : "Edit workout"}</Button><Button variant="danger" size="sm" onClick={() => setDeletingSession(session)}><Trash2 size={15} aria-hidden="true" />{locale === "vi" ? "Xóa buổi tập" : "Delete workout"}</Button></div> : null}</Card>;
             })}
+            {sessions.length > historyLimit ? <button type="button" className="text-link" onClick={() => setHistoryLimit((limit) => limit + 20)}>{locale === "vi" ? `Xem thêm buổi cũ hơn (còn ${sessions.length - historyLimit})` : `Show older workouts (${sessions.length - historyLimit} more)`}</button> : null}
             {!sessions.length ? <EmptyState icon={<TrendingUp />} title={locale === "vi" ? "Chưa có buổi đã lưu" : "No finished workouts"} body={locale === "vi" ? "Kết thúc buổi tập đầu tiên để bắt đầu theo dõi tiến độ." : "Finish your first workout to begin tracking progress."} /> : null}
           </div>
         </section>
       </div>
 
-      <Modal open={metricOpen} title={locale === "vi" ? "Thêm số đo cơ thể" : "Add body measurement"} onClose={() => setMetricOpen(false)}>
+      {editingSession ? <SessionEditModal key={editingSession.id} session={editingSession} locale={locale} onClose={() => setEditingSession(undefined)} /> : null}
+      {deletingSession ? <ConfirmDeleteModal locale={locale} title={locale === "vi" ? "Xóa buổi tập?" : "Delete workout?"} body={locale === "vi" ? `Buổi tập ngày ${formatDate(deletingSession.finishedAt!, locale, { day: "2-digit", month: "2-digit", year: "numeric" })} và mọi set trong đó sẽ bị xóa khỏi thiết bị này. Biểu đồ và kỷ lục sẽ được tính lại. Không thể hoàn tác.` : `The workout from ${formatDate(deletingSession.finishedAt!, locale, { day: "2-digit", month: "2-digit", year: "numeric" })} and all its sets will be removed from this device. Charts and records are recalculated. This cannot be undone.`} onConfirm={() => removePastSession(deletingSession.id)} onClose={() => setDeletingSession(undefined)} /> : null}
+      <Modal open={metricOpen} title={editingMetricId ? (locale === "vi" ? "Sửa số đo cơ thể" : "Edit body measurement") : (locale === "vi" ? "Thêm số đo cơ thể" : "Add body measurement")} onClose={() => setMetricOpen(false)}>
         <div className="metric-form">
           <Field label={locale === "vi" ? "Ngày" : "Date"}><input type="date" value={metric.date} onChange={(event) => setMetric((value) => ({ ...value, date: event.target.value }))} /></Field>
           <div className="form-grid"><Field label={locale === "vi" ? "Cân nặng (kg)" : "Weight (kg)"}><input type="number" inputMode="decimal" min="0.1" step="0.1" value={metric.weightKg} onChange={(event) => setMetric((value) => ({ ...value, weightKg: event.target.value }))} /></Field><Field label={locale === "vi" ? "Eo (cm)" : "Waist (cm)"}><input type="number" inputMode="decimal" min="0.1" step="0.1" value={metric.waistCm} onChange={(event) => setMetric((value) => ({ ...value, waistCm: event.target.value }))} /></Field><Field label={locale === "vi" ? "Ngực (cm)" : "Chest (cm)"}><input type="number" inputMode="decimal" min="0.1" step="0.1" value={metric.chestCm} onChange={(event) => setMetric((value) => ({ ...value, chestCm: event.target.value }))} /></Field><Field label={locale === "vi" ? "Hông (cm)" : "Hips (cm)"}><input type="number" inputMode="decimal" min="0.1" step="0.1" value={metric.hipsCm} onChange={(event) => setMetric((value) => ({ ...value, hipsCm: event.target.value }))} /></Field><Field label={locale === "vi" ? "Bắp tay (cm)" : "Arm (cm)"}><input type="number" inputMode="decimal" min="0.1" step="0.1" value={metric.armCm} onChange={(event) => setMetric((value) => ({ ...value, armCm: event.target.value }))} /></Field><Field label={locale === "vi" ? "Đùi (cm)" : "Thigh (cm)"}><input type="number" inputMode="decimal" min="0.1" step="0.1" value={metric.thighCm} onChange={(event) => setMetric((value) => ({ ...value, thighCm: event.target.value }))} /></Field></div>

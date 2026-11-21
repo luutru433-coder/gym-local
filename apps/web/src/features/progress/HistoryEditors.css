@@ -1,0 +1,150 @@
+.history-card__actions {
+  padding: 8px 14px 12px 68px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.history-card__note {
+  margin: 0;
+  padding: 0 14px 10px 68px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.history-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.history-edit__exercise {
+  min-width: 0;
+  margin: 0;
+  padding: 10px 12px 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.history-edit__exercise legend {
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.history-edit__remove-exercise {
+  min-height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--danger);
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.history-edit__set {
+  padding: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.history-edit__set select {
+  min-height: 44px;
+  flex: 1 1 104px;
+  min-width: 0;
+}
+
+.history-edit__set label {
+  flex: 1 1 64px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.history-edit__set label span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.history-edit__set input {
+  width: 100%;
+  min-height: 44px;
+}
+
+.history-edit__icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.history-edit__icon:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
+.history-edit__confirm {
+  margin: 0;
+  font-size: 14px;
+}
+
+.metric-log {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.metric-log h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+
+.metric-log ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metric-log li {
+  min-height: 52px;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.metric-log li > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.metric-log li strong,
+.metric-log li small {
+  display: block;
+}
+
+.metric-log li strong {
+  font-size: 13px;
+}
+
+.metric-log li small {
+  color: var(--muted);
+  font-size: 12px;
+}
