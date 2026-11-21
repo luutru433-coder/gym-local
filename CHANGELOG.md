@@ -7,6 +7,10 @@
 - The suggestion is never applied on its own: "Use new target" saves it as a manual target, "Ignore" hides it for 7 days on this device. Changing body details in Settings afterwards asks for the estimate to be reviewed again.
 - No database or backup schema change.
 
+## Unreleased — Weekly nutrition trends
+
+- The Nutrition page now shows weekly trends: average daily calories for the last six Monday–Sunday weeks against your target, and the chosen week's average protein, carbs, and fat with the gap to each target. Averages count only days with logged food, so empty days are not treated as zero. No stored data or formula changed.
+
 ## Unreleased — Timed routine targets
 
 - Fixed the routine editor saving a hidden 8–12 rep target for timed and distance-tracked exercises (plank, farmer carry): new exercises and added sets now save the 30-second duration target the editor shows, so the workout screen displays it. Existing routines are not rewritten.
