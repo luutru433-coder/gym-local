@@ -34,7 +34,7 @@ function chestPress(kind: "bar" | "dumbbell", equipment: ExerciseTechnique["equi
             ? t("Tay: nắm rộng khoảng 1,5 lần vai, thanh đòn nằm ở gốc bàn tay, cổ tay thẳng ngay trên khuỷu.", "Hands: grip about 1.5× shoulder width, bar low on the heel of the palm, wrists straight over the elbows.")
             : t("Tay: tạ nằm ở gốc bàn tay, cổ tay thẳng ngay trên khuỷu, hai tạ ở trên vai.", "Hands: dumbbells low on the heel of the palm, wrists straight over the elbows, both weights above the shoulders.")
         },
-        { at: "shoulder", arrow: -25, shift: [-6, 24], text: t("Bả vai: kép hai bả vai về sau rồi hạ xuống phía hông, giữ nguyên suốt set.", "Shoulder blades: squeeze them together, then pull them down toward the hips and keep them there all set.") },
+        { at: "shoulder", arrow: -25, shift: [-6, 24], text: t("Bả vai: khép hai bả vai về sau rồi hạ xuống phía hông, giữ nguyên suốt set.", "Shoulder blades: squeeze them together, then pull them down toward the hips and keep them there all set.") },
         { at: "hip", shift: [-20, -16], text: t("Lưng: ưỡn nhẹ lưng trên, ngực nâng cao; mông và lưng trên luôn chạm ghế.", "Back: slight upper-back arch, chest lifted; glutes and upper back stay on the bench.") },
         { angle: ["hip", "knee", "ankle"], shift: [-34, 16], text: t("Chân: cả bàn chân chạm sàn, gối gập khoảng 80–90°, bàn chân nằm dưới gối.", "Feet: whole foot on the floor, knees bent about 80–90°, feet under the knees.") }
       ]

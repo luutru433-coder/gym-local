@@ -1,5 +1,10 @@
 # Verification report — 2026-11-21
 
+## Technique figures (ADR 0019)
+
+- `pnpm run verify` passed: architecture audit, ESLint, TypeScript, content gates, 253 tests across 29 files, production build and performance budgets (entry 214.1 KiB; the technique records load in five groups, each under the 80 KiB route budget).
+- Every pose of the 30 movements was rendered to a contact sheet and looked at once; the chest press was also opened in the app at 390 px. The cue text and angle ranges are original guidance marked `draft` and have not been reviewed by the owner or checked against a cited source.
+
 ## Nutrition pack 2026.11.1 — food names and duplicates
 
 - Rebuilding the unchanged script from the pinned USDA downloads (Foundation 2026-04-30, SR Legacy 2018-04, FNDDS 2021-2023) reproduced every row of the released 2026.08.1 `foods` table, so the comparison below is against the pack users have.

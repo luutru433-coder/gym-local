@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { ExerciseTechnique as Technique } from "@gym/contracts";
 import { Check, Crosshair, X } from "lucide-react";
-import { getExerciseTechnique } from "@gym/catalog/technique";
+import { loadExerciseTechnique } from "@gym/catalog/technique";
 import { TechniqueFigure } from "./TechniqueFigure";
 
 export default function ExerciseTechnique({ variantId, locale }: { variantId: string; locale: "vi" | "en" }) {
-  const technique = getExerciseTechnique(variantId);
+  const [technique, setTechnique] = useState<Technique>();
   const [active, setActive] = useState(0);
+  useEffect(() => {
+    let current = true;
+    void loadExerciseTechnique(variantId).then((loaded) => {
+      if (current) setTechnique(loaded);
+    });
+    return () => {
+      current = false;
+    };
+  }, [variantId]);
   if (!technique) return null;
   const steps = [technique.setup, ...technique.phases];
   const step = steps[Math.min(active, steps.length - 1)];

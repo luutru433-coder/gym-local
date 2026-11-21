@@ -11,7 +11,7 @@ function inclinePress(kind: "bar" | "dumbbell", equipment: ExerciseTechnique["eq
   return technique("incline_chest_press", equipment, frame, {
     setup: [top, [
       cue("Ghế: dốc 30–45°; dốc hơn nữa sẽ chuyển tải sang vai trước.", "Bench: set to 30–45°; steeper shifts the work to the front delts.", ang("back", "hip", "shoulder", [-4, 14])),
-      cue("Bả vai: kép về sau và hạ xuống, ngực nâng cao, mông và lưng trên chạm ghế.", "Shoulder blades: back and down, chest lifted, glutes and upper back on the bench.", at("shoulder", -40, [-12, 10])),
+      cue("Bả vai: khép về sau và hạ xuống, ngực nâng cao, mông và lưng trên chạm ghế.", "Shoulder blades: back and down, chest lifted, glutes and upper back on the bench.", at("shoulder", -40, [-12, 10])),
       cue(kind === "bar" ? "Tay: nắm rộng khoảng 1,5 lần vai, cổ tay thẳng trên khuỷu." : "Tay: tạ ở trên vai, cổ tay thẳng trên khuỷu.", kind === "bar" ? "Hands: grip about 1.5× shoulder width, wrists straight over the elbows." : "Hands: dumbbells above the shoulders, wrists straight over the elbows.", at("wrist", undefined, [14, 0])),
       cue("Chân: cả bàn chân chạm sàn, gối gập khoảng 90°.", "Feet: flat on the floor, knees bent about 90°.", ang("hip", "knee", "ankle", [10, -8]))
     ]],
@@ -43,7 +43,7 @@ function chestFly(): ExerciseTechnique {
   return technique("chest_fly", ["dumbbell"], frame, {
     setup: [closed, [
       cue("Tay: hai tạ ở trên ngực, lòng bàn tay hướng vào nhau, khuỷu chùng nhẹ.", "Hands: dumbbells above the chest, palms facing each other, elbows slightly bent.", at("wrist", undefined, [16, -8])),
-      cue("Bả vai: kép về sau và hạ xuống ghế trước khi mở tay.", "Shoulder blades: back and down against the bench before opening the arms.", at("shoulder", -90, [0, 16])),
+      cue("Bả vai: khép về sau và hạ xuống ghế trước khi mở tay.", "Shoulder blades: back and down against the bench before opening the arms.", at("shoulder", -90, [0, 16])),
       cue("Lưng và chân: mông, lưng trên chạm ghế; bàn chân chạm sàn.", "Back and feet: glutes and upper back on the bench; feet flat on the floor.", at("hip"))
     ]],
     phases: [

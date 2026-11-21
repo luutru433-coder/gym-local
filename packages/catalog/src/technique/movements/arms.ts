@@ -104,7 +104,7 @@ function closeGripPress(): ExerciseTechnique {
   return technique("triceps_press", ["barbell", "smith"], frame, {
     setup: [top, [
       cue("Tay: nắm rộng bằng vai (hẹp hơn đẩy ngực), cổ tay thẳng trên khuỷu.", "Hands: shoulder-width grip (narrower than a chest press), wrists straight over the elbows.", at("wrist", undefined, [-14, -4])),
-      cue("Bả vai: kép về sau và hạ xuống, ngực nâng cao.", "Shoulder blades: back and down, chest lifted.", at("shoulder", -25, [-6, 24])),
+      cue("Bả vai: khép về sau và hạ xuống, ngực nâng cao.", "Shoulder blades: back and down, chest lifted.", at("shoulder", -25, [-6, 24])),
       cue("Lưng và chân: mông, lưng trên chạm ghế; bàn chân chạm sàn dưới gối.", "Back and feet: glutes and upper back on the bench; feet flat under the knees.", ang("hip", "knee", "ankle", [-34, 16]))
     ]],
     phases: [

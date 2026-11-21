@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Technique figures
+
+- Exercise pages have a new Technique section for 30 main movements (chest press, incline press, push-up, dip, chest fly, squat, leg press, split squat, lunge, deadlift, Romanian deadlift, hip thrust, leg curl, leg extension, calf raise, overhead press, lateral raise, rear delt fly, face pull, pull-up, lat pulldown, barbell/dumbbell row, one-arm row, biceps curl, hammer curl, triceps pushdown, overhead triceps extension, close-grip press, plank, crunch). Equipment variants without a record show no Technique section yet.
+- Each one shows a jointed figure that moves between positions, with numbered cues for setup (hands, feet, shoulder blades, back) and for each phase, joint angles measured from the figure, and common mistakes drawn as a wrong figure beside the right one with the fix. Vietnamese and English, offline.
+- The figure is a simple schematic; the existing drawings stay as the illustrative loop. Cue text and angle ranges are original guidance marked as draft until reviewed (ADR 0019).
+- No database or backup change; the section loads only when an exercise is opened.
+
 ## Unreleased — Weight trend and calorie target check
 
 - The body weight chart now draws a smoothed trend line over the scale readings (each day moves the trend 10% toward the reading, several readings on one day are averaged), so day-to-day water swings stop hiding the direction.

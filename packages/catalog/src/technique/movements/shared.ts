@@ -2,7 +2,7 @@ import type { EquipmentType, ExerciseTechnique, LocalizedText, TechniqueCue, Tec
 
 export const t = (vi: string, en: string): LocalizedText => ({ vi, en });
 
-export const reviewed = { sourceId: "gym-local-original", reviewStatus: "reviewed", reviewedAt: "2026-11-21" } satisfies Pick<ExerciseTechnique, "sourceId" | "reviewStatus" | "reviewedAt">;
+export const reviewed = { sourceId: "gym-local-original", reviewStatus: "draft", reviewedAt: "2026-11-21" } satisfies Pick<ExerciseTechnique, "sourceId" | "reviewStatus" | "reviewedAt">;
 
 export const stepTitle = {
   setup: t("Vào thế", "Setup"),
