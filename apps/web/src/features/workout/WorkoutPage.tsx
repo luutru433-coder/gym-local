@@ -150,8 +150,10 @@ export function WorkoutPage() {
   useScreenWakeLock(Boolean(activeSession));
 
   useEffect(() => {
-    window.addEventListener("pointerdown", primeRestAlert);
-    return () => window.removeEventListener("pointerdown", primeRestAlert);
+    // Sound unlocks only inside an activation gesture: touch release, click or key press.
+    const gestures = ["pointerup", "touchend", "click", "keydown"] as const;
+    gestures.forEach((gesture) => window.addEventListener(gesture, primeRestAlert));
+    return () => gestures.forEach((gesture) => window.removeEventListener(gesture, primeRestAlert));
   }, []);
 
   // Alert once per countdown that was seen running; an already expired timer stays silent.
