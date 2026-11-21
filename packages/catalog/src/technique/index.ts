@@ -1,11 +1,12 @@
 import type { EquipmentType, ExerciseTechnique } from "@gym/contracts";
 import { chestPressTechniques } from "./movements/chest-press";
 import { compoundTechniques } from "./movements/compound";
+import { upperTechniques } from "./movements/upper";
 
 export { blendPose, markPoint, measureAngle, resolvePose, shownAngle } from "./figure";
 export type { Joints, Point } from "./figure";
 
-export const EXERCISE_TECHNIQUES: ExerciseTechnique[] = [...chestPressTechniques, ...compoundTechniques];
+export const EXERCISE_TECHNIQUES: ExerciseTechnique[] = [...chestPressTechniques, ...compoundTechniques, ...upperTechniques];
 
 export function getExerciseTechnique(variantId: string): ExerciseTechnique | undefined {
   const [movementId, equipment] = variantId.split("__");
