@@ -123,7 +123,7 @@ export function WorkoutPage() {
       .some((candidate) => candidate.toLocaleLowerCase(locale).includes(query)));
   }, [exerciseQuery, locale]);
 
-  // Event handlers resync the 1s clock so a rest that just started never reads a second too long.
+  // Rest handlers call this after computing the new end time, so the 1s clock is never behind it (no 02:01 for a 120s rest).
   const syncClock = useCallback(() => setNow(Date.now()), []);
 
   useEffect(() => {
@@ -163,7 +163,6 @@ export function WorkoutPage() {
 
   const toggleComplete = (exerciseId: string, setId: string, suggestion?: SetSuggestion) => {
     if (!activeSession) return;
-    syncClock();
     const exercise = activeSession.exercises.find((item) => item.id === exerciseId);
     const set = exercise?.sets.find((item) => item.id === setId);
     if (!set) return;
@@ -175,26 +174,27 @@ export function WorkoutPage() {
       save(updated);
     } else {
       save(updateSet(activeSession, exerciseId, setId, applySetSuggestion(set, suggestion), true));
+      syncClock();
     }
   };
 
   const modifyRest = (seconds?: number) => {
     if (!activeSession) return;
-    syncClock();
     if (seconds === undefined) {
       save({ ...activeSession, restTimerEndsAt: undefined });
       return;
     }
     const currentEnd = new Date(activeSession.restTimerEndsAt ?? Date.now()).getTime();
     save({ ...activeSession, restTimerEndsAt: new Date(Math.max(Date.now(), currentEnd + seconds * 1000)).toISOString() });
+    syncClock();
   };
 
   const restartRest = () => {
     if (!activeSession) return;
-    syncClock();
     const activeExercise = activeSession.exercises.find((exercise) => exercise.id === activeSession.activeExerciseId);
     const seconds = activeExercise?.restSeconds ?? 90;
     save({ ...activeSession, restTimerEndsAt: new Date(Date.now() + seconds * 1000).toISOString() });
+    syncClock();
   };
 
   const patchExerciseNote = (exerciseId: string, note: string) => {

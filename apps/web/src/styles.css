@@ -573,7 +573,7 @@ a { color: inherit; text-decoration: none; }
 .progress-stat__icon { width: 37px; height: 37px; display: grid; place-items: center; background: var(--surface-2); border-radius: 9px 3px 9px 3px; }
 .progress-stats span { color: var(--muted); font-size: 10px; }
 .progress-stats strong { display: block; margin-top: 4px; font: 900 27px/1 "Arial Narrow", sans-serif; }
-.progress-stats small { grid-column: 1 / -1; align-self: end; color: var(--muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progress-stats small { grid-column: 1 / -1; align-self: end; color: var(--muted); font-size: 10px; line-height: 1.3; }
 .progress-stats > .progress-stat--accent { color: var(--ink); background: var(--lime); border-color: #c0df43; }
 .progress-stat--accent .progress-stat__icon { background: rgba(24,26,21,.1); }
 .progress-stat--accent span, .progress-stat--accent small { color: rgba(24,26,21,.6); }
