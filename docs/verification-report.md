@@ -2,8 +2,13 @@
 
 ## Technique figures (ADR 0019)
 
-- `pnpm run verify` passed: architecture audit, ESLint, TypeScript, content gates, 284 tests across 33 files, production build and performance budgets (entry 214.1 KiB; the technique records load in five groups, each under the 80 KiB route budget).
+- `pnpm run verify` passed: architecture audit, ESLint, TypeScript, content gates, 288 tests, production build and performance budgets (entry 214.1 KiB; the technique records load in five groups, each under the 80 KiB route budget).
 - Every pose of the 30 movements was rendered to a contact sheet and looked at once; the chest press was also opened in the app at 390 px. The cue text and angle ranges are original guidance marked `draft` and have not been reviewed by the owner or checked against a cited source.
+
+## ExerciseDB exercises added to the owner's list (ADR 0022)
+
+- Tests cover the vocabulary mapping, listing only exercises the app does not show yet, adding one with image link and steps, and not adding it twice.
+- Not verified on a physical iPhone; names and steps are not translated.
 
 ## Free ExerciseDB images on the device (ADR 0021)
 

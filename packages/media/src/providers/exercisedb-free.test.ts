@@ -23,7 +23,9 @@ describe("free ExerciseDB download", () => {
     const progress: string[] = [];
     const images = await listExerciseDbImages((done, total) => progress.push(`${done}/${total}`), undefined, noPause);
     expect(images.map((image) => image.id)).toEqual(["a", "b", "c"]);
-    expect(images[0]).toEqual({ id: "a", name: "barbell bench press", gifUrl: "https://static.exercisedb.dev/media/a.gif" });
+    // Missing or malformed detail fields become empty lists instead of failing the whole download.
+    expect(images[0].details).toEqual({ bodyParts: [], equipments: [], targetMuscles: [], secondaryMuscles: [], instructions: [] });
+    expect(images[0]).toMatchObject({ id: "a", name: "barbell bench press", gifUrl: "https://static.exercisedb.dev/media/a.gif" });
     expect(fetchMock.mock.calls.map((call) => call[0])).toEqual(["https://oss.exercisedb.dev/api/v1/exercises?limit=25", "https://oss.exercisedb.dev/api/v1/exercises?limit=25&after=p2"]);
     expect(progress).toEqual(["2/3", "3/3"]);
   });
