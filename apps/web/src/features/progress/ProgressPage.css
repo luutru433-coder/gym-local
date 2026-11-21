@@ -401,6 +401,7 @@
 }
 
 /* A hidden Recharts tooltip keeps its last position after a resize; keep it from widening the page. */
-.progress-page .chart-wrap {
+.progress-page .chart-wrap,
+.progress-page .variant-trend-chart {
   overflow: clip;
 }
