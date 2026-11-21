@@ -5,6 +5,7 @@ import { dailyNutrition, nutritionTargetNeedsConfirmation, type NutritionEstimat
 import { useState } from "react";
 import { sessionProgress } from "@gym/workouts";
 import { DEFAULT_PROGRESSION_RULE, createAdaptiveSessionFromRoutine, planAdaptiveSession, planTrainingWeek } from "@gym/workouts/plan";
+import { RecoveryMapCard } from "./RecoveryMapCard";
 import { TrainingPlanCard } from "./TrainingPlanCard";
 import { localize, formatDate } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -121,6 +122,8 @@ export function HomePage() {
           onApplyAdjustmentsChange={setApplyAdjustments}
         />
       ) : null}
+
+      <RecoveryMapCard locale={locale} sessions={sessions} />
 
       <div className="dashboard-grid">
         <section>

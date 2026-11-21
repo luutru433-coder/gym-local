@@ -375,3 +375,71 @@ export function bodyMetricSeries(metrics: BodyMetric[], key: BodyMetricKey): Bod
     })
     .sort((left, right) => left.date.localeCompare(right.date));
 }
+
+export type MuscleRecoveryStatus = "fatigued" | "recovering" | "ready";
+
+export interface MuscleRecovery {
+  muscle: MuscleGroup;
+  status: MuscleRecoveryStatus;
+  /** 0-100; 100 means the estimated recovery window has fully elapsed. */
+  recoveryPercent: number;
+  hoursUntilReady: number;
+  lastTrainedAt?: string;
+  /** Working sets this local Monday week where the muscle is a primary mover (same count as `weeklyMuscleSets`). */
+  weeklySets: number;
+}
+
+export const RECOVERY_MUSCLES: MuscleGroup[] = ["chest", "back", "shoulders", "biceps", "triceps", "forearms", "core", "quadriceps", "hamstrings", "glutes", "calves"];
+
+const RECOVERY_BASE_HOURS = 36;
+const RECOVERY_HOURS_PER_SET = 4;
+const RECOVERY_MAX_HOURS = 96;
+const SECONDARY_SET_WEIGHT = 0.5;
+
+/**
+ * Estimated recovery per muscle from finished sessions. Each session gives a muscle a window of
+ * 36 h + 4 h per effective working set (primary 1, secondary or full-body 0.5), capped at 96 h;
+ * the least-recovered session wins. Under half the window is "fatigued", under the full window "recovering".
+ */
+export function muscleRecoveryMap(sessions: WorkoutSession[], now: Date = new Date()): MuscleRecovery[] {
+  const weekly = weeklyMuscleSets(sessions, localWeekStart(now));
+  const state = new Map<MuscleGroup, { percent: number; hoursLeft: number; lastTrainedAt?: string }>();
+  sessions.forEach((session) => {
+    if (!session.finishedAt) return;
+    const elapsedHours = (now.getTime() - new Date(session.finishedAt).getTime()) / 3_600_000;
+    if (!(elapsedHours >= 0)) return;
+    const load = new Map<MuscleGroup, number>();
+    const add = (muscle: MuscleGroup, sets: number) => {
+      if (muscle === "full_body") RECOVERY_MUSCLES.forEach((item) => load.set(item, (load.get(item) ?? 0) + sets * SECONDARY_SET_WEIGHT));
+      else load.set(muscle, (load.get(muscle) ?? 0) + sets);
+    };
+    session.exercises.forEach((exercise) => {
+      const movement = getMovement(exercise.movementId);
+      const workingSets = exercise.sets.filter((set) => set.completedAt && set.type !== "warmup").length;
+      if (!movement || !workingSets) return;
+      movement.primaryMuscles.forEach((muscle) => add(muscle, workingSets));
+      movement.secondaryMuscles.filter((muscle) => !movement.primaryMuscles.includes(muscle)).forEach((muscle) => add(muscle, workingSets * SECONDARY_SET_WEIGHT));
+    });
+    load.forEach((sets, muscle) => {
+      const windowHours = Math.min(RECOVERY_MAX_HOURS, RECOVERY_BASE_HOURS + RECOVERY_HOURS_PER_SET * sets);
+      const percent = Math.min(1, elapsedHours / windowHours);
+      const current = state.get(muscle);
+      const lastTrainedAt = !current?.lastTrainedAt || session.finishedAt! > current.lastTrainedAt ? session.finishedAt : current.lastTrainedAt;
+      state.set(muscle, !current || percent < current.percent
+        ? { percent, hoursLeft: Math.max(0, windowHours - elapsedHours), lastTrainedAt }
+        : { ...current, lastTrainedAt });
+    });
+  });
+  return RECOVERY_MUSCLES.map((muscle) => {
+    const item = state.get(muscle);
+    const percent = item?.percent ?? 1;
+    return {
+      muscle,
+      status: percent >= 1 ? "ready" : percent < 0.5 ? "fatigued" : "recovering",
+      recoveryPercent: Math.floor(percent * 100),
+      hoursUntilReady: Math.ceil(item?.hoursLeft ?? 0),
+      lastTrainedAt: item?.lastTrainedAt,
+      weeklySets: weekly[muscle] ?? 0
+    };
+  });
+}
