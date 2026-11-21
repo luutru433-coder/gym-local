@@ -2,7 +2,7 @@ import { ArrowDown, ArrowUp, Check, Equal, Sparkles } from "lucide-react";
 import { Card, SectionTitle } from "@gym/ui";
 import { getVariant } from "@gym/catalog";
 import type { Routine } from "@gym/contracts";
-import type { AdaptiveSessionPlan, PlanAdjustmentAction, TrainingWeekPlan } from "@gym/workouts";
+import type { AdaptiveSessionPlan, PlanAdjustmentAction, TrainingWeekPlan } from "@gym/workouts/plan";
 import { localize } from "../../lib/i18n";
 import "./TrainingPlanCard.css";
 

@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button, Card, MetricRing, ProgressBar, SectionTitle } from "@gym/ui";
 import { dailyNutrition, nutritionTargetNeedsConfirmation, type NutritionEstimateInput } from "@gym/nutrition";
 import { useState } from "react";
-import { DEFAULT_PROGRESSION_RULE, planAdaptiveSession, planTrainingWeek, sessionProgress } from "@gym/workouts";
+import { sessionProgress } from "@gym/workouts";
+import { DEFAULT_PROGRESSION_RULE, createAdaptiveSessionFromRoutine, planAdaptiveSession, planTrainingWeek } from "@gym/workouts/plan";
 import { TrainingPlanCard } from "./TrainingPlanCard";
 import { localize, formatDate } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -65,7 +66,9 @@ export function HomePage() {
 
   const begin = async () => {
     if (!nextRoutine) return navigate("/routines");
-    await startWorkout(nextRoutine, programmedRoutine ? activeProgram?.id : undefined, applyAdjustments ? sessionPlan : undefined);
+    await startWorkout(nextRoutine, programmedRoutine ? activeProgram?.id : undefined, applyAdjustments && sessionPlan?.routineId === nextRoutine.id
+      ? (routine, locationId) => createAdaptiveSessionFromRoutine(routine, sessionPlan, locationId)
+      : undefined);
     navigate("/workout");
   };
 

@@ -18,7 +18,7 @@ import type {
   WaterEntry,
   WorkoutSession
 } from "@gym/contracts";
-import { cloneRoutineTemplate, createAdaptiveSessionFromRoutine, createFreestyleSession, createSessionFromRoutine, finishSession, type AdaptiveSessionPlan } from "@gym/workouts";
+import { cloneRoutineTemplate, createFreestyleSession, createSessionFromRoutine, finishSession } from "@gym/workouts";
 import {
   installNutritionPack,
   generateOfflineMealPlan,
@@ -127,7 +127,7 @@ interface GymState {
   saveUserProgram: (program: Program) => Promise<Program>;
   removeProgram: (programId: string) => Promise<void>;
   selectUserProgram: (programId?: string) => Promise<void>;
-  startWorkout: (routine: Routine, programId?: string, plan?: AdaptiveSessionPlan) => Promise<void>;
+  startWorkout: (routine: Routine, programId?: string, createSession?: (routine: Routine, locationId?: string) => WorkoutSession) => Promise<void>;
   startFreestyleWorkout: () => Promise<void>;
   setActiveSession: (session: WorkoutSession) => Promise<void>;
   completeWorkout: () => Promise<WorkoutSession | undefined>;
@@ -508,14 +508,12 @@ export const useGymStore = create<GymState>((set, get) => ({
     }));
   },
 
-  async startWorkout(routine, programId, plan) {
+  async startWorkout(routine, programId, createSession = createSessionFromRoutine) {
     const active = get().activeSession;
     if (active) throw new Error(get().profile?.locale === "en" ? "You already have an unfinished workout" : "Bạn đang có một buổi tập chưa hoàn tất");
     const locationId = get().profile?.activeLocationId;
     const session = {
-      ...(plan && plan.routineId === routine.id
-        ? createAdaptiveSessionFromRoutine(routine, plan, locationId)
-        : createSessionFromRoutine(routine, locationId)),
+      ...createSession(routine, locationId),
       programId
     };
     await saveStartedSession(session);

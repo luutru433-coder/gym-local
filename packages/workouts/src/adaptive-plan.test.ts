@@ -1,15 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { getVariant } from "@gym/catalog";
 import type { ProgressionRule, Routine, WorkoutSession } from "@gym/contracts";
-import {
-  cloneRoutineTemplate,
-  createAdaptiveSessionFromRoutine,
-  createSessionFromRoutine,
-  planAdaptiveSession,
-  planTrainingWeek,
-  switchExerciseVariant,
-  updateSet
-} from "./index";
+import { createAdaptiveSessionFromRoutine, planAdaptiveSession, planTrainingWeek } from "./adaptive-plan";
+import { cloneRoutineTemplate, createSessionFromRoutine, switchExerciseVariant, updateSet } from "./index";
 
 const rule: ProgressionRule = { type: "double_progression", successSessions: 2, defaultIncrementKg: 2.5, fallbackIncreasePercent: 5 };
 const PRESS = "chest_press__dumbbell";
