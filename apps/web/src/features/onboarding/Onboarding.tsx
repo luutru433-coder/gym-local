@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Dumbbell, Languages, LockKeyhole, Salad, 
 import { Button, Card, Chip, Field, Notice, ProgressBar } from "@gym/ui";
 import { createId, type Difficulty, type EquipmentType, type Goal, type Profile } from "@gym/contracts";
 import { EQUIPMENT_OPTIONS } from "@gym/catalog";
-import { estimateNutritionTarget } from "@gym/nutrition";
+import { confirmNutritionTarget, estimateNutritionTarget } from "@gym/nutrition";
 import { useGymStore } from "../../store/useGymStore";
 import { Brand } from "../../components/Brand";
 import { useDocumentLanguage } from "../../lib/i18n";
@@ -105,7 +105,7 @@ export function Onboarding() {
       heightCm: optionalPositiveNumber(height),
       weightKg: optionalPositiveNumber(weight),
       activityFactor,
-      nutritionTarget,
+      nutritionTarget: nutritionTarget ? confirmNutritionTarget(nutritionTarget) : undefined,
       locations: [{ id: locationId, name: locationName.trim() || "My gym", equipment }],
       activeLocationId: locationId,
       onboardingComplete: true,
@@ -218,7 +218,7 @@ export function Onboarding() {
                   <div><strong>{nutritionTarget.fat}g</strong><span>fat</span></div>
                 </div>
               ) : <Notice>{isVi ? "Để trống nếu bạn chỉ muốn dùng phần tập luyện." : "Leave blank if you only want workout tracking."}</Notice>}
-              <p className="fine-print">{isVi ? "Con số chỉ là ước tính khởi đầu, không thay thế tư vấn y tế hoặc dinh dưỡng chuyên môn." : "These are starting estimates, not medical or professional nutrition advice."}</p>
+              <p className="fine-print">{isVi ? "Con số chỉ là ước tính khởi đầu, không thay thế tư vấn y tế hoặc dinh dưỡng chuyên môn. Hoàn tất thiết lập là bạn đồng ý dùng mục tiêu này; có thể chỉnh lại trong Cài đặt." : "These are starting estimates, not medical or professional nutrition advice. Finishing setup accepts this target; you can change it in Settings."}</p>
             </div>
           ) : null}
 

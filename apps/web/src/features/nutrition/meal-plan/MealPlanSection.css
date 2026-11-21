@@ -148,7 +148,7 @@
   align-items: flex-end;
   gap: 3px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .meal-plan-day-card__totals strong {
@@ -185,7 +185,7 @@
 .saved-meal-plan-card p,
 .meal-plan-shopping small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .planned-meal p {

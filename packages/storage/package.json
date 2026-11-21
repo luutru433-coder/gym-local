@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./device": "./src/device-preferences.ts"
+    "./device": "./src/device-preferences.ts",
+    "./history": "./src/history-edit.ts"
   }
 }

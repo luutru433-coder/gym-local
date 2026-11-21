@@ -51,7 +51,7 @@
   background: transparent;
   border: 1px dashed rgba(219, 255, 88, .55);
   border-radius: 8px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -95,7 +95,7 @@
   background: #efede5;
   border: 1px solid #dcdbd2;
   border-radius: 8px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -143,7 +143,7 @@
   color: #586526;
   background: rgba(255, 255, 255, .5);
   border-radius: 20px;
-  font-size: 8px;
+  font-size: 10px;
   font-style: normal;
   font-weight: 850;
   letter-spacing: .05em;
@@ -158,7 +158,7 @@
 
 .progression-advice small {
   color: #667333;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .plate-guide-config {
@@ -179,7 +179,7 @@
   align-items: center;
   gap: 6px;
   color: #55584f;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -193,7 +193,7 @@
 .plate-guide-config > small {
   max-width: 260px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.35;
   text-align: right;
 }
@@ -232,7 +232,7 @@
   display: block;
   margin-top: 3px;
   color: #53631d;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 800;
   line-height: 1.25;
   text-align: center;
@@ -270,7 +270,7 @@
 
 .workout-note > span {
   color: #5c5f56;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 850;
   text-transform: uppercase;
   letter-spacing: .06em;
@@ -346,7 +346,7 @@
 
 .live-movement-choice header small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .live-exercise-picker__empty {

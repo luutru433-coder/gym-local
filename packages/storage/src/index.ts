@@ -23,7 +23,7 @@ import {
 
 export * from "./nutrition-pack-client";
 
-function assertFiniteRecord(value: unknown, path = "record"): void {
+export function assertFiniteRecord(value: unknown, path = "record"): void {
   if (typeof value === "number") {
     if (!Number.isFinite(value)) throw new Error(`${path} must contain only finite numbers`);
     return;
@@ -257,6 +257,13 @@ export class GymDatabase extends Dexie {
 export const gymDb = new GymDatabase();
 let sessionWriteQueue: Promise<void> = Promise.resolve();
 
+/** Runs session writes one at a time, in call order, even after a failed write. */
+export function queueSessionWrite(commit: () => PromiseLike<unknown>): Promise<unknown> {
+  const operation = sessionWriteQueue.then(commit, commit);
+  sessionWriteQueue = operation.then(() => undefined, () => undefined);
+  return operation;
+}
+
 export const defaultSettings: AppSettings = {
   id: "app",
   catalogVersion: APP_VERSIONS.catalog,
@@ -403,9 +410,7 @@ export async function saveSession(session: WorkoutSession, db: GymDatabase = gym
     const settings = (await db.settings.get("app")) ?? defaultSettings;
     await db.settings.put({ ...settings, activeSessionId: session.finishedAt ? undefined : session.id });
   });
-  const operation = sessionWriteQueue.then(commit, commit);
-  sessionWriteQueue = operation.then(() => undefined, () => undefined);
-  await operation;
+  await queueSessionWrite(commit);
 }
 
 export async function saveStartedSession(
@@ -432,9 +437,7 @@ export async function saveStartedSession(
       activeProgramId: session.programId ?? settings.activeProgramId
     });
   });
-  const operation = sessionWriteQueue.then(commit, commit);
-  sessionWriteQueue = operation.then(() => undefined, () => undefined);
-  await operation;
+  await queueSessionWrite(commit);
 }
 
 /**
@@ -472,9 +475,7 @@ export async function saveCompletedSessionAndAdvanceProgram(
       .map((program) => program.id === advanced?.id ? advanced : program)
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt) || left.id.localeCompare(right.id));
   });
-  const operation = sessionWriteQueue.then(commit, commit);
-  sessionWriteQueue = operation.then(() => undefined, () => undefined);
-  await operation;
+  await queueSessionWrite(commit);
   return programs;
 }
 
