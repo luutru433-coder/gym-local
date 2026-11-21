@@ -25,13 +25,14 @@ export function ExerciseImagePackCard({ locale }: { locale: "vi" | "en" }) {
     setMessage(undefined);
     try {
       const result = await importExerciseImagePack(files, (stored, total) => setProgress(`${stored}/${total}`));
-      setSummary(await exerciseImagePackSummary());
       setMessage(result.imported
-        ? { tone: "success", text: vi ? `Đã lưu ${result.imported} hình trên máy này và gợi ý hình cho ${result.suggested} bài tập. Mở từng bài trong Thư viện để kiểm tra hoặc đổi hình.` : `Stored ${result.imported} images on this device and suggested an image for ${result.suggested} exercises. Open an exercise in the Library to check or change it.` }
+        ? { tone: "success", text: vi ? `Đã lưu ${result.imported} hình trên máy này và gợi ý hình cho ${result.suggested} bài tập. Mở từng bài trong mục Bài tập để kiểm tra hoặc đổi hình.` : `Stored ${result.imported} images on this device and suggested an image for ${result.suggested} exercises. Open an exercise under Exercises to check or change it.` }
         : { tone: "warning", text: vi ? "Không tìm thấy file hình (GIF, WebP, PNG, JPG) trong các file đã chọn." : "No image files (GIF, WebP, PNG, JPG) were found in the selection." });
     } catch (error) {
       setMessage({ tone: "warning", text: `${vi ? "Không nhập được gói hình" : "Could not import the image pack"}: ${error instanceof Error ? error.message : String(error)}` });
     } finally {
+      // Also after a failure: batches stored before it stay on the device and must be removable.
+      setSummary(await exerciseImagePackSummary().catch(() => undefined));
       setBusy(false);
       setProgress(undefined);
       if (fileRef.current) fileRef.current.value = "";
@@ -59,7 +60,7 @@ export function ExerciseImagePackCard({ locale }: { locale: "vi" | "en" }) {
         {summary?.imageCount ? <Button variant="danger" disabled={busy} onClick={() => void removePack()}><Trash2 size={17} />{vi ? "Xóa gói hình" : "Remove pack"}</Button> : null}
       </div>
       <input ref={fileRef} type="file" multiple hidden accept=".zip,.json,.gif,.webp,.png,.apng,.jpg,.jpeg,.avif" aria-label={vi ? "File gói hình" : "Image pack files"} onChange={(event) => { const files = [...(event.target.files ?? [])]; if (files.length) void importFiles(files); }} />
-      <small className="image-pack-hint">{vi ? "Chọn nhiều file hình cùng file JSON đi kèm (nếu có) để có tên bài tập, hoặc một file ZIP. Gói lớn nên chọn một thư mục kích thước thay vì ZIP toàn bộ." : "Pick the image files together with the pack's JSON file (if it has one) to get exercise names, or one ZIP. For a large pack pick one size folder rather than a ZIP of everything."}</small>
+      <small className="image-pack-hint">{vi ? "Chọn nhiều file hình cùng file JSON đi kèm (nếu có) để có tên bài tập, hoặc một file ZIP. Với gói lớn, hãy chọn các file hình bên trong một thư mục kích thước cùng file JSON, thay vì ZIP toàn bộ." : "Pick the image files together with the pack's JSON file (if it has one) to get exercise names, or one ZIP. For a large pack, select the image files inside one size folder together with the JSON file rather than a ZIP of everything."}</small>
       {message ? <Notice tone={message.tone}>{message.text}</Notice> : null}
     </Card>
   );
