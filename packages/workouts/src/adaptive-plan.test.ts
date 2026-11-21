@@ -199,6 +199,19 @@ describe("adaptive targets without a load", () => {
     expect(plank.sets.at(-1)).toMatchObject({ durationSeconds: 35 });
   });
 
+  it("ignores a finished session where the variant was skipped", () => {
+    history = {};
+    const routine = cloneRoutineTemplate("tpl_full_body_a");
+    const item = routine.items.find((entry) => entry.movementId === "plank")!;
+    finishedItem(routine, "plank", "a", "2026-08-10T10:00:00.000Z", { durationSeconds: 30 });
+    const before = planAdaptiveSession(routine, history.plank, rule, new Date("2026-08-12T10:00:00.000Z"));
+    const empty = { ...createAdaptiveSessionFromRoutine(routine, before), id: "empty", finishedAt: "2026-08-11T10:00:00.000Z" };
+    const after = planAdaptiveSession(routine, [...history.plank, empty], rule, new Date("2026-08-12T10:00:00.000Z"));
+    const pick = (plan: typeof before) => plan.items.find((entry) => entry.itemId === item.id)!;
+    expect(pick(after).action).not.toBe("start");
+    expect(pick(after)).toEqual(pick(before));
+  });
+
   it("keeps unequal set targets unequal on hold", () => {
     history = {};
     const routine = cloneRoutineTemplate("tpl_full_body_a");

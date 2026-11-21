@@ -153,12 +153,15 @@ function carryProgressedTargets(
 
 function planItem(
   item: RoutineItem,
-  sessions: WorkoutSession[],
+  finished: WorkoutSession[],
   rule: ProgressionRule,
   readiness: PlanReadiness,
   daysSince: number | undefined
 ): PlanItemAdjustment {
   const variantId = item.preferredVariantId;
+  // A session where this variant was skipped says nothing about it and must not hide older history.
+  const sessions = finished.filter((session) => session.exercises.some((exercise) =>
+    exercise.variantId === variantId && exercise.sets.some((set) => set.type === "working" && Boolean(set.completedAt))));
   const direction = directionFor(variantId);
   const loaded = direction === "higher_load" || direction === "lower_assistance";
   const suggestion = suggestDoubleProgression(sessions, variantId, rule);

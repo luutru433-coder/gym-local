@@ -54,12 +54,14 @@ export function TrainingPlanCard({ locale, routines, weekPlan, sessionPlan, appl
             >
               <small>{weekday(day.date, locale)}</small>
               <strong>{Number(day.date.slice(8))}</strong>
-              <span>{day.status === "done" ? <Check size={13} aria-hidden="true" /> : null}{statusLabels[day.status][locale]}</span>
+              {day.status === "done"
+                ? <span role="img" aria-label={statusLabels.done[locale]}><Check size={14} aria-hidden="true" /></span>
+                : <span>{statusLabels[day.status][locale]}</span>}
               {day.status === "planned" && routineName(day.routineId) ? <em>{routineName(day.routineId)}</em> : null}
             </li>
           ))}
         </ol>
-        <p className="training-plan__note">{weekPlan.completedSessions}/{weekPlan.targetSessions} {locale === "vi" ? "buổi" : "sessions"} · {weekPlan.note[locale]}</p>
+        <p className="training-plan__note">{weekPlan.completedSessions}/{weekPlan.targetSessions} {locale === "vi" ? "ngày tập" : "training days"} · {weekPlan.note[locale]}</p>
 
         <div className="training-plan__session">
           <header>
@@ -81,7 +83,7 @@ export function TrainingPlanCard({ locale, routines, weekPlan, sessionPlan, appl
                   </span>
                   <div>
                     <strong>{variant ? localize(variant.name, locale) : item.variantId}</strong>
-                    <b>{workingSets} sets{item.loadKg !== undefined ? ` · ${item.previousLoadKg !== undefined && item.previousLoadKg !== item.loadKg ? `${item.previousLoadKg} → ` : ""}${item.loadKg} kg` : ""}</b>
+                    <b>{workingSets} {locale === "vi" ? "set" : "sets"}{item.loadKg !== undefined ? ` · ${item.previousLoadKg !== undefined && item.previousLoadKg !== item.loadKg ? `${item.previousLoadKg} → ` : ""}${item.loadKg} kg` : ""}</b>
                     <small>{item.reason[locale]}</small>
                   </div>
                 </li>

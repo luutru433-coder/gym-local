@@ -555,7 +555,7 @@ export function suggestDoubleProgression(
     successStreak,
     requiredSuccessSessions: rule.successSessions,
     explanation: {
-      vi: `${successStreak} buổi liên tiếp đạt đầu trên của khoảng mục tiêu; có thể ${directionText.vi} từ ${current} ${action === "decrease_assistance" ? "xuống" : "lên"} ${suggestedValue} ${unit}.`,
+      vi: `${successStreak} buổi liên tiếp đạt đầu trên của khoảng mục tiêu; có thể ${directionText.vi} từ ${current} ${action === "decrease_assistance" ? "xuống" : "lên"} ${suggestedValue} ${unit === "reps" ? "lần" : unit === "seconds" ? "giây" : unit === "meters" ? "mét" : unit}.`,
       en: `${successStreak} consecutive sessions reached the top of the target range; ${directionText.en} from ${current} to ${suggestedValue} ${unit}.`
     },
     evidence
