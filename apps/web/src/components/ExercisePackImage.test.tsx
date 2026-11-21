@@ -75,7 +75,7 @@ describe("ExercisePackImage", () => {
     await user.click(screen.getByRole("button", { name: "Change image" }));
     await user.click(screen.getByRole("button", { name: "barbell decline bench press" }));
     const changed = await screen.findByRole("img", { name: "Chest Press: barbell decline bench press" });
-    expect(store.saved).toEqual(["https://static.exercisedb.dev/media/r2.gif"]);
+    expect(store.saved).toEqual(["https://static.exercisedb.dev/media/r1.gif", "https://static.exercisedb.dev/media/r2.gif"]);
 
     // Offline with a GIF that was never saved: say so instead of a broken image.
     fireEvent.error(changed);

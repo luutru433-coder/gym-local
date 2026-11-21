@@ -7,7 +7,7 @@ const noPause = async () => undefined;
 
 function fakeCaches() {
   const entries = new Map<string, unknown>();
-  const cache = { match: async (url: string) => entries.get(url), put: async (url: string, response: unknown) => void entries.set(url, response) };
+  const cache = { match: async (url: string) => entries.get(url), put: async (url: string, response: unknown) => void entries.set(url, response), delete: async (url: string) => entries.delete(url) };
   const open = vi.fn(async () => cache);
   const remove = vi.fn(async () => { entries.clear(); return true; });
   vi.stubGlobal("caches", { open, delete: remove });
@@ -49,16 +49,17 @@ describe("free ExerciseDB download", () => {
       return { type: "opaque", ok: false } as Response;
     });
     vi.stubGlobal("fetch", fetchMock);
-    const urls = ["https://static.exercisedb.dev/media/a.gif", "https://static.exercisedb.dev/media/a.gif", "https://static.exercisedb.dev/media/bad.gif", "https://example.com/media/x.gif"];
+    const urls = ["https://static.exercisedb.dev/media/a.gif", "https://static.exercisedb.dev/media/a.gif", "https://static.exercisedb.dev/media/bad.gif", "https://static.exercisedb.dev/media/errorpage.gif", "https://example.com/media/x.gif"];
+    const shows = async (url: string) => !url.includes("errorpage");
     const progress: string[] = [];
-    expect(await storeExerciseDbGifs(urls, (done, total) => progress.push(`${done}/${total}`))).toEqual({ stored: 1, failed: 1 });
+    expect(await storeExerciseDbGifs(urls, (done, total) => progress.push(`${done}/${total}`), undefined, shows)).toEqual({ stored: 1, failed: 2 });
     expect(open).toHaveBeenCalledWith(EXERCISEDB_GIF_CACHE);
     expect([...entries.keys()]).toEqual(["https://static.exercisedb.dev/media/a.gif"]);
     expect(fetchMock.mock.calls.every((call) => (call as unknown as [string, RequestInit])[1].mode === "no-cors")).toBe(true);
-    expect(progress.at(-1)).toBe("2/2");
+    expect(progress.at(-1)).toBe("3/3");
 
     fetchMock.mockClear();
-    expect(await storeExerciseDbGifs(["https://static.exercisedb.dev/media/a.gif"])).toEqual({ stored: 1, failed: 0 });
+    expect(await storeExerciseDbGifs(["https://static.exercisedb.dev/media/a.gif"], undefined, undefined, shows)).toEqual({ stored: 1, failed: 0 });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

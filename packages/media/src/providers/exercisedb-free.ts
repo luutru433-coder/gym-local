@@ -67,12 +67,29 @@ export async function listExerciseDbImages(onProgress?: (done: number, total: nu
   return [...images.values()];
 }
 
+function showsAsImage(url: string): Promise<boolean> {
+  if (typeof Image === "undefined") return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const image = new Image();
+    const timer = setTimeout(() => resolve(false), 20000);
+    const done = (ok: boolean) => () => { clearTimeout(timer); resolve(ok); };
+    image.onload = done(true);
+    image.onerror = done(false);
+    image.src = url;
+  });
+}
+
 /**
  * Saves GIFs in the browser's cache storage on this device. The image server sends no cross-origin permission,
  * so the files cannot be read into the app's database; they are kept as the browser fetched them and the
  * service worker hands them back offline.
  */
-export async function storeExerciseDbGifs(urls: string[], onProgress?: (done: number, total: number) => void, signal?: AbortSignal): Promise<{ stored: number; failed: number }> {
+export async function storeExerciseDbGifs(
+  urls: string[],
+  onProgress?: (done: number, total: number) => void,
+  signal?: AbortSignal,
+  shows: (url: string) => Promise<boolean> = showsAsImage
+): Promise<{ stored: number; failed: number }> {
   const wanted = [...new Set(urls.filter(isMediaUrl))];
   const cache = await caches.open(EXERCISEDB_GIF_CACHE);
   let stored = 0;
@@ -86,6 +103,12 @@ export async function storeExerciseDbGifs(urls: string[], onProgress?: (done: nu
           const response = await fetch(url, { mode: "no-cors", signal });
           if (response.type !== "opaque" && !response.ok) throw new Error("not saved");
           await cache.put(url, response);
+          // The saved answer cannot be read, so an error page would be kept as if it were the GIF: keep it
+          // only when the browser can draw it.
+          if (!(await shows(url))) {
+            await cache.delete(url);
+            throw new Error("not an image");
+          }
         }
         stored++;
       } catch {

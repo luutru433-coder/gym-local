@@ -76,11 +76,12 @@ export default defineConfig(({ mode }) => ({
             }
           },
           {
-            // GIFs the owner downloaded on this device (ADR 0021). The cache name matches EXERCISEDB_GIF_CACHE;
-            // status 0 is the opaque answer of an image host that sends no cross-origin headers.
+            // GIFs the owner downloaded on this device (ADR 0021). The cache name matches EXERCISEDB_GIF_CACHE.
+            // The worker only reads this cache: the app saves a GIF itself after checking it, so picker
+            // previews and error answers are never kept.
             urlPattern: /^https:\/\/static\.exercisedb\.dev\/media\//,
             handler: "CacheFirst",
-            options: { cacheName: "exercisedb-gifs", cacheableResponse: { statuses: [0, 200] } }
+            options: { cacheName: "exercisedb-gifs", plugins: [{ cacheWillUpdate: async () => null }] }
           }
         ]
       },

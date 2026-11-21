@@ -23,7 +23,8 @@ export async function importExerciseImagePack(files: File[], onProgress?: (store
     onProgress?.(Math.min(start + BATCH, images.length), images.length);
   }
   const suggestions = suggestExerciseImageLinks(
-    await listExerciseImages(),
+    // Only his own files: a downloaded ExerciseDB GIF must not take the place of an image from his pack.
+    (await listExerciseImages()).filter((image) => !image.remoteUrl),
     EXERCISE_VARIANTS.map((variant) => ({ id: variant.id, movementId: variant.movementId, equipment: variant.equipment }))
   );
   return { imported: images.length, ignored, suggested: await applySuggestedExerciseImageLinks(suggestions) };

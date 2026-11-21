@@ -67,6 +67,14 @@ describe("exercise image pack import", () => {
     expect((await exerciseImagePackSummary()).remoteCount).toBe(3);
   });
 
+  it("lets his own pack replace downloaded GIFs, never the other way round", async () => {
+    await downloadExerciseDbImages();
+    expect((await getExerciseImage("squat__barbell"))?.remoteUrl).toBeDefined();
+    await importExerciseImagePack(pack());
+    expect((await getExerciseImage("chest_press__barbell"))?.id).toBe("0025");
+    expect((await getExerciseImage("squat__barbell"))?.remoteUrl).toBeUndefined();
+  });
+
   it("links the downloaded GIFs when there is no pack of his own", async () => {
     const result = await downloadExerciseDbImages();
     expect(result.suggested).toBeGreaterThanOrEqual(2);

@@ -50,6 +50,8 @@ export default function ExercisePackImage({ variantId, exerciseName, locale }: {
       if (image.blob) created = URL.createObjectURL(image.blob);
       const url = created ?? image.remoteUrl;
       setShown(url ? { id: image.id, name: image.name, url, remote: !created } : undefined);
+      // Keeps a linked GIF on the device once it has been opened online (no request when it is already saved).
+      if (!created && image.remoteUrl) void storeExerciseDbGifs([image.remoteUrl]).catch(() => undefined);
     }).catch(() => undefined);
     return () => {
       current = false;
@@ -66,9 +68,6 @@ export default function ExercisePackImage({ variantId, exerciseName, locale }: {
 
   async function choose(imageId: string | undefined) {
     await linkExerciseImage(variantId, imageId);
-    const remoteUrl = images?.find((image) => image.id === imageId)?.remoteUrl;
-    // Save the newly chosen GIF on the device too, so it is there offline.
-    if (remoteUrl) void storeExerciseDbGifs([remoteUrl]).catch(() => undefined);
     setPicking(false);
     setQuery("");
     setVersion((value) => value + 1);
