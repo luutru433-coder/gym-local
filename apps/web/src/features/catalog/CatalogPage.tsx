@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, Dumbbell, Info, Pencil, Plus, Search, ShieldCheck, SlidersHorizontal, Target, Trash2, UserRound } from "lucide-react";
 import { Button, Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
 import type { EquipmentType, ExerciseVariant, Movement, MuscleGroup } from "@gym/contracts";
@@ -11,6 +11,8 @@ import { useGymStore } from "../../store/useGymStore";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
 import { frameUrl, muscleLabels } from "../../lib/exercise-visuals";
+
+const ExerciseTechnique = lazy(() => import("../../components/ExerciseTechnique"));
 
 
 const muscleFilters: MuscleGroup[] = ["chest", "back", "shoulders", "quadriceps", "hamstrings", "glutes", "biceps", "triceps", "core"];
@@ -170,6 +172,7 @@ export function CatalogPage() {
             </section>
 
             <ExerciseAnimation key={activeVariant.id} animation={getExerciseAnimation(activeVariant.id)} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
+            <Suspense fallback={null}><ExerciseTechnique key={activeVariant.id} variantId={activeVariant.id} locale={locale} /></Suspense>
 
 
             <div className="instruction-layout">

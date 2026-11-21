@@ -874,3 +874,51 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+.technique-section h3 { display: flex; align-items: center; gap: 8px; font-size: 16px; margin-bottom: 12px; }
+.technique-steps { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+.technique-step { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 12px 6px 7px; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; font-size: 12px; font-weight: 700; }
+.technique-step span { width: 22px; height: 22px; display: grid; place-items: center; color: var(--olive-deep); background: var(--lime-tint); border-radius: 50%; font-size: 11px; }
+.technique-step--active { color: var(--on-accent); background: var(--accent-bg); border-color: var(--accent-bg); }
+.technique-panel { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.technique-figure { display: block; width: 100%; background: var(--surface-3); border: 1px solid var(--line); border-radius: 12px; }
+.technique-figure--wrong { background: var(--danger-bg); border-color: var(--danger-line); }
+.technique-figure--right { background: var(--lime-tint); border-color: var(--lime-line-soft); }
+.tf-limb, .tf-torso-side { fill: none; stroke: var(--ink-soft); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.tf-limb--far { stroke: var(--faint); }
+.tf-torso-side { stroke-width: 17; }
+.tf-torso { fill: var(--ink-soft); stroke: var(--ink-soft); stroke-width: 9; stroke-linejoin: round; }
+.tf-head { fill: var(--ink-soft); }
+.tf-joint { fill: var(--surface-3); }
+.tf-pad { fill: var(--line-strong); }
+.tf-floor, .tf-prop { stroke: var(--line-strong); stroke-width: 2; stroke-linecap: round; }
+.tf-prop { stroke-width: 4; }
+.tf-cable { stroke: var(--muted); stroke-width: 1.2; }
+.tf-bar { stroke: var(--muted); stroke-width: 3.5; stroke-linecap: round; }
+.tf-plate { fill: color-mix(in srgb, var(--muted) 35%, transparent); stroke: var(--muted); stroke-width: 2; }
+.tf-bar-end, .tf-weight { fill: var(--muted); }
+.tf-guide { stroke: var(--coral); stroke-width: 1.2; stroke-dasharray: 3 2.5; }
+.tf-arc, .tf-arrow { fill: none; stroke: var(--coral); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.tf-badge { fill: var(--accent-bg); stroke: var(--surface-3); stroke-width: 1.5; }
+.tf-badge-text { fill: var(--on-accent); font-size: 8px; font-weight: 800; }
+.tf-label { fill: var(--ink); font-size: 9.5px; font-weight: 800; paint-order: stroke; stroke: var(--surface-3); stroke-width: 3px; stroke-linejoin: round; }
+.technique-figure--wrong .tf-label { stroke: var(--danger-bg); }
+.technique-figure--right .tf-label { stroke: var(--lime-tint); }
+.technique-figure--right .tf-arc, .technique-figure--right .tf-arrow, .technique-figure--right .tf-guide { stroke: var(--olive); }
+.technique-figure--wrong .tf-arc, .technique-figure--wrong .tf-arrow, .technique-figure--wrong .tf-guide { stroke: var(--danger); }
+.technique-cues { list-style: none; margin: 0; padding: 0; }
+.technique-cues li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.technique-cues li > span { width: 24px; height: 24px; display: grid; place-items: center; color: var(--on-accent); background: var(--accent-bg); border-radius: 50%; font-size: 11px; font-weight: 800; }
+.technique-cues p { margin: 2px 0 0; color: var(--ink-soft); font-size: 13px; line-height: 1.5; }
+.technique-subtitle { margin: 20px 0 10px; font-size: 14px; }
+.technique-mistakes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.technique-mistake { padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.technique-mistake h5 { margin: 0 0 9px; font-size: 13px; }
+.technique-mistake > p { margin: 9px 0 0; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
+.technique-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.technique-compare figure { margin: 0; }
+.technique-compare figcaption { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 5px; font-size: 11px; font-weight: 800; }
+.technique-compare .is-wrong { color: var(--danger); }
+.technique-compare .is-right { color: var(--olive-deep); }
+@media (max-width: 700px) {
+  .technique-panel { grid-template-columns: 1fr; gap: 6px; }
+}
