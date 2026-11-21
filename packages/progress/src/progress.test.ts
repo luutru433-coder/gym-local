@@ -253,4 +253,24 @@ describe("progress calculations", () => {
     ]);
     expect(records[0]).toMatchObject({ exerciseId: liveExercise.id, variantId: "chest_press__dumbbell", weightKg: 40, reps: 10 });
   });
+
+  it("judges live records in logging order and counts carry loads without reps", () => {
+    const earlier = session("earlier", "2026-08-01T10:00:00.000Z", [
+      exercise("chest_press__dumbbell", [completedSet("old", { weightKg: 40, reps: 8 })]),
+      exercise("farmer_carry__dumbbell", [completedSet("old-carry", { weightKg: 30, durationSeconds: 40 })])
+    ]);
+    const live = session("live", undefined, [
+      exercise("chest_press__dumbbell", [
+        completedSet("top", { weightKg: 50, reps: 5, completedAt: "2026-08-10T10:05:00.000Z" }),
+        completedSet("first-logged", { weightKg: 45, reps: 5, completedAt: "2026-08-10T10:01:00.000Z" })
+      ]),
+      exercise("farmer_carry__dumbbell", [completedSet("carry", { weightKg: 35, durationSeconds: 40, completedAt: "2026-08-10T10:10:00.000Z" })])
+    ]);
+
+    expect(sessionRecordSets([live, earlier], live).map((record) => [record.setId, record.kinds])).toEqual([
+      ["first-logged", ["e1rm", "load"]],
+      ["top", ["e1rm", "load"]],
+      ["carry", ["load"]]
+    ]);
+  });
 });

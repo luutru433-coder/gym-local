@@ -172,7 +172,12 @@ export function sessionRecordSets(sessions: WorkoutSession[], session: WorkoutSe
   const bests = new Map<string, { e1rm: number; load: number; assistance?: number } | undefined>();
   const records: SessionRecordSet[] = [];
 
-  session.exercises.forEach((exercise) => {
+  // Judge sets in the order they were logged, so a later set never takes a badge from an earlier one.
+  const logged = session.exercises
+    .flatMap((exercise) => completedWorkingSets(exercise).map((set) => ({ exercise, set })))
+    .sort((left, right) => left.set.completedAt!.localeCompare(right.set.completedAt!));
+
+  logged.forEach(({ exercise, set }) => {
     if (!bests.has(exercise.variantId)) {
       const record = variantHistory(earlier, exercise.variantId).length > 0
         ? personalRecord(earlier, exercise.variantId)
@@ -183,30 +188,27 @@ export function sessionRecordSets(sessions: WorkoutSession[], session: WorkoutSe
     }
     const best = bests.get(exercise.variantId);
     if (!best) return;
-    const assisted = trackingProfile(exercise).loadEntryMode === "assisted";
-
-    completedWorkingSets(exercise).forEach((set) => {
-      const kinds: SessionRecordKind[] = [];
-      const e1rmKg = setPerformanceMetrics(exercise, set).e1rmKg;
-      if (assisted) {
-        if (best.assistance !== undefined && set.weightKg !== undefined && set.weightKg >= 0 && set.weightKg < best.assistance && (set.reps ?? 0) > 0) {
-          kinds.push("assistance");
-          best.assistance = set.weightKg;
-        }
-      } else {
-        if (best.e1rm > 0 && e1rmKg !== undefined && e1rmKg > best.e1rm) {
-          kinds.push("e1rm");
-          best.e1rm = e1rmKg;
-        }
-        if (best.load > 0 && (set.weightKg ?? 0) > best.load && (set.reps ?? 0) > 0) {
-          kinds.push("load");
-          best.load = set.weightKg!;
-        }
+    const kinds: SessionRecordKind[] = [];
+    const e1rmKg = setPerformanceMetrics(exercise, set).e1rmKg;
+    if (trackingProfile(exercise).loadEntryMode === "assisted") {
+      if (best.assistance !== undefined && set.weightKg !== undefined && set.weightKg >= 0 && set.weightKg < best.assistance) {
+        kinds.push("assistance");
+        best.assistance = set.weightKg;
       }
-      if (kinds.length) {
-        records.push({ exerciseId: exercise.id, setId: set.id, variantId: exercise.variantId, kinds, weightKg: set.weightKg, reps: set.reps, e1rmKg });
+    } else {
+      if (best.e1rm > 0 && e1rmKg !== undefined && e1rmKg > best.e1rm) {
+        kinds.push("e1rm");
+        best.e1rm = e1rmKg;
       }
-    });
+      // No reps check: carries and holds log a load without reps, as on the Progress page.
+      if (best.load > 0 && (set.weightKg ?? 0) > best.load) {
+        kinds.push("load");
+        best.load = set.weightKg!;
+      }
+    }
+    if (kinds.length) {
+      records.push({ exerciseId: exercise.id, setId: set.id, variantId: exercise.variantId, kinds, weightKg: set.weightKg, reps: set.reps, e1rmKg });
+    }
   });
 
   return records;
