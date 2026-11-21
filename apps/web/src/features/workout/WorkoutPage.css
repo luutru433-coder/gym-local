@@ -49,7 +49,7 @@
   gap: 7px;
   color: var(--lime);
   background: transparent;
-  border: 1px dashed rgba(219, 255, 88, .55);
+  border: 1px dashed color-mix(in srgb, var(--lime) 55%, transparent);
   border-radius: 8px;
   font-size: 11px;
   font-weight: 800;
@@ -343,12 +343,6 @@
   margin: 0;
 }
 
-.rest-dock__controls {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
 .live-exercise-picker > p {
   margin: 0 0 12px;
   color: var(--muted);
@@ -414,20 +408,6 @@
 }
 
 @media (max-width: 700px) {
-  .rest-dock {
-    grid-template-columns: auto 1fr;
-  }
-
-  .rest-dock__controls {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) 44px minmax(0, 1fr);
-  }
-
-  .rest-dock__controls button {
-    justify-content: center;
-    padding-inline: 5px;
-  }
 }
 
 @media (max-width: 520px) {
@@ -489,10 +469,6 @@
 }
 
 @media (max-width: 360px) {
-  .rest-dock__controls button span {
-    display: none;
-  }
-
   .variant-choice {
     grid-template-columns: auto minmax(0, 1fr);
   }
@@ -500,14 +476,6 @@
   .variant-choice em {
     grid-column: 2;
   }
-}
-
-.rest-dock__alert-toggle {
-  justify-content: center;
-}
-
-.rest-dock__alert-toggle[aria-pressed="false"] {
-  opacity: .55;
 }
 
 .set-record-badge {
@@ -624,3 +592,47 @@
 .workout-summary__actions > * {
   flex: 1 1 160px;
 }
+
+/* The live workout is always dark with one accent, whatever the app theme (ADR 0020). */
+.workout-page {
+  color-scheme: dark;
+  --ink: #f4f4f2;
+  --ink-soft: #d9d9d5;
+  --paper: #0b0b0c;
+  --surface: #161618;
+  --surface-2: #232326;
+  --surface-3: #1b1b1e;
+  --line: #2c2c30;
+  --line-strong: #4a4a50;
+  --muted: #9a9aa0;
+  --faint: #6c6c73;
+  --danger: #ff8f78;
+  --panel: #232326;
+  --panel-2: #2c2c30;
+  --stage: #0b0b0c;
+  --lime: #ff5a1f;
+  --lime-dark: #d9450f;
+  --accent-bg: var(--lime);
+  --accent-bg-hover: #ff7440;
+  --on-accent: var(--ink-fixed);
+  --olive: #ff7a45;
+  --olive-deep: #ff8f61;
+  --lime-tint: #2b170f;
+  --lime-line: #b0401a;
+  --lime-line-soft: #6b2c16;
+  --sage: #1b1b1e;
+  --danger-bg: #3a1d17;
+  --danger-line: #6b3329;
+  --info-bg: #152a30;
+  --info-ink: #9fd6e2;
+  --warn-bg: #2f2711;
+  --warn-ink: #ecd08a;
+  --shadow: 0 12px 40px rgba(0, 0, 0, .5);
+}
+
+.workout-header { background: rgba(11, 11, 12, .93); }
+.workout-exercise { background: var(--surface); }
+.workout-exercise--expanded { background: var(--surface); }
+.workout-exercise__index { border-radius: 10px; font-family: inherit; }
+.set-row--running { box-shadow: inset 3px 0 0 var(--lime); background: color-mix(in srgb, var(--lime) 7%, transparent); }
+.set-time { display: block; margin-top: 2px; color: var(--faint); font-size: 10px; font-variant-numeric: tabular-nums; }

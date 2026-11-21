@@ -71,7 +71,10 @@ const setLogSchema = z.object({
   distanceMeters: nonNegativeNumber.optional(),
   rir: finiteNumber.optional(),
   rpe: finiteNumber.optional(),
-  completedAt: timestampSchema.optional()
+  completedAt: timestampSchema.optional(),
+  startedAt: timestampSchema.optional(),
+  workSeconds: nonNegativeNumber.optional(),
+  restBeforeSeconds: nonNegativeNumber.optional()
 }).passthrough();
 
 const sessionExerciseSchema = z.object({

@@ -220,6 +220,12 @@ export interface SetLog {
   rir?: number;
   rpe?: number;
   completedAt?: string;
+  /** Set timer (ADR 0020): when the set was started; a set with `startedAt` and no `completedAt` is running. */
+  startedAt?: string;
+  /** Seconds from start to end of the set. Not the logged effort of a timed exercise (`durationSeconds`). */
+  workSeconds?: number;
+  /** Seconds actually rested between the previous finished set of the session and the start of this one. */
+  restBeforeSeconds?: number;
 }
 
 export interface SessionExercise {
