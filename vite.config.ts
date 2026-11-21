@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => ({
       "@gym/contracts": fromRoot("./packages/contracts/src/index.ts"),
       "@gym/catalog/custom": fromRoot("./packages/catalog/src/custom-exercise.ts"),
       "@gym/catalog": fromRoot("./packages/catalog/src/index.ts"),
+      "@gym/workouts/autoregulation": fromRoot("./packages/workouts/src/autoregulation.ts"),
       "@gym/workouts/plan": fromRoot("./packages/workouts/src/adaptive-plan.ts"),
       "@gym/workouts/superset": fromRoot("./packages/workouts/src/superset.ts"),
       "@gym/workouts/set-timer": fromRoot("./packages/workouts/src/set-timer.ts"),
