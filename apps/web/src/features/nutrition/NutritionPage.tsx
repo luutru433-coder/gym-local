@@ -476,7 +476,7 @@ export function NutritionPage() {
 
           {formErrors.length ? <Notice tone="warning"><ul>{formErrors.map((error, index) => <li key={`${error.field}-${error.code}-${index}`}>{error.message}</li>)}</ul></Notice> : null}
 
-          {!foodQuery.trim() && filteredFoods.some((food) => preferenceByFoodId.get(food.id)?.lastUsedAt) ? <p className="food-results__label">Dùng gần đây ở trên cùng · bấm + để ghi ngay lượng lần trước</p> : null}
+          {!editingMealId && !foodQuery.trim() && filteredFoods.some((food) => preferenceByFoodId.get(food.id)?.lastUsedAt) ? <p className="food-results__label">Dùng gần đây ở trên cùng · bấm + để ghi ngay lượng lần trước</p> : null}
           <div className="food-results">
             {visibleFoods.length ? visibleFoods.map((food) => {
               const preference = preferenceByFoodId.get(food.id);
