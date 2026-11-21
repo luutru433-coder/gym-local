@@ -84,7 +84,7 @@ describe("live workout editing", () => {
     const user = userEvent.setup();
     arrange(session());
 
-    expect(screen.getByText("Không tự điền")).toBeInTheDocument();
+    expect(screen.getByText("Bạn quyết định")).toBeInTheDocument();
     expect(screen.getByText(/Chưa đủ set chính đã hoàn tất của đúng biến thể/)).toBeInTheDocument();
 
     await user.selectOptions(screen.getByRole("combobox", { name: "Loại của set 1" }), "drop");

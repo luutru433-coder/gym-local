@@ -419,7 +419,7 @@ export function WorkoutPage() {
                   <aside className="progression-advice" aria-label={locale === "vi" ? "Gợi ý tăng tiến theo đúng biến thể" : "Exact-variation progression advice"}>
                     <Sparkles size={18} aria-hidden="true" />
                     <div>
-                      <header><strong>{locale === "vi" ? "Gợi ý đúng biến thể" : "Exact-variation advice"}</strong><em>{locale === "vi" ? "Không tự điền" : "Never auto-filled"}</em></header>
+                      <header><strong>{locale === "vi" ? "Gợi ý đúng biến thể" : "Exact-variation advice"}</strong><em>{locale === "vi" ? "Bạn quyết định" : "You decide"}</em></header>
                       <p>{progression.explanation[locale]}</p>
                       <small>{localize(exercise.variantNameSnapshot, locale)} · {progression.successStreak}/{progression.requiredSuccessSessions} {locale === "vi" ? "buổi đạt mục tiêu" : "successful sessions"}</small>
                     </div>

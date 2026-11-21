@@ -617,3 +617,4 @@ export function sessionProgress(session: WorkoutSession): { completed: number; t
 export function localizeName(name: LocalizedText, locale: "vi" | "en"): string {
   return name[locale];
 }
+export * from "./adaptive-plan";

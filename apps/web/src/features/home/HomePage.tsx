@@ -2,7 +2,9 @@ import { ArrowRight, CalendarCheck, ChevronRight, Clock3, Dumbbell, Flame, Play,
 import { useNavigate } from "react-router-dom";
 import { Button, Card, MetricRing, ProgressBar, SectionTitle } from "@gym/ui";
 import { dailyNutrition, nutritionTargetNeedsConfirmation, type NutritionEstimateInput } from "@gym/nutrition";
-import { sessionProgress } from "@gym/workouts";
+import { useState } from "react";
+import { DEFAULT_PROGRESSION_RULE, planAdaptiveSession, planTrainingWeek, sessionProgress } from "@gym/workouts";
+import { TrainingPlanCard } from "./TrainingPlanCard";
 import { localize, formatDate } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 
@@ -51,9 +53,19 @@ export function HomePage() {
   const recent = sessions.find((session) => session.finishedAt);
   const progress = activeSession ? sessionProgress(activeSession) : undefined;
 
+  const [applyAdjustments, setApplyAdjustments] = useState(true);
+  const rule = activeProgram?.progressionRule ?? DEFAULT_PROGRESSION_RULE;
+  const sessionPlan = nextRoutine ? planAdaptiveSession(nextRoutine, sessions, rule) : undefined;
+  const programStart = activeProgram ? Math.min(activeProgram.activeDayIndex, Math.max(0, activeProgramDays.length - 1)) : 0;
+  const routineStart = weeklySessions.length % Math.max(1, routines.length);
+  const upcomingRoutineIds = programmedRoutine
+    ? activeProgramDays.map((_, index) => activeProgramDays[(programStart + index) % activeProgramDays.length].routineId)
+    : routines.map((_, index) => routines[(routineStart + index) % routines.length].id);
+  const weekPlan = planTrainingWeek({ daysPerWeek: profile.daysPerWeek, sessions, upcomingRoutineIds });
+
   const begin = async () => {
     if (!nextRoutine) return navigate("/routines");
-    await startWorkout(nextRoutine, programmedRoutine ? activeProgram?.id : undefined);
+    await startWorkout(nextRoutine, programmedRoutine ? activeProgram?.id : undefined, applyAdjustments ? sessionPlan : undefined);
     navigate("/workout");
   };
 
@@ -95,6 +107,17 @@ export function HomePage() {
           </div>
         </Card>
       )}
+
+      {!activeSession && nextRoutine && sessionPlan ? (
+        <TrainingPlanCard
+          locale={locale}
+          routines={routines}
+          weekPlan={weekPlan}
+          sessionPlan={sessionPlan}
+          applyAdjustments={applyAdjustments}
+          onApplyAdjustmentsChange={setApplyAdjustments}
+        />
+      ) : null}
 
       <div className="dashboard-grid">
         <section>

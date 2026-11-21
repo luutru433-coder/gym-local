@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Self-adjusting training plan
+
+- Added an offline self-adjusting training plan on the home screen: the week's remaining sessions reflow around missed days, and the next session shows per-exercise adjustments with a bilingual reason.
+- The next session raises the load after the existing double-progression streak, holds it otherwise, lowers it about 10% after two sessions below the minimum target, and eases back about 10% after a 10-day break or 20% with one fewer set after 21 days.
+- Adjustments use exact equipment-variant history only and prefill the new session's working-set loads; routines and history are never rewritten, no set is auto-completed, and the prefill can be switched off before starting.
+
 ## 2026-08-22 — Nutrition planner algorithm 2
 
 - Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.
