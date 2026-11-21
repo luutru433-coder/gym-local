@@ -4,8 +4,6 @@
 
 - Added a dark theme. The app follows the device's light/dark setting by default; Settings → Appearance switches between System, Light and Dark. The choice is stored on the device only and is not part of backups.
 
-||||||| 0840100
-
 ## Unreleased — Weekly nutrition trends
 
 - The Nutrition page now shows weekly trends: average daily calories for the last six Monday–Sunday weeks against your target, and the chosen week's average protein, carbs, and fat with the gap to each target. Averages count only days with logged food, so empty days are not treated as zero. No stored data or formula changed.
