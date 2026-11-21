@@ -41,7 +41,10 @@ function completedPerformanceLabel(exercise: SessionExercise, locale: "vi" | "en
     ?? getTrackingProfile(exercise.variantId)
     ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
   if (profile.effortKind === "duration") return `${Math.max(0, ...sets.map((set) => set.durationSeconds ?? 0))}s`;
-  if (profile.effortKind === "distance_duration") return `${Math.max(0, ...sets.map((set) => set.distanceMeters ?? 0))}m`;
+  if (profile.effortKind === "distance_duration") {
+    const distance = Math.max(0, ...sets.map((set) => set.distanceMeters ?? 0));
+    return distance > 0 ? `${distance}m` : `${Math.max(0, ...sets.map((set) => set.durationSeconds ?? 0))}s`;
+  }
   if (profile.loadEntryMode === "assisted") {
     const values = sets.map((set) => set.weightKg).filter((value): value is number => value !== undefined);
     return values.length ? `${locale === "vi" ? "trợ lực" : "assist"} ${Math.min(...values)} kg` : "—";
