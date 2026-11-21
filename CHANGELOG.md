@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Exercise catalog search now ignores Vietnamese diacritics and letter case, so `keo xa` finds “Kéo xà” and `day nguc` finds “Đẩy ngực ngang”.
+
 ## 2026-08-22 — Nutrition planner algorithm 2
 
 - Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.
