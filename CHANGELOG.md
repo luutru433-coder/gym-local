@@ -7,6 +7,10 @@
 - The suggestion is never applied on its own: "Use new target" saves it as a manual target, "Ignore" hides it for 7 days on this device. Changing body details in Settings afterwards asks for the estimate to be reviewed again.
 - No database or backup schema change.
 
+## Unreleased — Dark theme
+
+- Added a dark theme. The app follows the device's light/dark setting by default; Settings → Appearance switches between System, Light and Dark. The choice is stored on the device only and is not part of backups.
+
 ## Unreleased — Supersets in live workouts
 
 - Exercises that share a superset label in a routine now run as a superset during the workout: finishing a set moves straight to the next exercise in the group with no rest, and the rest timer starts only after the last exercise of the round. Each grouped exercise shows a "Superset" badge and what comes next.

@@ -36,3 +36,26 @@ export function snoozeCalorieCheck(until: string): void {
     // The suggestion simply shows again on the next visit when storage is unavailable.
   }
 }
+
+export type ThemePreference = "system" | "light" | "dark";
+
+// index.html reads this key before the first paint; keep the two in sync.
+const THEME_KEY = "gym-local.theme";
+
+export function getThemePreference(): ThemePreference {
+  try {
+    const stored = globalThis.localStorage?.getItem(THEME_KEY);
+    return stored === "light" || stored === "dark" ? stored : "system";
+  } catch {
+    return "system";
+  }
+}
+
+export function setThemePreference(preference: ThemePreference): void {
+  try {
+    if (preference === "system") globalThis.localStorage?.removeItem(THEME_KEY);
+    else globalThis.localStorage?.setItem(THEME_KEY, preference);
+  } catch {
+    // The preference only lasts for this visit when storage is unavailable.
+  }
+}

@@ -56,13 +56,13 @@
 
 .nutrition-trends__detail { display: grid; gap: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .nutrition-trends__detail header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
-.nutrition-trends__icon { width: 42px; height: 42px; display: grid; place-items: center; color: #4d5d0b; background: #eefac0; border-radius: 12px 4px 12px 4px; }
+.nutrition-trends__icon { width: 42px; height: 42px; display: grid; place-items: center; color: var(--olive-deep); background: var(--lime-tint); border-radius: 12px 4px 12px 4px; }
 .nutrition-trends__detail header span { color: var(--muted); font-size: 11px; }
 .nutrition-trends__detail header strong { display: block; margin-top: 2px; font-size: 22px; }
 .nutrition-trends__detail header strong.is-empty { font-size: 15px; }
 .nutrition-trends__detail header strong small { color: var(--muted); font-size: 11px; font-weight: 600; }
-.nutrition-trends__detail header em { font-style: normal; font-weight: 850; text-align: center; color: #b84a32; }
-.nutrition-trends__detail header em.is-on-target { color: #4d5d0b; }
+.nutrition-trends__detail header em { font-style: normal; font-weight: 850; text-align: center; color: var(--danger); }
+.nutrition-trends__detail header em.is-on-target { color: var(--olive-deep); }
 .nutrition-trends__detail header em small { display: block; color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
 
 .nutrition-trends__macros { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }

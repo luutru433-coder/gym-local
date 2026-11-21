@@ -1,5 +1,5 @@
 .custom-exercise-form { display: flex; flex-direction: column; gap: 14px; }
 .custom-exercise-form textarea { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 12px; color: var(--ink); resize: vertical; }
-.custom-exercise-form textarea:focus { border-color: #839a34; outline: none; box-shadow: 0 0 0 3px rgba(200, 233, 75, .2); }
+.custom-exercise-form textarea:focus { border-color: var(--lime-line); outline: none; box-shadow: 0 0 0 3px rgba(200, 233, 75, .2); }
 .custom-exercise-form .filter-scroll { flex-wrap: wrap; }
 .custom-exercise-actions { display: flex; flex-wrap: wrap; gap: 10px; }

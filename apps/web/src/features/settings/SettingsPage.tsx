@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArchiveRestore, Check, ChevronRight, Download, Dumbbell, FileJson, FileSpreadsheet, HardDrive, Languages, LockKeyhole, MapPin, RefreshCw, Salad, Save, ShieldCheck, Upload, UserRound } from "lucide-react";
+import { ArchiveRestore, Check, ChevronRight, Download, Dumbbell, FileJson, FileSpreadsheet, HardDrive, Languages, LockKeyhole, MapPin, Moon, RefreshCw, Salad, Save, ShieldCheck, Upload, UserRound } from "lucide-react";
 import { Button, Card, Field, Modal, Notice, SectionTitle } from "@gym/ui";
 import { APP_VERSIONS, type EquipmentType, type Goal, type Profile } from "@gym/contracts";
 import { CONTENT_SOURCES, EQUIPMENT_OPTIONS, EXERCISE_VARIANTS, MOVEMENTS } from "@gym/catalog";
@@ -8,7 +8,12 @@ import { confirmNutritionTarget, estimateNutritionTarget, nutritionTargetNeedsCo
 import { exportAllData, persistentStorageStatus, requestPersistentStorage, storageEstimate } from "@gym/storage";
 import { formatDate, formatNumber } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
+import { getThemePreference, saveThemePreference, type ThemePreference } from "../../lib/theme";
 import { PwaInstallCard } from "./PwaInstallCard";
+
+const themeLabels: Record<ThemePreference, { vi: string; en: string }> = {
+  system: { vi: "Theo máy", en: "System" }, light: { vi: "Sáng", en: "Light" }, dark: { vi: "Tối", en: "Dark" }
+};
 
 const goalLabels: Record<Goal, { vi: string; en: string }> = {
   hypertrophy: { vi: "Tăng cơ", en: "Build muscle" }, strength: { vi: "Sức mạnh", en: "Strength" }, fat_loss: { vi: "Giảm mỡ", en: "Fat loss" }, general: { vi: "Sức khỏe chung", en: "General fitness" }
@@ -39,7 +44,9 @@ export function SettingsPage() {
   const [persistent, setPersistent] = useState<boolean>();
   const [persistenceBusy, setPersistenceBusy] = useState(false);
   const [targetConfirmation, setTargetConfirmation] = useState<Profile>();
+  const [theme, setTheme] = useState(getThemePreference);
   const fileRef = useRef<HTMLInputElement>(null);
+  const chooseTheme = (preference: ThemePreference) => { saveThemePreference(preference); setTheme(preference); };
 
   useEffect(() => {
     void storageEstimate().then((value) => value && setUsage({ usage: value.usage, quota: value.quota })).catch(() => setUsage(undefined));
@@ -205,6 +212,7 @@ export function SettingsPage() {
               <div className="settings-card__heading"><span><UserRound size={20} /></span><div><h3>{locale === "vi" ? "Thông tin cơ bản" : "Basic details"}</h3><p>{locale === "vi" ? "Dùng để hiển thị và tính mục tiêu khởi đầu." : "Used for display and starting estimates."}</p></div></div>
               <div className="form-grid"><Field label={locale === "vi" ? "Tên hiển thị" : "Display name"}><input value={profile.displayName} onChange={(event) => setProfile((value) => ({ ...value, displayName: event.target.value }))} /></Field><Field label={locale === "vi" ? "Mục tiêu" : "Goal"}><select value={profile.goal} onChange={(event) => setProfile((value) => ({ ...value, goal: event.target.value as Goal }))}>{Object.entries(goalLabels).map(([id, label]) => <option value={id} key={id}>{label[locale]}</option>)}</select></Field><Field label={locale === "vi" ? "Số buổi / tuần" : "Days / week"}><input type="number" min="1" max="7" value={profile.daysPerWeek} onChange={(event) => setProfile((value) => ({ ...value, daysPerWeek: Math.min(7, Math.max(1, Number(event.target.value) || 1)) }))} /></Field><Field label={locale === "vi" ? "Đơn vị" : "Units"}><input value="kg · cm" disabled aria-describedby="metric-note" /><small id="metric-note">{locale === "vi" ? "Phiên bản này lưu dữ liệu theo hệ mét để lịch sử luôn nhất quán." : "This version stores metric values so history stays consistent."}</small></Field></div>
               <div className="language-row"><span><Languages size={18} />{locale === "vi" ? "Ngôn ngữ giao diện" : "App language"}</span><div><button type="button" className={profile.locale === "vi" ? "active" : ""} onClick={() => setProfile((value) => ({ ...value, locale: "vi" }))}>Tiếng Việt</button><button type="button" className={profile.locale === "en" ? "active" : ""} onClick={() => setProfile((value) => ({ ...value, locale: "en" }))}>English</button></div></div>
+              <div className="language-row"><span><Moon size={18} />{locale === "vi" ? "Giao diện" : "Appearance"}</span><div role="group" aria-label={locale === "vi" ? "Giao diện" : "Appearance"}>{(Object.keys(themeLabels) as ThemePreference[]).map((preference) => <button type="button" key={preference} className={theme === preference ? "active" : ""} aria-pressed={theme === preference} onClick={() => chooseTheme(preference)}>{themeLabels[preference][locale]}</button>)}</div></div>
             </Card>
           </section>
 
