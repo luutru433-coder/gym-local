@@ -110,6 +110,43 @@
   cursor: pointer;
 }
 
+.food-result--quick .food-result__select {
+  padding-right: 116px;
+}
+
+.quick-add-button {
+  position: absolute;
+  z-index: 1;
+  top: 9px;
+  right: 46px;
+  min-width: 64px;
+  height: 44px;
+  padding: 0 9px;
+  border: 1px solid #99b424;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--ink);
+  background: #f4fad7;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.food-results__label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.search-box__status {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 10px;
+}
+
 .favorite-button[aria-pressed="true"] {
   color: #b84a32;
 }
