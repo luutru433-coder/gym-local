@@ -103,6 +103,18 @@ export interface ExerciseVideoGuide {
   lastVerifiedAt: string;
 }
 
+export interface ExerciseAnimation {
+  variantId: Id;
+  frames: string[];
+  frameDurationMs: number;
+  shownExercise: string;
+  match: "exact" | "closest";
+  sourceId: Id;
+  onlineOnly: false;
+  reviewStatus: ReviewStatus;
+  reviewedAt: string;
+}
+
 export interface Movement {
   id: Id;
   name: LocalizedText;

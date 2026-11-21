@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { CONTENT_SOURCES, EXERCISE_VARIANTS } from "@gym/catalog";
+import { CONTENT_SOURCES, EXERCISE_ANIMATIONS, EXERCISE_VARIANTS } from "@gym/catalog";
 import type { ExerciseVariant, ExerciseVideoGuide, MediaAsset } from "@gym/contracts";
-import { auditExerciseMedia, isSafeMediaUrl, isSafeVideoGuide, youtubeEmbedUrl } from "./index";
+import { auditExerciseAnimations, auditExerciseMedia, isSafeMediaUrl, isSafeVideoGuide, youtubeEmbedUrl } from "./index";
 
 function asset(type: MediaAsset["type"], url: string): MediaAsset {
   return { id: "test", type, url, sourceId: "source", title: { vi: "Test", en: "Test" }, onlineOnly: true, reviewStatus: "reviewed" };
@@ -69,5 +69,14 @@ describe("media allowlist", () => {
       "invalid_video_guide",
       "stale_video_review"
     ]));
+  });
+
+  it("requires a bundled offline animation for every reviewed variant", () => {
+    expect(auditExerciseAnimations(EXERCISE_VARIANTS, EXERCISE_ANIMATIONS, CONTENT_SOURCES)).toEqual([]);
+
+    const remote = structuredClone(EXERCISE_ANIMATIONS[0]);
+    remote.frames = ["https://example.com/frame-1.svg", "https://example.com/frame-2.svg"];
+    const issues = auditExerciseAnimations(EXERCISE_VARIANTS.slice(0, 2), [remote], CONTENT_SOURCES);
+    expect(issues.map((issue) => issue.code)).toEqual(["invalid_animation", "missing_animation"]);
   });
 });

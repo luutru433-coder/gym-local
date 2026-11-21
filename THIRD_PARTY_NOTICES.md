@@ -23,6 +23,21 @@ The repository stores only direct video identifiers and review metadata. Playbac
 - Provider terms: https://developers.google.com/youtube/terms/developer-policies
 - Per-video creator/title attribution: `content/exercise-video-guides.json`
 
+## Workout Guide exercise artwork
+
+The three-frame exercise drawings in `public/exercise-animations/` are copied unmodified from Workout Guide and are licensed under CC BY-SA 4.0. Copyright (c) 2026 Bryl Lim; 76 first-pose frames upstream are vector-traced adaptations of Everkinetic artwork (CC BY-SA 4.0). The app plays the frames in sequence and shows this credit under every animation.
+
+- Source: https://github.com/bryllim/workout-guide (commit pinned in `content/exercise-animations.json`)
+- Upstream attribution: https://github.com/bryllim/workout-guide/blob/main/ATTRIBUTION.md
+- Everkinetic: https://github.com/everkinetic/data
+- License: https://creativecommons.org/licenses/by-sa/4.0/
+
+## React Muscle Map body artwork
+
+The front and back body outlines in `apps/web/src/components/BodyArtwork.tsx` are ported from React Muscle Map, released into the public domain under the Unlicense.
+
+- Source: https://github.com/Josep1992/react-muscle-map
+
 ## Open Food Facts
 
 Barcode lookup calls the public Open Food Facts API at runtime. Open Food Facts records are not bundled in the SQLite nutrition pack; results retain their source URL and may be incomplete.

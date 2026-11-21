@@ -1,6 +1,7 @@
 import type {
   ContentSource,
   EquipmentType,
+  ExerciseAnimation,
   ExerciseLaterality,
   ExerciseTrackingProfile,
   ExerciseVideoGuide,
@@ -15,6 +16,7 @@ import type {
   TrackingVolumeMetric
 } from "@gym/contracts";
 import videoGuideManifest from "../../../content/exercise-video-guides.json";
+import animationManifest from "../../../content/exercise-animations.json";
 
 type Pattern = Movement["pattern"];
 
@@ -71,6 +73,26 @@ export const CONTENT_SOURCES: ContentSource[] = [
     licenseUrl: "https://github.com/yuhonas/free-exercise-db/blob/main/LICENSE.md",
     attribution: "Public-domain exercise reference images served from the Free Exercise DB repository.",
     reviewedAt: "2026-08-10"
+  },
+  {
+    id: "workout-guide",
+    label: "Workout Guide exercise artwork",
+    sourceUrl: "https://github.com/bryllim/workout-guide",
+    author: "Bryl Lim; first-pose frames adapted from Everkinetic",
+    licenseId: "cc-by-sa-4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    attribution: "Three-frame exercise drawings by Bryl Lim (CC BY-SA 4.0), partly adapted from Everkinetic (CC BY-SA 4.0); bundled unmodified for offline playback.",
+    reviewedAt: "2026-11-21"
+  },
+  {
+    id: "react-muscle-map",
+    label: "React Muscle Map body artwork",
+    sourceUrl: "https://github.com/Josep1992/react-muscle-map",
+    author: "React Muscle Map contributors",
+    licenseId: "unlicense",
+    licenseUrl: "https://github.com/Josep1992/react-muscle-map/blob/main/LICENSE",
+    attribution: "Public-domain front and back body outlines used for the worked-muscle diagram.",
+    reviewedAt: "2026-11-21"
   }
 ];
 
@@ -413,6 +435,34 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
     } satisfies ExerciseVariant;
   })
 );
+
+const animationDrawings: Record<string, string> = animationManifest.drawings;
+
+export const EXERCISE_ANIMATIONS: ExerciseAnimation[] = Object.entries(animationManifest.variants as Record<string, string>).map(([variantId, target]) => {
+  const slug = target.replace(/^~/, "");
+  return {
+    variantId,
+    frames: Array.from({ length: animationManifest.frameCount }, (_, index) => `exercise-animations/${slug}/frame-${index + 1}.svg`),
+    frameDurationMs: 650,
+    shownExercise: animationDrawings[slug],
+    match: target.startsWith("~") ? "closest" : "exact",
+    sourceId: animationManifest.sourceId,
+    onlineOnly: false,
+    reviewStatus: "reviewed",
+    reviewedAt: animationManifest.reviewedAt
+  };
+});
+
+const animationByVariant = new Map(EXERCISE_ANIMATIONS.map((animation) => [animation.variantId, animation]));
+
+export function getExerciseAnimation(variantId: string): ExerciseAnimation | undefined {
+  return animationByVariant.get(variantId);
+}
+
+export function getMovementAnimation(movementId: string): ExerciseAnimation | undefined {
+  const candidates = EXERCISE_VARIANTS.filter((variant) => variant.movementId === movementId).map((variant) => animationByVariant.get(variant.id));
+  return candidates.find((animation) => animation?.match === "exact") ?? candidates.find(Boolean);
+}
 
 export const EQUIPMENT_OPTIONS = Object.entries(equipmentName).map(([id, name]) => ({
   id: id as EquipmentType,

@@ -1,9 +1,14 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CONTENT_SOURCES,
+  EXERCISE_ANIMATIONS,
   EXERCISE_TRACKING_PROFILES,
   EXERCISE_VARIANTS,
   MOVEMENTS,
+  getExerciseAnimation,
+  getMovementAnimation,
   getTrackingProfile,
   getVariantsForMovement,
   rankVariantsForEquipment
@@ -13,6 +18,23 @@ describe("exercise catalog", () => {
   it("ships the agreed core breadth", () => {
     expect(MOVEMENTS.length).toBeGreaterThanOrEqual(50);
     expect(EXERCISE_VARIANTS.length).toBeGreaterThanOrEqual(180);
+  });
+
+  it("bundles an offline three-frame animation for every reviewed variant", () => {
+    const reviewed = EXERCISE_VARIANTS.filter((variant) => variant.reviewStatus === "reviewed");
+    expect(EXERCISE_ANIMATIONS).toHaveLength(reviewed.length);
+    for (const variant of reviewed) {
+      const animation = getExerciseAnimation(variant.id);
+      expect(animation, variant.id).toBeDefined();
+      expect(animation?.frames).toHaveLength(3);
+      expect(animation?.onlineOnly).toBe(false);
+      for (const frame of animation?.frames ?? []) {
+        expect(["public", "../../public"].some((base) => existsSync(resolve(base, frame))), frame).toBe(true);
+      }
+    }
+    expect(MOVEMENTS.every((movement) => getMovementAnimation(movement.id))).toBe(true);
+    expect(getExerciseAnimation("chest_press__barbell")?.match).toBe("exact");
+    expect(CONTENT_SOURCES.some((source) => source.id === "workout-guide" && source.licenseId === "cc-by-sa-4.0")).toBe(true);
   });
 
   it("contains the required chest press equipment alternatives", () => {

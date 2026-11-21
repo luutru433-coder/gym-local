@@ -1,4 +1,4 @@
-import type { ContentSource, ExerciseVariant, ExerciseVideoGuide, MediaAsset } from "@gym/contracts";
+import type { ContentSource, ExerciseAnimation, ExerciseVariant, ExerciseVideoGuide, MediaAsset } from "@gym/contracts";
 
 export interface MediaAuditIssue {
   code:
@@ -8,7 +8,9 @@ export interface MediaAuditIssue {
     | "invalid_source"
     | "missing_video_guide"
     | "multiple_video_guides"
-    | "stale_video_review";
+    | "stale_video_review"
+    | "missing_animation"
+    | "invalid_animation";
   variantId?: string;
   sourceId?: string;
   message: string;
@@ -166,4 +168,35 @@ export function mediaFallback(locale: "vi" | "en") {
   return locale === "vi"
     ? "Media cần Internet. Hãy dùng hướng dẫn chữ và các cue kỹ thuật ở trên."
     : "Media needs an Internet connection. Use the written steps and form cues above.";
+}
+
+const bundledAnimationFrame = /^exercise-animations\/[a-z0-9-]+\/frame-[1-9]\.svg$/;
+
+/**
+ * Bundled animations are the offline illustration for every reviewed variant:
+ * local same-origin frames only, never a remote URL, with a traceable source.
+ */
+export function auditExerciseAnimations(
+  variants: ExerciseVariant[],
+  animations: ExerciseAnimation[],
+  sources: ContentSource[]
+): MediaAuditIssue[] {
+  const issues: MediaAuditIssue[] = [];
+  const byVariant = new Map(animations.map((animation) => [animation.variantId, animation]));
+  const sourceIds = new Set(sources.map((source) => source.id));
+  for (const variant of variants.filter((item) => item.reviewStatus === "reviewed")) {
+    const animation = byVariant.get(variant.id);
+    if (!animation) {
+      issues.push({ code: "missing_animation", variantId: variant.id, message: "Reviewed variant has no bundled animation" });
+      continue;
+    }
+    const valid = animation.frames.length >= 2
+      && animation.frames.every((frame) => bundledAnimationFrame.test(frame))
+      && animation.onlineOnly === false
+      && animation.frameDurationMs >= 200
+      && Boolean(animation.shownExercise)
+      && sourceIds.has(animation.sourceId);
+    if (!valid) issues.push({ code: "invalid_animation", variantId: variant.id, sourceId: animation.sourceId, message: "Animation must use bundled local frames from a declared source" });
+  }
+  return issues;
 }
