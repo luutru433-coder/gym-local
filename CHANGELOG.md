@@ -6,6 +6,14 @@
 - The next session raises the load after the existing double-progression streak, holds it otherwise, lowers it about 10% after two sessions below the minimum target, and eases back about 10% after a 10-day break or 20% with one fewer set after 21 days.
 - Adjustments use exact equipment-variant history only and prefill the new session's working-set loads; routines and history are never rewritten, no set is auto-completed, and the prefill can be switched off before starting.
 
+## 2026-11-21 — Offline exercise animations
+
+- Every reviewed exercise variant (199) now has a bundled three-frame drawn animation that plays without a network connection, in the exercise library and in the in-workout quick guide. Variants without a drawing for their exact equipment show the closest drawing and name it.
+- Added a front/back muscle diagram that highlights the primary and secondary muscles of each movement.
+- Removed the 14 remote reference photos; no exercise image needs the network any more.
+- Library cards show the movement drawing instead of a generic dumbbell icon.
+- Rich-media policy changed (ADR 0016): licensed drawings are bundled and precached; YouTube guides remain optional and online-only.
+
 ## 2026-08-22 — Nutrition planner algorithm 2
 
 - Scale recipe portions deterministically from 0.5 to 2.5 servings so confirmed high-energy targets can be approached with three meals.

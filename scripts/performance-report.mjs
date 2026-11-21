@@ -16,7 +16,8 @@ const budgets = {
   vendorChunkBytes: 500 * KIB,
   workerChunkBytes: 250 * KIB,
   initialGraphBytes: 650 * KIB,
-  precacheBytes: 3.5 * MIB
+  precacheBytes: 3.5 * MIB,
+  exerciseAnimationBytes: 16 * MIB
 };
 
 const manifest = JSON.parse(await readFile(join(distRoot, ".vite", "manifest.json"), "utf8"));
@@ -49,7 +50,11 @@ const workerChunks = await Promise.all(assetEntries
   .map(async (file) => ({ file: `assets/${file}`, bytes: await bytes(`assets/${file}`) })));
 const precachePaths = [...new Set([...serviceWorker.matchAll(/\{url:"([^"]+)"/g)].map((match) => match[1]))];
 const precacheAssets = await Promise.all(precachePaths.map(async (file) => ({ file, bytes: await bytes(file) })));
-const precacheBytes = precacheAssets.reduce((total, asset) => total + asset.bytes, 0);
+// Bundled exercise animations are offline content with their own budget; the core app shell keeps its original one.
+const isExerciseAnimation = (file) => file.startsWith("exercise-animations/");
+const precacheBytes = precacheAssets.filter((asset) => !isExerciseAnimation(asset.file)).reduce((total, asset) => total + asset.bytes, 0);
+const exerciseAnimationAssets = precacheAssets.filter((asset) => isExerciseAnimation(asset.file));
+const exerciseAnimationBytes = exerciseAnimationAssets.reduce((total, asset) => total + asset.bytes, 0);
 const initialGraphBytes = initialGraph.reduce((total, asset) => total + asset.bytes, 0);
 const requiredOfflineFiles = [...new Set(Object.values(manifest)
   .filter((entry) => entry.isEntry || entry.isDynamicEntry)
@@ -64,6 +69,8 @@ function enforce(label, actual, maximum) {
 enforce("Entry chunk", await bytes(manifestEntry.file), budgets.entryChunkBytes);
 enforce("Initial JS graph", initialGraphBytes, budgets.initialGraphBytes);
 enforce("PWA precache", precacheBytes, budgets.precacheBytes);
+enforce("Exercise animation precache", exerciseAnimationBytes, budgets.exerciseAnimationBytes);
+if (!exerciseAnimationAssets.length) failures.push("Exercise animations are missing from the PWA precache");
 for (const chunk of routeChunks) enforce(`Route ${chunk.key}`, chunk.bytes, budgets.routeChunkBytes);
 for (const chunk of vendorChunks) enforce(`Vendor ${chunk.key}`, chunk.bytes, budgets.vendorChunkBytes);
 for (const chunk of workerChunks) enforce(`Worker ${chunk.file}`, chunk.bytes, budgets.workerChunkBytes);
@@ -81,6 +88,8 @@ const report = {
     entryChunk: { file: manifestEntry.file, bytes: await bytes(manifestEntry.file) },
     initialGraphBytes,
     precacheBytes,
+    exerciseAnimationBytes,
+    exerciseAnimationFrames: exerciseAnimationAssets.length,
     precacheEntries: precachePaths.length,
     routeChunks,
     vendorChunks,

@@ -21,6 +21,7 @@ Gym Local is a modular monolith compiled into one static PWA. `apps/web` is the 
 
 - Exercise metadata and one direct guide per reviewed variant are versioned in the repository.
 - Remote images and YouTube audiovisual content load only after user interaction and are not stored in offline caches.
+- Exercise animation frames and the muscle diagram are local app assets, precached by the service worker and available offline (ADR 0016).
 - A blocked or unavailable video falls back to bilingual text, setup cues, and a direct source link.
 
 ## Independent versions

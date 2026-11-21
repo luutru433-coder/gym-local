@@ -1,19 +1,14 @@
 import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowUpRight, CheckCircle2, Dumbbell, Info, Search, ShieldCheck, SlidersHorizontal, Target } from "lucide-react";
-import { Button, Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
+import { AlertTriangle, CheckCircle2, Dumbbell, Info, Search, ShieldCheck, SlidersHorizontal, Target } from "lucide-react";
+import { Card, Chip, EmptyState, Modal, Notice } from "@gym/ui";
 import type { EquipmentType, ExerciseVariant, Movement, MuscleGroup } from "@gym/contracts";
-import { EQUIPMENT_OPTIONS, getVariantsForMovement, MOVEMENTS, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
-import { openExternalMedia } from "@gym/media";
+import { EQUIPMENT_OPTIONS, getExerciseAnimation, getMovementAnimation, getVariantsForMovement, MOVEMENTS, rankVariantsForEquipment, searchCatalog } from "@gym/catalog";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
+import { ExerciseAnimation } from "../../components/ExerciseAnimation";
+import { frameUrl, muscleLabels } from "../../lib/exercise-visuals";
 
-const muscleLabels: Record<MuscleGroup, { vi: string; en: string }> = {
-  chest: { vi: "Ngực", en: "Chest" }, back: { vi: "Lưng", en: "Back" }, shoulders: { vi: "Vai", en: "Shoulders" },
-  biceps: { vi: "Tay trước", en: "Biceps" }, triceps: { vi: "Tay sau", en: "Triceps" }, quadriceps: { vi: "Đùi trước", en: "Quads" },
-  hamstrings: { vi: "Đùi sau", en: "Hamstrings" }, glutes: { vi: "Mông", en: "Glutes" }, calves: { vi: "Bắp chân", en: "Calves" },
-  core: { vi: "Core", en: "Core" }, forearms: { vi: "Cẳng tay", en: "Forearms" }, full_body: { vi: "Toàn thân", en: "Full body" }
-};
 
 const muscleFilters: MuscleGroup[] = ["chest", "back", "shoulders", "quadriceps", "hamstrings", "glutes", "biceps", "triceps", "core"];
 
@@ -42,7 +37,6 @@ export function CatalogPage() {
   const selectedMovement = MOVEMENTS.find((movement) => movement.id === selectedMovementId);
   const variants = selectedMovement ? rankVariantsForEquipment(selectedMovement.id, availableEquipment) : [];
   const activeVariant = selectedVariant ?? variants[0];
-  const referenceImage = activeVariant?.media.find((asset) => asset.type === "image");
   const tutorialVideo = activeVariant?.videoGuides[0];
 
   const openMovement = (id: string) => {
@@ -71,6 +65,7 @@ export function CatalogPage() {
         <div className="movement-grid">
           {results.map((movement, index) => {
             const allVariants = getVariantsForMovement(movement.id);
+            const cardAnimation = getMovementAnimation(movement.id);
             const readyCount = allVariants.filter((variant) => variant.equipment.every((item) => availableEquipment.includes(item))).length;
             return (
               <Card
@@ -90,7 +85,7 @@ export function CatalogPage() {
               >
                 <div className={`movement-card__visual movement-card__visual--${index % 6}`}>
                   <span className="movement-card__number">{String(index + 1).padStart(2, "0")}</span>
-                  <Dumbbell size={40} strokeWidth={1.5} />
+                  {cardAnimation ? <img className="movement-card__figure" src={frameUrl(cardAnimation.frames[0])} alt="" loading="lazy" /> : <Dumbbell size={40} strokeWidth={1.5} />}
                   <span className="muscle-stamp">{muscleLabels[movement.primaryMuscles[0]][locale]}</span>
                 </div>
                 <div className="movement-card__body">
@@ -120,7 +115,8 @@ export function CatalogPage() {
               })}</div>
             </section>
 
-            {referenceImage ? <figure className="exercise-media-preview"><div><img src={referenceImage.url} alt={localize(referenceImage.title, locale)} loading="lazy" onError={(event) => event.currentTarget.parentElement?.classList.add("media-load-error")} /><span>{locale === "vi" ? "Cần Internet để tải hình" : "Internet required for image"}</span></div><figcaption><span className="eyebrow">Free Exercise DB · Unlicense</span><strong>{localize(referenceImage.title, locale)}</strong><p>{locale === "vi" ? "Hình tham khảo công khai; hướng dẫn song ngữ của Gym Local vẫn dùng được offline." : "Public-domain reference; Gym Local's written guide remains available offline."}</p><Button size="sm" variant="ghost" onClick={() => openExternalMedia(referenceImage)}>{locale === "vi" ? "Mở ảnh nguồn" : "Open source image"}<ArrowUpRight size={15} /></Button></figcaption></figure> : null}
+            <ExerciseAnimation key={activeVariant.id} animation={getExerciseAnimation(activeVariant.id)} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
+
 
             <div className="instruction-layout">
               <section>
