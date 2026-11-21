@@ -217,4 +217,27 @@ describe("copying meals from a previous day", () => {
     await waitFor(() => expect(useGymStore.getState().addMeal).toHaveBeenCalledTimes(1));
     expect(vi.mocked(useGymStore.getState().addMeal).mock.calls[0]?.[0]).toMatchObject({ meal: "lunch", foodId: rice.id, grams: 150, date: dayOffset(0) });
   });
+
+  it("retries only the entries that were not saved and logs the latest amount last", async () => {
+    const user = userEvent.setup();
+    const source = dayOffset(-1);
+    const meals = [
+      { ...createMealEntry(rice, 200, source, "dinner"), createdAt: `${source}T12:00:00.000Z` },
+      { ...createMealEntry(rice, 120, source, "lunch"), createdAt: `${source}T05:00:00.000Z` }
+    ];
+    const addMeal = vi.fn().mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error("Lưu thất bại")).mockResolvedValue(undefined);
+    useGymStore.setState({ foods: [food, rice], meals, addMeal });
+    render(<NutritionPage />);
+
+    await user.click(screen.getByRole("button", { name: "Sao chép ngày trước" }));
+    await user.click(screen.getByRole("button", { name: /Sao chép 2 món/ }));
+    expect(await screen.findByText("Lưu thất bại")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: /Sao chép 2 món/ }));
+
+    await waitFor(() => expect(addMeal).toHaveBeenCalledTimes(3));
+    const saved = addMeal.mock.calls.map((call) => call[0]);
+    expect(saved.map((entry) => entry.grams)).toEqual([120, 200, 200]);
+    expect(saved[1].id).toBe(saved[2].id);
+    await waitFor(() => expect(screen.queryByLabelText("Sao chép từ ngày")).toBeNull());
+  });
 });

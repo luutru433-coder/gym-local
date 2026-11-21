@@ -99,6 +99,7 @@ export function NutritionPage() {
   const [copyMeals, setCopyMeals] = useState<MealEntry["meal"][]>([]);
   const [copyBusy, setCopyBusy] = useState(false);
   const [copyError, setCopyError] = useState<string>();
+  const copyQueueRef = useRef<MealEntry[] | undefined>(undefined);
 
   const dayMeals = useMemo(() => meals.filter((entry) => entry.date === date), [date, meals]);
   const total = dailyNutrition(meals, date);
@@ -271,6 +272,7 @@ export function NutritionPage() {
   const openCopy = (meal?: MealEntry["meal"]) => {
     setCopyFromDate(latestDiaryDateBefore(meals, date, meal) ?? previousDate(date));
     setCopyMeals(meal ? [meal] : mealOrder);
+    copyQueueRef.current = undefined;
     setCopyError(undefined);
     setCopyOpen(true);
   };
@@ -284,9 +286,14 @@ export function NutritionPage() {
     setCopyBusy(true);
     setCopyError(undefined);
     try {
-      // The store lists the newest entry first, so save in reverse to keep the source order on screen.
-      const copies = copyMealEntries(meals, copyFromDate, date, copyMeals).reverse();
-      for (const entry of copies) await addMeal(entry);
+      // Entries left over from a failed attempt are retried as they are, so a retry never duplicates saved ones.
+      const queue = copyQueueRef.current ?? copyMealEntries(meals, copyFromDate, date, copyMeals);
+      copyQueueRef.current = queue;
+      while (queue.length) {
+        await addMeal(queue[0]);
+        queue.shift();
+      }
+      copyQueueRef.current = undefined;
       setCopyOpen(false);
     } catch (error) {
       setCopyError(error instanceof Error ? error.message : "Không thể sao chép bữa ăn.");
@@ -552,7 +559,7 @@ export function NutritionPage() {
 
       <Modal open={copyOpen} title="Sao chép bữa ăn" onClose={() => setCopyOpen(false)}>
         <div className="copy-meals">
-          <Field label="Sao chép từ ngày"><input type="date" value={copyFromDate} onChange={(event) => { setCopyFromDate(event.target.value); setCopyError(undefined); }} /></Field>
+          <Field label="Sao chép từ ngày"><input type="date" value={copyFromDate} onChange={(event) => { setCopyFromDate(event.target.value); setCopyError(undefined); copyQueueRef.current = undefined; }} /></Field>
           <p className="copy-meals__target">Thêm vào nhật ký ngày {formatDiaryDate(date)}. Các món đã ghi được giữ nguyên.</p>
           {copyFromDate === date ? <Notice tone="warning">Hãy chọn một ngày khác với ngày đang xem.</Notice> : copySourceMeals.length ? (
             <ul className="copy-meals__list">
@@ -564,7 +571,7 @@ export function NutritionPage() {
                 return (
                   <li key={meal}>
                     <label>
-                      <input type="checkbox" checked={checked} onChange={() => setCopyMeals((current) => checked ? current.filter((item) => item !== meal) : [...current, meal])} />
+                      <input type="checkbox" checked={checked} onChange={() => { copyQueueRef.current = undefined; setCopyMeals((current) => checked ? current.filter((item) => item !== meal) : [...current, meal]); }} />
                       <span><strong>{mealLabels[meal].vi} · {calories} kcal</strong><small>{entries.map((entry) => `${localize(entry.foodNameSnapshot, locale)} ${formatNumber(entry.grams, locale, 1)}g`).join(", ")}</small></span>
                     </label>
                   </li>
