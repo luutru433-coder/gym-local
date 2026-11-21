@@ -874,3 +874,24 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Imported exercise image pack (device only) */
+.image-pack-summary { margin: 0 0 12px; font-size: 12px; font-weight: 700; }
+.image-pack-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.image-pack-hint { display: block; margin: 12px 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.pack-image { display: grid; gap: 9px; margin-bottom: 14px; }
+.pack-image figure { margin: 0; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 13px; }
+.pack-image figure img { display: block; width: 100%; max-height: 420px; object-fit: contain; }
+.pack-image figcaption { display: grid; gap: 3px; padding: 10px 14px; background: var(--surface-3); border-top: 1px solid var(--line); }
+.pack-image figcaption span { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.pack-image figcaption strong { font-size: 11px; text-transform: capitalize; }
+.pack-image-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.pack-image-actions button { min-height: 36px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; color: var(--ink); background: var(--surface-3); border: 1px solid var(--line); border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.pack-image-picker { display: grid; gap: 9px; padding: 12px; background: var(--surface-3); border: 1px solid var(--line); border-radius: 11px; }
+.pack-image-picker label { display: flex; align-items: center; gap: 8px; padding: 0 10px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 9px; }
+.pack-image-picker input { flex: 1; min-width: 0; min-height: 38px; color: var(--ink); background: transparent; border: 0; outline: 0; font-size: 13px; }
+.pack-image-picker ul { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; max-height: 320px; overflow-y: auto; }
+.pack-image-picker li button { width: 100%; padding: 6px; display: grid; gap: 5px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 9px; font-size: 10px; text-align: left; text-transform: capitalize; cursor: pointer; }
+.pack-image-picker li button.is-current { border-color: var(--olive-deep); box-shadow: 0 0 0 1px var(--olive-deep); }
+.pack-image-picker li img, .pack-image-thumb-empty { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; border-radius: 6px; }
+.pack-image-picker p { margin: 0; color: var(--muted); font-size: 11px; }

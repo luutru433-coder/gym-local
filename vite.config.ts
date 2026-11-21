@@ -22,9 +22,11 @@ export default defineConfig(({ mode }) => ({
       "@gym/progress": fromRoot("./packages/progress/src/index.ts"),
       "@gym/storage/device": fromRoot("./packages/storage/src/device-preferences.ts"),
       "@gym/storage/custom-exercises": fromRoot("./packages/storage/src/custom-exercises.ts"),
+      "@gym/storage/exercise-images": fromRoot("./packages/storage/src/exercise-images.ts"),
       "@gym/storage/history": fromRoot("./packages/storage/src/history-edit.ts"),
       "@gym/storage": fromRoot("./packages/storage/src/index.ts"),
       "@gym/backup": fromRoot("./packages/backup/src/index.ts"),
+      "@gym/media/exercise-pack": fromRoot("./packages/media/src/exercise-pack.ts"),
       "@gym/media": fromRoot("./packages/media/src/index.ts"),
       "@gym/ui": fromRoot("./packages/ui/src/index.tsx")
     }
