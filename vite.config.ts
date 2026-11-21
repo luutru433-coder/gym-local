@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
       "@gym/workouts": fromRoot("./packages/workouts/src/index.ts"),
       "@gym/nutrition": fromRoot("./packages/nutrition/src/index.ts"),
       "@gym/progress": fromRoot("./packages/progress/src/index.ts"),
+      "@gym/storage/device": fromRoot("./packages/storage/src/device-preferences.ts"),
       "@gym/storage/custom-exercises": fromRoot("./packages/storage/src/custom-exercises.ts"),
       "@gym/storage/history": fromRoot("./packages/storage/src/history-edit.ts"),
       "@gym/storage": fromRoot("./packages/storage/src/index.ts"),

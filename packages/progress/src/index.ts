@@ -151,6 +151,69 @@ export function personalRecord(sessions: WorkoutSession[], variantId: string) {
   };
 }
 
+export type SessionRecordKind = "e1rm" | "load" | "assistance";
+
+export interface SessionRecordSet {
+  exerciseId: string;
+  setId: string;
+  variantId: string;
+  kinds: SessionRecordKind[];
+  weightKg?: number;
+  reps?: number;
+  e1rmKg?: number;
+}
+
+/**
+ * Completed working sets of `session` that beat the exact-variant record held by
+ * the other finished sessions. A variant with no earlier history has no record to beat.
+ */
+export function sessionRecordSets(sessions: WorkoutSession[], session: WorkoutSession): SessionRecordSet[] {
+  const earlier = sessions.filter((candidate) => candidate.id !== session.id);
+  const bests = new Map<string, { e1rm: number; load: number; assistance?: number } | undefined>();
+  const records: SessionRecordSet[] = [];
+
+  // Judge sets in the order they were logged, so a later set never takes a badge from an earlier one.
+  const logged = session.exercises
+    .flatMap((exercise) => completedWorkingSets(exercise).map((set) => ({ exercise, set })))
+    .sort((left, right) => left.set.completedAt!.localeCompare(right.set.completedAt!));
+
+  logged.forEach(({ exercise, set }) => {
+    if (!bests.has(exercise.variantId)) {
+      const record = variantHistory(earlier, exercise.variantId).length > 0
+        ? personalRecord(earlier, exercise.variantId)
+        : undefined;
+      bests.set(exercise.variantId, record
+        ? { e1rm: record.maxE1rm, load: record.maxWeightKg, assistance: record.minAssistanceKg }
+        : undefined);
+    }
+    const best = bests.get(exercise.variantId);
+    if (!best) return;
+    const kinds: SessionRecordKind[] = [];
+    const e1rmKg = setPerformanceMetrics(exercise, set).e1rmKg;
+    if (trackingProfile(exercise).loadEntryMode === "assisted") {
+      if (best.assistance !== undefined && set.weightKg !== undefined && set.weightKg >= 0 && set.weightKg < best.assistance) {
+        kinds.push("assistance");
+        best.assistance = set.weightKg;
+      }
+    } else {
+      if (best.e1rm > 0 && e1rmKg !== undefined && e1rmKg > best.e1rm) {
+        kinds.push("e1rm");
+        best.e1rm = e1rmKg;
+      }
+      // No reps check: carries and holds log a load without reps, as on the Progress page.
+      if (best.load > 0 && (set.weightKg ?? 0) > best.load) {
+        kinds.push("load");
+        best.load = set.weightKg!;
+      }
+    }
+    if (kinds.length) {
+      records.push({ exerciseId: exercise.id, setId: set.id, variantId: exercise.variantId, kinds, weightKg: set.weightKg, reps: set.reps, e1rmKg });
+    }
+  });
+
+  return records;
+}
+
 export function sessionVolumeMetrics(session: WorkoutSession): SessionVolumeMetrics {
   let externalLoadVolumeKg = 0;
   let contributingSets = 0;

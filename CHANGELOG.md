@@ -4,6 +4,13 @@
 
 - Fixed the routine editor saving a hidden 8–12 rep target for timed and distance-tracked exercises (plank, farmer carry): new exercises and added sets now save the 30-second duration target the editor shows, so the workout screen displays it. Existing routines are not rewritten.
 
+## Unreleased — Rest alert and workout summary
+
+- The rest timer now beeps and, where the device supports it (not iPhone), vibrates when the rest ends; a bell button in the rest bar turns the alert off. The alert needs the app open in the foreground.
+- The screen stays awake during a live workout on browsers that support the Screen Wake Lock API.
+- A completed set that beats the exact-variation record (estimated 1RM, heaviest load, or least assistance) gets a “New record” badge straight away. Variations without earlier history get no badge.
+- Finishing a workout now shows a summary (duration, sets done, volume, new records, exercises) instead of jumping to Progress.
+
 ## Unreleased — Custom exercises
 
 - You can now create your own exercises from the exercise library (name, primary and secondary muscles, equipment, how sets are logged, optional note), then edit or delete them. They appear first in the library, the routine editor, and the workout exercise picker, and are logged, charted, and given records like catalog variations.

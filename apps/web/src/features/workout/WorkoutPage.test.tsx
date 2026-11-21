@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Profile, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, getVariant } from "@gym/catalog";
 import { WorkoutPage } from "./WorkoutPage";
+import { setRestAlertMuted } from "@gym/storage/device";
 import { useGymStore } from "../../store/useGymStore";
 
 const timestamp = "2026-08-13T10:00:00.000Z";
@@ -178,5 +179,71 @@ describe("live workout editing", () => {
   it("keeps completion disabled when there is nothing to suggest", () => {
     arrange(session());
     expect(screen.getByRole("button", { name: "Set 1: nhập số lần, quãng đường hoặc thời gian trước" })).toBeDisabled();
+  });
+
+  it("alerts with vibration once when a running rest countdown ends, unless muted", async () => {
+    const user = userEvent.setup();
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", { configurable: true, value: vibrate });
+    setRestAlertMuted(false);
+    const live = session();
+    live.restTimerEndsAt = new Date(Date.now() + 1100).toISOString();
+    arrange(live);
+
+    expect(vibrate).not.toHaveBeenCalled();
+    await waitFor(() => expect(vibrate).toHaveBeenCalledTimes(1), { timeout: 4000 });
+    expect(screen.getByText("Hết giờ nghỉ, sẵn sàng tập")).toBeInTheDocument();
+
+    const toggle = screen.getByRole("button", { name: "Âm báo và rung khi hết giờ nghỉ" });
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await user.click(screen.getByRole("button", { name: "Bắt đầu lại giờ nghỉ" }));
+    await user.click(screen.getByRole("button", { name: "Giảm 15 giây nghỉ" }));
+    expect(vibrate).toHaveBeenCalledTimes(1);
+    setRestAlertMuted(false);
+  });
+
+  it("stays silent for a rest timer that had already expired", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", { configurable: true, value: vibrate });
+    const live = session();
+    live.restTimerEndsAt = new Date(Date.now() - 60000).toISOString();
+    arrange(live);
+
+    expect(await screen.findByText("Hết giờ nghỉ, sẵn sàng tập", undefined, { timeout: 4000 })).toBeInTheDocument();
+    expect(vibrate).not.toHaveBeenCalled();
+  });
+
+  it("badges a new exact-variant record live and shows the finish summary", async () => {
+    const user = userEvent.setup();
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    live.exercises[0].sets = [
+      { id: "set-one", type: "working", weightKg: 40, reps: 10, completedAt: "2026-08-13T10:05:00.000Z" },
+      { id: "set-two", type: "working" }
+    ];
+    const lastTime: WorkoutSession = { ...session(), id: "session-last", restTimerEndsAt: undefined, finishedAt: "2026-08-10T10:00:00.000Z" };
+    lastTime.exercises[0].sets = [{ id: "last-one", type: "working", weightKg: 40, reps: 8, completedAt: "2026-08-10T09:30:00.000Z" }];
+    arrange(live);
+    const completeWorkout = vi.fn(async () => {
+      const finished = { ...useGymStore.getState().activeSession!, finishedAt: "2026-08-13T10:45:00.000Z" };
+      useGymStore.setState({ activeSession: undefined, sessions: [finished, lastTime] });
+      return finished;
+    });
+    useGymStore.setState({ sessions: [live, lastTime], completeWorkout });
+
+    expect(await screen.findByText("Kỷ lục mới")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Kết thúc" }));
+
+    expect(await screen.findByRole("heading", { name: "Hoàn thành buổi tập" })).toBeInTheDocument();
+    expect(completeWorkout).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("45 phút")).toBeInTheDocument();
+    expect(screen.getByText("1/2")).toBeInTheDocument();
+    expect(screen.getByText("800 kg")).toBeInTheDocument();
+    expect(screen.getByText("1RM ước tính")).toBeInTheDocument();
+    expect(screen.getByText("40 kg × 10")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Xem tiến độ" })).toBeInTheDocument();
   });
 });
