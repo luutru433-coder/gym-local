@@ -18,6 +18,25 @@ export function setRestAlertMuted(muted: boolean): void {
   }
 }
 
+const CALORIE_CHECK_SNOOZE_KEY = "gym-local.calorie-check.snoozed-until";
+
+/** Local day (YYYY-MM-DD) until which the calorie target suggestion stays hidden. */
+export function calorieCheckSnoozedUntil(): string | undefined {
+  try {
+    return globalThis.localStorage?.getItem(CALORIE_CHECK_SNOOZE_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function snoozeCalorieCheck(until: string): void {
+  try {
+    globalThis.localStorage?.setItem(CALORIE_CHECK_SNOOZE_KEY, until);
+  } catch {
+    // The suggestion simply shows again on the next visit when storage is unavailable.
+  }
+}
+
 export type ThemePreference = "system" | "light" | "dark";
 
 // index.html reads this key before the first paint; keep the two in sync.

@@ -508,3 +508,5 @@ export function muscleRecoveryMap(sessions: WorkoutSession[], now: Date = new Da
     };
   });
 }
+
+export * from "./weight-trend";

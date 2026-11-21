@@ -6,6 +6,7 @@ import { createId, type BodyMetric, type MuscleGroup, type SessionExercise, type
 import { EQUIPMENT_OPTIONS, getTrackingProfile, getVariant, trackingProfileForLoadMode } from "@gym/catalog";
 import {
   bodyMetricSeries,
+  weightTrend,
   exactVariantTrend,
   personalRecord,
   sessionExternalVolume,
@@ -21,6 +22,7 @@ import {
 import { formatDate, formatNumber, localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { removePastSession } from "./history-actions";
+import { CalorieTargetCard } from "./CalorieTargetCard";
 import { BodyMetricLog, ConfirmDeleteModal, SessionEditModal } from "./HistoryEditors";
 import "./ProgressPage.css";
 
@@ -256,9 +258,12 @@ export function ProgressPage() {
   const muscleWeeklyAverage = selectedMuscle ? (muscleTotals[selectedMuscle] ?? 0) / weekly.length : 0;
 
   const bodyMetric = BODY_METRICS.find((item) => item.key === bodyMetricKey)!;
-  const bodyData = bodyMetricSeries(bodyMetrics, bodyMetricKey)
+  const weightTrendPoints = weightTrend(bodyMetricSeries(bodyMetrics, "weightKg"));
+  const showWeightTrend = bodyMetricKey === "weightKg";
+  const bodyData: { date: string; value: number; trend?: number; label: string }[] = (showWeightTrend ? weightTrendPoints : bodyMetricSeries(bodyMetrics, bodyMetricKey))
     .filter((point) => inRange(point.date))
     .map((point) => ({ ...point, label: dateFormat.format(new Date(`${point.date.slice(0, 10)}T12:00:00`)) }));
+  const latestTrend = showWeightTrend ? bodyData.at(-1)?.trend : undefined;
   const bodyChange = bodyData.length > 1 ? bodyData.at(-1)!.value - bodyData[0].value : undefined;
   const calendarDays = rollingCalendar(workoutCalendar(sessions));
   const maxCalendarSets = Math.max(1, ...calendarDays.map((day) => day.completedWorkingSets));
@@ -442,17 +447,22 @@ export function ProgressPage() {
             {BODY_METRICS.map((item) => <Chip key={item.key} active={item.key === bodyMetricKey} onClick={() => setBodyMetricKey(item.key)}>{item.label[locale]}</Chip>)}
           </div>
           {bodyData.length ? <>
-            <dl className="chart-facts">
+            <dl className={latestTrend !== undefined ? "chart-facts chart-facts--four" : "chart-facts"}>
               <div><dt>{locale === "vi" ? "Gần nhất" : "Latest"}</dt><dd>{formatNumber(bodyData.at(-1)!.value, locale, 1)} {bodyMetric.unit}</dd></div>
+              {latestTrend !== undefined ? <div><dt>{locale === "vi" ? "Xu hướng" : "Trend"}</dt><dd>{formatNumber(latestTrend, locale, 1)} {bodyMetric.unit}</dd></div> : null}
               <div><dt>{locale === "vi" ? "Thay đổi trong kỳ" : "Change in range"}</dt><dd>{bodyChange !== undefined ? `${signed(bodyChange, locale)} ${bodyMetric.unit}` : "—"}</dd></div>
               <div><dt>{locale === "vi" ? "Thấp nhất – cao nhất" : "Low – high"}</dt><dd>{formatNumber(Math.min(...bodyData.map((point) => point.value)), locale, 1)} – {formatNumber(Math.max(...bodyData.map((point) => point.value)), locale, 1)}</dd></div>
             </dl>
             <p className="sr-only">{locale === "vi" ? `Biểu đồ ${bodyMetric.label.vi} gồm ${bodyData.length} số đo. Số đo gần nhất là ${formatNumber(bodyData.at(-1)!.value, locale, 1)} ${bodyMetric.unit}.` : `${bodyMetric.label.en} chart contains ${bodyData.length} measurements. The latest is ${formatNumber(bodyData.at(-1)!.value, locale, 1)} ${bodyMetric.unit}.`}</p>
-            <div className="chart-wrap chart-wrap--compact" aria-hidden="true"><ResponsiveContainer width="100%" height="100%"><LineChart data={bodyData} margin={{ left: -15, right: 14, top: 12 }}><CartesianGrid strokeDasharray="3 5" vertical={false} stroke="var(--line)" /><XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} minTickGap={18} /><YAxis domain={["dataMin - 2", "dataMax + 2"]} axisLine={false} tickLine={false} tick={axisTick} /><Tooltip contentStyle={tooltipStyle} /><Line type="monotone" dataKey="value" name={`${bodyMetric.label[locale]} (${bodyMetric.unit})`} stroke="#ff6c4a" strokeWidth={2.5} dot={{ r: 4, fill: "#ff6c4a", strokeWidth: 0 }} isAnimationActive={false} /></LineChart></ResponsiveContainer></div>
-            <table className="sr-only"><caption>{locale === "vi" ? `Dữ liệu ${bodyMetric.label.vi}` : `${bodyMetric.label.en} data`}</caption><thead><tr><th scope="col">{locale === "vi" ? "Ngày" : "Date"}</th><th scope="col">{bodyMetric.label[locale]} ({bodyMetric.unit})</th></tr></thead><tbody>{bodyData.map((entry, index) => <tr key={`${entry.date}-${index}`}><th scope="row">{entry.label}</th><td>{formatNumber(entry.value, locale, 1)}</td></tr>)}</tbody></table>
+            <div className="chart-wrap chart-wrap--compact" aria-hidden="true"><ResponsiveContainer width="100%" height="100%"><LineChart data={bodyData} margin={{ left: -15, right: 14, top: 12 }}><CartesianGrid strokeDasharray="3 5" vertical={false} stroke="var(--line)" /><XAxis dataKey="label" axisLine={false} tickLine={false} tick={axisTick} minTickGap={18} /><YAxis domain={["dataMin - 2", "dataMax + 2"]} axisLine={false} tickLine={false} tick={axisTick} /><Tooltip contentStyle={tooltipStyle} />{showWeightTrend
+                ? <><Line type="linear" dataKey="value" name={locale === "vi" ? "Cân thực tế (kg)" : "Scale weight (kg)"} stroke="var(--muted)" strokeWidth={1} dot={{ r: 3, fill: "var(--muted)", strokeWidth: 0 }} isAnimationActive={false} /><Line type="monotone" dataKey="trend" name={locale === "vi" ? "Xu hướng (kg)" : "Trend (kg)"} stroke="#ff6c4a" strokeWidth={2.5} dot={false} isAnimationActive={false} /></>
+                : <Line type="monotone" dataKey="value" name={`${bodyMetric.label[locale]} (${bodyMetric.unit})`} stroke="#ff6c4a" strokeWidth={2.5} dot={{ r: 4, fill: "#ff6c4a", strokeWidth: 0 }} isAnimationActive={false} />}</LineChart></ResponsiveContainer></div>
+            <table className="sr-only"><caption>{locale === "vi" ? `Dữ liệu ${bodyMetric.label.vi}` : `${bodyMetric.label.en} data`}</caption><thead><tr><th scope="col">{locale === "vi" ? "Ngày" : "Date"}</th><th scope="col">{bodyMetric.label[locale]} ({bodyMetric.unit})</th>{showWeightTrend ? <th scope="col">{locale === "vi" ? "Xu hướng (kg)" : "Trend (kg)"}</th> : null}</tr></thead><tbody>{bodyData.map((entry, index) => <tr key={`${entry.date}-${index}`}><th scope="row">{entry.label}</th><td>{formatNumber(entry.value, locale, 1)}</td>{entry.trend !== undefined ? <td>{formatNumber(entry.trend, locale, 1)}</td> : null}</tr>)}</tbody></table>
+            {showWeightTrend ? <p className="fine-print">{locale === "vi" ? "Đường cam là xu hướng đã làm mượt (mỗi ngày dịch 10% về phía số cân mới), giúp bỏ qua dao động nước và thức ăn hằng ngày. Chấm xám là số cân thực tế." : "The orange line is the smoothed trend (it moves 10% toward each new weigh-in per day), which filters out daily water and food swings. Grey dots are scale readings."}</p> : null}
           </> : <EmptyState icon={<Scale />} title={locale === "vi" ? `Chưa có số đo ${bodyMetric.label.vi.toLowerCase()} trong kỳ` : `No ${bodyMetric.label.en.toLowerCase()} entries in range`} body={locale === "vi" ? "Thêm số đo để tạo đường xu hướng." : "Add a measurement to start the trend."} />}
           <BodyMetricLog metrics={bodyMetrics} locale={locale} onEdit={openMetricEdit} />
         </Card>
+        <CalorieTargetCard trend={weightTrendPoints} />
       </div>
 
       <div className="progress-detail-grid">

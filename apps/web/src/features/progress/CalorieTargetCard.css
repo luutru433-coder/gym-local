@@ -1,0 +1,9 @@
+.calorie-check__text { margin: 0; font-size: 13px; line-height: 1.55; }
+.calorie-check__suggestion { display: grid; gap: 8px; padding: 12px; background: var(--surface-2); border-radius: 9px; }
+.calorie-check__suggestion p { margin: 0; display: grid; gap: 2px; }
+.calorie-check__suggestion p span { color: var(--muted); font-size: 11px; font-weight: 700; }
+.calorie-check__suggestion p strong { font-size: 20px; }
+.calorie-check__suggestion small { color: var(--muted); font-size: 12px; }
+.calorie-check__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.calorie-check .fine-print { margin: 10px 0 0; }
+.calorie-check .chart-facts dd { overflow: visible; white-space: normal; overflow-wrap: anywhere; }
