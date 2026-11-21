@@ -34,6 +34,7 @@
       "@gym/storage/history": ["packages/storage/src/history-edit.ts"],
       "@gym/storage": ["packages/storage/src/index.ts"],
       "@gym/backup": ["packages/backup/src/index.ts"],
+      "@gym/media/online-gifs": ["packages/media/src/providers/exercisedb-free.ts"],
       "@gym/media/exercise-pack": ["packages/media/src/exercise-pack.ts"],
       "@gym/media": ["packages/media/src/index.ts"],
       "@gym/ui": ["packages/ui/src/index.ts"]

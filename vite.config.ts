@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => ({
       "@gym/storage/history": fromRoot("./packages/storage/src/history-edit.ts"),
       "@gym/storage": fromRoot("./packages/storage/src/index.ts"),
       "@gym/backup": fromRoot("./packages/backup/src/index.ts"),
+      "@gym/media/online-gifs": fromRoot("./packages/media/src/providers/exercisedb-free.ts"),
       "@gym/media/exercise-pack": fromRoot("./packages/media/src/exercise-pack.ts"),
       "@gym/media": fromRoot("./packages/media/src/index.ts"),
       "@gym/ui": fromRoot("./packages/ui/src/index.tsx")
@@ -73,6 +74,14 @@ export default defineConfig(({ mode }) => ({
               expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 },
               networkTimeoutSeconds: 4
             }
+          },
+          {
+            // GIFs the owner downloaded on this device (ADR 0021). The cache name matches EXERCISEDB_GIF_CACHE.
+            // The worker only reads this cache: the app saves a GIF itself after checking it, so picker
+            // previews and error answers are never kept.
+            urlPattern: /^https:\/\/static\.exercisedb\.dev\/media\//,
+            handler: "CacheFirst",
+            options: { cacheName: "exercisedb-gifs", plugins: [{ cacheWillUpdate: async () => null }] }
           }
         ]
       },

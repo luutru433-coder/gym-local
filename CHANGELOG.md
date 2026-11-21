@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Free ExerciseDB images, saved on the device
+
+- Settings → Exercise images has a new "Download free ExerciseDB images" button. The device downloads the free ExerciseDB list once, straight from their server, links a 180p GIF to each exercise in the app that has no image yet, and saves those GIFs on the device so they show offline. Used with AscendAPI's permission; the credit to AscendAPI.com is shown in Settings and under each GIF.
+- Nothing from ExerciseDB is in the app, its repository or its website, and nothing is in backups: after a restore on another device, download again there.
+- Only GIFs for exercises in the app are saved. "Change image" on an exercise page searches all 1,500 names; a GIF picked while online is saved too. Images you imported or chose yourself are never replaced.
+- "Remove pack" also deletes the downloaded list and GIFs.
+- No change to the personal database or the backup format (ADR 0021).
+
 ## Unreleased — Workout screen redesign and per-set timer
 
 - The live workout screen is redesigned: always dark with one orange accent, and the current set sits at the top with its weight and reps as large numbers and one-tap −/+ buttons.

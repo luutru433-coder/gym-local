@@ -884,3 +884,6 @@ a { color: inherit; text-decoration: none; }
 .pack-image-picker li button.is-current { border-color: var(--olive-deep); box-shadow: 0 0 0 1px var(--olive-deep); }
 .pack-image-picker li img, .pack-image-thumb-empty { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; border-radius: 6px; }
 .pack-image-picker p { margin: 0; color: var(--muted); font-size: 11px; }
+
+.pack-image-missing { margin: 0; padding: 18px 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.pack-image figcaption a, .image-pack-hint a { color: inherit; text-decoration: underline; }
