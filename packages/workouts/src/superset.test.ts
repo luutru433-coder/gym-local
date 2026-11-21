@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cloneRoutineTemplate, createSessionFromRoutine, updateSet } from "./index";
-import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, supersetMembers, unlinkSuperset } from "./superset";
+import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, restingExercise, supersetMembers, unlinkSuperset } from "./superset";
 
 function pairedSession() {
   const routine = cloneRoutineTemplate("tpl_full_body_a");
@@ -32,6 +32,7 @@ describe("supersets", () => {
     expect(session.restTimerEndsAt).toBeDefined();
     expect(session.activeExerciseId).toBe(first.id);
     expect(nextInSupersetRound(session, first.id)?.id).toBe(second.id);
+    expect(restingExercise(session)?.id).toBe(second.id);
   });
 
   it("rests after every set once the other member has no sets left", () => {

@@ -34,6 +34,21 @@ export function advanceSuperset(session: WorkoutSession, exerciseId: string): Wo
   return roundStart ? { ...session, activeExerciseId: roundStart.id } : session;
 }
 
+/** The block whose rest is running: the one with the most recently completed set. */
+export function restingExercise(session: WorkoutSession): SessionExercise | undefined {
+  let latest: SessionExercise | undefined;
+  let latestAt = "";
+  for (const exercise of session.exercises) {
+    for (const set of exercise.sets) {
+      if (set.completedAt && set.completedAt >= latestAt) {
+        latest = exercise;
+        latestAt = set.completedAt;
+      }
+    }
+  }
+  return latest ?? session.exercises.find((exercise) => exercise.id === session.activeExerciseId);
+}
+
 function freeGroupLabel(session: WorkoutSession): string {
   const used = new Set(session.exercises.map((exercise) => exercise.supersetGroup));
   for (let code = 65; code <= 90; code += 1) {

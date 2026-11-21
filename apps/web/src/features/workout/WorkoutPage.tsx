@@ -44,7 +44,7 @@ import {
   switchExerciseVariant,
   updateSet
 } from "@gym/workouts";
-import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
+import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, restingExercise, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
 import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
@@ -248,8 +248,7 @@ export function WorkoutPage() {
 
   const restartRest = () => {
     if (!activeSession) return;
-    const activeExercise = activeSession.exercises.find((exercise) => exercise.id === activeSession.activeExerciseId);
-    const seconds = activeExercise?.restSeconds ?? 90;
+    const seconds = restingExercise(activeSession)?.restSeconds ?? 90;
     save({ ...activeSession, restTimerEndsAt: new Date(Date.now() + seconds * 1000).toISOString() });
     syncClock();
   };
