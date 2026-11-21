@@ -6,7 +6,7 @@
 - The home screen's weekly stat cards no longer overlap on phones.
 - Raised the smallest text across the app (navigation labels, stat captions, chart notes) to a readable 10–11px floor on phone and desktop.
 - A new rest countdown starts at the planned time instead of one second over (02:01 for a 120s rest).
-- The next-workout goal and "working sets" label follow the selected language, and the offline food library card and macro rings are available in English.
+- The next-workout goal and "working sets" label on the home screen follow the selected language.
 
 ## Unreleased — Self-adjusting training plan
 
