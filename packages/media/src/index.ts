@@ -194,7 +194,7 @@ export function auditExerciseAnimations(
       && animation.frames.every((frame) => bundledAnimationFrame.test(frame))
       && animation.onlineOnly === false
       && animation.frameDurationMs >= 200
-      && Boolean(animation.shownExercise)
+      && Boolean(animation.shownExercise.vi && animation.shownExercise.en)
       && sourceIds.has(animation.sourceId);
     if (!valid) issues.push({ code: "invalid_animation", variantId: variant.id, sourceId: animation.sourceId, message: "Animation must use bundled local frames from a declared source" });
   }

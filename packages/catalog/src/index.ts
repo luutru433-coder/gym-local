@@ -398,7 +398,7 @@ export const EXERCISE_VARIANTS: ExerciseVariant[] = movementSeeds.flatMap((seed)
   })
 );
 
-const animationDrawings: Record<string, string> = animationManifest.drawings;
+const animationDrawings: Record<string, LocalizedText> = animationManifest.drawings;
 const animationFrameOverrides: Record<string, number[]> = animationManifest.frameOverrides;
 const defaultAnimationFrames = Array.from({ length: animationManifest.frameCount }, (_, index) => index + 1);
 

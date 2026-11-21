@@ -66,7 +66,7 @@ export function ExerciseAnimation({ animation, primaryMuscles, secondaryMuscles,
         {animation ? (
           <div className="exercise-animation__figure" data-testid="exercise-animation" data-frame={activeFrame + 1} data-playing={playing}>
             {frames.map((frame, index) => (
-              <img key={frame} src={frameUrl(frame)} alt={index === 0 ? `${locale === "vi" ? "Hoạt ảnh" : "Animation"}: ${animation.shownExercise}` : ""} className={index === activeFrame ? "is-active" : ""} draggable={false} />
+              <img key={frame} src={frameUrl(frame)} alt={index === 0 ? `${locale === "vi" ? "Hoạt ảnh" : "Animation"}: ${animation.shownExercise[locale]}` : ""} className={index === activeFrame ? "is-active" : ""} draggable={false} />
             ))}
             <button type="button" className="exercise-animation__toggle" onClick={() => setPlaying((current) => !current)} aria-label={playing ? (locale === "vi" ? "Tạm dừng hoạt ảnh" : "Pause animation") : (locale === "vi" ? "Phát hoạt ảnh" : "Play animation")}>
               {playing ? <Pause size={16} /> : <Play size={16} />}
@@ -85,7 +85,7 @@ export function ExerciseAnimation({ animation, primaryMuscles, secondaryMuscles,
       {animation ? (
         <figcaption>
           <span>{locale === "vi" ? "Hoạt ảnh offline · có sẵn trong app" : "Offline animation · bundled in the app"}</span>
-          {animation.match === "closest" ? <strong>{locale === "vi" ? `Minh hoạ gần nhất: ${animation.shownExercise}` : `Closest illustration: ${animation.shownExercise}`}</strong> : null}
+          {animation.match === "closest" ? <strong>{locale === "vi" ? `Minh hoạ gần nhất: ${animation.shownExercise[locale]}` : `Closest illustration: ${animation.shownExercise[locale]}`}</strong> : null}
           <small>{locale === "vi" ? "Hình vẽ: Bryl Lim / Everkinetic, CC BY-SA 4.0" : "Artwork: Bryl Lim / Everkinetic, CC BY-SA 4.0"}</small>
         </figcaption>
       ) : null}

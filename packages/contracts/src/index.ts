@@ -107,7 +107,7 @@ export interface ExerciseAnimation {
   variantId: Id;
   frames: string[];
   frameDurationMs: number;
-  shownExercise: string;
+  shownExercise: LocalizedText;
   match: "exact" | "closest";
   sourceId: Id;
   onlineOnly: false;

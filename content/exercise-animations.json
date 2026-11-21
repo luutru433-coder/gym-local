@@ -11,117 +11,450 @@
     ]
   },
   "drawings": {
-    "dumbbell-bench-press": "Dumbbell Bench Press",
-    "bench-press": "Bench Press",
-    "smith-machine-bench-press": "Smith Machine Bench Press",
-    "machine-chest-press": "Machine Chest Press",
-    "incline-dumbbell-press": "Incline Dumbbell Press",
-    "incline-bench-press": "Incline Bench Press",
-    "dumbbell-fly": "Dumbbell Fly",
-    "cable-fly": "Cable Fly",
-    "pec-deck": "Pec Deck",
-    "push-up": "Push-up",
-    "incline-push-up": "Incline Push-up",
-    "chest-dip": "Chest Dip",
-    "assisted-dip": "Assisted Dip",
-    "lat-pulldown": "Lat Pulldown",
-    "banded-lat-pulldown": "Banded Lat Pulldown",
-    "pull-up": "Pull-up",
-    "assisted-pull-up": "Assisted Pull-up",
-    "seated-row": "Seated Cable Row",
-    "machine-row": "Machine Row",
-    "barbell-row": "Barbell Row",
-    "dumbbell-bent-over-row": "Dumbbell Bent Over Row",
-    "banded-row": "Banded Row",
-    "one-arm-dumbbell-row": "One-Arm Dumbbell Row",
-    "single-arm-cable-row": "Single-Arm Cable Row",
-    "straight-arm-pulldown": "Straight-Arm Pulldown",
-    "face-pull": "Face Pull",
-    "banded-face-pull": "Banded Face Pull",
-    "back-extension": "Back Extension",
-    "standing-dumbbell-press": "Standing Dumbbell Press",
-    "overhead-press": "Overhead Press",
-    "machine-shoulder-press": "Machine Shoulder Press",
-    "lateral-raise": "Lateral Raise",
-    "cable-lateral-raise": "Cable Lateral Raise",
-    "machine-lateral-raise": "Machine Lateral Raise",
-    "rear-delt-fly": "Rear Delt Fly",
-    "cable-rear-delt-fly": "Cable Rear Delt Fly",
-    "reverse-pec-deck": "Reverse Pec Deck",
-    "band-pull-apart": "Band Pull-Apart",
-    "front-raise": "Front Raise",
-    "cable-front-raise": "Cable Front Raise",
-    "plate-front-raise": "Plate Front Raise",
-    "upright-row": "Upright Row",
-    "dumbbell-shrug": "Dumbbell Shrug",
-    "shrug": "Barbell Shrug",
-    "bicep-curl": "Bicep Curl",
-    "ez-bar-curl": "EZ-Bar Curl",
-    "cable-curl": "Cable Curl",
-    "preacher-curl": "Preacher Curl",
-    "hammer-curl": "Hammer Curl",
-    "rope-hammer-curl": "Rope Hammer Curl",
-    "reverse-curl": "Reverse Curl",
-    "tricep-pushdown": "Tricep Pushdown",
-    "dumbbell-overhead-tricep-extension": "Dumbbell Overhead Tricep Extension",
-    "overhead-tricep-extension": "Overhead Tricep Extension",
-    "close-grip-bench-press": "Close-Grip Bench Press",
-    "diamond-push-up": "Diamond Push-up",
-    "tricep-kickback": "Tricep Kickback",
-    "bodyweight-squat": "Bodyweight Squat",
-    "squat": "Squat",
-    "goblet-squat": "Goblet Squat",
-    "smith-machine-squat": "Smith Machine Squat",
-    "hack-squat": "Hack Squat",
-    "banded-squat": "Banded Squat",
-    "leg-press": "Leg Press",
-    "split-squat": "Split Squat",
-    "smith-machine-split-squat": "Smith Machine Split Squat",
-    "forward-lunge": "Forward Lunge",
-    "walking-lunge": "Walking Lunge",
-    "smith-machine-reverse-lunge": "Smith Machine Reverse Lunge",
-    "step-up": "Step-Up",
-    "leg-extension": "Leg Extension",
-    "glute-bridge": "Glute Bridge",
-    "hip-thrust": "Hip Thrust",
-    "dumbbell-hip-thrust": "Dumbbell Hip Thrust",
-    "smith-machine-hip-thrust": "Smith Machine Hip Thrust",
-    "banded-hip-thrust": "Banded Hip Thrust",
-    "cable-kickback": "Cable Kickback",
-    "machine-glute-kickback": "Machine Glute Kickback",
-    "banded-kickback": "Banded Kickback",
-    "donkey-kick": "Donkey Kick",
-    "hip-abduction-machine": "Hip Abduction Machine",
-    "cable-standing-hip-abduction": "Cable Standing Hip Abduction",
-    "banded-standing-hip-abduction": "Banded Standing Hip Abduction",
-    "side-lying-hip-abduction": "Side-Lying Hip Abduction",
-    "hip-adduction-machine": "Hip Adduction Machine",
-    "cable-standing-hip-adduction": "Cable Standing Hip Adduction",
-    "romanian-deadlift": "Romanian Deadlift",
-    "dumbbell-romanian-deadlift": "Dumbbell Romanian Deadlift",
-    "smith-machine-romanian-deadlift": "Smith Machine Romanian Deadlift",
-    "cable-pull-through": "Cable Pull-Through",
-    "lying-leg-curl": "Lying Leg Curl",
-    "good-morning": "Good Morning",
-    "nordic-hamstring-curl": "Nordic Hamstring Curl",
-    "calf-raise": "Calf Raise",
-    "standing-calf-raise": "Standing Calf Raise",
-    "seated-calf-raise": "Seated Calf Raise",
-    "crunch": "Crunch",
-    "cable-crunch": "Cable Crunch",
-    "lying-leg-raise": "Lying Leg Raise",
-    "captains-chair-knee-raise": "Captain's Chair Knee Raise",
-    "plank": "Plank",
-    "cable-woodchop": "Cable Woodchop",
-    "banded-woodchop": "Banded Woodchop",
-    "weighted-russian-twist": "Weighted Russian Twist",
-    "pallof-press": "Pallof Press",
-    "banded-pallof-press": "Banded Pallof Press",
-    "dumbbell-side-bend": "Dumbbell Side Bend",
-    "deadlift": "Deadlift",
-    "dumbbell-sumo-deadlift": "Dumbbell Sumo Deadlift",
-    "trap-bar-deadlift": "Trap Bar Deadlift",
-    "farmer-carry": "Farmer Carry"
+    "dumbbell-bench-press": {
+      "vi": "Đẩy ngực ngang với tạ đơn",
+      "en": "Dumbbell Bench Press"
+    },
+    "bench-press": {
+      "vi": "Đẩy ngực ngang với tạ đòn",
+      "en": "Bench Press"
+    },
+    "smith-machine-bench-press": {
+      "vi": "Đẩy ngực ngang trên máy Smith",
+      "en": "Smith Machine Bench Press"
+    },
+    "machine-chest-press": {
+      "vi": "Đẩy ngực trên máy",
+      "en": "Machine Chest Press"
+    },
+    "incline-dumbbell-press": {
+      "vi": "Đẩy ngực trên với tạ đơn",
+      "en": "Incline Dumbbell Press"
+    },
+    "incline-bench-press": {
+      "vi": "Đẩy ngực trên với tạ đòn",
+      "en": "Incline Bench Press"
+    },
+    "dumbbell-fly": {
+      "vi": "Ép ngực với tạ đơn",
+      "en": "Dumbbell Fly"
+    },
+    "cable-fly": {
+      "vi": "Ép ngực với cáp",
+      "en": "Cable Fly"
+    },
+    "pec-deck": {
+      "vi": "Ép ngực trên máy",
+      "en": "Pec Deck"
+    },
+    "push-up": {
+      "vi": "Chống đẩy",
+      "en": "Push-up"
+    },
+    "incline-push-up": {
+      "vi": "Chống đẩy tay kê cao",
+      "en": "Incline Push-up"
+    },
+    "chest-dip": {
+      "vi": "Chống xà kép",
+      "en": "Chest Dip"
+    },
+    "assisted-dip": {
+      "vi": "Chống xà kép có trợ lực",
+      "en": "Assisted Dip"
+    },
+    "lat-pulldown": {
+      "vi": "Kéo xô trên máy cáp",
+      "en": "Lat Pulldown"
+    },
+    "banded-lat-pulldown": {
+      "vi": "Kéo xô với dây kháng lực",
+      "en": "Banded Lat Pulldown"
+    },
+    "pull-up": {
+      "vi": "Hít xà",
+      "en": "Pull-up"
+    },
+    "assisted-pull-up": {
+      "vi": "Hít xà có trợ lực",
+      "en": "Assisted Pull-up"
+    },
+    "seated-row": {
+      "vi": "Ngồi kéo cáp ngang",
+      "en": "Seated Cable Row"
+    },
+    "machine-row": {
+      "vi": "Kéo ngang trên máy",
+      "en": "Machine Row"
+    },
+    "barbell-row": {
+      "vi": "Gập người kéo tạ đòn",
+      "en": "Barbell Row"
+    },
+    "dumbbell-bent-over-row": {
+      "vi": "Gập người kéo tạ đơn",
+      "en": "Dumbbell Bent Over Row"
+    },
+    "banded-row": {
+      "vi": "Kéo ngang với dây kháng lực",
+      "en": "Banded Row"
+    },
+    "one-arm-dumbbell-row": {
+      "vi": "Kéo tạ đơn một tay",
+      "en": "One-Arm Dumbbell Row"
+    },
+    "single-arm-cable-row": {
+      "vi": "Kéo cáp một tay",
+      "en": "Single-Arm Cable Row"
+    },
+    "straight-arm-pulldown": {
+      "vi": "Kéo cáp tay thẳng",
+      "en": "Straight-Arm Pulldown"
+    },
+    "face-pull": {
+      "vi": "Kéo cáp về mặt",
+      "en": "Face Pull"
+    },
+    "banded-face-pull": {
+      "vi": "Kéo dây kháng lực về mặt",
+      "en": "Banded Face Pull"
+    },
+    "back-extension": {
+      "vi": "Duỗi lưng trên ghế",
+      "en": "Back Extension"
+    },
+    "standing-dumbbell-press": {
+      "vi": "Đứng đẩy vai với tạ đơn",
+      "en": "Standing Dumbbell Press"
+    },
+    "overhead-press": {
+      "vi": "Đẩy vai với tạ đòn",
+      "en": "Overhead Press"
+    },
+    "machine-shoulder-press": {
+      "vi": "Đẩy vai trên máy",
+      "en": "Machine Shoulder Press"
+    },
+    "lateral-raise": {
+      "vi": "Nâng tạ đơn sang ngang",
+      "en": "Lateral Raise"
+    },
+    "cable-lateral-raise": {
+      "vi": "Nâng cáp sang ngang",
+      "en": "Cable Lateral Raise"
+    },
+    "machine-lateral-raise": {
+      "vi": "Nâng vai ngang trên máy",
+      "en": "Machine Lateral Raise"
+    },
+    "rear-delt-fly": {
+      "vi": "Dang tay vai sau với tạ đơn",
+      "en": "Rear Delt Fly"
+    },
+    "cable-rear-delt-fly": {
+      "vi": "Dang tay vai sau với cáp",
+      "en": "Cable Rear Delt Fly"
+    },
+    "reverse-pec-deck": {
+      "vi": "Ép ngược vai sau trên máy",
+      "en": "Reverse Pec Deck"
+    },
+    "band-pull-apart": {
+      "vi": "Kéo giãn dây kháng lực",
+      "en": "Band Pull-Apart"
+    },
+    "front-raise": {
+      "vi": "Nâng tạ đơn ra trước",
+      "en": "Front Raise"
+    },
+    "cable-front-raise": {
+      "vi": "Nâng cáp ra trước",
+      "en": "Cable Front Raise"
+    },
+    "plate-front-raise": {
+      "vi": "Nâng bánh tạ ra trước",
+      "en": "Plate Front Raise"
+    },
+    "upright-row": {
+      "vi": "Kéo tạ đòn dọc thân",
+      "en": "Upright Row"
+    },
+    "dumbbell-shrug": {
+      "vi": "Nhún vai với tạ đơn",
+      "en": "Dumbbell Shrug"
+    },
+    "shrug": {
+      "vi": "Nhún vai với tạ đòn",
+      "en": "Barbell Shrug"
+    },
+    "bicep-curl": {
+      "vi": "Cuốn tay trước với tạ đơn",
+      "en": "Bicep Curl"
+    },
+    "ez-bar-curl": {
+      "vi": "Cuốn tay trước với thanh EZ",
+      "en": "EZ-Bar Curl"
+    },
+    "cable-curl": {
+      "vi": "Cuốn tay trước với cáp",
+      "en": "Cable Curl"
+    },
+    "preacher-curl": {
+      "vi": "Cuốn tay trước trên ghế tì",
+      "en": "Preacher Curl"
+    },
+    "hammer-curl": {
+      "vi": "Cuốn tạ đơn kiểu búa",
+      "en": "Hammer Curl"
+    },
+    "rope-hammer-curl": {
+      "vi": "Cuốn cáp dây thừng kiểu búa",
+      "en": "Rope Hammer Curl"
+    },
+    "reverse-curl": {
+      "vi": "Cuốn tay nắm sấp",
+      "en": "Reverse Curl"
+    },
+    "tricep-pushdown": {
+      "vi": "Đẩy cáp tay sau",
+      "en": "Tricep Pushdown"
+    },
+    "dumbbell-overhead-tricep-extension": {
+      "vi": "Duỗi tay sau qua đầu với tạ đơn",
+      "en": "Dumbbell Overhead Tricep Extension"
+    },
+    "overhead-tricep-extension": {
+      "vi": "Duỗi tay sau qua đầu với cáp",
+      "en": "Overhead Tricep Extension"
+    },
+    "close-grip-bench-press": {
+      "vi": "Đẩy tạ đòn tay hẹp",
+      "en": "Close-Grip Bench Press"
+    },
+    "diamond-push-up": {
+      "vi": "Chống đẩy kim cương",
+      "en": "Diamond Push-up"
+    },
+    "tricep-kickback": {
+      "vi": "Đá tạ đơn tay sau",
+      "en": "Tricep Kickback"
+    },
+    "bodyweight-squat": {
+      "vi": "Squat không tạ",
+      "en": "Bodyweight Squat"
+    },
+    "squat": {
+      "vi": "Squat với tạ đòn",
+      "en": "Squat"
+    },
+    "goblet-squat": {
+      "vi": "Squat ôm tạ trước ngực",
+      "en": "Goblet Squat"
+    },
+    "smith-machine-squat": {
+      "vi": "Squat trên máy Smith",
+      "en": "Smith Machine Squat"
+    },
+    "hack-squat": {
+      "vi": "Hack squat",
+      "en": "Hack Squat"
+    },
+    "banded-squat": {
+      "vi": "Squat với dây kháng lực",
+      "en": "Banded Squat"
+    },
+    "leg-press": {
+      "vi": "Đạp đùi",
+      "en": "Leg Press"
+    },
+    "split-squat": {
+      "vi": "Squat chẻ chân",
+      "en": "Split Squat"
+    },
+    "smith-machine-split-squat": {
+      "vi": "Squat chẻ chân trên máy Smith",
+      "en": "Smith Machine Split Squat"
+    },
+    "forward-lunge": {
+      "vi": "Chùng chân bước tới",
+      "en": "Forward Lunge"
+    },
+    "walking-lunge": {
+      "vi": "Chùng chân bước đi",
+      "en": "Walking Lunge"
+    },
+    "smith-machine-reverse-lunge": {
+      "vi": "Chùng chân lùi trên máy Smith",
+      "en": "Smith Machine Reverse Lunge"
+    },
+    "step-up": {
+      "vi": "Bước lên bục",
+      "en": "Step-Up"
+    },
+    "leg-extension": {
+      "vi": "Duỗi đùi trên máy",
+      "en": "Leg Extension"
+    },
+    "glute-bridge": {
+      "vi": "Nâng hông nằm sàn",
+      "en": "Glute Bridge"
+    },
+    "hip-thrust": {
+      "vi": "Đẩy hông với tạ đòn",
+      "en": "Hip Thrust"
+    },
+    "dumbbell-hip-thrust": {
+      "vi": "Đẩy hông với tạ đơn",
+      "en": "Dumbbell Hip Thrust"
+    },
+    "smith-machine-hip-thrust": {
+      "vi": "Đẩy hông trên máy Smith",
+      "en": "Smith Machine Hip Thrust"
+    },
+    "banded-hip-thrust": {
+      "vi": "Đẩy hông với dây kháng lực",
+      "en": "Banded Hip Thrust"
+    },
+    "cable-kickback": {
+      "vi": "Đá mông với cáp",
+      "en": "Cable Kickback"
+    },
+    "machine-glute-kickback": {
+      "vi": "Đá mông trên máy",
+      "en": "Machine Glute Kickback"
+    },
+    "banded-kickback": {
+      "vi": "Đá mông với dây kháng lực",
+      "en": "Banded Kickback"
+    },
+    "donkey-kick": {
+      "vi": "Quỳ đá mông",
+      "en": "Donkey Kick"
+    },
+    "hip-abduction-machine": {
+      "vi": "Dạng hông trên máy",
+      "en": "Hip Abduction Machine"
+    },
+    "cable-standing-hip-abduction": {
+      "vi": "Đứng dạng hông với cáp",
+      "en": "Cable Standing Hip Abduction"
+    },
+    "banded-standing-hip-abduction": {
+      "vi": "Đứng dạng hông với dây kháng lực",
+      "en": "Banded Standing Hip Abduction"
+    },
+    "side-lying-hip-abduction": {
+      "vi": "Nằm nghiêng dạng hông",
+      "en": "Side-Lying Hip Abduction"
+    },
+    "hip-adduction-machine": {
+      "vi": "Khép hông trên máy",
+      "en": "Hip Adduction Machine"
+    },
+    "cable-standing-hip-adduction": {
+      "vi": "Đứng khép hông với cáp",
+      "en": "Cable Standing Hip Adduction"
+    },
+    "romanian-deadlift": {
+      "vi": "Romanian deadlift với tạ đòn",
+      "en": "Romanian Deadlift"
+    },
+    "dumbbell-romanian-deadlift": {
+      "vi": "Romanian deadlift với tạ đơn",
+      "en": "Dumbbell Romanian Deadlift"
+    },
+    "smith-machine-romanian-deadlift": {
+      "vi": "Romanian deadlift trên máy Smith",
+      "en": "Smith Machine Romanian Deadlift"
+    },
+    "cable-pull-through": {
+      "vi": "Kéo cáp qua háng",
+      "en": "Cable Pull-Through"
+    },
+    "lying-leg-curl": {
+      "vi": "Nằm cuốn đùi sau",
+      "en": "Lying Leg Curl"
+    },
+    "good-morning": {
+      "vi": "Good morning với tạ đòn",
+      "en": "Good Morning"
+    },
+    "nordic-hamstring-curl": {
+      "vi": "Nordic curl",
+      "en": "Nordic Hamstring Curl"
+    },
+    "calf-raise": {
+      "vi": "Nhón bắp chân không tạ",
+      "en": "Calf Raise"
+    },
+    "standing-calf-raise": {
+      "vi": "Nhón bắp chân đứng trên máy",
+      "en": "Standing Calf Raise"
+    },
+    "seated-calf-raise": {
+      "vi": "Nhón bắp chân ngồi trên máy",
+      "en": "Seated Calf Raise"
+    },
+    "crunch": {
+      "vi": "Gập bụng",
+      "en": "Crunch"
+    },
+    "cable-crunch": {
+      "vi": "Gập bụng với cáp",
+      "en": "Cable Crunch"
+    },
+    "lying-leg-raise": {
+      "vi": "Nằm nâng chân",
+      "en": "Lying Leg Raise"
+    },
+    "captains-chair-knee-raise": {
+      "vi": "Nâng gối trên ghế treo",
+      "en": "Captain's Chair Knee Raise"
+    },
+    "plank": {
+      "vi": "Plank",
+      "en": "Plank"
+    },
+    "cable-woodchop": {
+      "vi": "Xoay thân chặt cáp",
+      "en": "Cable Woodchop"
+    },
+    "banded-woodchop": {
+      "vi": "Xoay thân chặt dây kháng lực",
+      "en": "Banded Woodchop"
+    },
+    "weighted-russian-twist": {
+      "vi": "Russian twist có tạ",
+      "en": "Weighted Russian Twist"
+    },
+    "pallof-press": {
+      "vi": "Pallof press với cáp",
+      "en": "Pallof Press"
+    },
+    "banded-pallof-press": {
+      "vi": "Pallof press với dây kháng lực",
+      "en": "Banded Pallof Press"
+    },
+    "dumbbell-side-bend": {
+      "vi": "Nghiêng lườn với tạ đơn",
+      "en": "Dumbbell Side Bend"
+    },
+    "deadlift": {
+      "vi": "Deadlift với tạ đòn",
+      "en": "Deadlift"
+    },
+    "dumbbell-sumo-deadlift": {
+      "vi": "Sumo deadlift với tạ đơn",
+      "en": "Dumbbell Sumo Deadlift"
+    },
+    "trap-bar-deadlift": {
+      "vi": "Deadlift với thanh lục giác",
+      "en": "Trap Bar Deadlift"
+    },
+    "farmer-carry": {
+      "vi": "Xách tạ đi bộ",
+      "en": "Farmer Carry"
+    }
   },
   "variants": {
     "chest_press__dumbbell": "dumbbell-bench-press",
