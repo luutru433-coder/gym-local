@@ -272,3 +272,136 @@
     height: 165px;
   }
 }
+
+.progress-range {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.progress-range > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 780;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.progress-range > div,
+.chart-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chart-chips {
+  margin: 0 0 12px;
+  padding-bottom: 2px;
+}
+
+.chart-chips .chip,
+.progress-range .chip {
+  flex: 0 0 auto;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.chart-facts {
+  margin: 0 0 6px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.chart-facts > div {
+  min-width: 0;
+  padding: 9px 10px;
+  background: var(--surface-2);
+  border-radius: 9px;
+}
+
+.chart-facts dt {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 760;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.chart-facts dd {
+  margin: 3px 0 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chart-wrap--compact {
+  height: 220px;
+}
+
+.chart-grid--weekly {
+  margin-bottom: 14px;
+}
+
+.chart-grid--weekly .section-title {
+  align-items: flex-start;
+}
+
+.chart-legend {
+  margin: 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.chart-legend__pr {
+  width: 10px;
+  height: 10px;
+  background: #ff6c4a;
+  border: 1.5px solid #1d2018;
+  border-radius: 50%;
+}
+
+.chart-range-empty {
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 520px) {
+  .progress-range {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .chart-facts dd {
+    font-size: 13px;
+  }
+}
+
+.progress-page .chart-card {
+  min-width: 0;
+}
+
+.chart-grid--weekly .section-title {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chart-grid--weekly .variant-trend-picker select {
+  max-width: 100%;
+}
+
+/* A hidden Recharts tooltip keeps its last position after a resize; keep it from widening the page. */
+.progress-page .chart-wrap,
+.progress-page .variant-trend-chart {
+  overflow: clip;
+}

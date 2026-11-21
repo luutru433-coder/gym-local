@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
+import type { BodyMetric, SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, getVariant } from "@gym/catalog";
 import {
+  bodyMetricSeries,
   estimatedOneRepMax,
   exactVariantTrend,
   latestVariantHistory,
@@ -10,6 +11,7 @@ import {
   setPerformanceMetrics,
   variantHistory,
   variantVolumeSummary,
+  weeklyTrainingSummary,
   workoutCalendar
 } from "./index";
 
@@ -179,5 +181,52 @@ describe("progress calculations", () => {
       { variantId: "chest_press__dumbbell", externalLoadVolumeKg: 400, completedWorkingSets: 1 },
       { variantId: "chest_press__barbell", externalLoadVolumeKg: 500, completedWorkingSets: 1 }
     ].sort((left, right) => right.externalLoadVolumeKg - left.externalLoadVolumeKg));
+  });
+
+  it("adds total reps to each exact-variant trend point", () => {
+    const trend = exactVariantTrend([
+      session("reps", "2026-08-10T10:00:00.000Z", [exercise("chest_press__dumbbell", [
+        completedSet("a", { weightKg: 16, reps: 10 }),
+        completedSet("b", { weightKg: 16, reps: 8 }),
+        completedSet("warm", { type: "warmup", weightKg: 8, reps: 15 })
+      ])])
+    ], "chest_press__dumbbell");
+    expect(trend[0].totalReps).toBe(18);
+  });
+
+  it("summarizes training per local week and keeps empty weeks", () => {
+    const local = (year: number, month: number, day: number, hour: number) => new Date(year, month - 1, day, hour).toISOString();
+    const sessions = [
+      // Monday 2026-08-03 and Sunday 2026-08-09 belong to the same week.
+      session("mon", local(2026, 8, 3, 10), [exercise("chest_press__barbell", [completedSet("a", { weightKg: 100, reps: 5 })])]),
+      session("sun", local(2026, 8, 9, 10), [exercise("chest_press__dumbbell", [
+        completedSet("b", { weightKg: 20, reps: 10 }),
+        completedSet("warm", { type: "warmup", weightKg: 10, reps: 10 })
+      ])]),
+      session("latest", local(2026, 8, 19, 10), [exercise("chest_press__barbell", [completedSet("c", { weightKg: 100, reps: 5 })])]),
+      session("too_old", local(2026, 7, 1, 10), [exercise("chest_press__barbell", [completedSet("d", { weightKg: 100, reps: 5 })])]),
+      session("unfinished", undefined, [exercise("chest_press__barbell", [completedSet("e", { weightKg: 999, reps: 1 })])])
+    ];
+    sessions[0].startedAt = local(2026, 8, 3, 9);
+    sessions[1].startedAt = local(2026, 8, 9, 9);
+    sessions[2].startedAt = local(2026, 8, 19, 9);
+
+    const weeks = weeklyTrainingSummary(sessions, 3, new Date(2026, 7, 20, 12));
+    expect(weeks.map((week) => week.weekStart)).toEqual(["2026-08-03", "2026-08-10", "2026-08-17"]);
+    expect(weeks[0]).toMatchObject({ sessions: 2, completedWorkingSets: 2, externalLoadVolumeKg: 900, durationMinutes: 120 });
+    expect(weeks[0].muscleSets.chest).toBe(2);
+    expect(weeks[1]).toEqual({ weekStart: "2026-08-10", sessions: 0, completedWorkingSets: 0, externalLoadVolumeKg: 0, durationMinutes: 0, muscleSets: {} });
+    expect(weeks[2]).toMatchObject({ sessions: 1, completedWorkingSets: 1, externalLoadVolumeKg: 500 });
+  });
+
+  it("builds a sorted series for one body measurement and skips missing values", () => {
+    const metrics: BodyMetric[] = [
+      { id: "m3", date: "2026-08-20", weightKg: 71.5, waistCm: 80 },
+      { id: "m1", date: "2026-08-01", weightKg: 73 },
+      { id: "m2", date: "2026-08-10", waistCm: 82 }
+    ];
+    expect(bodyMetricSeries(metrics, "weightKg")).toEqual([{ date: "2026-08-01", value: 73 }, { date: "2026-08-20", value: 71.5 }]);
+    expect(bodyMetricSeries(metrics, "waistCm")).toEqual([{ date: "2026-08-10", value: 82 }, { date: "2026-08-20", value: 80 }]);
+    expect(bodyMetricSeries(metrics, "armCm")).toEqual([]);
   });
 });
