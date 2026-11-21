@@ -5,6 +5,7 @@ import {
   bodyMetricSeries,
   estimatedOneRepMax,
   exactVariantTrend,
+  muscleRecoveryMap,
   latestVariantHistory,
   personalRecord,
   sessionRecordSets,
@@ -272,5 +273,37 @@ describe("progress calculations", () => {
       ["top", ["e1rm", "load"]],
       ["carry", ["load"]]
     ]);
+  });
+
+  it("estimates muscle recovery from finished working sets", () => {
+    const sets = (prefix: string, count: number, type: SetLog["type"] = "working") => Array.from({ length: count }, (_, index) => completedSet(`${prefix}_${index}`, { type, weightKg: 20, reps: 10 }));
+    const sessions = [
+      session("push", "2026-08-10T10:00:00.000Z", [exercise("chest_press__dumbbell", [...sets("warm", 2, "warmup"), ...sets("push", 3), { id: "open", type: "working" }])]),
+      session("unfinished", undefined, [exercise("squat__barbell", sets("legs", 5))])
+    ];
+    const at = (iso: string) => Object.fromEntries(muscleRecoveryMap(sessions, new Date(iso)).map((item) => [item.muscle, item]));
+
+    // Chest: 3 primary sets -> 48 h window. Triceps: 1.5 effective sets -> 42 h window.
+    const early = at("2026-08-11T06:00:00.000Z");
+    expect(early.chest).toMatchObject({ status: "fatigued", recoveryPercent: 41, hoursUntilReady: 28, lastTrainedAt: "2026-08-10T10:00:00.000Z" });
+    expect(early.triceps).toMatchObject({ status: "fatigued", recoveryPercent: 47, hoursUntilReady: 22 });
+    expect(early.quadriceps).toMatchObject({ status: "ready", recoveryPercent: 100, hoursUntilReady: 0, lastTrainedAt: undefined });
+    expect(early.full_body).toBeUndefined();
+
+    const later = at("2026-08-11T22:00:00.000Z");
+    expect(later.chest.status).toBe("recovering");
+    expect(later.triceps.status).toBe("recovering");
+    expect(at("2026-08-12T10:00:00.000Z").chest).toMatchObject({ status: "ready", hoursUntilReady: 0 });
+    expect(at("2026-08-12T10:00:00.000Z").chest.weeklySets).toBe(3);
+    expect(at("2026-08-09T10:00:00.000Z").chest.status).toBe("ready");
+
+    // Heavy session (15 sets -> 96 h window) then a light one (1 set -> 40 h) 31 h later: the light one
+    // is the least recovered (19/40), but the heavy one still needs 46 h.
+    const overlapping = [
+      session("heavy", "2026-08-10T10:00:00.000Z", [exercise("chest_press__dumbbell", sets("heavy", 15))]),
+      session("light", "2026-08-11T17:00:00.000Z", [exercise("chest_press__dumbbell", sets("light", 1))])
+    ];
+    const chest = muscleRecoveryMap(overlapping, new Date("2026-08-12T12:00:00.000Z")).find((item) => item.muscle === "chest");
+    expect(chest).toMatchObject({ status: "fatigued", recoveryPercent: 47, hoursUntilReady: 46, lastTrainedAt: "2026-08-11T17:00:00.000Z" });
   });
 });

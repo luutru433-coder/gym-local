@@ -4,7 +4,9 @@ import {
   completeFoodLookupCandidate,
   confirmNutritionTarget,
   createCustomFood,
+  copyMealEntries,
   createMealEntry,
+  latestDiaryDateBefore,
   createMealEntryFromRecipe,
   createRecipe,
   createWaterEntry,
@@ -177,5 +179,43 @@ describe("nutrition", () => {
     expect(rankFoodsByPreference([pho, tofu], [], "vi", "pho bo").map((food) => food.id)).toEqual([pho.id]);
     expect(rankFoodsByPreference([pho, tofu], [], "vi", " dau ").map((food) => food.id)).toEqual([tofu.id]);
     expect(rankFoodsByPreference([pho, tofu], [], "vi", "PHỞ").map((food) => food.id)).toEqual([pho.id]);
+  });
+});
+
+describe("copying diary entries from a previous day", () => {
+  const rice = createCustomFood("Rice", { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 });
+  const egg = createCustomFood("Egg", { calories: 155, protein: 13, carbs: 1.1, fat: 11 });
+  const breakfast = { ...createMealEntry(egg, 100, "2026-08-10", "breakfast"), createdAt: "2026-08-10T01:00:00.000Z" };
+  const lunch = { ...createMealEntry(rice, 200, "2026-08-10", "lunch"), createdAt: "2026-08-10T05:00:00.000Z", sourceMealPlanId: "plan-1", sourcePlannedMealId: "planned-1" };
+  const older = createMealEntry(rice, 150, "2026-08-07", "dinner");
+  const diary = [lunch, older, breakfast];
+
+  it("copies a whole day with new ids and unchanged snapshots", () => {
+    const before = structuredClone(diary);
+    const copies = copyMealEntries(diary, "2026-08-10", "2026-08-11", undefined, "2026-08-11T02:00:00.000Z");
+
+    expect(copies.map((entry) => entry.meal)).toEqual(["breakfast", "lunch"]);
+    expect(copies.every((entry) => entry.date === "2026-08-11")).toBe(true);
+    expect(copies[1]).toMatchObject({ foodId: rice.id, grams: 200, nutrientsSnapshot: lunch.nutrientsSnapshot, foodNameSnapshot: lunch.foodNameSnapshot });
+    expect(new Set([...copies, ...diary].map((entry) => entry.id)).size).toBe(5);
+    expect(copies[1]).not.toHaveProperty("sourceMealPlanId");
+    expect(copies[1]).not.toHaveProperty("sourcePlannedMealId");
+    expect(copies[0].createdAt < copies[1].createdAt).toBe(true);
+    expect(diary).toEqual(before);
+    expect(dailyNutrition([...diary, ...copies], "2026-08-11")).toEqual(dailyNutrition(diary, "2026-08-10"));
+  });
+
+  it("copies only the chosen meals and rejects an invalid target", () => {
+    expect(copyMealEntries(diary, "2026-08-10", "2026-08-11", ["lunch"]).map((entry) => entry.meal)).toEqual(["lunch"]);
+    expect(copyMealEntries(diary, "2026-08-09", "2026-08-11")).toEqual([]);
+    expect(() => copyMealEntries(diary, "2026-08-10", "2026-08-10")).toThrow();
+    expect(() => copyMealEntries(diary, "2026-08-10", "not-a-date")).toThrow();
+  });
+
+  it("finds the latest earlier day with entries, optionally for one meal", () => {
+    expect(latestDiaryDateBefore(diary, "2026-08-11")).toBe("2026-08-10");
+    expect(latestDiaryDateBefore(diary, "2026-08-11", "dinner")).toBe("2026-08-07");
+    expect(latestDiaryDateBefore(diary, "2026-08-10")).toBe("2026-08-07");
+    expect(latestDiaryDateBefore(diary, "2026-08-07")).toBeUndefined();
   });
 });
