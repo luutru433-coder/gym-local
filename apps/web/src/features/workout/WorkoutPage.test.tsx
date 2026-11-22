@@ -334,7 +334,7 @@ describe("live workout editing", () => {
     await user.click(within(energy).getByRole("button", { name: "Năng lượng lúc này: 1" }));
     await user.click(screen.getByRole("button", { name: "Lưu" }));
     await waitFor(() => expect(useGymStore.getState().activeSession?.checkIn).toEqual({ sleep: 3, energy: 1, soreness: 3 }));
-    expect(screen.getByText(/năng lượng 1\/5 · đau mỏi 3\/5 · gợi ý tạ -1%/)).toBeInTheDocument();
+    expect(screen.getByText(/năng lượng 1\/5 · cơ hết mỏi 3\/5 · gợi ý tạ -1%/)).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Sửa" }));
     await user.click(screen.getByRole("button", { name: "Xoá câu trả lời" }));

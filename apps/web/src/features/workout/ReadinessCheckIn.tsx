@@ -27,7 +27,7 @@ export function ReadinessCheckInCard({ locale, value, onChange }: { locale: Loca
     return (
       <div className="readiness-summary">
         <span>{value
-          ? `${vi ? "Hôm nay" : "Today"}: ${vi ? "ngủ" : "sleep"} ${value.sleep}/5 · ${vi ? "năng lượng" : "energy"} ${value.energy}/5 · ${vi ? "đau mỏi" : "soreness"} ${value.soreness}/5 · ${vi ? "gợi ý tạ" : "suggested loads"} ${effect > 0 ? "+" : ""}${effect}%`
+          ? `${vi ? "Hôm nay" : "Today"}: ${vi ? "ngủ" : "sleep"} ${value.sleep}/5 · ${vi ? "năng lượng" : "energy"} ${value.energy}/5 · ${vi ? "cơ hết mỏi" : "muscles fresh"} ${value.soreness}/5 · ${vi ? "gợi ý tạ" : "suggested loads"} ${effect > 0 ? "+" : ""}${effect}%`
           : (vi ? "Chưa trả lời câu hỏi đầu buổi." : "Pre-workout check-in skipped.")}</span>
         <button type="button" onClick={() => setDraft(value ?? NORMAL)}>{value ? (vi ? "Sửa" : "Edit") : (vi ? "Trả lời" : "Answer")}</button>
       </div>
