@@ -39,7 +39,7 @@ import {
   updateSet
 } from "@gym/workouts";
 import { cancelRunningSet, lastFinishedSet, nextOpenSet, reopenSet, runningSeconds, runningSet, stampWorkSeconds, startSet, type SetRef } from "@gym/workouts/set-timer";
-import { adviseSet, buildAdviceContext, type SetAdvice } from "@gym/workouts/autoregulation-plan";
+import { adviseSet, buildAdviceContext, usesWarmupFeel, type SetAdvice } from "@gym/workouts/autoregulation-plan";
 import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, restingExercise, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
 import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
@@ -654,7 +654,7 @@ export function WorkoutPage() {
                     </div>
                   </aside>
 
-                  {!distanceMode && !timedMode && !repsOnly && exercise.sets.some((set) => set.type === "warmup" && set.completedAt) ? (
+                  {usesWarmupFeel(exercise) && exercise.sets.some((set) => set.type === "warmup" && set.completedAt) ? (
                     <WarmupFeelPicker
                       locale={locale}
                       value={exercise.warmupFeel}

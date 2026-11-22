@@ -383,6 +383,7 @@ export function switchExerciseVariant(session: WorkoutSession, exerciseId: strin
     current.variantNameSnapshot = variant.name;
     current.loadEntryModeSnapshot = variant.loadEntryMode;
     current.trackingProfileSnapshot = trackingProfile;
+    delete current.warmupFeel;
     return updated;
   }
   current.sets = completed;
@@ -393,6 +394,8 @@ export function switchExerciseVariant(session: WorkoutSession, exerciseId: strin
     variantNameSnapshot: variant.name,
     loadEntryModeSnapshot: variant.loadEntryMode,
     trackingProfileSnapshot: trackingProfile,
+    // A warm-up was felt on the old equipment; the new variant starts unrated.
+    warmupFeel: undefined,
     sets: (remaining.length ? remaining : [{ id: createId("set"), type: "working" as const }]).map((set) => ({
       ...set,
       id: createId("set"),

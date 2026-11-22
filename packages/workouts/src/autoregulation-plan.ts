@@ -105,6 +105,11 @@ function validCheckIn(checkIn: ReadinessCheckIn | undefined): ReadinessCheckIn |
   return checkIn && ok(checkIn.sleep) && ok(checkIn.energy) && ok(checkIn.soreness) ? checkIn : undefined;
 }
 
+/** Whether a warm-up rating can change this exercise's suggestions: the engine applies and a working set has a rep target. */
+export function usesWarmupFeel(exercise: SessionExercise): boolean {
+  return supported(exercise) && exercise.sets.some((set) => set.type === "working" && Boolean(set.targetMinReps ?? set.targetMaxReps));
+}
+
 /** Names what moved today's estimate away from 100%: recovery, the check-in, the warm-up. */
 function readinessBasis(parts: { recovery: number; checkIn: number; warmup: number }, percent: number): LocalizedText {
   const causes: LocalizedText[] = [];
@@ -172,7 +177,7 @@ export function adviseSet(context: AdviceContext, exercise: SessionExercise, set
   const percent = Math.round(readiness.factor * 100);
   const basis: LocalizedText = done.length
     ? { vi: `tính lại sau ${done.length} set hôm nay`, en: `re-estimated after ${done.length} set${done.length === 1 ? "" : "s"} today` }
-    : percent !== 100
+    : percent !== 100 || readiness.parts.checkIn || readiness.parts.warmup
       ? readinessBasis(readiness.parts, percent)
       : { vi: `từ ${baseline?.sessionsUsed ?? 0} buổi gần nhất`, en: `from your last ${baseline?.sessionsUsed ?? 0} session${baseline?.sessionsUsed === 1 ? "" : "s"}` };
   return {
