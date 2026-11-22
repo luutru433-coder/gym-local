@@ -188,3 +188,21 @@ describe("soreness feedback", () => {
     expect(recoveryOverview([], now).every((item) => item.status === "ready")).toBe(true);
   });
 });
+
+describe("review fixes", () => {
+  it("spreads a full-body movement over every muscle at the secondary weight", () => {
+    const session = finished("carry", "2026-11-22T04:00:00.000Z", "farmer_carry__dumbbell", [done("a", 30, 10), done("b", 30, 10), done("c", 30, 10)]);
+    const recovery = buildAdviceContext([session], now).recovery;
+    const of = (muscle: string) => recovery.find((item) => item.muscle === muscle)!.fatigueUnits;
+    expect(of("chest")).toBeGreaterThan(0);
+    expect(of("chest")).toBe(of("back"));
+    expect(of("forearms")).toBeGreaterThan(of("chest"));
+  });
+
+  it("says a typed load is too heavy today and names a load that fits, instead of offering last time's reps", () => {
+    const context = buildAdviceContext([lastWeek], now);
+    const advice = adviseSet(context, exercise(barbell, [open("one", { weightKg: 500 }), open("two")]), "one")!;
+    expect(advice).toMatchObject({ tooHeavy: true, weightKg: 500, reps: 1 });
+    expect(advice.reason.en).toMatch(/500 kg is too heavy for today's estimated strength; about [\d.]+ kg fits \d+ reps/);
+  });
+});

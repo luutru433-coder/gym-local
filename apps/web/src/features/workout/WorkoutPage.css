@@ -635,3 +635,6 @@
 .warmup-feel button[aria-pressed="true"],
 .readiness-card .readiness-card__save { color: var(--stage); background: var(--lime); border-color: var(--lime); }
 .readiness-summary { display: flex; gap: 10px; align-items: center; justify-content: space-between; color: var(--muted); }
+
+/* Above the set panel, so the fixed Start dock never covers the check-in. */
+.readiness-slot { width: calc(100% - 36px); max-width: 560px; margin: 0 auto; }

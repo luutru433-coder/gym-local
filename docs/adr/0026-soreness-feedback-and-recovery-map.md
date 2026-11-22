@@ -15,6 +15,7 @@ The autoregulation engine (ADR 0024) estimates each muscle's recovery from expon
 - `personalTauHours` replays all answers in date order through `calibrateTau`: score 4 lengthens that muscle's time constant by 10%, score 1 shortens it by 5%, 2 and 3 leave it, bounded to 12-60 h. The value is derived on read and not stored, so editing or deleting a session or an answer recalculates it.
 - `buildAdviceContext` uses these time constants, so the workout screen's readiness and the home map share one estimate.
 - The home map shows the engine's recovery (`recoveryOverview`): ready from 85% recovered (the engine's `readyAt`), fatigued below 60% (ours), recovering between. Hours left come from the engine. The weekly working-set count per muscle is unchanged.
+- A movement tagged `full_body` loads every muscle not otherwise named at the secondary weight, as the previous map did.
 - No database version bump and no backup version bump: the field is optional and unindexed. Backup validation accepts integer scores 1-4 and rejects others. Readers ignore a malformed score.
 - Muscle recovery aggregates across equipment variants by design (a muscle is tired whatever trained it). Performance history, e1RM and records stay per exact variant.
 

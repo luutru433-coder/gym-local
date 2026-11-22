@@ -28,6 +28,8 @@ export interface SetAdvice {
   action: PrescriptionAction;
   confidence: BaselineEstimate["confidence"];
   reason: LocalizedText;
+  /** The typed load allows no rep at the target effort today; `reason` names a load that fits. */
+  tooHeavy?: boolean;
 }
 
 function profileOf(exercise: SessionExercise) {
@@ -91,10 +93,12 @@ export function buildAdviceContext(finishedSessions: WorkoutSession[], at: Date)
       const working = exercise.sets.filter((set) => set.completedAt && set.type !== "warmup");
       if (!movement || !working.length) continue;
       const units = (role: "primary" | "secondary") => working.reduce((sum, set) => sum + setFatigueUnits(validRir(set.rir) ?? validRir(set.targetRir) ?? DEFAULT_TARGET_RIR, role), 0);
-      movement.primaryMuscles.forEach((muscle) => { if (muscle !== "full_body") events.push({ at: session.finishedAt!, muscle, units: units("primary") }); });
-      movement.secondaryMuscles.forEach((muscle) => {
-        if (muscle !== "full_body" && !movement.primaryMuscles.includes(muscle)) events.push({ at: session.finishedAt!, muscle, units: units("secondary") });
-      });
+      // One event per muscle: primary if listed as primary, else secondary; "full_body" reaches every other muscle at the secondary weight.
+      const named = [...movement.primaryMuscles, ...movement.secondaryMuscles];
+      for (const muscle of Object.keys(DEFAULT_TAU_HOURS) as RecoveryMuscle[]) {
+        const role = movement.primaryMuscles.includes(muscle) ? "primary" : movement.secondaryMuscles.includes(muscle) || named.includes("full_body") ? "secondary" : undefined;
+        if (role) events.push({ at: session.finishedAt!, muscle, units: units(role) });
+      }
     }
   }
   return { at, history, recovery: muscleRecovery(events, at, personalTauHours(finishedSessions, at)) };
@@ -246,13 +250,35 @@ export function adviseSet(context: AdviceContext, exercise: SessionExercise, set
     availableLoadsKg: typed ? [typed] : loadsUpTo(stepKg, Math.max(capacity.e1rmKg, currentLoadKg ?? 0)),
     currentLoadKg
   });
-  if (!prescription.feasible) return undefined;
   const percent = Math.round(readiness.factor * 100);
   const basis: LocalizedText = done.length
     ? { vi: `tính lại sau ${done.length} set hôm nay`, en: `re-estimated after ${done.length} set${done.length === 1 ? "" : "s"} today` }
     : percent !== 100 || readiness.parts.checkIn || readiness.parts.warmup
       ? readinessBasis(readiness.parts, percent)
       : { vi: `từ ${baseline?.sessionsUsed ?? 0} buổi gần nhất`, en: `from your last ${baseline?.sessionsUsed ?? 0} session${baseline?.sessionsUsed === 1 ? "" : "s"}` };
+  if (!prescription.feasible) {
+    // The typed load allows no rep at the target effort today: say so and name the load that fits, never last time's reps.
+    const fitting = typed ? prescribeSet({
+      capacityE1rmKg: capacity.e1rmKg,
+      target: { minReps, maxReps, rir: targetRir },
+      availableLoadsKg: loadsUpTo(stepKg, capacity.e1rmKg)
+    }) : undefined;
+    if (!typed || !fitting?.feasible) return undefined;
+    return {
+      weightKg: typed,
+      reps: 1,
+      expectedRir: prescription.expectedRir,
+      freshE1rmKg: capacity.freshE1rmKg,
+      readinessPercent: percent,
+      action: "keep_load",
+      confidence: done.length ? "high" : baseline?.confidence ?? "low",
+      tooHeavy: true,
+      reason: {
+        vi: `${typed} kg quá nặng so với sức ước tính hôm nay; khoảng ${fitting.loadKg} kg vừa ${fitting.reps} lần (${basis.vi})`,
+        en: `${typed} kg is too heavy for today's estimated strength; about ${fitting.loadKg} kg fits ${fitting.reps} reps (${basis.en})`
+      }
+    };
+  }
   return {
     weightKg: prescription.loadKg,
     reps: prescription.reps,
