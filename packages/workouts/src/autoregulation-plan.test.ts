@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, getVariant } from "@gym/catalog";
-import { adviseSet, buildAdviceContext } from "./autoregulation-plan";
+import { adviseSet, buildAdviceContext, usesWarmupFeel } from "./autoregulation-plan";
+import { switchExerciseVariant } from "./index";
 
 const now = new Date("2026-11-22T10:00:00.000Z");
 
@@ -113,5 +114,45 @@ describe("adviseSet", () => {
     const odd = finished("s3", "2026-11-18T10:00:00.000Z", barbell, [done("a", 60, 10, { rir: 2.3 }), done("b", 0, 10), done("c", 60, 9.5)]);
     const advice = adviseSet(buildAdviceContext([odd], now), exercise(barbell, [open("one")]), "one")!;
     expect(advice).toMatchObject({ weightKg: 60, reps: 10 });
+  });
+  it("moves the first set with the pre-workout check-in and names it in the reason", () => {
+    const context = buildAdviceContext([lastWeek], now);
+    const plan = (checkIn?: { sleep: number; energy: number; soreness: number }) => adviseSet(context, exercise(barbell, [open("one")]), "one", checkIn)!;
+    const strength = (advice: { weightKg: number; reps: number; expectedRir: number }) => advice.weightKg * (1 + (advice.reps + advice.expectedRir) / 30);
+    expect(plan({ sleep: 3, energy: 3, soreness: 3 })).toEqual(plan());
+    expect(plan({ sleep: 1, energy: 1, soreness: 1 }).readinessPercent).toBe(plan().readinessPercent - 3);
+    expect(strength(plan({ sleep: 1, energy: 1, soreness: 1 }))).toBeLessThan(strength(plan()));
+    expect(plan({ sleep: 1, energy: 1, soreness: 1 }).reason.en).toContain("checked in below normal");
+    // Answers outside 1-5 (another build, a hand-edited backup) are ignored, not thrown on.
+    expect(plan({ sleep: 9, energy: 3, soreness: 3 })).toEqual(plan());
+  });
+
+  it("moves the first set with the warm-up feel of that exercise only", () => {
+    const context = buildAdviceContext([lastWeek], now);
+    const plan = (warmupFeel?: "worse" | "expected" | "better") => adviseSet(context, { ...exercise(barbell, [open("one")]), warmupFeel }, "one")!;
+    expect(plan("expected")).toEqual(plan());
+    expect(plan("worse").readinessPercent).toBeLessThan(plan().readinessPercent);
+    expect(plan("better").readinessPercent).toBeGreaterThan(plan().readinessPercent);
+    expect(plan("worse").reason.vi).toContain("khởi động nặng hơn thường");
+  });
+  it("names a good check-in even when it only cancels out a recovery penalty", () => {
+    const yesterday = finished("s2", "2026-11-22T04:00:00.000Z", barbell, [done("a", 60, 10), done("b", 60, 9), done("c", 60, 8)]);
+    const context = buildAdviceContext([lastWeek, yesterday], now);
+    const advice = adviseSet(context, exercise(barbell, [open("one")]), "one", { sleep: 5, energy: 5, soreness: 5 })!;
+    expect(advice.reason.en).toContain("checked in above normal");
+  });
+
+  it("does not carry a warm-up rating to another equipment variant", () => {
+    const warm: SetLog = { id: "w", type: "warmup", weightKg: 30, reps: 8, completedAt: "2026-11-22T09:00:00.000Z" };
+    const session: WorkoutSession = { id: "live", startedAt: "2026-11-22T09:00:00.000Z", exercises: [{ ...exercise(barbell, [warm, open("one")]), warmupFeel: "worse" }] };
+    const switched = switchExerciseVariant(session, "exercise", getVariant(dumbbell)!);
+    expect(switched.exercises[0].warmupFeel).toBe("worse");
+    expect(switched.exercises[1].variantId).toBe(dumbbell);
+    expect(switched.exercises[1].warmupFeel).toBeUndefined();
+  });
+
+  it("offers the warm-up rating only where it can change a suggestion", () => {
+    expect(usesWarmupFeel(exercise(barbell, [open("one")]))).toBe(true);
+    expect(usesWarmupFeel(exercise(barbell, [{ id: "free", type: "working" }]))).toBe(false);
   });
 });

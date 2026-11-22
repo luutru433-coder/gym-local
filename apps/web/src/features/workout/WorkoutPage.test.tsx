@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -323,5 +323,22 @@ describe("live workout editing", () => {
     const next = useGymStore.getState().activeSession!;
     expect(next.restTimerEndsAt).toBeUndefined();
     expect(next.exercises[0].sets[1].restBeforeSeconds).toBeGreaterThanOrEqual(0);
+  });
+  it("saves the pre-workout check-in on the session and lets it be skipped", async () => {
+    const user = userEvent.setup();
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    arrange(live);
+
+    const energy = screen.getByRole("group", { name: "Năng lượng lúc này" });
+    await user.click(within(energy).getByRole("button", { name: "Năng lượng lúc này: 1" }));
+    await user.click(screen.getByRole("button", { name: "Lưu" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.checkIn).toEqual({ sleep: 3, energy: 1, soreness: 3 }));
+    expect(screen.getByText(/năng lượng 1\/5 · cơ hết mỏi 3\/5 · gợi ý tạ -1%/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Sửa" }));
+    await user.click(screen.getByRole("button", { name: "Xoá câu trả lời" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.checkIn).toBeUndefined());
+    expect(screen.getByText("Chưa trả lời câu hỏi đầu buổi.")).toBeInTheDocument();
   });
 });

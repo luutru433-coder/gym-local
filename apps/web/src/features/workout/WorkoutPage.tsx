@@ -39,7 +39,7 @@ import {
   updateSet
 } from "@gym/workouts";
 import { cancelRunningSet, lastFinishedSet, nextOpenSet, reopenSet, runningSeconds, runningSet, stampWorkSeconds, startSet, type SetRef } from "@gym/workouts/set-timer";
-import { adviseSet, buildAdviceContext, type SetAdvice } from "@gym/workouts/autoregulation-plan";
+import { adviseSet, buildAdviceContext, usesWarmupFeel, type SetAdvice } from "@gym/workouts/autoregulation-plan";
 import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, restingExercise, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
 import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
@@ -50,6 +50,7 @@ import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
 import { playRestAlert, primeRestAlert, useScreenWakeLock } from "./restAlert";
 import { recordKindsLabel } from "./recordLabels";
 import { WorkoutSummary } from "./WorkoutSummary";
+import { ReadinessCheckInCard, WarmupFeelPicker } from "./ReadinessCheckIn";
 import { clock } from "./clock";
 import { SetFocus, type FocusNumber, type FocusSet, type FocusState } from "./SetFocus";
 import "./WorkoutPage.css";
@@ -170,7 +171,7 @@ export function WorkoutPage() {
   /** Engine advice when the exercise can be estimated, else the "same as last time" values. */
   const suggestFor = (exercise: WorkoutSession["exercises"][number], set: SetLog, previous: SetSuggestion[]): { suggestion?: SetSuggestion; advice?: SetAdvice } => {
     if (set.completedAt) return {};
-    const advice = adviceContext ? adviseSet(adviceContext, exercise, set.id) : undefined;
+    const advice = adviceContext ? adviseSet(adviceContext, exercise, set.id, activeSession?.checkIn) : undefined;
     return advice
       ? { advice, suggestion: { weightKg: advice.weightKg, reps: advice.reps } }
       : { suggestion: suggestSetValues(exercise, set.id, previous) };
@@ -562,6 +563,9 @@ export function WorkoutPage() {
       </nav>
 
       <main className="workout-content">
+        {activeSession.exercises.length > 0 && (activeSession.checkIn || progress.completed === 0) ? (
+          <ReadinessCheckInCard locale={locale} value={activeSession.checkIn} onChange={(checkIn) => save({ ...activeSession, checkIn })} />
+        ) : null}
         {activeSession.exercises.length === 0 ? (
           <Card className="workout-zero-state">
             <Dumbbell size={30} aria-hidden="true" />
@@ -649,6 +653,14 @@ export function WorkoutPage() {
                       <small>{localize(exercise.variantNameSnapshot, locale)} · {progression.successStreak}/{progression.requiredSuccessSessions} {locale === "vi" ? "buổi đạt mục tiêu" : "successful sessions"}</small>
                     </div>
                   </aside>
+
+                  {usesWarmupFeel(exercise) && exercise.sets.some((set) => set.type === "warmup" && set.completedAt) ? (
+                    <WarmupFeelPicker
+                      locale={locale}
+                      value={exercise.warmupFeel}
+                      onChange={(warmupFeel) => save({ ...activeSession, exercises: activeSession.exercises.map((item) => item.id === exercise.id ? { ...item, warmupFeel } : item) })}
+                    />
+                  ) : null}
 
                   {plateEligible ? (
                     <div className="plate-guide-config">

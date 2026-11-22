@@ -1,4 +1,4 @@
-import type { LocalizedText, SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
+import type { LocalizedText, ReadinessCheckIn, SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, trackingProfileForLoadMode } from "@gym/catalog";
 import {
   estimateBaseline, calibrateFatigueDrop, muscleRecovery, nextSetCapacity, prescribeSet, readinessFactor, setFatigueUnits,
@@ -100,6 +100,28 @@ export function buildAdviceContext(finishedSessions: WorkoutSession[], at: Date)
   return { at, history, recovery: muscleRecovery(events, at) };
 }
 
+function validCheckIn(checkIn: ReadinessCheckIn | undefined): ReadinessCheckIn | undefined {
+  const ok = (value: unknown) => Number.isInteger(value) && (value as number) >= 1 && (value as number) <= 5;
+  return checkIn && ok(checkIn.sleep) && ok(checkIn.energy) && ok(checkIn.soreness) ? checkIn : undefined;
+}
+
+/** Whether a warm-up rating can change this exercise's suggestions: the engine applies and a working set has a rep target. */
+export function usesWarmupFeel(exercise: SessionExercise): boolean {
+  return supported(exercise) && exercise.sets.some((set) => set.type === "working" && Boolean(set.targetMinReps ?? set.targetMaxReps));
+}
+
+/** Names what moved today's estimate away from 100%: recovery, the check-in, the warm-up. */
+function readinessBasis(parts: { recovery: number; checkIn: number; warmup: number }, percent: number): LocalizedText {
+  const causes: LocalizedText[] = [];
+  if (parts.recovery < 0) causes.push({ vi: "nhóm cơ chính chưa hồi phục hết", en: "main muscles not fully recovered" });
+  if (parts.checkIn) causes.push(parts.checkIn < 0 ? { vi: "hôm nay bạn báo chưa khoẻ", en: "you checked in below normal" } : { vi: "hôm nay bạn báo khoẻ", en: "you checked in above normal" });
+  if (parts.warmup) causes.push(parts.warmup < 0 ? { vi: "khởi động nặng hơn thường", en: "warm-up felt heavier" } : { vi: "khởi động nhẹ hơn thường", en: "warm-up felt lighter" });
+  return {
+    vi: `${causes.map((cause) => cause.vi).join(", ")}; sức ước tính ${percent}%`,
+    en: `${causes.map((cause) => cause.en).join(", ")}; estimated strength ${percent}%`
+  };
+}
+
 function loadsUpTo(stepKg: number, topKg: number): number[] {
   return Array.from({ length: Math.max(1, Math.ceil(topKg / stepKg)) }, (_, index) => Math.round((index + 1) * stepKg * 100) / 100);
 }
@@ -109,7 +131,7 @@ function loadsUpTo(stepKg: number, topKg: number): number[] {
  * the sets already done. Undefined when the exercise cannot be estimated or has no
  * data yet; the caller then keeps the previous "same as last time" suggestion.
  */
-export function adviseSet(context: AdviceContext, exercise: SessionExercise, setId: string): SetAdvice | undefined {
+export function adviseSet(context: AdviceContext, exercise: SessionExercise, setId: string, checkIn?: ReadinessCheckIn): SetAdvice | undefined {
   const set = exercise.sets.find((item) => item.id === setId);
   if (!set || set.completedAt || set.type !== "working" || !supported(exercise)) return undefined;
   const minReps = set.targetMinReps ?? set.targetMaxReps;
@@ -121,7 +143,10 @@ export function adviseSet(context: AdviceContext, exercise: SessionExercise, set
   const movement = getMovement(exercise.movementId);
   const primary = (movement?.primaryMuscles ?? []).filter((muscle): muscle is RecoveryMuscle => muscle !== "full_body");
   const readiness = readinessFactor({
-    primaryMuscleRecovery: primary.map((muscle) => context.recovery.find((item) => item.muscle === muscle)?.recovery ?? 1)
+    primaryMuscleRecovery: primary.map((muscle) => context.recovery.find((item) => item.muscle === muscle)?.recovery ?? 1),
+    // Answers and warm-up feel written by another build are used only when well-formed.
+    checkIn: validCheckIn(checkIn),
+    warmupFeel: exercise.warmupFeel === "worse" || exercise.warmupFeel === "better" ? exercise.warmupFeel : undefined
   });
   const done = observedSets(exercise);
   const rest = set.restBeforeSeconds;
@@ -152,8 +177,8 @@ export function adviseSet(context: AdviceContext, exercise: SessionExercise, set
   const percent = Math.round(readiness.factor * 100);
   const basis: LocalizedText = done.length
     ? { vi: `tính lại sau ${done.length} set hôm nay`, en: `re-estimated after ${done.length} set${done.length === 1 ? "" : "s"} today` }
-    : percent < 100
-      ? { vi: `nhóm cơ chính chưa hồi phục hết, sức ước tính ${percent}%`, en: `main muscles not fully recovered, estimated strength ${percent}%` }
+    : percent !== 100 || readiness.parts.checkIn || readiness.parts.warmup
+      ? readinessBasis(readiness.parts, percent)
       : { vi: `từ ${baseline?.sessionsUsed ?? 0} buổi gần nhất`, en: `from your last ${baseline?.sessionsUsed ?? 0} session${baseline?.sessionsUsed === 1 ? "" : "s"}` };
   return {
     weightKg: prescription.loadKg,
