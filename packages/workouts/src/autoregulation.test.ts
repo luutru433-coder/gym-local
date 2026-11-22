@@ -58,6 +58,14 @@ describe("baseline and fatigue calibration", () => {
     expect(learned.dropPerSet).toBeCloseTo(1 - (1 + 9 / 30) / (1 + 10 / 30), 6);
   });
 
+  it("learns from unrated sets too, but never from a rated set next to an unrated one", () => {
+    const day = (index: number) => `2026-11-${String(index + 1).padStart(2, "0")}T10:00:00Z`;
+    const unrated = Array.from({ length: 6 }, (_, index) => ({ finishedAt: day(index), sets: [{ loadKg: 60, reps: 10 }, { loadKg: 60, reps: 10 }] }));
+    expect(calibrateFatigueDrop(unrated)).toEqual({ dropPerSet: 0.01, pairs: 6 });
+    const mixed = Array.from({ length: 6 }, (_, index) => ({ finishedAt: day(index), sets: [{ loadKg: 60, reps: 10, rir: 2 }, { loadKg: 60, reps: 10 }] }));
+    expect(calibrateFatigueDrop(mixed)).toEqual({ dropPerSet: 0.03, pairs: 0 });
+  });
+
   it("learns the drop at the reference effort and rest, so it is not counted twice", () => {
     // Failure sets after 60 s rest: the 4.5% seen is 2% × 1.5 (effort) × 1.5 (rest).
     const hard = Array.from({ length: 6 }, (_, index) => ({
@@ -119,7 +127,7 @@ describe("prescription", () => {
 
   it("starts near the middle of the range and only uses loads the gym has", () => {
     const start = prescribeSet({ capacityE1rmKg: 100, target, availableLoadsKg: [20, 40, 60, 70, 80] });
-    expect(start).toMatchObject({ loadKg: 70, reps: 10, action: "start" });
+    expect(start).toMatchObject({ loadKg: 70, reps: 11, action: "start" });
     expect(() => prescribeSet({ capacityE1rmKg: 100, target, availableLoadsKg: [] })).toThrow(RangeError);
     expect(start.feasible).toBe(true);
     // Every load is above today's capacity: the lightest is shown and flagged, never the heaviest.

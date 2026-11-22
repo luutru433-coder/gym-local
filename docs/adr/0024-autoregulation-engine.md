@@ -1,6 +1,6 @@
 # ADR 0024: Autoregulation engine
 
-- Status: Proposed (engine and sample run only; nothing in the app calls it yet)
+- Status: Accepted. The engine was merged first; the workout screen uses it for set suggestions (see "In the app"). Check-in, soreness, weekly set changes and blocks are not in the app yet.
 - Date: 2026-11-22
 
 ## Context
@@ -51,9 +51,9 @@ It replaces population data with the owner's own log: every constant is a starti
 | Readiness, check-in: 1.5% per point of the mean answer away from 3 | ±3% | That a questionnaire moves the day's load: published by JuggernautAI. The scale and size are ours. |
 | Readiness, warm-up feel: better +1.3%, worse −2.6% | | Published example by JuggernautAI: 190 kg becomes 192.5 kg or 185 kg. Applying those ratios generally is ours. |
 | Within the session, each of today's sets counts 3 times the pre-session estimate | 3 | That targets are re-derived after every set: published by Alpha Progression. The weight is ours. |
-| Capacity drops per completed set | 3% at 2 RIR and 120 s rest | That the next set may be lower: published by Alpha Progression. The size is ours and is re-learned per exercise once 6 pairs of rated sets exist (median, with the effort and rest multipliers divided out, kept within 1-8%). |
+| Capacity drops per completed set | 3% at 2 RIR and 120 s rest | That the next set may be lower: published by Alpha Progression. The size is ours and is re-learned per exercise once 6 pairs of consecutive sets exist that are both rated or both unrated (median, with the effort and rest multipliers divided out, kept within 1-8%). |
 | Harder sets and shorter rests cost more | ×1.5 at 0 RIR to ×0.6 at 4+ RIR; ×0.75 at 180 s to ×1.75 at 30 s | Ours. No app documents using rest time. |
-| Load choice: among the loads the equipment has, reps at the target RIR must fall in the rep range; keep the current load when it does | switch penalty 0.5 | Published by Alpha Progression (available weights are a hard limit, rep target a soft one, no reload for a negligible gain). The cost function is ours. |
+| Load choice: among the loads the equipment has, reps at the target RIR (nearest whole rep) must fall in the rep range; keep the current load when it does | switch penalty 0.5 | Published by Alpha Progression (available weights are a hard limit, rep target a soft one, no reload for a negligible gain). The cost function is ours. |
 | Fatigue units per set | 1.25 at 0 RIR to 0.7 at 4+ RIR; secondary muscle half | The half weight for secondary muscles is what the app already uses. The effort weights are ours. |
 | Recovery = 1 − fatigue / 10, fatigue decays exponentially; ready at 85% | time constant 30 h for chest, back, quadriceps, hamstrings, glutes; 20 h for the rest | A 0-100% recovery per muscle from sets, reps and load: published by Fitbod, which does not publish its curve. Fitbod's blog gives 48-72 h as the physiological range; after 8 hard sets these constants give ready at about 50 h for the large muscles and about 34 h for the small ones. The curve and constants are ours. |
 | Soreness re-learns the time constant | still sore when trained again: +10%; never sore: −5%; within 12-60 h | That people recover at different rates and the model needs correcting: published by Fitbod, which uses manual edits. Learning it from soreness is ours. |
@@ -84,16 +84,28 @@ Not adopted. It needs bar speed from a sensor or camera, which an offline web ap
 
 Known gaps the run shows:
 
-- The engine's e1RM estimate lags real gains. Over the four hard weeks it rose 3.7% on the bench press (real 4.1%) but only 1.0-1.8% on the other three exercises (real 3.1-3.7%): with a fixed Epley curve and RIR logged as the target, part of the gain is not seen. A personal rep-curve constant, learned the same way as the fatigue drop, is the next refinement.
-- The learned set-to-set drop moved from the 3% default toward each exercise's real value (bench 5.3% against a real 4%, row 1.9% against 2.5%, squat 3.7% against 5%, curl 2.9% against 3%), but is noisy with few sessions: one rep of RIR error moves an estimate about 2.5%.
+- The engine's e1RM trend is only roughly right. Over the four hard weeks it rose 7.0% on the bench press (real 4.1%), 3.3% on the row (real 3.7%), 7.3% on the squat (real 3.6%) and 0% on the curl (real 3.1%): with a fixed Epley curve and RIR logged as the target, the estimate moves with the rep count as well as with strength. A personal rep-curve constant, learned the same way as the fatigue drop, is the next refinement.
+- The learned set-to-set drop moved from the 3% default toward each exercise's real value on three of four exercises (bench 4.4% against a real 4%, row 2.3% against 2.5%, squat 5.4% against 5%) and away from it on the curl (1.6% against 3%); it is noisy with few sessions, because one rep of RIR error moves an estimate about 2.5%.
 - The check-in moved the bad day's load by about 2% against a real 6% loss; the rest was caught after the first set.
 - With a one-value rep target the engine changes the weight where Alpha Progression holds it; with rep ranges it holds the weight.
 
+## In the app
+
+`@gym/workouts/autoregulation-plan` adapts sessions and the catalog to the engine, and the workout screen calls it for every unfinished working set:
+
+- It applies only to rep-based exercises that progress by entered load, for sets with a rep target, once the exact variant has history or a set done today. Everything else keeps the previous "same as last time" suggestion, as does a first-ever exercise.
+- The suggestion fills the empty weight and reps exactly as before and never overwrites what was typed; a typed weight is kept and only the reps are fitted to it. Nothing is logged on the user's behalf.
+- Before the first set it uses the baseline and the recovery of the exercise's primary muscles at the start of the workout. After each finished set (including a corrected RIR) the next set is planned again from today's sets and the planned rest.
+- A set with no logged RIR and no target RIR is read as 2 RIR, and a set with no target RIR aims for 2 RIR. Using the same value on both sides means unrated history reproduces last time's first set instead of asking for fewer reps.
+- Available loads are multiples of the step the screen already uses (2.5 kg for total-weight entry, 1 kg otherwise), because the app has no list of the gym's weights.
+- The focus panel shows the suggestion with the expected reps left and the reason; during the rest it shows the plan for the next set.
+- History, records, routines, the database and backups are unchanged. The module loads with the workout page, not at startup.
+
 ## Consequences
 
-- No behaviour, schema, database or backup change. The module is behind its own subpath and is not imported by the app, so the entry chunk is unchanged.
-- Wiring it in is separate work and needs its own decisions:
-  1. An adapter from sessions and the catalog to the engine's inputs (muscle roles, loads the equipment allows), and a new explicit progression rule type next to `double_progression` (ADR 0006 requires new rule types rather than reinterpreting history).
+- No schema, database or backup change. The engine and its adapter sit behind their own subpaths and load with the workout page, so the entry chunk is unchanged.
+- The rest of the wiring is separate work and needs its own decisions:
+  1. The loads each piece of equipment really has, and a new explicit progression rule type next to `double_progression` for the next-session plan on the home screen (ADR 0006 requires new rule types rather than reinterpreting history).
   2. Optional fields on `WorkoutSession` for the check-in, warm-up feel and soreness per muscle, added the way ADR 0020 added timing (optional, no version bump, backup types checked). Block start and length on the program.
-  3. Screens: a pre-session card, the next-set suggestion after each set, a weekly review, and the recovery map on the new model. Every suggestion stays advisory with its reason, as today.
+  3. Screens: a pre-session card, a weekly review, and the recovery map on the new model. Every suggestion stays advisory with its reason, as today.
 - The engine's volume and time-constant state is derived by replaying history plus those optional fields, so backups need no new store.

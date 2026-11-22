@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — Set suggestions from today's estimated strength
+
+- During a workout, the suggested weight and reps for a set now come from your estimated strength today instead of repeating last time's numbers: your recent sessions of the exact variant, how recovered the main muscles are, and the sets you have already done in this workout (ADR 0024). After each set the next one is planned again; correcting a set's RIR during the rest updates it.
+- The focus panel shows the suggestion with about how many reps it should leave and why; during the rest it shows the plan for the next set.
+- It applies to exercises logged as weight × reps with a rep target, once the exact variant has history. Other exercises, and a first-ever exercise, keep the previous suggestion. What you type always wins, and nothing is logged for you.
+- A set with no RIR logged is read as 2 reps in reserve. Logging RIR makes the estimate follow you more closely.
+- No change to history, records, routines, the database or backups.
+
+||||||| a7a1ad9
 ## Unreleased — One look for the whole app, larger exercise movements
 
 - Every screen now uses the look of the workout screen: dark background, one orange accent. The cream and lime colours are gone, and so is the Appearance (light / dark / system) setting (ADR 0023).

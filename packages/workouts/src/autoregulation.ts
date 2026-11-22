@@ -156,13 +156,16 @@ function restMultiplier(restSeconds: number | undefined): number {
   return restSeconds === undefined ? 1 : clamp(1 + (120 - restSeconds) / 120, [0.75, 1.75]);
 }
 
-/** Personal set-to-set capacity drop at 2 RIR and 120 s rest: median over consecutive measured sets; default until 6 pairs exist. */
+/** Personal set-to-set capacity drop at 2 RIR and 120 s rest: median over consecutive comparable sets; default until 6 pairs exist. */
 export function calibrateFatigueDrop(history: VariantSessionRecord[]): { dropPerSet: number; pairs: number } {
   const drops: number[] = [];
   for (const record of history) {
     for (let index = 1; index < record.sets.length; index += 1) {
       const [previous, current] = [record.sets[index - 1], record.sets[index]];
-      if (effectiveRir(previous).source !== "logged" || effectiveRir(current).source !== "logged") continue;
+      // Both sets rated, or both unrated at the same assumed RIR: a rated set next to a guessed one says nothing.
+      const [left, right] = [effectiveRir(previous), effectiveRir(current)];
+      const rated = (source: RirSource) => source === "logged" || source === "rpe";
+      if (rated(left.source) !== rated(right.source) || (!rated(left.source) && left.rir !== right.rir)) continue;
       const [before, after] = [e1rmFromSet(previous), e1rmFromSet(current)];
       // Undo the effort and rest multipliers that nextSetCapacity applies on top of the drop.
       if (before && after) drops.push((1 - after / before) / (effortMultiplier(previous) * restMultiplier(current.restBeforeSeconds)));
@@ -299,7 +302,8 @@ export function prescribeSet(input: PrescribeSetInput): SetPrescription {
   for (const load of loads) {
     const toFailure = repsToFailure(load, input.capacityE1rmKg);
     // Unclamped so that, among loads too heavy for a single rep, the lightest is the least bad.
-    const reps = Math.floor(AUTOREG.epleyReps * (input.capacityE1rmKg / load - 1) - target.rir + 1e-9);
+    // Nearest whole rep: rounding down would ask for one rep fewer than last time whenever the estimate dips by a hair.
+    const reps = Math.floor(AUTOREG.epleyReps * (input.capacityE1rmKg / load - 1) - target.rir + 0.5);
     const outside = reps < target.minReps ? target.minReps - reps : reps > target.maxReps ? reps - target.maxReps : 0;
     const cost = outside * outside
       + (input.currentLoadKg === undefined ? Math.abs(reps - middle) * 0.01 : load === input.currentLoadKg ? 0 : AUTOREG.switchLoadPenalty);
