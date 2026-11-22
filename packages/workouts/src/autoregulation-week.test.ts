@@ -78,4 +78,31 @@ describe("planEngineSession", () => {
     expect(started.exercises[0].sets.filter((set) => set.type === "working").map((set) => set.targetRir)).toEqual([3, 3, 3, 3]);
     expect(new Set(started.exercises[0].sets.map((set) => set.id)).size).toBe(4);
   });
+
+  it("never reads performance from another equipment variant", () => {
+    const other = getVariant("chest_press__dumbbell")!;
+    const swap = (item: WorkoutSession): WorkoutSession => ({ ...item, exercises: item.exercises.map((exercise) => ({ ...exercise, variantId: other.id, variantNameSnapshot: other.name, loadEntryModeSnapshot: other.loadEntryMode, trackingProfileSnapshot: getTrackingProfile(other.id) })) });
+    const missed = plan([swap(session(7, 5, { soreness: { chest: 2 } }, 4))]);
+    expect(missed.engine!.muscles[0]).toMatchObject({ action: "hold", performance: undefined });
+    expect(missed.items[0].sets.filter((set) => set.type === "working")).toHaveLength(3);
+    expect(plan([swap(session(3, 5)), swap(session(10, 5))]).engine!.block.early).toBe(false);
+  });
+
+  it("does not count drop or failure sets as working sets planned last time", () => {
+    const last = session(7, 10);
+    last.exercises[0].sets.push({ ...last.exercises[0].sets[0], id: "drop", type: "drop" });
+    expect(working([last])).toHaveLength(3);
+  });
+
+  it("leaves the load to the set suggestions instead of prefilling last time's at a new target effort", () => {
+    const result = plan([7, 14, 21, 28].map((days) => session(days, 10)));
+    expect(result.items[0]).toMatchObject({ action: "hold", loadKg: undefined, previousLoadKg: undefined });
+    expect(createAdaptiveSessionFromRoutine(routine, result).exercises[0].sets.every((set) => set.weightKg === undefined)).toBe(true);
+  });
+
+  it("explains a still-sore muscle that is already at the weekly minimum", () => {
+    const result = plan([session(7, 10, { soreness: { chest: 4 } })]);
+    expect(result.engine!.muscles[0]).toMatchObject({ action: "hold", sessionSetDelta: 0, soreness: 4 });
+    expect(result.engine!.muscles[0].reason.en).toContain("minimum");
+  });
 });
