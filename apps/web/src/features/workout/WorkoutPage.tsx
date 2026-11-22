@@ -115,7 +115,8 @@ export function WorkoutPage() {
   const sessionSaveStatus = useGymStore((state) => state.sessionSaveStatus);
   const storeError = useGymStore((state) => state.error);
   const locale = profile.locale;
-  const [now, setNow] = useState(() => activeSession ? new Date(activeSession.startedAt).getTime() : 0);
+  // Starts at the real time: the session's start time made a reloaded rest timer show too much time left until the first tick.
+  const [now, setNow] = useState(() => Date.now());
   const [expandedId, setExpandedId] = useState(activeSession?.activeExerciseId);
   const [exercisePicker, setExercisePicker] = useState<ExercisePickerState>();
   const [exerciseQuery, setExerciseQuery] = useState("");

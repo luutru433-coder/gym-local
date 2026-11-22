@@ -6,6 +6,7 @@
 - Set counts follow your feedback: a muscle you rated "not sore" or "gone early" and trained on target gets one more set next time; "still sore" takes one away; missed rep targets halve its sets for one session. Without a soreness answer the set count stays as it is.
 - For weight × reps exercises with history, the plan no longer prefills last time's weight on these sessions; the per-set suggestion picks weight and reps for the week's target effort. Other exercises are prefilled as before.
 - Two weeks of missed targets for the same muscle on the same equipment, or two muscles in one week, bring the deload forward.
+- Fixed: reopening a workout during a rest briefly showed too much rest time left (for example 1:53 of a 1:30 rest) until the next second; the rest itself was never extended.
 - These changes apply to the new session only, through the existing "apply adjustments on start" switch. Routines, history, the database and backups are unchanged.
 
 ## Unreleased — Soreness feedback and one recovery estimate
