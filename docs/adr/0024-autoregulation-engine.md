@@ -102,6 +102,7 @@ Known gaps the run shows:
 - History, records, routines, the database and backups are unchanged. The module loads with the workout page, not at startup.
 - The pre-workout check-in and the warm-up feel reach `readinessFactor` since ADR 0025.
 - Soreness answers calibrate each muscle's time constant, and the home recovery map shows the engine's recovery, since ADR 0026.
+- Weekly set changes, the block week and the deload reach the home next-session plan since ADR 0027.
 
 ## Consequences
 

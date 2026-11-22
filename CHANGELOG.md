@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Weekly set changes, block weeks and deload in the next-session plan
+
+- The home screen's next-session plan now follows a 5-week block: each week you train in a row the target effort gets one rep closer to failure (about 4, 3, 2, then 1 reps left), and the fifth week is a deload with half the sets (ADR 0027). A week off restarts the block.
+- Set counts follow your feedback: a muscle you rated "not sore" or "gone early" and trained on target gets one more set next time; "still sore" takes one away; missed rep targets halve its sets for one session. Without a soreness answer the set count stays as it is.
+- Two weeks of missed targets for the same muscle, or two muscles in one week, bring the deload forward.
+- These changes apply to the new session only, through the existing "apply adjustments on start" switch. Routines, history, the database and backups are unchanged.
+
 ## Unreleased — Soreness feedback and one recovery estimate
 
 - The muscle recovery map on the home screen now asks how sore each main muscle of your last workout got: not sore, gone early, gone just in time, or still sore. Answering is optional and you can change or clear an answer (ADR 0026).
