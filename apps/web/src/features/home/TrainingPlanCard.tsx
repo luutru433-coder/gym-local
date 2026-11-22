@@ -2,15 +2,17 @@ import { ArrowDown, ArrowUp, Check, Equal, Sparkles } from "lucide-react";
 import { Card, SectionTitle } from "@gym/ui";
 import { getVariant } from "@gym/catalog";
 import type { Routine } from "@gym/contracts";
-import type { AdaptiveSessionPlan, PlanAdjustmentAction, TrainingWeekPlan } from "@gym/workouts/plan";
+import type { PlanAdjustmentAction, TrainingWeekPlan } from "@gym/workouts/plan";
+import type { EngineSessionPlan } from "@gym/workouts/autoregulation-week";
 import { localize } from "../../lib/i18n";
+import { muscleLabels } from "../../lib/exercise-visuals";
 import "./TrainingPlanCard.css";
 
 interface TrainingPlanCardProps {
   locale: "vi" | "en";
   routines: Routine[];
   weekPlan: TrainingWeekPlan;
-  sessionPlan: AdaptiveSessionPlan;
+  sessionPlan: EngineSessionPlan;
   applyAdjustments: boolean;
   onApplyAdjustmentsChange: (value: boolean) => void;
 }
@@ -39,7 +41,10 @@ export function TrainingPlanCard({ locale, routines, weekPlan, sessionPlan, appl
     const routine = routines.find((item) => item.id === routineId);
     return routine ? localize(routine.name, locale) : undefined;
   };
-  const hasPrefill = sessionPlan.items.some((item) => item.loadKg !== undefined || item.action === "progress" || item.action === "ease_back");
+  const hasPrefill = sessionPlan.items.some((item) => item.loadKg !== undefined || item.action === "progress" || item.action === "ease_back") || Boolean(sessionPlan.engine);
+  const engine = sessionPlan.engine;
+  const changed = engine?.muscles.filter((item) => item.action !== "hold" || (item.soreness === 4 && item.performance !== undefined)) ?? [];
+  const unanswered = engine?.muscles.some((item) => item.soreness === undefined) ?? false;
 
   return (
     <section className="training-plan" aria-label={locale === "vi" ? "Kế hoạch tự điều chỉnh" : "Self-adjusting plan"}>
@@ -71,6 +76,18 @@ export function TrainingPlanCard({ locale, routines, weekPlan, sessionPlan, appl
               <p>{sessionPlan.summary[locale]}</p>
             </div>
           </header>
+          {engine ? (
+            <div className="training-plan__engine">
+              <strong>{engine.block.deload
+                ? (locale === "vi" ? `Tuần xả tải${engine.block.early ? " sớm" : ""}: nửa số set, dừng khi còn khoảng ${engine.block.targetRir} lần` : `${engine.block.early ? "Early deload" : "Deload week"}: half the sets, stop with about ${engine.block.targetRir} reps left`)
+                : (locale === "vi" ? `Tuần ${engine.block.week}/${engine.block.totalWeeks} của chu kỳ: dừng mỗi set khi còn khoảng ${engine.block.targetRir} lần (RIR ${engine.block.targetRir})` : `Week ${engine.block.week} of ${engine.block.totalWeeks} in the block: stop each set with about ${engine.block.targetRir} reps left (RIR ${engine.block.targetRir})`)}</strong>
+              {engine.block.early ? <small>{locale === "vi" ? "Hai tuần liền không giữ được mục tiêu ở cùng nhóm cơ, hoặc hai nhóm cơ trong một tuần." : "Targets were missed for the same muscle two weeks running, or for two muscles in one week."}</small> : null}
+              {changed.map((item) => (
+                <small key={item.muscle}><b>{muscleLabels[item.muscle][locale]} {item.sessionSetDelta > 0 ? "+" : ""}{item.sessionSetDelta === 0 ? "±0" : item.sessionSetDelta} set</b> · {item.reason[locale]}</small>
+              ))}
+              {!engine.block.deload && unanswered ? <small>{locale === "vi" ? "Số set chỉ đổi khi bạn trả lời câu hỏi đau cơ ở bản đồ phục hồi bên dưới." : "Set counts only change once you answer the soreness question on the recovery map below."}</small> : null}
+            </div>
+          ) : null}
           <ul className="training-plan__items">
             {sessionPlan.items.map((item) => {
               const variant = getVariant(item.variantId);

@@ -23,6 +23,7 @@
       "@gym/catalog": ["packages/catalog/src/index.ts"],
       "@gym/workouts/autoregulation-plan": ["packages/workouts/src/autoregulation-plan.ts"],
       "@gym/workouts/autoregulation": ["packages/workouts/src/autoregulation.ts"],
+      "@gym/workouts/autoregulation-week": ["packages/workouts/src/autoregulation-week.ts"],
       "@gym/workouts/plan": ["packages/workouts/src/adaptive-plan.ts"],
       "@gym/workouts/superset": ["packages/workouts/src/superset.ts"],
       "@gym/workouts/set-timer": ["packages/workouts/src/set-timer.ts"],

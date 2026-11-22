@@ -6,6 +6,7 @@
     ".": "./src/index.ts",
     "./autoregulation-plan": "./src/autoregulation-plan.ts",
     "./autoregulation": "./src/autoregulation.ts",
+    "./autoregulation-week": "./src/autoregulation-week.ts",
     "./plan": "./src/adaptive-plan.ts",
     "./superset": "./src/superset.ts",
     "./set-timer": "./src/set-timer.ts"

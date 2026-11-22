@@ -36,3 +36,6 @@
   .training-plan__day em { display: none; }
   .training-plan__item { grid-template-columns: 70px minmax(0, 1fr); }
 }
+.training-plan__engine { display: grid; gap: 4px; margin: 10px 0; padding: 10px 12px; border: 1px solid var(--line, rgba(0,0,0,.1)); border-radius: 10px; font-size: 13px; }
+.training-plan__engine small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+.training-plan__engine small b { color: var(--ink); }
