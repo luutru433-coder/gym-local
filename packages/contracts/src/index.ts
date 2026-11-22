@@ -228,6 +228,15 @@ export interface SetLog {
   restBeforeSeconds?: number;
 }
 
+/** Pre-workout answers (ADR 0025), 1-5 each; 3 is a normal day and soreness 5 means none. */
+export interface ReadinessCheckIn {
+  sleep: number;
+  energy: number;
+  soreness: number;
+}
+
+export type WarmupFeel = "worse" | "expected" | "better";
+
 export interface SessionExercise {
   id: Id;
   movementId: Id;
@@ -240,6 +249,8 @@ export interface SessionExercise {
   restSeconds: number;
   note?: string;
   supersetGroup?: string;
+  /** How this exercise's warm-up felt against a normal day (ADR 0025). */
+  warmupFeel?: WarmupFeel;
 }
 
 export interface WorkoutSession {
@@ -254,6 +265,8 @@ export interface WorkoutSession {
   restTimerEndsAt?: string;
   exercises: SessionExercise[];
   notes?: string;
+  /** Answered at the start of the workout; absent when skipped (ADR 0025). */
+  checkIn?: ReadinessCheckIn;
 }
 
 export interface NutrientProfile {

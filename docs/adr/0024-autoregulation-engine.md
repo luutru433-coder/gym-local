@@ -100,6 +100,7 @@ Known gaps the run shows:
 - Available loads are multiples of the step the screen already uses (2.5 kg for total-weight entry, 1 kg otherwise), because the app has no list of the gym's weights.
 - The focus panel shows the suggestion with the expected reps left and the reason; during the rest it shows the plan for the next set.
 - History, records, routines, the database and backups are unchanged. The module loads with the workout page, not at startup.
+- The pre-workout check-in and the warm-up feel reach `readinessFactor` since ADR 0025.
 
 ## Consequences
 

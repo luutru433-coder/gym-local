@@ -114,4 +114,24 @@ describe("adviseSet", () => {
     const advice = adviseSet(buildAdviceContext([odd], now), exercise(barbell, [open("one")]), "one")!;
     expect(advice).toMatchObject({ weightKg: 60, reps: 10 });
   });
+  it("moves the first set with the pre-workout check-in and names it in the reason", () => {
+    const context = buildAdviceContext([lastWeek], now);
+    const plan = (checkIn?: { sleep: number; energy: number; soreness: number }) => adviseSet(context, exercise(barbell, [open("one")]), "one", checkIn)!;
+    const strength = (advice: { weightKg: number; reps: number; expectedRir: number }) => advice.weightKg * (1 + (advice.reps + advice.expectedRir) / 30);
+    expect(plan({ sleep: 3, energy: 3, soreness: 3 })).toEqual(plan());
+    expect(plan({ sleep: 1, energy: 1, soreness: 1 }).readinessPercent).toBe(plan().readinessPercent - 3);
+    expect(strength(plan({ sleep: 1, energy: 1, soreness: 1 }))).toBeLessThan(strength(plan()));
+    expect(plan({ sleep: 1, energy: 1, soreness: 1 }).reason.en).toContain("checked in below normal");
+    // Answers outside 1-5 (another build, a hand-edited backup) are ignored, not thrown on.
+    expect(plan({ sleep: 9, energy: 3, soreness: 3 })).toEqual(plan());
+  });
+
+  it("moves the first set with the warm-up feel of that exercise only", () => {
+    const context = buildAdviceContext([lastWeek], now);
+    const plan = (warmupFeel?: "worse" | "expected" | "better") => adviseSet(context, { ...exercise(barbell, [open("one")]), warmupFeel }, "one")!;
+    expect(plan("expected")).toEqual(plan());
+    expect(plan("worse").readinessPercent).toBeLessThan(plan().readinessPercent);
+    expect(plan("better").readinessPercent).toBeGreaterThan(plan().readinessPercent);
+    expect(plan("worse").reason.vi).toContain("khởi động nặng hơn thường");
+  });
 });

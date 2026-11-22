@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Pre-workout check-in and warm-up feel
+
+- A workout now opens with three optional questions: last night's sleep, energy right now and muscle soreness, each 1-5 with 3 as a normal day. The answers move the suggested weights of that workout by at most 3% either way (ADR 0025). Skip it and nothing changes; you can answer, edit or clear it until the workout ends.
+- After a warm-up set of an exercise you can say whether it felt heavier, as usual or lighter. Lighter raises that exercise's suggested weights by 1.3%, heavier lowers them by 2.6%.
+- The reason under a suggestion now says which of these moved it. What you type still wins, and nothing is logged for you.
+- Sessions gain two optional fields (`checkIn`, and `warmupFeel` on an exercise), kept in backups. Older backups and sessions without them work as before; no database migration.
+
 ## Unreleased — Set suggestions from today's estimated strength
 
 - During a workout, the suggested weight and reps for a set now come from your estimated strength today instead of repeating last time's numbers: your recent sessions of the exact variant, how recovered the main muscles are, and the sets you have already done in this workout (ADR 0024). After each set the next one is planned again; correcting a set's RIR during the rest updates it.
@@ -8,15 +15,12 @@
 - A set with no RIR logged is read as 2 reps in reserve. Logging RIR makes the estimate follow you more closely.
 - No change to history, records, routines, the database or backups.
 
-||||||| a7a1ad9
 ## Unreleased — One look for the whole app, larger exercise movements
 
 - Every screen now uses the look of the workout screen: dark background, one orange accent. The cream and lime colours are gone, and so is the Appearance (light / dark / system) setting (ADR 0023).
 - Exercise pictures are easier to see: on a phone the movement fills the width of the exercise page and of the technique dialog during a workout, with the muscle map underneath.
 - All exercise pictures (built-in drawings and ExerciseDB GIFs) sit on the same white plate, so they stand out from the dark screen instead of sinking into it.
 - Only one filled orange button per screen; other buttons are tinted.
-
-||||||| 7426b33
 
 ## Unreleased — Autoregulation engine (not yet in the app)
 
