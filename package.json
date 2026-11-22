@@ -23,6 +23,7 @@
     "media:health": "node scripts/media-health-report.mjs",
     "media:health:online": "node scripts/media-health-report.mjs --online",
     "performance:report": "node scripts/performance-report.mjs",
+    "autoregulation:sample": "node scripts/autoregulation-sample.mjs",
     "nutrition:recipes": "node scripts/generate-vietnamese-recipes.mjs",
     "nutrition:verify-pack": "python scripts/verify-nutrition-pack.py --db outputs/gym-local-nutrition-2026.11.1.sqlite3 --manifest public/nutrition-pack-manifest.json",
     "db:test-migrations": "vitest run packages/storage",
