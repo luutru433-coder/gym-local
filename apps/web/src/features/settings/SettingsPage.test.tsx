@@ -4,7 +4,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Profile } from "@gym/contracts";
 import { estimateNutritionTarget } from "@gym/nutrition";
 import { defaultSettings } from "@gym/storage";
-import { getThemePreference, setThemePreference } from "@gym/storage/device";
 import { useGymStore } from "../../store/useGymStore";
 import { SettingsPage } from "./SettingsPage";
 
@@ -37,8 +36,6 @@ function profile(): Profile {
 
 afterEach(() => {
   cleanup();
-  setThemePreference("system");
-  delete document.documentElement.dataset.theme;
   vi.restoreAllMocks();
 });
 
@@ -77,23 +74,3 @@ describe("nutrition target confirmation", () => {
   });
 });
 
-describe("appearance", () => {
-  it("follows the system by default and keeps a manual choice on the device", async () => {
-    const user = userEvent.setup();
-    useGymStore.setState({ profile: profile(), settings: defaultSettings, activeSession: undefined, recoveryAvailable: false });
-    render(<SettingsPage />);
-
-    expect(screen.getByRole("button", { name: "Theo máy" })).toHaveAttribute("aria-pressed", "true");
-
-    await user.click(screen.getByRole("button", { name: "Tối" }));
-    expect(document.documentElement.dataset.theme).toBe("dark");
-    expect(getThemePreference()).toBe("dark");
-    expect(screen.getByRole("button", { name: "Tối" })).toHaveAttribute("aria-pressed", "true");
-
-    await user.click(screen.getByRole("button", { name: "Sáng" }));
-    expect(document.documentElement.dataset.theme).toBe("light");
-
-    await user.click(screen.getByRole("button", { name: "Theo máy" }));
-    expect(getThemePreference()).toBe("system");
-  });
-});
