@@ -5,6 +5,7 @@ import { dailyNutrition, nutritionTargetNeedsConfirmation, type NutritionEstimat
 import { useState } from "react";
 import type { Goal } from "@gym/contracts";
 import { sessionProgress } from "@gym/workouts";
+import { planEngineSession } from "@gym/workouts/autoregulation-week";
 import { DEFAULT_PROGRESSION_RULE, createAdaptiveSessionFromRoutine, planAdaptiveSession, planTrainingWeek } from "@gym/workouts/plan";
 import { RecoveryMapCard } from "./RecoveryMapCard";
 import { TrainingPlanCard } from "./TrainingPlanCard";
@@ -66,7 +67,7 @@ export function HomePage() {
 
   const [applyAdjustments, setApplyAdjustments] = useState(true);
   const rule = activeProgram?.progressionRule ?? DEFAULT_PROGRESSION_RULE;
-  const sessionPlan = nextRoutine ? planAdaptiveSession(nextRoutine, sessions, rule) : undefined;
+  const sessionPlan = nextRoutine ? planEngineSession(planAdaptiveSession(nextRoutine, sessions, rule), nextRoutine, sessions) : undefined;
   const programStart = activeProgram ? Math.min(activeProgram.activeDayIndex, Math.max(0, activeProgramDays.length - 1)) : 0;
   const routineStart = weeklySessions.length % Math.max(1, routines.length);
   const upcomingRoutineIds = programmedRoutine
