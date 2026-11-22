@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Autoregulation engine (not yet in the app)
+
+- New `@gym/workouts/autoregulation` module with the formulas for estimating strength on the day, fatigue within a session, muscle recovery, and weekly set changes (ADR 0024). Nothing in the app uses it yet, so workouts, suggestions, the database and backups are unchanged.
+- `pnpm autoregulation:sample` runs the engine against a simulated lifter and writes `docs/autoregulation-sample-run.md`.
+
 ## Unreleased — Add exercises from the downloaded ExerciseDB set
 
 - The exercise library has a new "Add from ExerciseDB" button. It lists the exercises of the downloaded set that the app does not have yet (search by name, filter by body part); add one, or everything listed. An added exercise joins your own exercises with its image, muscles, equipment and steps, and can be picked in routines.
