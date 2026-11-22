@@ -179,6 +179,11 @@ export function WorkoutPage() {
 
   useScreenWakeLock(Boolean(activeSession));
 
+  // A workout opens at its top (check-in, then the set panel), not at the scroll position of the screen it came from.
+  useEffect(() => {
+    if (activeSessionId) document.documentElement.scrollTop = 0;
+  }, [activeSessionId]);
+
   useEffect(() => {
     // Sound unlocks only inside an activation gesture: touch release, click or key press.
     const gestures = ["pointerup", "touchend", "click", "keydown"] as const;
