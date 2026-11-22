@@ -124,17 +124,22 @@ export function adviseSet(context: AdviceContext, exercise: SessionExercise, set
     primaryMuscleRecovery: primary.map((muscle) => context.recovery.find((item) => item.muscle === muscle)?.recovery ?? 1)
   });
   const done = observedSets(exercise);
+  const rest = set.restBeforeSeconds;
+  const actualRest = done.length && rest !== undefined && rest >= 0 && Number.isFinite(rest) ? rest : undefined;
   const capacity = nextSetCapacity({
     priorE1rmKg: baseline ? baseline.e1rmKg * readiness.factor : undefined,
     completedSets: done,
-    restSeconds: exercise.restSeconds >= 0 ? exercise.restSeconds : undefined,
+    // A set already started knows the rest really taken; before that, the planned rest.
+    restSeconds: actualRest ?? (exercise.restSeconds >= 0 ? exercise.restSeconds : undefined),
     fatigueDropPerSet: calibrateFatigueDrop(records).dropPerSet
   });
   if (!capacity) return undefined;
 
   const stepKg = profileOf(exercise).loadEntryMode === "total_weight" ? 2.5 : 1;
   const typed = set.weightKg !== undefined && set.weightKg > 0 ? set.weightKg : undefined;
-  const currentLoadKg = typed ?? done.at(-1)?.loadKg ?? records.at(-1)?.sets[0]?.loadKg;
+  // Sessions arrive in the store's order, so the latest one is found by date.
+  const latest = records.reduce<VariantSessionRecord | undefined>((newest, record) => !newest || record.finishedAt > newest.finishedAt ? record : newest, undefined);
+  const currentLoadKg = typed ?? done.at(-1)?.loadKg ?? latest?.sets[0]?.loadKg;
   const targetRir = validRir(set.targetRir) ?? DEFAULT_TARGET_RIR;
   const prescription = prescribeSet({
     capacityE1rmKg: capacity.e1rmKg,

@@ -74,6 +74,26 @@ describe("adviseSet", () => {
     expect(tired.reason.en).toContain("not fully recovered");
   });
 
+  it("starts from the latest session's load whatever order the sessions arrive in", () => {
+    const older = finished("old", "2026-11-08T10:00:00.000Z", barbell, [done("a", 55, 12)]);
+    const newer = finished("new", "2026-11-15T10:00:00.000Z", barbell, [done("a", 60, 10)]);
+    for (const sessions of [[older, newer], [newer, older]]) {
+      expect(adviseSet(buildAdviceContext(sessions, now), exercise(barbell, [open("one")]), "one")!.weightKg).toBe(60);
+    }
+  });
+
+  it("uses the rest really taken once the set has been started", () => {
+    const context = buildAdviceContext([lastWeek], now);
+    const next = (restBeforeSeconds?: number) => adviseSet(context, exercise(barbell, [
+      done("one", 60, 10, { completedAt: now.toISOString(), rir: 2 }),
+      open("two", { startedAt: now.toISOString(), restBeforeSeconds })
+    ]), "two")!;
+    const short = next(30);
+    const long = next(240);
+    expect(short.weightKg * (1 + short.reps / 30)).toBeLessThan(long.weightKg * (1 + long.reps / 30));
+    expect(next()).toMatchObject({ weightKg: next(120).weightKg, reps: next(120).reps });
+  });
+
   it("keeps a load the user typed and fits the reps to it", () => {
     const context = buildAdviceContext([lastWeek], now);
     const advice = adviseSet(context, exercise(barbell, [open("one", { weightKg: 65 })]), "one")!;
