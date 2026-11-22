@@ -15,15 +15,15 @@ A simulated lifter trains 3 days a week for 5 weeks (4 hard weeks, then a deload
 
 ## How close the prescriptions were
 
-Hard weeks only (weeks 1-4), 161 working sets. The lifter's own feel for RIR is off by one rep on a third of the sets, so a gap of about 0.33 reps is unavoidable.
+Hard weeks only (weeks 1-4), 158 working sets. The lifter's own feel for RIR is off by one rep on a third of the sets, so a gap of about 0.33 reps is unavoidable.
 
 | Measure | Result |
 | --- | --- |
-| Sets where the reps done were within 1 of the reps prescribed | 73% |
-| Mean gap between prescribed reps and reps done | 1.07 |
-| Mean gap between the planned RIR and the real RIR | 0.35 |
-| Sets with reps inside the rep range | 93% |
-| Sets that ended at failure without being planned to | 4% |
+| Sets where the reps done were within 1 of the reps prescribed | 81% |
+| Mean gap between prescribed reps and reps done | 0.94 |
+| Mean gap between the planned RIR and the real RIR | 0.34 |
+| Sets with reps inside the rep range | 92% |
+| Sets that ended at failure without being planned to | 3% |
 
 ## Next to the app's current rule
 
@@ -31,9 +31,9 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Measure | Autoregulation engine | Current rule |
 | --- | --- | --- |
-| Working sets in 4 weeks | 161 | 144 |
-| Sets with reps inside the rep range | 93% | 100% |
-| Sets that ended at failure | 4% | 0% |
+| Working sets in 4 weeks | 158 | 144 |
+| Sets with reps inside the rep range | 92% | 100% |
+| Sets that ended at failure | 3% | 0% |
 | Mean real RIR per set | 2.4 | 1.22 |
 
 ## Week by week
@@ -43,9 +43,9 @@ The current rule is simplified: three sets at one load aiming for the top of the
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
 | bench press | 55 kg × 10 | 76.6 | 80.3 | 7.8% |
-| barbell row | 47.5 kg × 12 | 65.6 | 70 | 1.9% |
+| barbell row | 47.5 kg × 12 | 66.4 | 70 | 2.5% |
 | squat | 75 kg × 10 | 103.9 | 110 | 5.3% |
-| dumbbell curl | 20 kg × 15 | 30.9 | 35 | 2.9% |
+| dumbbell curl | 20 kg × 15 | 31.1 | 35 | 1.4% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -58,15 +58,15 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 9 | 77.2 | 81.3 | 6.4% |
-| barbell row | 45 kg × 10 | 64.5 | 70.8 | 1.9% |
-| squat | 75 kg × 8 | 105 | 111.3 | 4.7% |
-| dumbbell curl | 20 kg × 13 | 30.4 | 35.3 | 2.2% |
+| bench press | 55 kg × 10 | 77.2 | 81.3 | 5.2% |
+| barbell row | 47.5 kg × 9 | 66 | 70.8 | 3% |
+| squat | 75 kg × 9 | 105 | 111.3 | 4.7% |
+| dumbbell curl | 20 kg × 13 | 30.3 | 35.3 | 1% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
 | chest | 9 | 2 | 2 | add | +1 | 30 |
-| back | 10 | 2 | 2 | add | +1 | 28.5 |
+| back | 10 | 2 | 3 | hold | 0 | 28.5 |
 | quadriceps | 9 | 2 | 2 | add | +1 | 28.5 |
 | biceps | 10 | 1 | 2 | add | +1 | 18.1 |
 
@@ -74,15 +74,15 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 9 | 77.5 | 82.3 | 6.1% |
-| barbell row | 45 kg × 10 | 64.9 | 71.7 | 2.3% |
-| squat | 75 kg × 10 | 104.1 | 112.7 | 4% |
-| dumbbell curl | 20 kg × 13 | 30.6 | 35.7 | 2.9% |
+| bench press | 55 kg × 9 | 77.7 | 82.3 | 5.2% |
+| barbell row | 47.5 kg × 10 | 67.3 | 71.7 | 2.7% |
+| squat | 75 kg × 10 | 104.9 | 112.7 | 4.2% |
+| dumbbell curl | 20 kg × 14 | 30.5 | 35.7 | 1.7% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
 | chest | 10 | 2 | 2 | add | +1 | 30 |
-| back | 11 | 2 | 2 | add | +1 | 28.5 |
+| back | 10 | 2 | 3 | hold | 0 | 28.5 |
 | quadriceps | 10 | 2 | 3 | hold | 0 | 28.5 |
 | biceps | 11 | 2 | 2 | add | +1 | 18.1 |
 
@@ -90,32 +90,32 @@ The current rule is simplified: three sets at one load aiming for the top of the
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 10 | 79.4 | 83.3 | 5.3% |
-| barbell row | 45 kg × 12 | 66.4 | 72.6 | 1.9% |
-| squat | 75 kg × 10 | 105.8 | 114 | 3.7% |
-| dumbbell curl | 20 kg × 14 | 31.2 | 36.1 | 2.9% |
+| bench press | 62.5 kg × 6 | 82 | 83.3 | 4.4% |
+| barbell row | 47.5 kg × 11 | 68.6 | 72.6 | 2.3% |
+| squat | 85 kg × 6 | 111.5 | 114 | 5.4% |
+| dumbbell curl | 20 kg × 15 | 31.1 | 36.1 | 1.6% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
 | chest | 11 | 3 | 2 | hold | 0 | 30 |
-| back | 12 | 2 | 2 | add | +1 | 28.5 |
-| quadriceps | 10 | 2 | 2 | add | +1 | 28.5 |
+| back | 10 | 2 | 2 | add | +1 | 28.5 |
+| quadriceps | 10 | 2 | 3 | hold | 0 | 28.5 |
 | biceps | 12 | 2 | 2 | add | +1 | 18.1 |
 
 ### Week 5 (deload): target RIR 5
 
 | Exercise | Monday set 1 | Engine fresh e1RM (kg) | True 1RM after week (kg) | Learned drop per set |
 | --- | --- | --- | --- | --- |
-| bench press | 55 kg × 6 | 78.5 | 83.3 | 5.2% |
-| barbell row | 45 kg × 8 | 66.1 | 72.6 | 1.9% |
-| squat | 75 kg × 7 | 107.2 | 114 | 4.2% |
-| dumbbell curl | 20 kg × 10 | 31.2 | 36.1 | 2.9% |
+| bench press | 57.5 kg × 7 | 78.2 | 83.3 | 4.5% |
+| barbell row | 47.5 kg × 8 | 65.8 | 72.6 | 2.4% |
+| squat | 80 kg × 7 | 108.5 | 114 | 5.6% |
+| dumbbell curl | 20 kg × 12 | 30.9 | 36.1 | 1.6% |
 
 | Muscle | Sets this week | Soreness (1-4) | Performance (1-4) | Decision | Set change next week | Recovery constant (h) |
 | --- | --- | --- | --- | --- | --- | --- |
-| chest | 6 | 2 | 2 | deload | 0 | 30 |
-| back | 7 | 1 | 2 | deload | 0 | 27.1 |
-| quadriceps | 6 | 1 | 2 | deload | 0 | 27.1 |
+| chest | 6 | 2 | 3 | deload | 0 | 30 |
+| back | 6 | 1 | 3 | deload | 0 | 27.1 |
+| quadriceps | 6 | 1 | 3 | deload | 0 | 27.1 |
 | biceps | 7 | 1 | 2 | deload | 0 | 17.2 |
 
 ## One session set by set: the bad night (week 3, Wednesday)
@@ -124,20 +124,19 @@ Check-in sleep 1, energy 2, soreness 3. Real strength that day is about 6% down.
 
 | Exercise | Set | Readiness | Prior e1RM | Capacity e1RM | Prescribed | Done | Real RIR |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| bench press | 1 | 0.976 | 74.8 | 74.8 | 55 × 8 @ 2 RIR | 55 × 8 | 2 |
-| bench press | 2 | 0.976 | 74.8 | 70.3 | 55 × 6 @ 2 RIR | 55 × 8 | 1 |
-| bench press | 3 | 0.976 | 74.8 | 68.4 | 52.5 × 7 @ 2 RIR | 52.5 × 7 | 2 |
-| barbell row | 1 | 0.977 | 63.8 | 63.8 | 45 × 10 @ 2 RIR | 45 × 11 | 1 |
-| barbell row | 2 | 0.977 | 63.8 | 63 | 45 × 10 @ 2 RIR | 45 × 9 | 2 |
-| barbell row | 3 | 0.977 | 63.8 | 61 | 45 × 8 @ 2 RIR | 45 × 8 | 2 |
-| barbell row | 4 | 0.977 | 63.8 | 59.4 | 42.5 × 9 @ 2 RIR | 42.5 × 10 | 1 |
-| squat | 1 | 0.977 | 102.9 | 102.9 | 75 × 9 @ 2 RIR | 75 × 8 | 2 |
-| squat | 2 | 0.977 | 102.9 | 97.6 | 75 × 7 @ 2 RIR | 75 × 7 | 2 |
-| squat | 3 | 0.977 | 102.9 | 94.5 | 72.5 × 7 @ 2 RIR | 72.5 × 8 | 1 |
-| dumbbell curl | 1 | 0.981 | 30.2 | 30.2 | 20 × 13 @ 2 RIR | 20 × 12 | 2 |
-| dumbbell curl | 2 | 0.981 | 30.2 | 28.6 | 20 × 10 @ 2 RIR | 20 × 12 | 1 |
-| dumbbell curl | 3 | 0.981 | 30.2 | 28 | 20 × 10 @ 2 RIR | 20 × 10 | 2 |
-| dumbbell curl | 4 | 0.981 | 30.2 | 27.1 | 18 × 13 @ 2 RIR | 18 × 11 | 3 |
+| bench press | 1 | 0.976 | 74.8 | 74.8 | 55 × 9 @ 2 RIR | 55 × 8 | 2 |
+| bench press | 2 | 0.976 | 74.8 | 70.8 | 55 × 7 @ 2 RIR | 55 × 8 | 1 |
+| bench press | 3 | 0.976 | 74.8 | 69.1 | 55 × 6 @ 2 RIR | 55 × 6 | 2 |
+| barbell row | 1 | 0.977 | 65.8 | 65.8 | 47.5 × 10 @ 2 RIR | 47.5 × 9 | 1 |
+| barbell row | 2 | 0.977 | 65.8 | 63.2 | 47.5 × 8 @ 2 RIR | 47.5 × 8 | 2 |
+| barbell row | 3 | 0.977 | 65.8 | 61.4 | 45 × 9 @ 2 RIR | 45 × 8 | 2 |
+| squat | 1 | 0.977 | 102.9 | 102.9 | 75 × 9 @ 2 RIR | 75 × 9 | 1 |
+| squat | 2 | 0.977 | 102.9 | 99.4 | 75 × 8 @ 2 RIR | 75 × 7 | 2 |
+| squat | 3 | 0.977 | 102.9 | 95.5 | 75 × 6 @ 2 RIR | 75 × 5 | 2 |
+| dumbbell curl | 1 | 0.981 | 30.4 | 30.4 | 20 × 14 @ 2 RIR | 20 × 13 | 1 |
+| dumbbell curl | 2 | 0.981 | 30.4 | 29.7 | 20 × 13 @ 2 RIR | 20 × 11 | 2 |
+| dumbbell curl | 3 | 0.981 | 30.4 | 28.8 | 20 × 11 @ 2 RIR | 20 × 12 | 1 |
+| dumbbell curl | 4 | 0.981 | 30.4 | 28.6 | 20 × 11 @ 2 RIR | 20 × 10 | 2 |
 
 ## Alpha Progression's published examples through this engine
 
@@ -147,9 +146,9 @@ Alpha Progression does not publish its formula, so these are a comparison, not a
 | --- | --- | --- | --- |
 | 2: DB shoulder press, target 12, weights 18/20; last 20×10, 20×8, 20×4; today's set 1 | 18 × 14 | 20 × 10 | no |
 | 3a: same; set 1 done 20×12; set 2 | 20 × 10 | 20 × 10 | yes |
-| 3b: same; set 1 done 18×10; set 2 | 18 × 10 | 18 × 9 | no |
-| 4: sumo deadlift, target 6 @ 2 RIR; set 1 done 90×7 @ 0 RIR; set 2 (2.5 kg steps assumed) | 90 × 5 | 82.5 × 6 | no |
-| 5: barbell bench, target 10; last 80×10 ×3; set 1 done 85×10; set 2 (2.5 kg steps assumed) | 85 × 9 | 80 × 10 | no |
+| 3b: same; set 1 done 18×10; set 2 | 18 × 10 | 18 × 10 | yes |
+| 4: sumo deadlift, target 6 @ 2 RIR; set 1 done 90×7 @ 0 RIR; set 2 (2.5 kg steps assumed) | 90 × 5 | 85 × 5 | no |
+| 5: barbell bench, target 10; last 80×10 ×3; set 1 done 85×10; set 2 (2.5 kg steps assumed) | 85 × 9 | 82.5 × 9 | no |
 
 Where they differ, Alpha Progression holds the weight and lets reps fall below a one-value target, while this engine changes the weight to land on the target. Gym Local routines use rep ranges (for example 8-12), where this engine also holds the weight until reps leave the range.
 

@@ -39,6 +39,7 @@ import {
   updateSet
 } from "@gym/workouts";
 import { cancelRunningSet, lastFinishedSet, nextOpenSet, reopenSet, runningSeconds, runningSet, stampWorkSeconds, startSet, type SetRef } from "@gym/workouts/set-timer";
+import { adviseSet, buildAdviceContext, type SetAdvice } from "@gym/workouts/autoregulation-plan";
 import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, restingExercise, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
 import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
@@ -156,6 +157,24 @@ export function WorkoutPage() {
     () => activeSession ? sessionRecordSets(sessions, activeSession) : [],
     [sessions, activeSession]
   );
+
+  // Finished history and muscle recovery as of the start of this workout; today's sets are read live.
+  const activeSessionId = activeSession?.id;
+  const activeSessionStartedAt = activeSession?.startedAt;
+  const adviceContext = useMemo(
+    () => activeSessionId && activeSessionStartedAt
+      ? buildAdviceContext(sessions.filter((session) => session.id !== activeSessionId), new Date(activeSessionStartedAt))
+      : undefined,
+    [sessions, activeSessionId, activeSessionStartedAt]
+  );
+  /** Engine advice when the exercise can be estimated, else the "same as last time" values. */
+  const suggestFor = (exercise: WorkoutSession["exercises"][number], set: SetLog, previous: SetSuggestion[]): { suggestion?: SetSuggestion; advice?: SetAdvice } => {
+    if (set.completedAt) return {};
+    const advice = adviceContext ? adviseSet(adviceContext, exercise, set.id) : undefined;
+    return advice
+      ? { advice, suggestion: { weightKg: advice.weightKg, reps: advice.reps } }
+      : { suggestion: suggestSetValues(exercise, set.id, previous) };
+  };
 
   useScreenWakeLock(Boolean(activeSession));
 
@@ -392,7 +411,7 @@ export function WorkoutPage() {
       ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
     const mode = tracking.effortKind === "distance_duration" ? "distance" as const : tracking.effortKind === "duration" ? "timed" as const : "reps" as const;
     const previous = latestVariantHistory(sessions.filter((session) => session.id !== activeSession.id), exercise.variantId);
-    const suggestion = set.completedAt ? undefined : suggestSetValues(exercise, set.id, previous);
+    const { suggestion, advice } = suggestFor(exercise, set, previous);
     const filled = { ...set, ...applySetSuggestion(set, suggestion) };
     const patch = (values: SetSuggestion & Pick<SetLog, "rir">) => set.completedAt
       // Correcting a finished set must not move the workout back to its block (supersets).
@@ -425,6 +444,9 @@ export function WorkoutPage() {
       doneCount: exercise.sets.filter((item) => item.completedAt).length,
       targetLabel: mode === "reps" ? (repRange ? `${repRange} ${locale === "vi" ? "lần" : "reps"}` : undefined) : set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : undefined,
       previousLabel: prior ? (mode === "distance" ? `${prior.distanceMeters ?? "—"} m · ${prior.durationSeconds ?? "—"} s` : mode === "timed" ? `${prior.weightKg ? `${prior.weightKg} kg · ` : ""}${prior.durationSeconds ?? "—"} s` : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`) : undefined,
+      adviceLabel: advice
+        ? `${advice.weightKg} × ${advice.reps} · ${locale === "vi" ? `còn khoảng ${Math.round(advice.expectedRir)} lần` : `about ${Math.round(advice.expectedRir)} left`} · ${localize(advice.reason, locale)}`
+        : undefined,
       load,
       effort
     };
@@ -664,7 +686,7 @@ export function WorkoutPage() {
                             ? `${prior.weightKg ? `${prior.weightKg}kg · ` : ""}${prior.durationSeconds ?? "—"}s`
                             : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`)
                         : targetLabel;
-                      const suggestion = set.completedAt ? undefined : suggestSetValues(exercise, set.id, previous);
+                      const { suggestion } = suggestFor(exercise, set, previous);
                       const filled = { ...set, ...applySetSuggestion(set, suggestion) };
                       const canComplete = distanceMode
                         ? Boolean((filled.distanceMeters ?? 0) > 0 || (filled.durationSeconds ?? 0) > 0)

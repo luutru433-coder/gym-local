@@ -20,6 +20,8 @@ export interface FocusSet {
   doneCount: number;
   targetLabel?: string;
   previousLabel?: string;
+  /** Engine advice for this set: load × reps, expected reps left and why. */
+  adviceLabel?: string;
   load?: FocusNumber;
   effort: FocusNumber;
 }
@@ -125,6 +127,7 @@ export function SetFocus({ locale, state, alertMuted, wakeLockSupported, onStart
             <p className="focus-eyebrow">{vi ? `Set ${state.set.setNumber}` : `Set ${state.set.setNumber}`}{state.set.targetLabel ? ` · ${vi ? "mục tiêu" : "target"} ${state.set.targetLabel}` : ""}</p>
             <Numbers set={state.set} locale={locale} />
             {state.set.previousLabel ? <p className="focus-hint">{vi ? "Lần trước" : "Last time"} <b>{state.set.previousLabel}</b></p> : null}
+            {state.set.adviceLabel ? <p className="focus-hint">{vi ? "Gợi ý hôm nay" : "Today's suggestion"} <b>{state.set.adviceLabel}</b></p> : null}
           </>
         ) : null}
 
@@ -177,6 +180,7 @@ export function SetFocus({ locale, state, alertMuted, wakeLockSupported, onStart
                 </div>
               </div>
             ) : null}
+            {state.next?.adviceLabel ? <p className="focus-hint">{vi ? `Gợi ý set ${state.next.setNumber}` : `Suggestion for set ${state.next.setNumber}`} <b>{state.next.adviceLabel}</b></p> : null}
             <span className="sr-only" aria-live="assertive">{restDone ? (vi ? "Hết giờ nghỉ, sẵn sàng tập" : "Rest complete, ready") : ""}</span>
           </div>
         ) : null}

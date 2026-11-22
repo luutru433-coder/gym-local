@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Set suggestions from today's estimated strength
+
+- During a workout, the suggested weight and reps for a set now come from your estimated strength today instead of repeating last time's numbers: your recent sessions of the exact variant, how recovered the main muscles are, and the sets you have already done in this workout (ADR 0024). After each set the next one is planned again; correcting a set's RIR during the rest updates it.
+- The focus panel shows the suggestion with about how many reps it should leave and why; during the rest it shows the plan for the next set.
+- It applies to exercises logged as weight × reps with a rep target, once the exact variant has history. Other exercises, and a first-ever exercise, keep the previous suggestion. What you type always wins, and nothing is logged for you.
+- A set with no RIR logged is read as 2 reps in reserve. Logging RIR makes the estimate follow you more closely.
+- No change to history, records, routines, the database or backups.
+
 ## Unreleased — Autoregulation engine (not yet in the app)
 
 - New `@gym/workouts/autoregulation` module with the formulas for estimating strength on the day, fatigue within a session, muscle recovery, and weekly set changes (ADR 0024). Nothing in the app uses it yet, so workouts, suggestions, the database and backups are unchanged.
