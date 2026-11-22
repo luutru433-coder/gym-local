@@ -106,7 +106,8 @@ const sessionSchema = z.object({
   restTimerEndsAt: timestampSchema.optional(),
   exercises: z.array(sessionExerciseSchema),
   notes: z.string().optional(),
-  checkIn: z.object({ sleep: checkInAnswer, energy: checkInAnswer, soreness: checkInAnswer }).passthrough().optional()
+  checkIn: z.object({ sleep: checkInAnswer, energy: checkInAnswer, soreness: checkInAnswer }).passthrough().optional(),
+  soreness: z.record(z.string(), z.number().int().min(1).max(4)).optional()
 }).passthrough();
 
 const routineTargetSchema = z.object({

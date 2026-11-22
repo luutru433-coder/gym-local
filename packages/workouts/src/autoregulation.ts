@@ -1,4 +1,4 @@
-import type { LocalizedText, MuscleGroup } from "@gym/contracts";
+import type { LocalizedText, MuscleGroup, SorenessScore } from "@gym/contracts";
 
 /**
  * Autoregulation engine (ADR 0024). Pure functions over plain data: no catalog,
@@ -385,7 +385,7 @@ export function muscleRecovery(
 }
 
 /** Soreness on RP's published 1-4 scale. */
-export type SorenessScore = 1 | 2 | 3 | 4;
+export type { SorenessScore };
 
 /** Still sore at the next session lengthens the muscle's time constant by 10%; never sore shortens it by 5%. */
 export function calibrateTau(tauHours: number, soreness: SorenessScore): number {

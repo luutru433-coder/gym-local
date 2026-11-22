@@ -1,7 +1,7 @@
-import type { LocalizedText, ReadinessCheckIn, SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
+import type { LocalizedText, ReadinessCheckIn, SessionExercise, SorenessScore, SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, trackingProfileForLoadMode } from "@gym/catalog";
 import {
-  estimateBaseline, calibrateFatigueDrop, muscleRecovery, nextSetCapacity, prescribeSet, readinessFactor, setFatigueUnits,
+  AUTOREG, DEFAULT_TAU_HOURS, calibrateTau, estimateBaseline, calibrateFatigueDrop, muscleRecovery, nextSetCapacity, prescribeSet, readinessFactor, setFatigueUnits,
   type BaselineEstimate, type MuscleLoadEvent, type MuscleRecoveryEstimate, type ObservedSet, type PrescriptionAction,
   type RecoveryMuscle, type VariantSessionRecord
 } from "./autoregulation";
@@ -97,7 +97,80 @@ export function buildAdviceContext(finishedSessions: WorkoutSession[], at: Date)
       });
     }
   }
-  return { at, history, recovery: muscleRecovery(events, at) };
+  return { at, history, recovery: muscleRecovery(events, at, personalTauHours(finishedSessions, at)) };
+}
+
+const validSoreness = (value: unknown): value is SorenessScore => value === 1 || value === 2 || value === 3 || value === 4;
+
+/**
+ * Each muscle's recovery time constant, learned by replaying the soreness answers
+ * of finished sessions in date order (ADR 0026). Muscles never rated are absent
+ * and keep the engine's default.
+ */
+export function personalTauHours(finishedSessions: WorkoutSession[], at: Date): Partial<Record<RecoveryMuscle, number>> {
+  const tau: Partial<Record<RecoveryMuscle, number>> = {};
+  const rated = finishedSessions
+    .filter((session) => session.finishedAt && session.soreness && new Date(session.finishedAt).getTime() <= at.getTime())
+    .sort((left, right) => left.finishedAt!.localeCompare(right.finishedAt!));
+  for (const session of rated) {
+    for (const muscle of Object.keys(DEFAULT_TAU_HOURS) as RecoveryMuscle[]) {
+      const score = session.soreness?.[muscle];
+      if (validSoreness(score)) tau[muscle] = calibrateTau(tau[muscle] ?? DEFAULT_TAU_HOURS[muscle], score);
+    }
+  }
+  return tau;
+}
+
+export type RecoveryStatus = "fatigued" | "recovering" | "ready";
+
+export interface MuscleRecoveryView extends MuscleRecoveryEstimate {
+  status: RecoveryStatus;
+  /** The time constant used, in hours, and whether soreness answers moved it off the default. */
+  tauHours: number;
+  personal: boolean;
+}
+
+/** Below this recovery a muscle is shown as fatigued; from `AUTOREG.readyAt` it is ready. Ours. */
+export const FATIGUED_BELOW = 0.6;
+
+/** The engine's recovery of every muscle now, for the home screen's map. */
+export function recoveryOverview(finishedSessions: WorkoutSession[], at: Date): MuscleRecoveryView[] {
+  const tau = personalTauHours(finishedSessions, at);
+  return buildAdviceContext(finishedSessions, at).recovery.map((item) => ({
+    ...item,
+    status: item.recovery >= AUTOREG.readyAt ? "ready" : item.recovery < FATIGUED_BELOW ? "fatigued" : "recovering",
+    tauHours: tau[item.muscle] ?? DEFAULT_TAU_HOURS[item.muscle],
+    personal: tau[item.muscle] !== undefined && tau[item.muscle] !== DEFAULT_TAU_HOURS[item.muscle]
+  }));
+}
+
+export interface SorenessPrompt {
+  sessionId: string;
+  finishedAt: string;
+  /** Primary muscles of the session's completed working sets, in catalog order. */
+  muscles: RecoveryMuscle[];
+  answers: Partial<Record<RecoveryMuscle, SorenessScore>>;
+}
+
+/** The latest finished session of the last 10 days whose muscles can be rated for soreness. */
+export function sorenessPrompt(finishedSessions: WorkoutSession[], at: Date): SorenessPrompt | undefined {
+  const latest = finishedSessions
+    .filter((session) => session.finishedAt && new Date(session.finishedAt).getTime() <= at.getTime() && at.getTime() - new Date(session.finishedAt).getTime() <= RECOVERY_LOOKBACK_MS)
+    .reduce<WorkoutSession | undefined>((newest, session) => !newest || session.finishedAt! > newest.finishedAt! ? session : newest, undefined);
+  if (!latest) return undefined;
+  const trained = new Set<string>();
+  for (const exercise of latest.exercises) {
+    if (!exercise.sets.some((set) => set.completedAt && set.type !== "warmup")) continue;
+    getMovement(exercise.movementId)?.primaryMuscles.forEach((muscle) => trained.add(muscle));
+  }
+  const muscles = (Object.keys(DEFAULT_TAU_HOURS) as RecoveryMuscle[]).filter((muscle) => trained.has(muscle));
+  if (!muscles.length) return undefined;
+  const answers: SorenessPrompt["answers"] = {};
+  for (const muscle of muscles) {
+    const score = latest.soreness?.[muscle];
+    if (validSoreness(score)) answers[muscle] = score;
+  }
+  return { sessionId: latest.id, finishedAt: latest.finishedAt!, muscles, answers };
 }
 
 function validCheckIn(checkIn: ReadinessCheckIn | undefined): ReadinessCheckIn | undefined {

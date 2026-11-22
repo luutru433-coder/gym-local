@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, getVariant } from "@gym/catalog";
-import { adviseSet, buildAdviceContext, usesWarmupFeel } from "./autoregulation-plan";
+import { adviseSet, buildAdviceContext, personalTauHours, recoveryOverview, sorenessPrompt, usesWarmupFeel } from "./autoregulation-plan";
 import { switchExerciseVariant } from "./index";
 
 const now = new Date("2026-11-22T10:00:00.000Z");
@@ -154,5 +154,37 @@ describe("adviseSet", () => {
   it("offers the warm-up rating only where it can change a suggestion", () => {
     expect(usesWarmupFeel(exercise(barbell, [open("one")]))).toBe(true);
     expect(usesWarmupFeel(exercise(barbell, [{ id: "free", type: "working" }]))).toBe(false);
+  });
+});
+
+describe("soreness feedback", () => {
+  const sets = [done("a", 60, 10), done("b", 60, 9), done("c", 60, 8)];
+  const yesterday = finished("s2", "2026-11-22T04:00:00.000Z", barbell, [...sets, done("d", 60, 8, { rir: 0 }), done("e", 60, 8, { rir: 0 })]);
+
+  it("asks about the primary muscles of the latest finished session and reads back valid answers only", () => {
+    const prompt = sorenessPrompt([lastWeek, { ...yesterday, soreness: { chest: 4, back: 9 as never } }], now)!;
+    expect(prompt.sessionId).toBe("s2");
+    expect(prompt.muscles).toEqual(getMovement("chest_press")!.primaryMuscles);
+    expect(prompt.answers).toEqual({ chest: 4 });
+    expect(sorenessPrompt([], now)).toBeUndefined();
+    expect(sorenessPrompt([finished("old", "2026-11-01T10:00:00.000Z", barbell, sets)], now)).toBeUndefined();
+  });
+
+  it("learns a slower recovery from 'still sore' and a faster one from 'not sore', in date order", () => {
+    expect(personalTauHours([lastWeek, yesterday], now)).toEqual({});
+    expect(personalTauHours([{ ...yesterday, soreness: { chest: 4 } }, { ...lastWeek, soreness: { chest: 4 } }], now).chest).toBeCloseTo(36.3, 1);
+    expect(personalTauHours([{ ...yesterday, soreness: { chest: 1 } }], now).chest).toBeCloseTo(28.5, 1);
+    expect(personalTauHours([{ ...yesterday, soreness: { chest: 2 } }], now).chest).toBe(30);
+  });
+
+  it("shows a muscle rated still sore as less recovered and feeds the same estimate to set advice", () => {
+    const plain = recoveryOverview([yesterday], now).find((item) => item.muscle === "chest")!;
+    const sore = recoveryOverview([{ ...yesterday, soreness: { chest: 4 } }], now).find((item) => item.muscle === "chest")!;
+    expect(sore.recovery).toBeLessThan(plain.recovery);
+    expect(sore.hoursUntilReady).toBeGreaterThan(plain.hoursUntilReady);
+    expect(sore).toMatchObject({ personal: true, tauHours: 33 });
+    expect(plain).toMatchObject({ personal: false, tauHours: 30 });
+    expect(buildAdviceContext([{ ...yesterday, soreness: { chest: 4 } }], now).recovery.find((item) => item.muscle === "chest")!.recovery).toBe(sore.recovery);
+    expect(recoveryOverview([], now).every((item) => item.status === "ready")).toBe(true);
   });
 });
