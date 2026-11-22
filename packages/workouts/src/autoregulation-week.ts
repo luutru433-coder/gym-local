@@ -1,8 +1,9 @@
 import type { LocalizedText, Routine, RoutineSetTarget, SessionExercise, SorenessScore, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, trackingProfileForLoadMode } from "@gym/catalog";
 import type { AdaptiveSessionPlan, PlanItemAdjustment } from "./adaptive-plan";
+import { buildAdviceContext } from "./autoregulation-plan";
 import {
-  AUTOREG, DEFAULT_TAU_HOURS, blockWeek, distributeSetDelta, needsEarlyDeload, performanceScore, volumeDecision,
+  AUTOREG, DEFAULT_TAU_HOURS, blockWeek, estimateBaseline, distributeSetDelta, needsEarlyDeload, performanceScore, volumeDecision,
   type PerformanceScore, type RecoveryMuscle, type ScoredSet, type VolumeAction, type WeekPlan
 } from "./autoregulation";
 
@@ -84,10 +85,10 @@ function recoveryMuscles(finished: WorkoutSession[], variantIds: Set<string>, fr
   });
 }
 
-/** The workout screen's set advice can pick this item's load itself: weight x reps with a rep range and history. */
-function engineLoaded(item: PlanItemAdjustment): boolean {
+/** The workout screen's set advice can pick this item's load itself: weight x reps with a rep range and a strength estimate from history. */
+function engineLoaded(item: PlanItemAdjustment, estimable: boolean): boolean {
   const profile = getTrackingProfile(item.variantId);
-  return item.loadKg !== undefined && profile?.effortKind === "reps" && profile.progressDirection === "higher_load" && profile.e1rmMetric === "entered_load"
+  return estimable && item.loadKg !== undefined && profile?.effortKind === "reps" && profile.progressDirection === "higher_load" && profile.e1rmMetric === "entered_load"
     && item.sets.some((set) => set.type === "working" && Boolean(set.minReps ?? set.maxReps));
 }
 
@@ -187,6 +188,7 @@ export function planEngineSession(plan: AdaptiveSessionPlan, routine: Routine, s
     decided.forEach((item) => target.set(item.id, item.sets));
   }
 
+  const history = buildAdviceContext(finished, now).history;
   const items = plan.items.map((item) => {
     const count = target.get(item.itemId);
     if (count === undefined) return item;
@@ -198,7 +200,7 @@ export function planEngineSession(plan: AdaptiveSessionPlan, routine: Routine, s
       : change
         ? { vi: `${change > 0 ? "Thêm" : "Bớt"} ${Math.abs(change)} set so với lịch gốc.`, en: `${Math.abs(change)} set${Math.abs(change) === 1 ? "" : "s"} ${change > 0 ? "more" : "fewer"} than the routine.` }
         : undefined;
-    if (engineLoaded(item)) {
+    if (engineLoaded(item, Boolean(estimateBaseline(history.get(item.variantId) ?? [], now)))) {
       // A prefilled load counts as typed on the workout screen and would be kept at the new target effort, so the set advice picks it instead.
       const effort: LocalizedText = { vi: `Tạ và số lần do gợi ý từng set chọn, để còn khoảng ${block.targetRir} lần (RIR ${block.targetRir}) theo sức hôm nay.`, en: `The set suggestions pick weight and reps to leave about ${block.targetRir} reps (RIR ${block.targetRir}) at today's strength.` };
       return { ...item, action: "hold" as const, loadKg: undefined, previousLoadKg: undefined, sets, reason: note ? { vi: `${note.vi} ${effort.vi}`, en: `${note.en} ${effort.en}` } : effort };

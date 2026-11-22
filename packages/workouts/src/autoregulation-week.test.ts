@@ -105,4 +105,9 @@ describe("planEngineSession", () => {
     expect(result.engine!.muscles[0]).toMatchObject({ action: "hold", sessionSetDelta: 0, soreness: 4 });
     expect(result.engine!.muscles[0].reason.en).toContain("minimum");
   });
+
+  it("keeps the planned load when history gives the engine no strength estimate", () => {
+    const result = plan([session(7, 40)]);
+    expect(result.items[0].loadKg).toBe(60);
+  });
 });
