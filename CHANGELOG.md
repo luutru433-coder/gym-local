@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — Soreness feedback and one recovery estimate
+
+- The muscle recovery map on the home screen now asks how sore each main muscle of your last workout got: not sore, gone early, gone just in time, or still sore. Answering is optional and you can change or clear an answer (ADR 0026).
+- "Still sore" gives that muscle 10% longer to recover from then on; "not sore" 5% less. The other two answers change nothing.
+- The map now shows the same recovery estimate the workout screen uses for set suggestions: harder sets tire a muscle more, secondary muscles count half, and fatigue fades by the hour. It replaces the fixed 36 h + 4 h per set rule, so the map can look different for the same history.
+- A carry or other full-body exercise now tires every muscle a little on the map, as before, instead of none.
+- During a workout, if you type a weight that is too heavy for today's estimate, the suggestion line now says so and names a weight that fits the rep range, instead of showing last time's reps.
+- The pre-workout check-in now sits above the set panel, so the Start button no longer covers it.
+- Sessions gain an optional `soreness` field, kept in backups. Older backups and sessions without it work as before; no database migration.
+
 ## Unreleased — Pre-workout check-in and warm-up feel
 
 - A workout now opens with three optional questions: last night's sleep, energy right now and muscle soreness, each 1-5 with 3 as a normal day. The answers move the suggested weights of that workout by at most 3% either way (ADR 0025). Skip it and nothing changes; you can answer, edit or clear it until the workout ends.

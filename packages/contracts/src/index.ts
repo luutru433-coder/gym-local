@@ -235,6 +235,9 @@ export interface ReadinessCheckIn {
   soreness: number;
 }
 
+/** How sore a muscle got after a session (ADR 0026): 1 not sore, 2 sore but gone well before the next session, 3 gone just in time, 4 still sore at the next session. */
+export type SorenessScore = 1 | 2 | 3 | 4;
+
 export type WarmupFeel = "worse" | "expected" | "better";
 
 export interface SessionExercise {
@@ -267,6 +270,8 @@ export interface WorkoutSession {
   notes?: string;
   /** Answered at the start of the workout; absent when skipped (ADR 0025). */
   checkIn?: ReadinessCheckIn;
+  /** Answered after the session, per muscle it trained; unanswered muscles are absent (ADR 0026). */
+  soreness?: Partial<Record<MuscleGroup, SorenessScore>>;
 }
 
 export interface NutrientProfile {

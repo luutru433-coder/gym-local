@@ -1,7 +1,7 @@
-import type { LocalizedText, ReadinessCheckIn, SessionExercise, SetLog, WorkoutSession } from "@gym/contracts";
+import type { LocalizedText, ReadinessCheckIn, SessionExercise, SorenessScore, SetLog, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, trackingProfileForLoadMode } from "@gym/catalog";
 import {
-  estimateBaseline, calibrateFatigueDrop, muscleRecovery, nextSetCapacity, prescribeSet, readinessFactor, setFatigueUnits,
+  AUTOREG, DEFAULT_TAU_HOURS, calibrateTau, estimateBaseline, calibrateFatigueDrop, muscleRecovery, nextSetCapacity, prescribeSet, readinessFactor, setFatigueUnits,
   type BaselineEstimate, type MuscleLoadEvent, type MuscleRecoveryEstimate, type ObservedSet, type PrescriptionAction,
   type RecoveryMuscle, type VariantSessionRecord
 } from "./autoregulation";
@@ -28,6 +28,8 @@ export interface SetAdvice {
   action: PrescriptionAction;
   confidence: BaselineEstimate["confidence"];
   reason: LocalizedText;
+  /** The typed load allows no rep at the target effort today; `reason` names a load that fits. */
+  tooHeavy?: boolean;
 }
 
 function profileOf(exercise: SessionExercise) {
@@ -91,13 +93,88 @@ export function buildAdviceContext(finishedSessions: WorkoutSession[], at: Date)
       const working = exercise.sets.filter((set) => set.completedAt && set.type !== "warmup");
       if (!movement || !working.length) continue;
       const units = (role: "primary" | "secondary") => working.reduce((sum, set) => sum + setFatigueUnits(validRir(set.rir) ?? validRir(set.targetRir) ?? DEFAULT_TARGET_RIR, role), 0);
-      movement.primaryMuscles.forEach((muscle) => { if (muscle !== "full_body") events.push({ at: session.finishedAt!, muscle, units: units("primary") }); });
-      movement.secondaryMuscles.forEach((muscle) => {
-        if (muscle !== "full_body" && !movement.primaryMuscles.includes(muscle)) events.push({ at: session.finishedAt!, muscle, units: units("secondary") });
-      });
+      // One event per muscle: primary if listed as primary, else secondary; "full_body" reaches every other muscle at the secondary weight.
+      const named = [...movement.primaryMuscles, ...movement.secondaryMuscles];
+      for (const muscle of Object.keys(DEFAULT_TAU_HOURS) as RecoveryMuscle[]) {
+        const role = movement.primaryMuscles.includes(muscle) ? "primary" : movement.secondaryMuscles.includes(muscle) || named.includes("full_body") ? "secondary" : undefined;
+        if (role) events.push({ at: session.finishedAt!, muscle, units: units(role) });
+      }
     }
   }
-  return { at, history, recovery: muscleRecovery(events, at) };
+  return { at, history, recovery: muscleRecovery(events, at, personalTauHours(finishedSessions, at)) };
+}
+
+const validSoreness = (value: unknown): value is SorenessScore => value === 1 || value === 2 || value === 3 || value === 4;
+
+/**
+ * Each muscle's recovery time constant, learned by replaying the soreness answers
+ * of finished sessions in date order (ADR 0026). Muscles never rated are absent
+ * and keep the engine's default.
+ */
+export function personalTauHours(finishedSessions: WorkoutSession[], at: Date): Partial<Record<RecoveryMuscle, number>> {
+  const tau: Partial<Record<RecoveryMuscle, number>> = {};
+  const rated = finishedSessions
+    .filter((session) => session.finishedAt && session.soreness && new Date(session.finishedAt).getTime() <= at.getTime())
+    .sort((left, right) => left.finishedAt!.localeCompare(right.finishedAt!));
+  for (const session of rated) {
+    for (const muscle of Object.keys(DEFAULT_TAU_HOURS) as RecoveryMuscle[]) {
+      const score = session.soreness?.[muscle];
+      if (validSoreness(score)) tau[muscle] = calibrateTau(tau[muscle] ?? DEFAULT_TAU_HOURS[muscle], score);
+    }
+  }
+  return tau;
+}
+
+export type RecoveryStatus = "fatigued" | "recovering" | "ready";
+
+export interface MuscleRecoveryView extends MuscleRecoveryEstimate {
+  status: RecoveryStatus;
+  /** The time constant used, in hours, and whether soreness answers moved it off the default. */
+  tauHours: number;
+  personal: boolean;
+}
+
+/** Below this recovery a muscle is shown as fatigued; from `AUTOREG.readyAt` it is ready. Ours. */
+export const FATIGUED_BELOW = 0.6;
+
+/** The engine's recovery of every muscle now, for the home screen's map. */
+export function recoveryOverview(finishedSessions: WorkoutSession[], at: Date): MuscleRecoveryView[] {
+  const tau = personalTauHours(finishedSessions, at);
+  return buildAdviceContext(finishedSessions, at).recovery.map((item) => ({
+    ...item,
+    status: item.recovery >= AUTOREG.readyAt ? "ready" : item.recovery < FATIGUED_BELOW ? "fatigued" : "recovering",
+    tauHours: tau[item.muscle] ?? DEFAULT_TAU_HOURS[item.muscle],
+    personal: tau[item.muscle] !== undefined && tau[item.muscle] !== DEFAULT_TAU_HOURS[item.muscle]
+  }));
+}
+
+export interface SorenessPrompt {
+  sessionId: string;
+  finishedAt: string;
+  /** Primary muscles of the session's completed working sets, in catalog order. */
+  muscles: RecoveryMuscle[];
+  answers: Partial<Record<RecoveryMuscle, SorenessScore>>;
+}
+
+/** The latest finished session of the last 10 days whose muscles can be rated for soreness. */
+export function sorenessPrompt(finishedSessions: WorkoutSession[], at: Date): SorenessPrompt | undefined {
+  const latest = finishedSessions
+    .filter((session) => session.finishedAt && new Date(session.finishedAt).getTime() <= at.getTime() && at.getTime() - new Date(session.finishedAt).getTime() <= RECOVERY_LOOKBACK_MS)
+    .reduce<WorkoutSession | undefined>((newest, session) => !newest || session.finishedAt! > newest.finishedAt! ? session : newest, undefined);
+  if (!latest) return undefined;
+  const trained = new Set<string>();
+  for (const exercise of latest.exercises) {
+    if (!exercise.sets.some((set) => set.completedAt && set.type !== "warmup")) continue;
+    getMovement(exercise.movementId)?.primaryMuscles.forEach((muscle) => trained.add(muscle));
+  }
+  const muscles = (Object.keys(DEFAULT_TAU_HOURS) as RecoveryMuscle[]).filter((muscle) => trained.has(muscle));
+  if (!muscles.length) return undefined;
+  const answers: SorenessPrompt["answers"] = {};
+  for (const muscle of muscles) {
+    const score = latest.soreness?.[muscle];
+    if (validSoreness(score)) answers[muscle] = score;
+  }
+  return { sessionId: latest.id, finishedAt: latest.finishedAt!, muscles, answers };
 }
 
 function validCheckIn(checkIn: ReadinessCheckIn | undefined): ReadinessCheckIn | undefined {
@@ -173,13 +250,35 @@ export function adviseSet(context: AdviceContext, exercise: SessionExercise, set
     availableLoadsKg: typed ? [typed] : loadsUpTo(stepKg, Math.max(capacity.e1rmKg, currentLoadKg ?? 0)),
     currentLoadKg
   });
-  if (!prescription.feasible) return undefined;
   const percent = Math.round(readiness.factor * 100);
   const basis: LocalizedText = done.length
     ? { vi: `tính lại sau ${done.length} set hôm nay`, en: `re-estimated after ${done.length} set${done.length === 1 ? "" : "s"} today` }
     : percent !== 100 || readiness.parts.checkIn || readiness.parts.warmup
       ? readinessBasis(readiness.parts, percent)
       : { vi: `từ ${baseline?.sessionsUsed ?? 0} buổi gần nhất`, en: `from your last ${baseline?.sessionsUsed ?? 0} session${baseline?.sessionsUsed === 1 ? "" : "s"}` };
+  if (!prescription.feasible) {
+    // The typed load allows no rep at the target effort today: say so and name the load that fits, never last time's reps.
+    const fitting = typed ? prescribeSet({
+      capacityE1rmKg: capacity.e1rmKg,
+      target: { minReps, maxReps, rir: targetRir },
+      availableLoadsKg: loadsUpTo(stepKg, capacity.e1rmKg)
+    }) : undefined;
+    if (!typed || !fitting?.feasible) return undefined;
+    return {
+      weightKg: typed,
+      reps: 1,
+      expectedRir: prescription.expectedRir,
+      freshE1rmKg: capacity.freshE1rmKg,
+      readinessPercent: percent,
+      action: "keep_load",
+      confidence: done.length ? "high" : baseline?.confidence ?? "low",
+      tooHeavy: true,
+      reason: {
+        vi: `${typed} kg quá nặng so với sức ước tính hôm nay; khoảng ${fitting.loadKg} kg vừa ${fitting.reps} lần (${basis.vi})`,
+        en: `${typed} kg is too heavy for today's estimated strength; about ${fitting.loadKg} kg fits ${fitting.reps} reps (${basis.en})`
+      }
+    };
+  }
   return {
     weightKg: prescription.loadKg,
     reps: prescription.reps,

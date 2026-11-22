@@ -101,6 +101,7 @@ Known gaps the run shows:
 - The focus panel shows the suggestion with the expected reps left and the reason; during the rest it shows the plan for the next set.
 - History, records, routines, the database and backups are unchanged. The module loads with the workout page, not at startup.
 - The pre-workout check-in and the warm-up feel reach `readinessFactor` since ADR 0025.
+- Soreness answers calibrate each muscle's time constant, and the home recovery map shows the engine's recovery, since ADR 0026.
 
 ## Consequences
 

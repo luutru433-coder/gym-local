@@ -655,4 +655,12 @@ describe("backup", () => {
 
     await expect(createBackup(emptyData({ sessions: [session(6)] } as never))).rejects.toThrow();
   });
+  it("round-trips per-muscle soreness on a session and rejects a score outside 1-4", async () => {
+    const session = (chest: number) => ({ id: "session_sore", startedAt: "2026-08-10T01:00:00.000Z", finishedAt: "2026-08-10T02:00:00.000Z", soreness: { chest, triceps: 1 }, exercises: [] });
+
+    const restored = await readBackup(await createBackup(emptyData({ sessions: [session(4)] } as never)));
+    expect(restored.data.sessions[0].soreness).toEqual({ chest: 4, triceps: 1 });
+
+    await expect(createBackup(emptyData({ sessions: [session(5)] } as never))).rejects.toThrow();
+  });
 });

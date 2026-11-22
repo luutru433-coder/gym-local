@@ -179,6 +179,11 @@ export function WorkoutPage() {
 
   useScreenWakeLock(Boolean(activeSession));
 
+  // A workout opens at its top (check-in, then the set panel), not at the scroll position of the screen it came from.
+  useEffect(() => {
+    if (activeSessionId) document.documentElement.scrollTop = 0;
+  }, [activeSessionId]);
+
   useEffect(() => {
     // Sound unlocks only inside an activation gesture: touch release, click or key press.
     const gestures = ["pointerup", "touchend", "click", "keydown"] as const;
@@ -445,7 +450,9 @@ export function WorkoutPage() {
       doneCount: exercise.sets.filter((item) => item.completedAt).length,
       targetLabel: mode === "reps" ? (repRange ? `${repRange} ${locale === "vi" ? "lần" : "reps"}` : undefined) : set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : undefined,
       previousLabel: prior ? (mode === "distance" ? `${prior.distanceMeters ?? "—"} m · ${prior.durationSeconds ?? "—"} s` : mode === "timed" ? `${prior.weightKg ? `${prior.weightKg} kg · ` : ""}${prior.durationSeconds ?? "—"} s` : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`) : undefined,
-      adviceLabel: advice
+      adviceLabel: advice?.tooHeavy
+        ? localize(advice.reason, locale)
+        : advice
         ? `${advice.weightKg} × ${advice.reps} · ${locale === "vi" ? `còn khoảng ${Math.round(advice.expectedRir)} lần` : `about ${Math.round(advice.expectedRir)} left`} · ${localize(advice.reason, locale)}`
         : undefined,
       load,
@@ -540,6 +547,12 @@ export function WorkoutPage() {
         </div>
       ) : null}
 
+      {activeSession.exercises.length > 0 && (activeSession.checkIn || progress.completed === 0) ? (
+        <div className="readiness-slot">
+          <ReadinessCheckInCard locale={locale} value={activeSession.checkIn} onChange={(checkIn) => save({ ...activeSession, checkIn })} />
+        </div>
+      ) : null}
+
       <SetFocus
         locale={locale}
         state={focusState}
@@ -563,9 +576,6 @@ export function WorkoutPage() {
       </nav>
 
       <main className="workout-content">
-        {activeSession.exercises.length > 0 && (activeSession.checkIn || progress.completed === 0) ? (
-          <ReadinessCheckInCard locale={locale} value={activeSession.checkIn} onChange={(checkIn) => save({ ...activeSession, checkIn })} />
-        ) : null}
         {activeSession.exercises.length === 0 ? (
           <Card className="workout-zero-state">
             <Dumbbell size={30} aria-hidden="true" />
