@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card, SectionTitle } from "@gym/ui";
 import type { SorenessScore, WorkoutSession } from "@gym/contracts";
 import { muscleRecoveryMap } from "@gym/progress";
@@ -36,16 +36,21 @@ export function RecoveryMapCard({ locale, sessions }: { locale: "vi" | "en"; ses
   const weeklySets = new Map(muscleRecoveryMap(sessions, now).map((item) => [item.muscle, item.weeklySets]));
   const prompt = sorenessPrompt(finished, now);
   const [saveError, setSaveError] = useState(false);
+  const pending = useRef<{ sessionId: string; soreness: NonNullable<WorkoutSession["soreness"]> } | undefined>(undefined);
   const rate = async (muscle: MuscleRecoveryView["muscle"], score: SorenessScore) => {
     const session = sessions.find((item) => item.id === prompt?.sessionId);
     if (!session) return;
-    const soreness = { ...session.soreness };
+    // Answers tapped before the previous save has come back build on it, not on the stale prop.
+    const base = pending.current?.sessionId === session.id ? pending.current.soreness : session.soreness;
+    const soreness = { ...base };
     if (soreness[muscle] === score) delete soreness[muscle];
     else soreness[muscle] = score;
+    pending.current = { sessionId: session.id, soreness };
     try {
       await updatePastSession({ ...session, soreness });
       setSaveError(false);
     } catch {
+      pending.current = undefined;
       setSaveError(true);
     }
   };
@@ -81,7 +86,7 @@ export function RecoveryMapCard({ locale, sessions }: { locale: "vi" | "en"; ses
         {prompt ? (
           <div className="recovery-map__soreness">
             <strong>{locale === "vi" ? "Sau buổi tập gần nhất, cơ có đau không?" : "After your last workout, how sore did these get?"}</strong>
-            <small>{new Date(prompt.finishedAt).toLocaleDateString(locale === "vi" ? "vi-VN" : "en-GB", { weekday: "long", day: "numeric", month: "numeric" })} · {locale === "vi" ? "Vẫn còn đau: lần sau cơ đó được tính hồi phục chậm hơn 10%. Không đau: nhanh hơn 5%." : "Still sore: that muscle is given 10% longer to recover next time. Not sore: 5% less."}</small>
+            <small>{new Date(prompt.finishedAt).toLocaleDateString(locale === "vi" ? "vi-VN" : "en-GB", { weekday: "long", day: "numeric", month: "numeric" })} · {locale === "vi" ? "Vẫn còn đau: từ giờ cơ đó được tính hồi phục chậm hơn 10%. Không đau: nhanh hơn 5%. Bản đồ cập nhật ngay." : "Still sore: from now on that muscle is given 10% longer to recover. Not sore: 5% less. The map updates right away."}</small>
             {prompt.muscles.map((muscle) => (
               <div className="recovery-map__soreness-row" role="group" aria-label={muscleLabels[muscle][locale]} key={muscle}>
                 <span>{muscleLabels[muscle][locale]}</span>

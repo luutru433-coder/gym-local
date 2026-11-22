@@ -57,4 +57,16 @@ describe("RecoveryMapCard soreness", () => {
     view.rerender(<RecoveryMapCard locale="en" sessions={[]} />);
     expect(screen.queryByRole("group", { name: "Chest" })).toBeNull();
   });
+
+  it("keeps the first answer when a second muscle is rated before the first save comes back", async () => {
+    const session = finishedSession();
+    session.exercises.push({ ...session.exercises[0], id: "exercise-two", movementId: "squat" });
+    updatePastSession.mockReturnValue(new Promise(() => undefined));
+    render(<RecoveryMapCard locale="en" sessions={[session]} />);
+
+    await userEvent.click(within(screen.getByRole("group", { name: "Chest" })).getByRole("button", { name: "Still sore" }));
+    await userEvent.click(within(screen.getByRole("group", { name: "Quads" })).getByRole("button", { name: "Not sore" }));
+
+    expect(updatePastSession).toHaveBeenLastCalledWith({ ...session, soreness: { chest: 4, quadriceps: 1 } });
+  });
 });
