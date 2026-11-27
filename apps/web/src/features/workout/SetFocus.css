@@ -19,18 +19,32 @@
 .focus-eyebrow--live { color: var(--lime); }
 .focus-eyebrow--live span { animation: focus-blink 1.2s steps(2) infinite; }
 
-.focus-numbers { display: flex; align-items: flex-start; justify-content: center; gap: 14px; margin: 10px 0 4px; }
+.focus-numbers { display: flex; align-items: flex-start; justify-content: center; gap: clamp(6px, 3vw, 14px); margin: 10px 0 4px; }
 .focus-numbers__times { margin-top: 30px; color: var(--faint); font-size: 34px; font-weight: 300; }
 .focus-number { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.focus-number--load, .focus-number--load ~ .focus-number { flex: 1; container-type: inline-size; }
+.focus-weight-input {
+  min-width: 0; padding: 0 4px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: inherit; text-align: center; font: inherit; font-variant-numeric: tabular-nums;
+}
+.focus-weight-input:focus { outline: 2px solid var(--lime); outline-offset: 1px; }
+.focus-number .focus-weight-input {
+  width: min(100%, calc(var(--weight-chars) * 1ch + 10px)); min-height: 44px;
+  --weight-fit: calc((100cqi - 10px) / (var(--weight-chars) * .7));
+  font-size: clamp(20px, var(--weight-fit), 76px); line-height: .95; font-weight: 900; letter-spacing: -.045em;
+}
 .focus-number b { font-size: clamp(64px, 24vw, 104px); line-height: .95; font-weight: 900; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.focus-number--load ~ .focus-number b { font-size: min(33cqi, 104px); }
 .focus-number small { margin-top: 6px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .focus-numbers--small { margin-top: 2px; }
 .focus-numbers--small .focus-number b { font-size: clamp(40px, 13vw, 56px); }
+.focus-numbers--small .focus-number--load ~ .focus-number b { font-size: min(33cqi, 56px); }
+.focus-numbers--small .focus-weight-input { font-size: clamp(20px, var(--weight-fit), 52px); }
 .focus-numbers--small .focus-numbers__times { margin-top: 12px; font-size: 24px; }
 
 .focus-stepper { display: flex; gap: 6px; margin-top: 12px; }
 .focus-stepper button {
-  min-width: 62px; min-height: 44px; padding: 0 10px;
+  min-width: clamp(44px, 13vw, 62px); min-height: 44px; padding: 0 5px;
   color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
   font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; cursor: pointer;
 }
@@ -67,6 +81,7 @@
 .focus-just-done > div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .focus-edit { flex: 1 1 auto; min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 2px; background: var(--surface-2); border-radius: 10px; }
 .focus-edit b { flex: 1; padding: 0 8px; font-size: 18px; font-weight: 900; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.focus-edit .focus-weight-input { width: 7ch; min-height: 44px; }
 .focus-edit b i { margin-left: 4px; color: var(--muted); font-size: 10px; font-style: normal; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .focus-edit button { width: 44px; height: 46px; display: grid; place-items: center; color: var(--ink); background: transparent; border: 0; border-radius: 10px; cursor: pointer; }
 
