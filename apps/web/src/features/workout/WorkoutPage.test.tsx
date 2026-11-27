@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -81,6 +81,26 @@ afterEach(() => {
 });
 
 describe("live workout editing", () => {
+  it("persists a dragged exercise once without changing logged sets, the active exercise or rest", () => {
+    const base = session();
+    base.exercises[0].sets[0].completedAt = timestamp;
+    base.exercises.push({ ...session("squat__barbell").exercises[0], id: "exercise-two", sets: [{ id: "set-three", type: "working" }] });
+    const { setActiveSession } = arrange(base);
+    const [first, second] = screen.getAllByTitle("Kéo để đổi thứ tự bài tập");
+    first.closest<HTMLElement>("[data-exercise-reorder-item]")!.getBoundingClientRect = () => new DOMRect(0, 100, 300, 200);
+    second.closest<HTMLElement>("[data-exercise-reorder-item]")!.getBoundingClientRect = () => new DOMRect(0, 310, 300, 90);
+    second.setPointerCapture = vi.fn();
+    const pointer = { pointerId: 1, isPrimary: true, pointerType: "touch" };
+    fireEvent.pointerDown(second, { ...pointer, clientY: 335 });
+    fireEvent.pointerMove(second, { ...pointer, clientY: 155 });
+    expect(setActiveSession).not.toHaveBeenCalled();
+    fireEvent.pointerUp(second, { ...pointer, clientY: 155 });
+    expect(setActiveSession).toHaveBeenCalledExactlyOnceWith({
+      ...base,
+      exercises: [base.exercises[1], base.exercises[0]]
+    });
+  });
+
   it("groups two exercises into a superset and alternates sets before resting", async () => {
     const user = userEvent.setup();
     const base = session();

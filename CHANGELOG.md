@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Drag to reorder exercises
+
+- Drag the grip on an exercise to change its position in a routine or an active workout. The up and down buttons are still available if you prefer not to drag.
+
 ## Unreleased — Weekly set changes, block weeks and deload in the next-session plan
 
 - The home screen's next-session plan now follows a 5-week block: each week you train in a row the target effort gets one rep closer to failure (about 4, 3, 2, then 1 reps left), and the fifth week is a deload with half the sets (ADR 0027). A week off restarts the block.

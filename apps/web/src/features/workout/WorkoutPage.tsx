@@ -45,6 +45,7 @@ import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
+import { ExerciseDragHandle } from "../../components/ExerciseDragHandle";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
 import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
 import { playRestAlert, primeRestAlert, useScreenWakeLock } from "./restAlert";
@@ -624,12 +625,15 @@ export function WorkoutPage() {
              ? (locale === "vi" ? "Thời gian giây" : "Duration sec")
              : "RIR";
           return (
-            <Card id={exercise.id} key={exercise.id} className={expanded ? "workout-exercise workout-exercise--expanded" : "workout-exercise"}>
-              <button type="button" className="workout-exercise__header" aria-expanded={expanded} aria-controls={`${exercise.id}-details`} onClick={() => setExpandedId(expanded ? undefined : exercise.id)}>
-                <span className="workout-exercise__index">{String(exerciseIndex + 1).padStart(2, "0")}</span>
-                <div><span className="eyebrow">{localize(exercise.movementNameSnapshot, locale)}{superset.length ? <b className="superset-badge">Superset {exercise.supersetGroup}</b> : null}</span><h2>{localize(exercise.variantNameSnapshot, locale)}</h2><p>{doneCount}/{exercise.sets.length} sets · {exercise.restSeconds}s {locale === "vi" ? "nghỉ" : "rest"}</p></div>
-                <span className="workout-exercise__chevron"><ChevronDown size={20} /></span>
-              </button>
+            <Card id={exercise.id} key={exercise.id} className={expanded ? "workout-exercise workout-exercise--expanded" : "workout-exercise"} data-exercise-reorder-item>
+              <div className="workout-exercise__heading">
+                <button type="button" className="workout-exercise__header" aria-expanded={expanded} aria-controls={`${exercise.id}-details`} onClick={() => setExpandedId(expanded ? undefined : exercise.id)}>
+                  <span className="workout-exercise__index">{String(exerciseIndex + 1).padStart(2, "0")}</span>
+                  <div><span className="eyebrow">{localize(exercise.movementNameSnapshot, locale)}{superset.length ? <b className="superset-badge">Superset {exercise.supersetGroup}</b> : null}</span><h2>{localize(exercise.variantNameSnapshot, locale)}</h2><p>{doneCount}/{exercise.sets.length} sets · {exercise.restSeconds}s {locale === "vi" ? "nghỉ" : "rest"}</p></div>
+                  <span className="workout-exercise__chevron"><ChevronDown size={20} /></span>
+                </button>
+                {activeSession.exercises.length > 1 ? <ExerciseDragHandle locale={locale} onMove={(target) => moveExercise(exercise.id, target)} /> : null}
+              </div>
 
               {expanded ? (
                 <div className="workout-exercise__body" id={`${exercise.id}-details`}>

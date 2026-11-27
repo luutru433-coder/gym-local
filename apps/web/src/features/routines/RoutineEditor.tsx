@@ -19,6 +19,7 @@ import {
   listMovements,
   rankVariantsForEquipment
 } from "@gym/catalog";
+import { ExerciseDragHandle } from "../../components/ExerciseDragHandle";
 import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 
@@ -63,14 +64,6 @@ function makeDraft(routine: Routine | undefined, profile: Profile): Routine {
   };
 }
 
-function move<T>(items: T[], index: number, direction: -1 | 1): T[] {
-  const target = index + direction;
-  if (target < 0 || target >= items.length) return items;
-  const next = [...items];
-  [next[index], next[target]] = [next[target], next[index]];
-  return next;
-}
-
 function numeric(value: string, minimum: number, maximum: number): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? Math.min(maximum, Math.max(minimum, parsed)) : minimum;
@@ -95,6 +88,17 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
       ...current,
       items: current.items.map((item) => item.id === itemId ? update(item) : item)
     }));
+  };
+
+  const moveItem = (itemId: string, toIndex: number) => {
+    setDraft((current) => {
+      const fromIndex = current.items.findIndex((item) => item.id === itemId);
+      if (fromIndex < 0 || fromIndex === toIndex || toIndex < 0 || toIndex >= current.items.length) return current;
+      const items = [...current.items];
+      const [item] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, item);
+      return { ...current, items };
+    });
   };
 
   const addMovement = (movementId: string) => {
@@ -189,7 +193,7 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
 
         <section className="routine-editor__section" aria-labelledby="routine-items-title">
           <div className="routine-editor__section-title">
-            <div><h3 id="routine-items-title">{locale === "vi" ? "Thứ tự bài tập" : "Exercise order"}</h3><p>{locale === "vi" ? "Mỗi biến thể dụng cụ có lịch sử riêng." : "Each equipment variant keeps separate history."}</p></div>
+            <div><h3 id="routine-items-title">{locale === "vi" ? "Thứ tự bài tập" : "Exercise order"}</h3><p>{locale === "vi" ? "Mỗi biến thể dụng cụ có lịch sử riêng." : "Each equipment variant keeps separate history."}</p>{draft.items.length > 1 ? <p>{locale === "vi" ? "Kéo tay nắm để đổi thứ tự bài tập." : "Drag the handles to change the exercise order."}</p> : null}</div>
             <strong aria-live="polite">{draft.items.length}</strong>
           </div>
           {draft.items.length ? <ol className="routine-item-editor-list">
@@ -197,13 +201,14 @@ export function RoutineEditor({ routine, profile, onClose, onSave, onDelete }: R
               const movement = getMovement(item.movementId);
               const variants = getVariantsForMovement(item.movementId);
               const timed = isTimedVariant(item.preferredVariantId);
-              return <li className="routine-item-editor" key={item.id}>
+              return <li className="routine-item-editor" key={item.id} data-exercise-reorder-item>
                 <div className="routine-item-editor__head">
                   <span className="routine-item-editor__order">{index + 1}</span>
                   <div><strong>{movement ? localize(movement.name, locale) : item.movementId}</strong><small>{localize(getVariant(item.preferredVariantId)?.name ?? { vi: "Biến thể", en: "Variant" }, locale)}</small></div>
+                  {draft.items.length > 1 ? <ExerciseDragHandle locale={locale} onMove={(target) => moveItem(item.id, target)} /> : null}
                   <div className="routine-editor__icon-actions">
-                    <button type="button" className="icon-button" disabled={index === 0} onClick={() => setDraft({ ...draft, items: move(draft.items, index, -1) })} aria-label={`${locale === "vi" ? "Đưa lên" : "Move up"}: ${movement ? localize(movement.name, locale) : item.movementId}`}><ArrowUp size={17} /></button>
-                    <button type="button" className="icon-button" disabled={index === draft.items.length - 1} onClick={() => setDraft({ ...draft, items: move(draft.items, index, 1) })} aria-label={`${locale === "vi" ? "Đưa xuống" : "Move down"}: ${movement ? localize(movement.name, locale) : item.movementId}`}><ArrowDown size={17} /></button>
+                    <button type="button" className="icon-button" disabled={index === 0} onClick={() => moveItem(item.id, index - 1)} aria-label={`${locale === "vi" ? "Đưa lên" : "Move up"}: ${movement ? localize(movement.name, locale) : item.movementId}`}><ArrowUp size={17} /></button>
+                    <button type="button" className="icon-button" disabled={index === draft.items.length - 1} onClick={() => moveItem(item.id, index + 1)} aria-label={`${locale === "vi" ? "Đưa xuống" : "Move down"}: ${movement ? localize(movement.name, locale) : item.movementId}`}><ArrowDown size={17} /></button>
                     <button type="button" className="icon-button" onClick={() => duplicateItem(index)} aria-label={`${locale === "vi" ? "Nhân đôi" : "Duplicate"}: ${movement ? localize(movement.name, locale) : item.movementId}`}><Copy size={17} /></button>
                     <button type="button" className="icon-button routine-editor__delete-icon" onClick={() => setDraft({ ...draft, items: draft.items.filter((entry) => entry.id !== item.id) })} aria-label={`${locale === "vi" ? "Xóa" : "Delete"}: ${movement ? localize(movement.name, locale) : item.movementId}`}><Trash2 size={17} /></button>
                   </div>

@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Profile, Routine } from "@gym/contracts";
@@ -63,5 +63,38 @@ describe("RoutineEditor default set targets", () => {
       expect(set).toMatchObject({ minReps: 8, maxReps: 12 });
       expect(set.durationSeconds).toBeUndefined();
     }
+  });
+});
+
+describe("RoutineEditor exercise order", () => {
+  afterEach(cleanup);
+
+  it("saves a dragged exercise in its new position with its set targets intact", async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn<(routine: Routine) => Promise<void>>().mockResolvedValue(undefined);
+    render(<RoutineEditor profile={profile} onClose={() => undefined} onSave={onSave} />);
+    await user.type(screen.getByLabelText("English name"), "Core day");
+    const search = screen.getByLabelText("Search exercises");
+    await user.type(search, "Plank");
+    await user.click(screen.getByRole("button", { name: /^Plank/ }));
+    await user.clear(search);
+    await user.type(search, "Chest Press");
+    await user.click(screen.getByRole("button", { name: /^Chest Press/ }));
+
+    screen.getAllByRole("listitem").forEach((row, index) => {
+      row.getBoundingClientRect = () => new DOMRect(0, 100 + index * 100, 300, 90);
+    });
+    const [handle] = screen.getAllByTitle("Drag to reorder exercise");
+    handle.setPointerCapture = vi.fn();
+    const pointer = { pointerId: 1, isPrimary: true, pointerType: "touch" };
+    fireEvent.pointerDown(handle, { ...pointer, clientY: 125 });
+    fireEvent.pointerMove(handle, { ...pointer, clientY: 260 });
+    fireEvent.pointerUp(handle, { ...pointer, clientY: 260 });
+
+    await user.click(screen.getByRole("button", { name: "Save routine" }));
+    expect(onSave.mock.calls[0][0].items).toMatchObject([
+      { movementId: "chest_press", sets: [{ minReps: 8 }, { minReps: 8 }, { minReps: 8 }] },
+      { movementId: "plank", sets: [{ durationSeconds: 30 }, { durationSeconds: 30 }, { durationSeconds: 30 }] }
+    ]);
   });
 });

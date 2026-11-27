@@ -253,7 +253,7 @@
 
 .routine-item-editor__head {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 11px;
 }
@@ -291,6 +291,10 @@
 .routine-editor__icon-actions {
   display: flex;
   gap: 4px;
+}
+
+.routine-item-editor__head .routine-editor__icon-actions {
+  grid-column: -2;
 }
 
 .routine-editor__icon-actions .icon-button {
@@ -524,7 +528,7 @@
   }
 
   .routine-item-editor__head {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .routine-item-editor__head .routine-editor__icon-actions {
