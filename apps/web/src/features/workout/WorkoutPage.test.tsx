@@ -452,6 +452,62 @@ describe("live workout editing", () => {
     expect(screen.getByRole("button", { name: "Xem tiến độ" })).toBeInTheDocument();
   });
 
+  it("commits exact decimal weights in the focus panel and keeps the weight steppers", async () => {
+    const user = userEvent.setup();
+    const live = session("chest_press__barbell");
+    live.restTimerEndsAt = undefined;
+    live.exercises[0].sets[0] = { id: "set-one", type: "working", targetMaxReps: 10, weightKg: 20 };
+    arrange(live);
+
+    const focus = within(screen.getByRole("region", { name: "Set hiện tại" }));
+    const currentSet = () => useGymStore.getState().activeSession!.exercises[0].sets[0];
+    const weight = focus.getByRole("textbox", { name: "Khối lượng (kg)" });
+    expect(weight).toHaveAttribute("inputmode", "decimal");
+    expect(weight).toHaveStyle({ "--weight-chars": "2" });
+    await user.clear(weight);
+    await user.type(weight, "21,25");
+    expect(weight).toHaveStyle({ "--weight-chars": "5" });
+    expect(currentSet().weightKg).toBe(20);
+    await user.keyboard("{Enter}");
+    expect(weight).toHaveValue("21.25");
+    expect(currentSet().weightKg).toBe(21.25);
+
+    await user.click(focus.getByRole("button", { name: "Tăng 2.5 kg" }));
+    expect(weight).toHaveValue("23.75");
+    await user.click(focus.getByRole("button", { name: "Giảm 2.5 kg" }));
+    expect(weight).toHaveValue("21.25");
+
+    await user.click(screen.getByRole("button", { name: "Bắt đầu set 1" }));
+    const runningWeight = focus.getByRole("textbox", { name: "Khối lượng (kg)" });
+    await user.clear(runningWeight);
+    await user.type(runningWeight, "24.5");
+    await user.click(screen.getByRole("button", { name: "Kết thúc set" }));
+    expect(currentSet()).toMatchObject({ weightKg: 24.5, reps: 10, completedAt: expect.any(String) });
+
+    const correction = focus.getByRole("textbox", { name: "Khối lượng (kg)" });
+    await user.clear(correction);
+    await user.type(correction, "0");
+    await user.tab();
+    expect(currentSet()).toMatchObject({ weightKg: 0, completedAt: expect.any(String) });
+  });
+
+  it("restores the previous focus weight for empty, malformed, negative, and excessive entries", async () => {
+    const user = userEvent.setup();
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    live.exercises[0].sets[0].weightKg = 12;
+    const { setActiveSession } = arrange(live);
+
+    const weight = screen.getByRole("textbox", { name: "Khối lượng (kg/tay)" });
+    for (const invalid of ["", "abc", "-1", "1001"]) {
+      await user.clear(weight);
+      if (invalid) await user.type(weight, invalid);
+      await user.tab();
+      expect(weight).toHaveValue("12");
+    }
+    expect(setActiveSession).not.toHaveBeenCalled();
+  });
+
   it("starts and ends a set from the focus panel, then rests and lets the reps be corrected", async () => {
     const user = userEvent.setup();
     const live = session();

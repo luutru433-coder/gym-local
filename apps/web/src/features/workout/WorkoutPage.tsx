@@ -418,7 +418,8 @@ export function WorkoutPage() {
       unit: "kg",
       label: loadMode === "per_hand" ? (locale === "vi" ? "kg/tay" : "kg/hand") : loadMode === "per_side" ? (locale === "vi" ? "kg/bên" : "kg/side") : loadMode === "assisted" ? (locale === "vi" ? "kg trợ lực" : "assist kg") : loadMode === "bodyweight_plus" ? (locale === "vi" ? "kg thêm" : "added kg") : "kg",
       step: loadMode === "total_weight" ? 2.5 : 1,
-      onStep: (delta) => patch({ weightKg: Math.max(0, (filled.weightKg ?? 0) + delta) })
+      onStep: (delta) => patch({ weightKg: Math.max(0, (filled.weightKg ?? 0) + delta) }),
+      onValueChange: (weightKg) => patch({ weightKg })
     };
     const effort: FocusNumber = mode === "reps"
       ? { value: filled.reps ?? repRange ?? 0, unit: locale === "vi" ? "lần" : "reps", label: locale === "vi" ? "lần" : "reps", step: 1, onStep: (delta) => patch({ reps: Math.max(0, (filled.reps ?? targetReps ?? 0) + delta) }) }
@@ -428,6 +429,7 @@ export function WorkoutPage() {
     const workingIndex = exercise.sets.slice(0, setNumber).filter((candidate) => candidate.type !== "warmup").length - 1;
     const prior = set.type === "warmup" ? undefined : previous[workingIndex];
     const view: FocusSet = {
+      id: set.id,
       exerciseName: localize(exercise.variantNameSnapshot, locale),
       exercisePosition: `${locale === "vi" ? "Bài" : "Exercise"} ${activeSession.exercises.findIndex((item) => item.id === exercise.id) + 1}/${activeSession.exercises.length}`,
       setNumber,

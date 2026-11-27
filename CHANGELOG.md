@@ -4,6 +4,10 @@
 
 - Drag the grip on an exercise to change its position in a routine or an active workout. The up and down buttons are still available if you prefer not to drag.
 
+## Unreleased — Type a workout set's weight
+
+- Tap the weight in the workout focus panel to type an exact number, including decimals. The plus and minus buttons still work.
+
 ## Unreleased — Experimental iPhone lock-screen workout timer
 
 - Opt in from Settings and tap the workout screen to try starting and ending sets, skipping rest, and hearing the rest bell from iPhone's Now Playing controls. This is best-effort: iOS can suspend the web app or its background audio.
