@@ -127,7 +127,6 @@ export function WorkoutPage() {
   const [barWeights, setBarWeights] = useState<Record<string, number>>({});
   const [summary, setSummary] = useState<{ session: WorkoutSession; records: SessionRecordSet[] }>();
   const [restAlertMuted, setRestAlertMutedState] = useState(isRestAlertMuted);
-  const [restartedRest, setRestartedRest] = useState<{ sessionId: string; startedAt: number }>();
   const availableEquipment = profile.locations.find((location) => location.id === profile.activeLocationId)?.equipment ?? [];
   const customMovements = useGymStore((state) => state.customMovements);
   const filteredMovements = useMemo(() => {
@@ -231,7 +230,6 @@ export function WorkoutPage() {
     if (!set) return;
     const completed = updateSet(activeSession, exerciseId, setId, { ...applySetSuggestion(set, suggestion), ...extra }, true);
     const updated = advanceSuperset(stampWorkSeconds(completed, exerciseId, setId), exerciseId);
-    setRestartedRest(undefined);
     save(updated);
     syncClock();
     if (updated.activeExerciseId !== exerciseId) {
@@ -263,9 +261,7 @@ export function WorkoutPage() {
   const restartRest = () => {
     if (!activeSession) return;
     const seconds = restingExercise(activeSession)?.restSeconds ?? 90;
-    const startedAt = Date.now();
-    setRestartedRest({ sessionId: activeSession.id, startedAt });
-    save({ ...activeSession, restTimerEndsAt: new Date(startedAt + seconds * 1000).toISOString() });
+    save({ ...activeSession, restTimerEndsAt: new Date(Date.now() + seconds * 1000).toISOString() });
     syncClock();
   };
 
@@ -454,10 +450,6 @@ export function WorkoutPage() {
   const upcoming = nextOpenSet(activeSession);
   const justDone = lastFinishedSet(activeSession);
   const plannedRest = restEndsAt ? restingExercise(activeSession)?.restSeconds ?? 90 : 0;
-  const restStartedAt = restEndsAt
-    ? restartedRest?.sessionId === activeSession.id ? restartedRest.startedAt
-      : justDone?.set.completedAt ? Date.parse(justDone.set.completedAt) : Date.parse(restEndsAt) - plannedRest * 1000
-    : undefined;
   const runningInfo = running ? describeSet(running) : undefined;
   const runningElapsed = running ? runningSeconds(running.set, now) : 0;
   let focusState: FocusState;
@@ -565,7 +557,7 @@ export function WorkoutPage() {
         state={focusState}
         now={now}
         restEndsAt={restEndsAt}
-        restStartedAt={restStartedAt}
+        plannedRest={plannedRest}
         onStart={() => { if (useGymStore.getState().activeSession === activeSession) startFocusSet(); }}
         onEnd={() => { if (useGymStore.getState().activeSession === activeSession) endFocusSet(); }}
         onSkip={() => { if (useGymStore.getState().activeSession === activeSession) modifyRest(); }}

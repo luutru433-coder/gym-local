@@ -173,6 +173,20 @@ describe("lock-screen workout controls", () => {
     expect(audio.src).toBe(carrier);
     expect(audio.loop).toBe(true);
   });
+
+  it("restores the lock-screen position from the current rest deadline when reopening a workout", async () => {
+    vi.useFakeTimers();
+    const { media } = mockWorkoutMedia();
+    const live = session();
+    live.exercises[0].sets[0].completedAt = new Date(Date.now() - 180_000).toISOString();
+    live.restTimerEndsAt = new Date(Date.now() + 80_000).toISOString();
+    setLockScreenTimerEnabled(true);
+    arrange(live);
+
+    await act(async () => { fireEvent.click(screen.getByRole("region", { name: "Bộ đếm thời gian nghỉ" })); });
+    expect(media.metadata?.title).toBe("Nghỉ 1:20");
+    expect(media.setPositionState).toHaveBeenLastCalledWith({ duration: 90, playbackRate: 1, position: 10 });
+  });
 });
 
 describe("live workout editing", () => {

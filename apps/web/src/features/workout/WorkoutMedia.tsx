@@ -11,7 +11,7 @@ interface Props {
   state: FocusState;
   now: number;
   restEndsAt?: string;
-  restStartedAt?: number;
+  plannedRest: number;
   onStart: () => void;
   onEnd: () => void;
   onSkip: () => void;
@@ -25,8 +25,9 @@ function setTarget(set?: FocusSet): string {
   return set.load ? `${set.load.value} ${set.load.label} × ${effort}` : effort;
 }
 
-export function WorkoutMedia({ locale, state, now, restEndsAt, restStartedAt, onStart, onEnd, onSkip }: Props) {
+export function WorkoutMedia({ locale, state, now, restEndsAt, plannedRest, onStart, onEnd, onSkip }: Props) {
   const armedRestEnd = useRef<string | undefined>(undefined);
+  const restWindow = useRef<{ endsAt: string; duration: number } | undefined>(undefined);
   const controller = useRef<{ publish: () => void; alert: () => boolean } | undefined>(undefined);
   const restFinished = state.phase === "rest" && state.remaining === 0;
 
@@ -40,12 +41,16 @@ export function WorkoutMedia({ locale, state, now, restEndsAt, restStartedAt, on
     if (media.metadata?.title !== title || media.metadata.artist !== artist) {
       media.metadata = new MediaMetadata({ title, artist, artwork: [{ src: artworkUrl, sizes: "192x192", type: "image/png" }] });
     }
-    const end = restEndsAt ? Date.parse(restEndsAt) : 0;
-    const duration = restStartedAt === undefined ? 0 : (end - restStartedAt) / 1000;
-    if (state.phase === "rest" && duration > 0) {
-      const position = duration - (end - now) / 1000;
-      media.setPositionState?.({ duration, playbackRate: 1, position: Math.max(0, Math.min(duration, position)) });
+    if (state.phase === "rest" && restEndsAt) {
+      const remaining = Math.max(0, (Date.parse(restEndsAt) - now) / 1000);
+      if (restWindow.current?.endsAt !== restEndsAt) {
+        restWindow.current = { endsAt: restEndsAt, duration: Math.max(plannedRest, remaining) };
+      }
+      const { duration } = restWindow.current;
+      if (duration > 0) media.setPositionState?.({ duration, playbackRate: 1, position: Math.max(0, duration - remaining) });
+      else media.setPositionState?.();
     } else {
+      restWindow.current = undefined;
       media.setPositionState?.();
     }
     const playbackState = paused ? "paused" : "playing";
@@ -161,7 +166,7 @@ export function WorkoutMedia({ locale, state, now, restEndsAt, restStartedAt, on
       armedRestEnd.current = undefined;
       playRestAlert(controller.current?.alert);
     }
-  }, [locale, now, restEndsAt, restFinished, restStartedAt, state]);
+  }, [locale, now, plannedRest, restEndsAt, restFinished, state]);
 
   return null;
 }
