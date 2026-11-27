@@ -206,3 +206,15 @@ describe("review fixes", () => {
     expect(advice.reason.en).toMatch(/500 kg is too heavy for today's estimated strength; about [\d.]+ kg fits \d+ reps/);
   });
 });
+
+describe("next set after a set done today", () => {
+  const context = buildAdviceContext([lastWeek], now);
+  it.each([50, 60, 65])("keeps the %i kg just lifted as the starting weight", (weightKg) => {
+    const advice = adviseSet(context, exercise(barbell, [done("one", weightKg, 10, { completedAt: now.toISOString(), rir: 2 }), open("two")]), "two");
+    expect(advice?.weightKg).toBe(weightKg);
+  });
+  it("starts a set after a failed one from a weight above zero", () => {
+    const advice = adviseSet(context, exercise(barbell, [done("one", 60, 3, { completedAt: now.toISOString(), rir: 0 }), open("two")]), "two");
+    expect(advice?.weightKg ?? 0).toBeGreaterThan(0);
+  });
+});
