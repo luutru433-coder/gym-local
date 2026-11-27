@@ -23,13 +23,18 @@ export function primeRestAlert(): void {
   if (context?.state === "suspended") void context.resume().catch(() => undefined);
 }
 
-export function playRestAlert(): void {
+export function playRestAlert(playMediaAlert?: () => boolean): void {
   if (isRestAlertMuted()) return;
   try {
     navigator.vibrate?.([220, 120, 220]);
   } catch {
     // Vibration is optional (not available on iOS).
   }
+  if (playMediaAlert?.()) return;
+  playRestSound();
+}
+
+export function playRestSound(): void {
   const context = getAudioContext();
   if (!context) return;
   try {

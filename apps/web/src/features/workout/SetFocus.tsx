@@ -37,6 +37,7 @@ interface Props {
   state: FocusState;
   alertMuted: boolean;
   wakeLockSupported: boolean;
+  lockScreenTimerEnabled: boolean;
   onStart: () => void;
   onEnd: () => void;
   onCancelSet: () => void;
@@ -86,7 +87,7 @@ function Heading({ set }: { set: FocusSet }) {
   );
 }
 
-export function SetFocus({ locale, state, alertMuted, wakeLockSupported, onStart, onEnd, onCancelSet, onFinish, onRest, onRestartRest, onToggleAlert }: Props) {
+export function SetFocus({ locale, state, alertMuted, wakeLockSupported, lockScreenTimerEnabled, onStart, onEnd, onCancelSet, onFinish, onRest, onRestartRest, onToggleAlert }: Props) {
   const vi = locale === "vi";
   const restDone = state.phase === "rest" && state.remaining === 0;
   const headingSet = state.phase === "rest" ? (state.done ?? state.next) : state.phase === "finished" ? undefined : state.set;
@@ -164,7 +165,9 @@ export function SetFocus({ locale, state, alertMuted, wakeLockSupported, onStart
               <button type="button" onClick={() => onRest(undefined)}>{vi ? "Bỏ qua" : "Skip"}</button>
             </div>
             {state.next?.adviceLabel ? <p className="focus-hint">{vi ? `Gợi ý set ${state.next.setNumber}` : `Suggestion for set ${state.next.setNumber}`} <b>{state.next.adviceLabel}</b></p> : null}
-            <p className="focus-note">{vi
+            <p className="focus-note">{lockScreenTimerEnabled ? (vi
+              ? "Trên màn hình khóa, bấm Tiếp để kết thúc hoặc bắt đầu set, bấm Trước để bỏ qua giờ nghỉ. Chuông có thể không kêu nếu iPhone dừng âm thanh nền."
+              : "On the lock screen, use Next to end or start a set and Previous to skip rest. The bell may not sound if iPhone stops background audio.") : vi
               ? `Chuông chỉ kêu khi app đang mở trên màn hình và iPhone không gạt im lặng.${wakeLockSupported ? "" : " Máy này không giữ sáng màn hình được: hãy tăng thời gian tự khoá."}`
               : `The alert sounds only while the app is open on screen and the iPhone is not on silent.${wakeLockSupported ? "" : " This device cannot keep the screen awake: raise the auto-lock time."}`}</p>
             {state.done ? (
