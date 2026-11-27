@@ -343,11 +343,13 @@ export function suggestSetValues(
   const doneAbove = (match: (item: SetLog) => boolean) => suggestionFrom([...earlier].reverse().find((item) => item.completedAt && match(item)));
   if (set.type === "warmup") return doneAbove((item) => item.type === "warmup");
   const workingIndex = earlier.filter((item) => item.type !== "warmup").length;
-  // The set just finished today comes first, so the next one is adjusted from it; then last time's, then today's warm-up rather than nothing.
-  return doneAbove((item) => item.type !== "warmup")
-    ?? suggestionFrom(lastTime[workingIndex])
-    ?? suggestionFrom(lastTime.at(-1))
-    ?? doneAbove(() => true);
+  // The set just finished today comes first, so the next one is adjusted from it; a field it lacks comes from last time.
+  const above = doneAbove((item) => item.type !== "warmup");
+  const last = suggestionFrom(lastTime[workingIndex]) ?? suggestionFrom(lastTime.at(-1));
+  if (above || last) return { ...last, ...above };
+  // No working set to go by: start from today's warm-up load and reps rather than from nothing.
+  const warmup = doneAbove(() => true);
+  return suggestionFrom(warmup && { weightKg: warmup.weightKg, reps: warmup.reps });
 }
 
 /** Fills only the fields the user left empty, so typed values always win. */

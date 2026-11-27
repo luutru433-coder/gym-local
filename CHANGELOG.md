@@ -3,7 +3,7 @@
 ## Unreleased — The next set starts from the set you just finished
 
 - On the workout screen the weight and reps offered for the next set now start from the set you just finished in this workout, so you only adjust up or down. Before, they could come from last time's workout, and a drop or failure set, or the first working set after a warm-up with no history, started from 0.
-- Order used: the set finished just above in this workout, then the same set last time, then last time's final set, then this workout's warm-up. Exact equipment variants still never share values, and anything you type is kept.
+- Order used: the set finished just above in this workout, then the same set last time, then last time's final set, then this workout's warm-up (weight and reps only). A value the finished set does not have, such as a weight you left empty, still comes from last time. Exact equipment variants still never share values, and anything you type is kept.
 
 ## Unreleased — Weekly set changes, block weeks and deload in the next-session plan
 

@@ -237,6 +237,15 @@ describe("set suggestions from last time", () => {
     expect(suggestSetValues(exercise, exercise.sets[1].id, lastTime)).toEqual({ weightKg: 40, reps: 10 });
   });
 
+  it("keeps last time's weight when the set above has only reps, and never carries a warm-up's distance or time", () => {
+    const exercise = block();
+    Object.assign(exercise.sets[0], { reps: 12, completedAt: "2026-08-13T10:00:00.000Z" });
+    expect(suggestSetValues(exercise, exercise.sets[1].id, lastTime)).toEqual({ weightKg: 40, reps: 12 });
+    const carry = block();
+    Object.assign(carry.sets[0], { type: "warmup", weightKg: 20, distanceMeters: 30, durationSeconds: 40, completedAt: "2026-08-13T10:00:00.000Z" });
+    expect(suggestSetValues(carry, carry.sets[1].id, [])).toEqual({ weightKg: 20 });
+  });
+
   it("never replaces values the user typed", () => {
     expect(applySetSuggestion({ id: "set", type: "working", weightKg: 45 }, { weightKg: 40, reps: 10 })).toEqual({ reps: 10 });
     expect(applySetSuggestion({ id: "set", type: "working" }, undefined)).toEqual({});
