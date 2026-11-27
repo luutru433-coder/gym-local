@@ -18,6 +18,25 @@ export function setRestAlertMuted(muted: boolean): void {
   }
 }
 
+const LOCK_SCREEN_TIMER_KEY = "gym-local.lock-screen-timer.enabled";
+
+export function isLockScreenTimerEnabled(): boolean {
+  try {
+    return globalThis.localStorage?.getItem(LOCK_SCREEN_TIMER_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setLockScreenTimerEnabled(enabled: boolean): void {
+  try {
+    if (enabled) globalThis.localStorage?.setItem(LOCK_SCREEN_TIMER_KEY, "1");
+    else globalThis.localStorage?.removeItem(LOCK_SCREEN_TIMER_KEY);
+  } catch {
+    // The preference cannot be saved on this device.
+  }
+}
+
 const CALORIE_CHECK_SNOOZE_KEY = "gym-local.calorie-check.snoozed-until";
 
 /** Local day (YYYY-MM-DD) until which the calorie target suggestion stays hidden. */

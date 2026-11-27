@@ -20,6 +20,9 @@ A set had one timestamp, `completedAt`, written by the single ✓ button, which 
 
 ## Consequences
 
-- On an installed iPhone web app the rest alert cannot fire while the app is in the background or the phone is locked (no local notifications without a push server), there is no vibration, sound follows the silent switch, and the screen wake lock needs iOS 18.4+. The screen therefore flashes, counts time past the rest, catches up on return to the foreground, and states these limits in the rest panel.
+- The default rest alert is foreground-only on iPhone. There is no vibration on iOS, and screen wake lock needs iOS 18.4+. The screen flashes, counts time past rest, and catches up on return to the foreground.
+- An experimental, device-only Settings switch enables Media Session while the workout screen is open. A tap in that screen starts a quiet bundled audio loop; Now Playing shows set targets or rest progress. Next (or seek forward) ends a valid running set or starts the next set, and Previous (or seek back) skips rest. Play/Pause controls the media only; the workout and rest still measure wall-clock time. Now Playing stops when the workout ends or you leave its screen.
+- Absolute seek requests never change the workout or move the audio, since scrubbing and some browsers' ±10-second buttons send the same request. Use the Next and Previous track buttons when the browser does not send separate forward and backward actions.
+- When the web app detects rest expiry, it tries to play the bell through the same audio element, then returns to the loop. The mute preference applies to the bell. This is not a push notification, and if iOS suspends JavaScript or playback, the countdown display, controls, or bell may not work until the app returns. The loop can also interrupt other audio. The two audio clips are generated sine tones, bundled for offline use.
 - History and records ignore the new fields; only the finish summary reads them.
 - Nothing is added to the startup entry chunk.

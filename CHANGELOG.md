@@ -4,6 +4,10 @@
 
 - Drag the grip on an exercise to change its position in a routine or an active workout. The up and down buttons are still available if you prefer not to drag.
 
+## Unreleased — Experimental iPhone lock-screen workout timer
+
+- Opt in from Settings and tap the workout screen to try starting and ending sets, skipping rest, and hearing the rest bell from iPhone's Now Playing controls. This is best-effort: iOS can suspend the web app or its background audio.
+
 ## Unreleased — The next set starts from the set you just finished
 
 - On the workout screen the weight and reps offered for the next set now start from the set you just finished in this workout, so you only adjust up or down. Before, they could come from last time's workout, and a drop or failure set, or the first working set after a warm-up with no history, started from 0.
