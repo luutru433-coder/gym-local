@@ -106,7 +106,7 @@ describe("RoutineEditor exercise order", () => {
     fireEvent.pointerMove(handle, { ...pointer, clientY: 260 });
     expect(rows[1]).toHaveAttribute("data-exercise-drop", "after");
 
-    await user.keyboard("{Escape}");
+    fireEvent.keyDown(name, { key: "Escape" });
     expect(onClose).not.toHaveBeenCalled();
     expect(rows[0]).not.toHaveAttribute("data-exercise-dragging");
     expect(rows[1]).not.toHaveAttribute("data-exercise-drop");
@@ -115,6 +115,12 @@ describe("RoutineEditor exercise order", () => {
     expect(screen.getAllByRole("listitem")).toEqual(rows);
     expect(name).toHaveValue("Routine draft");
 
+    fireEvent.keyDown(name, { key: "Escape", repeat: true });
+    fireEvent.keyDown(name, { key: "Escape", repeat: true });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(name).toHaveValue("Routine draft");
+
+    fireEvent.keyUp(name, { key: "Escape" });
     await user.keyboard("{Escape}");
     expect(onClose).toHaveBeenCalledTimes(1);
   });

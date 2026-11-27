@@ -55,10 +55,35 @@ function resetDrag(drag: Drag | undefined) {
   delete drag.rows[drag.target].dataset.exerciseDrop;
 }
 
+function consumeEscape(event: KeyboardEvent): boolean {
+  if (event.key !== "Escape") return false;
+  event.preventDefault();
+  event.stopPropagation();
+  return true;
+}
+
+function suppressHeldEscape() {
+  const swallow = (event: KeyboardEvent) => { consumeEscape(event); };
+  const release = (event: KeyboardEvent) => {
+    if (event.key === "Escape") cleanup();
+  };
+  const cleanup = () => {
+    window.removeEventListener("keydown", swallow, true);
+    window.removeEventListener("keyup", release, true);
+  };
+  window.addEventListener("keydown", swallow, true);
+  window.addEventListener("keyup", release, true);
+  return cleanup;
+}
+
 // The arrow buttons on each row provide the alternative to dragging.
 export function ExerciseDragHandle({ locale, onMove }: { locale: Locale; onMove: (index: number) => void }) {
   const dragRef = useRef<Drag>(undefined);
-  useEffect(() => () => resetDrag(dragRef.current), []);
+  const releaseEscapeRef = useRef<() => void>(undefined);
+  useEffect(() => () => {
+    resetDrag(dragRef.current);
+    releaseEscapeRef.current?.();
+  }, []);
 
   const start = (event: PointerEvent<HTMLSpanElement>) => {
     if (!event.isPrimary || event.button !== 0 || dragRef.current) return;
@@ -78,12 +103,12 @@ export function ExerciseDragHandle({ locale, onMove }: { locale: Locale; onMove:
       target: source,
       scroller: scrollContainer(row),
       onEscape: (keyEvent) => {
-        if (keyEvent.key !== "Escape") return;
-        keyEvent.preventDefault();
-        keyEvent.stopPropagation();
+        if (keyEvent.defaultPrevented || !consumeEscape(keyEvent)) return;
         const drag = dragRef.current;
         resetDrag(drag);
         dragRef.current = undefined;
+        releaseEscapeRef.current?.();
+        releaseEscapeRef.current = suppressHeldEscape();
         if (drag && handle.hasPointerCapture(drag.pointerId)) handle.releasePointerCapture(drag.pointerId);
       }
     };
