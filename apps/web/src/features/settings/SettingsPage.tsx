@@ -6,6 +6,7 @@ import { CONTENT_SOURCES, EQUIPMENT_OPTIONS, EXERCISE_VARIANTS, MOVEMENTS } from
 import { createBackup, downloadBlob, readBackup, workoutCsv } from "@gym/backup";
 import { confirmNutritionTarget, estimateNutritionTarget, nutritionTargetNeedsConfirmation, type NutritionEstimateInput } from "@gym/nutrition";
 import { exportAllData, persistentStorageStatus, requestPersistentStorage, storageEstimate } from "@gym/storage";
+import { isLockScreenTimerEnabled, setLockScreenTimerEnabled } from "@gym/storage/device";
 import { formatDate, formatNumber } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { PwaInstallCard } from "./PwaInstallCard";
@@ -40,6 +41,7 @@ export function SettingsPage() {
   const [persistent, setPersistent] = useState<boolean>();
   const [persistenceBusy, setPersistenceBusy] = useState(false);
   const [targetConfirmation, setTargetConfirmation] = useState<Profile>();
+  const [lockScreenTimer, setLockScreenTimer] = useState(isLockScreenTimerEnabled);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -234,6 +236,21 @@ export function SettingsPage() {
               <p className="fine-print">{locale === "vi" ? "Ước tính chỉ là điểm bắt đầu, không thay thế chẩn đoán hay tư vấn của chuyên gia." : "Estimates are only a starting point and do not replace professional advice."}</p>
             </Card>
           </section>
+
+          {navigator.mediaSession && typeof MediaMetadata !== "undefined" ? (
+            <section>
+              <SectionTitle eyebrow={locale === "vi" ? "Thử nghiệm trên iPhone" : "Experimental on iPhone"} title={locale === "vi" ? "Bộ đếm trên màn hình khóa" : "Lock-screen workout timer"} />
+              <Card className="settings-card">
+                <p id="lock-screen-timer-note">{locale === "vi"
+                  ? "Chạm vào màn hình buổi tập để bật trình phát trên màn hình khóa. Tính năng dùng âm thanh nền rất nhỏ, có thể ngắt nhạc đang phát và có thể không hoạt động nếu iPhone dừng âm thanh nền."
+                  : "Tap the workout screen to activate Now Playing on the lock screen. It uses very quiet background audio, may interrupt other music, and may stop working if iPhone suspends background audio."}</p>
+                <Button type="button" variant="secondary" aria-pressed={lockScreenTimer} aria-describedby="lock-screen-timer-note" onClick={() => {
+                  setLockScreenTimerEnabled(!lockScreenTimer);
+                  setLockScreenTimer(!lockScreenTimer);
+                }}>{locale === "vi" ? "Điều khiển giờ tập trên màn hình khóa" : "Lock-screen workout controls"}</Button>
+              </Card>
+            </section>
+          ) : null}
 
           <section>
             <SectionTitle eyebrow={locale === "vi" ? "Bạn giữ file" : "You keep the file"} title={locale === "vi" ? "Backup & khôi phục" : "Backup & restore"} />

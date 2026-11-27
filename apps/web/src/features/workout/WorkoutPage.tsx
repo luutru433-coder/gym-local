@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowDown,
@@ -46,13 +46,14 @@ import { localize } from "../../lib/i18n";
 import { useGymStore } from "../../store/useGymStore";
 import { ExerciseAnimation } from "../../components/ExerciseAnimation";
 import { ExerciseVideoPlayer } from "../../components/ExerciseVideoPlayer";
-import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
-import { playRestAlert, primeRestAlert, useScreenWakeLock } from "./restAlert";
+import { isLockScreenTimerEnabled, isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
+import { primeRestAlert, useScreenWakeLock } from "./restAlert";
 import { recordKindsLabel } from "./recordLabels";
 import { WorkoutSummary } from "./WorkoutSummary";
 import { ReadinessCheckInCard, WarmupFeelPicker } from "./ReadinessCheckIn";
 import { clock } from "./clock";
 import { SetFocus, type FocusNumber, type FocusSet, type FocusState } from "./SetFocus";
+import { WorkoutMedia } from "./WorkoutMedia";
 import "./WorkoutPage.css";
 
 function durationLabel(startedAt: string, now: number): string {
@@ -126,7 +127,7 @@ export function WorkoutPage() {
   const [barWeights, setBarWeights] = useState<Record<string, number>>({});
   const [summary, setSummary] = useState<{ session: WorkoutSession; records: SessionRecordSet[] }>();
   const [restAlertMuted, setRestAlertMutedState] = useState(isRestAlertMuted);
-  const armedRestEnd = useRef<string | undefined>(undefined);
+  const [restartedRest, setRestartedRest] = useState<{ sessionId: string; startedAt: number }>();
   const availableEquipment = profile.locations.find((location) => location.id === profile.activeLocationId)?.equipment ?? [];
   const customMovements = useGymStore((state) => state.customMovements);
   const filteredMovements = useMemo(() => {
@@ -154,7 +155,6 @@ export function WorkoutPage() {
   const progress = activeSession ? sessionProgress(activeSession) : { completed: 0, total: 0, percent: 0 };
   const restRemaining = restLabel(activeSession?.restTimerEndsAt, now);
   const restEndsAt = activeSession?.restTimerEndsAt;
-  const restFinished = Boolean(restEndsAt) && restRemaining === 0;
   const liveRecords = useMemo(
     () => activeSession ? sessionRecordSets(sessions, activeSession) : [],
     [sessions, activeSession]
@@ -191,22 +191,6 @@ export function WorkoutPage() {
     gestures.forEach((gesture) => window.addEventListener(gesture, primeRestAlert));
     return () => gestures.forEach((gesture) => window.removeEventListener(gesture, primeRestAlert));
   }, []);
-
-  // Alert once per countdown that was seen running; an already expired timer stays silent.
-  useEffect(() => {
-    if (!restEndsAt) {
-      armedRestEnd.current = undefined;
-      return;
-    }
-    if (!restFinished) {
-      if (new Date(restEndsAt).getTime() > Date.now()) armedRestEnd.current = restEndsAt;
-      return;
-    }
-    if (armedRestEnd.current === restEndsAt) {
-      armedRestEnd.current = undefined;
-      playRestAlert();
-    }
-  }, [restEndsAt, restFinished]);
 
   const toggleRestAlert = () => {
     const muted = !restAlertMuted;
@@ -247,6 +231,7 @@ export function WorkoutPage() {
     if (!set) return;
     const completed = updateSet(activeSession, exerciseId, setId, { ...applySetSuggestion(set, suggestion), ...extra }, true);
     const updated = advanceSuperset(stampWorkSeconds(completed, exerciseId, setId), exerciseId);
+    setRestartedRest(undefined);
     save(updated);
     syncClock();
     if (updated.activeExerciseId !== exerciseId) {
@@ -278,7 +263,9 @@ export function WorkoutPage() {
   const restartRest = () => {
     if (!activeSession) return;
     const seconds = restingExercise(activeSession)?.restSeconds ?? 90;
-    save({ ...activeSession, restTimerEndsAt: new Date(Date.now() + seconds * 1000).toISOString() });
+    const startedAt = Date.now();
+    setRestartedRest({ sessionId: activeSession.id, startedAt });
+    save({ ...activeSession, restTimerEndsAt: new Date(startedAt + seconds * 1000).toISOString() });
     syncClock();
   };
 
@@ -466,18 +453,22 @@ export function WorkoutPage() {
   const running = runningSet(activeSession);
   const upcoming = nextOpenSet(activeSession);
   const justDone = lastFinishedSet(activeSession);
+  const plannedRest = restEndsAt ? restingExercise(activeSession)?.restSeconds ?? 90 : 0;
+  const restStartedAt = restEndsAt
+    ? restartedRest?.sessionId === activeSession.id ? restartedRest.startedAt
+      : justDone?.set.completedAt ? Date.parse(justDone.set.completedAt) : Date.parse(restEndsAt) - plannedRest * 1000
+    : undefined;
   const runningInfo = running ? describeSet(running) : undefined;
   const runningElapsed = running ? runningSeconds(running.set, now) : 0;
   let focusState: FocusState;
   if (running && runningInfo) {
     focusState = { phase: "running", set: runningInfo.view, elapsed: runningElapsed, canEnd: runningInfo.mode !== "reps" || (runningInfo.filled.reps ?? runningInfo.targetReps ?? 0) > 0 };
   } else if (restEndsAt) {
-    const planned = restingExercise(activeSession)?.restSeconds ?? 90;
     const doneInfo = justDone ? describeSet(justDone) : undefined;
     focusState = {
       phase: "rest",
       remaining: restRemaining,
-      total: Math.max(planned, restRemaining),
+      total: Math.max(plannedRest, restRemaining),
       overtime: Math.max(0, Math.floor((now - new Date(restEndsAt).getTime()) / 1000)),
       done: doneInfo && justDone ? { ...doneInfo.view, workSeconds: justDone.set.workSeconds, rir: doneInfo.rir } : undefined,
       next: upcoming ? describeSet(upcoming).view : undefined
@@ -559,6 +550,7 @@ export function WorkoutPage() {
         state={focusState}
         alertMuted={restAlertMuted}
         wakeLockSupported={"wakeLock" in navigator}
+        lockScreenTimerEnabled={isLockScreenTimerEnabled() && Boolean(navigator.mediaSession) && typeof MediaMetadata !== "undefined"}
         onStart={startFocusSet}
         onEnd={endFocusSet}
         onCancelSet={() => save(cancelRunningSet(activeSession))}
@@ -566,6 +558,17 @@ export function WorkoutPage() {
         onRest={modifyRest}
         onRestartRest={restartRest}
         onToggleAlert={toggleRestAlert}
+      />
+      <WorkoutMedia
+        key={activeSession.id}
+        locale={locale}
+        state={focusState}
+        now={now}
+        restEndsAt={restEndsAt}
+        restStartedAt={restStartedAt}
+        onStart={() => { if (useGymStore.getState().activeSession === activeSession) startFocusSet(); }}
+        onEnd={() => { if (useGymStore.getState().activeSession === activeSession) endFocusSet(); }}
+        onSkip={() => { if (useGymStore.getState().activeSession === activeSession) modifyRest(); }}
       />
 
       <nav className="exercise-jump" aria-label={locale === "vi" ? "Các bài trong buổi tập" : "Workout exercises"}>

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Experimental iPhone lock-screen workout timer
+
+- Opt in from Settings and tap the workout screen to try starting and ending sets, skipping rest, and hearing the rest bell from iPhone's Now Playing controls. This is best-effort: iOS can suspend the web app or its background audio.
+
 ## Unreleased — Weekly set changes, block weeks and deload in the next-session plan
 
 - The home screen's next-session plan now follows a 5-week block: each week you train in a row the target effort gets one rep closer to failure (about 4, 3, 2, then 1 reps left), and the fifth week is a deload with half the sets (ADR 0027). A week off restarts the block.

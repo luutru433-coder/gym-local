@@ -1,11 +1,11 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Profile, WorkoutSession } from "@gym/contracts";
 import { getMovement, getTrackingProfile, getVariant } from "@gym/catalog";
 import { WorkoutPage } from "./WorkoutPage";
-import { setRestAlertMuted } from "@gym/storage/device";
+import { setLockScreenTimerEnabled, setRestAlertMuted } from "@gym/storage/device";
 import { useGymStore } from "../../store/useGymStore";
 
 const timestamp = "2026-08-13T10:00:00.000Z";
@@ -78,6 +78,101 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+});
+
+function mockWorkoutMedia() {
+  const handlers = new Map<MediaSessionAction, MediaSessionActionHandler>();
+  const media = {
+    metadata: null as MediaMetadata | null,
+    playbackState: "none",
+    setPositionState: vi.fn(),
+    setActionHandler: (action: MediaSessionAction, handler: MediaSessionActionHandler | null) => {
+      if (handler) handlers.set(action, handler);
+      else handlers.delete(action);
+    }
+  };
+  class MockMetadata {
+    constructor(init: MediaMetadataInit) { Object.assign(this, init); }
+  }
+  vi.stubGlobal("MediaMetadata", MockMetadata);
+  vi.stubGlobal("navigator", Object.create(navigator, {
+    mediaSession: { value: media },
+    vibrate: { value: vi.fn() }
+  }));
+  let playing = false;
+  vi.spyOn(HTMLMediaElement.prototype, "paused", "get").mockImplementation(() => !playing);
+  const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {
+    playing = true;
+    return Promise.resolve();
+  });
+  const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => { playing = false; });
+  const press = (action: MediaSessionAction) => act(() => handlers.get(action)?.({ action }));
+  return { media, handlers, play, pause, press };
+}
+
+describe("lock-screen workout controls", () => {
+  afterEach(() => {
+    cleanup();
+    setLockScreenTimerEnabled(false);
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  it("opts in on the workout gesture and connects media actions to set and rest state", async () => {
+    vi.useFakeTimers();
+    const { media, handlers, play, pause, press } = mockWorkoutMedia();
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    live.exercises[0].sets[0] = { ...live.exercises[0].sets[0], targetMaxReps: 10, weightKg: 20 };
+    live.exercises[0].sets[1] = { ...live.exercises[0].sets[1], reps: 8, weightKg: 22 };
+    setLockScreenTimerEnabled(true);
+    arrange(live);
+
+    expect(play).not.toHaveBeenCalled();
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Bắt đầu set 1" })); });
+    expect(media.metadata?.title).toMatch(/^Set 1 · /);
+    expect(media.metadata?.artist).toMatch(/20 kg.* × 10 lần/);
+    press("nexttrack");
+    expect(useGymStore.getState().activeSession?.exercises[0].sets[0]).toMatchObject({ reps: 10 });
+    expect(media.metadata?.title).toBe("Nghỉ 1:30");
+    expect(media.metadata?.artist).toMatch(/22 kg.* × 8 lần/);
+    expect(media.setPositionState).toHaveBeenLastCalledWith({ duration: 90, playbackRate: 1, position: expect.any(Number) });
+    press("pause");
+    expect(pause).toHaveBeenCalled();
+    expect(media.playbackState).toBe("paused");
+    await act(async () => { press("play"); });
+    expect(media.playbackState).toBe("playing");
+    press("previoustrack");
+    expect(useGymStore.getState().activeSession?.restTimerEndsAt).toBeUndefined();
+    press("seekforward");
+    expect(useGymStore.getState().activeSession?.exercises[0].sets[1].startedAt).toBeDefined();
+    cleanup();
+    expect(handlers.size).toBe(0);
+    expect(media.metadata).toBeNull();
+    expect(media.playbackState).toBe("none");
+  });
+
+  it("plays the rest bell on the same element, then returns to the audio loop", async () => {
+    vi.useFakeTimers();
+    const { media, play } = mockWorkoutMedia();
+    const live = session();
+    live.restTimerEndsAt = new Date(Date.now() + 1000).toISOString();
+    setLockScreenTimerEnabled(true);
+    arrange(live);
+
+    await act(async () => { fireEvent.click(screen.getByRole("region", { name: "Bộ đếm thời gian nghỉ" })); });
+    const audio = play.mock.contexts[0] as HTMLAudioElement;
+    const carrier = audio.src;
+    expect(audio.loop).toBe(true);
+    await act(async () => { vi.advanceTimersByTime(1000); });
+    expect(play.mock.contexts[1]).toBe(audio);
+    expect(audio.src).not.toBe(carrier);
+    expect(audio.loop).toBe(false);
+    expect(media.metadata?.title).toBe("Hết giờ nghỉ");
+    await act(async () => { fireEvent.ended(audio); });
+    expect(audio.src).toBe(carrier);
+    expect(audio.loop).toBe(true);
+  });
 });
 
 describe("live workout editing", () => {
