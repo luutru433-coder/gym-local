@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@gym/contracts": fromRoot("./packages/contracts/src/index.ts"),
       "@gym/catalog/custom": fromRoot("./packages/catalog/src/custom-exercise.ts"),
+      "@gym/catalog/technique": fromRoot("./packages/catalog/src/technique/index.ts"),
       "@gym/catalog": fromRoot("./packages/catalog/src/index.ts"),
       "@gym/workouts/autoregulation-plan": fromRoot("./packages/workouts/src/autoregulation-plan.ts"),
       "@gym/workouts/autoregulation-week": fromRoot("./packages/workouts/src/autoregulation-week.ts"),
