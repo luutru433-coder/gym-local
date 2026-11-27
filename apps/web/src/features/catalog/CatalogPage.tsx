@@ -15,6 +15,8 @@ const ExercisePackImage = lazy(() => import("../../components/ExercisePackImage"
 const ExerciseDbExercisePicker = lazy(() => import("./ExerciseDbExercisePicker"));
 import { frameUrl, muscleLabels } from "../../lib/exercise-visuals";
 
+const ExerciseTechnique = lazy(() => import("../../components/ExerciseTechnique"));
+
 
 const muscleFilters: MuscleGroup[] = ["chest", "back", "shoulders", "quadriceps", "hamstrings", "glutes", "biceps", "triceps", "core"];
 
@@ -189,6 +191,7 @@ export function CatalogPage() {
 
             <Suspense fallback={null}><ExercisePackImage key={`pack-${activeVariant.id}`} variantId={activeVariant.id} exerciseName={localize(selectedMovement.name, locale)} locale={locale} /></Suspense>
             <ExerciseAnimation key={activeVariant.id} animation={getExerciseAnimation(activeVariant.id)} primaryMuscles={selectedMovement.primaryMuscles} secondaryMuscles={selectedMovement.secondaryMuscles} locale={locale} />
+            <Suspense fallback={null}><ExerciseTechnique key={activeVariant.id} variantId={activeVariant.id} locale={locale} /></Suspense>
 
 
             <div className="instruction-layout">
