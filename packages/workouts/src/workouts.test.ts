@@ -222,6 +222,21 @@ describe("set suggestions from last time", () => {
     expect(suggestSetValues(exercise, exercise.sets[0].id, [])).toBeUndefined();
   });
 
+  it("starts the next set from the set just finished today, not from last time or zero", () => {
+    const exercise = block();
+    Object.assign(exercise.sets[0], { weightKg: 45, reps: 9, completedAt: "2026-08-13T10:00:00.000Z" });
+    expect(suggestSetValues(exercise, exercise.sets[1].id, lastTime)).toEqual({ weightKg: 45, reps: 9 });
+    exercise.sets[1].type = "drop";
+    expect(suggestSetValues(exercise, exercise.sets[1].id, [])).toEqual({ weightKg: 45, reps: 9 });
+  });
+
+  it("starts the first working set from today's warm-up when there is no history", () => {
+    const exercise = block();
+    Object.assign(exercise.sets[0], { type: "warmup", weightKg: 20, reps: 10, completedAt: "2026-08-13T10:00:00.000Z" });
+    expect(suggestSetValues(exercise, exercise.sets[1].id, [])).toEqual({ weightKg: 20, reps: 10 });
+    expect(suggestSetValues(exercise, exercise.sets[1].id, lastTime)).toEqual({ weightKg: 40, reps: 10 });
+  });
+
   it("never replaces values the user typed", () => {
     expect(applySetSuggestion({ id: "set", type: "working", weightKg: 45 }, { weightKg: 40, reps: 10 })).toEqual({ reps: 10 });
     expect(applySetSuggestion({ id: "set", type: "working" }, undefined)).toEqual({});

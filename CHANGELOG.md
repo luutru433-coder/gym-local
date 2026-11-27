@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — The next set starts from the set you just finished
+
+- On the workout screen the weight and reps offered for the next set now start from the set you just finished in this workout, so you only adjust up or down. Before, they could come from last time's workout, and a drop or failure set, or the first working set after a warm-up with no history, started from 0.
+- Order used: the set finished just above in this workout, then the same set last time, then last time's final set, then this workout's warm-up. Exact equipment variants still never share values, and anything you type is kept.
+
 ## Unreleased — Weekly set changes, block weeks and deload in the next-session plan
 
 - The home screen's next-session plan now follows a 5-week block: each week you train in a row the target effort gets one rep closer to failure (about 4, 3, 2, then 1 reps left), and the fifth week is a deload with half the sets (ADR 0027). A week off restarts the block.
