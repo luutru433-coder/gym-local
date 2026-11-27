@@ -1,5 +1,5 @@
 import { Bell, BellOff, Check, Minus, Play, Plus, Square, TimerReset } from "lucide-react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { clock } from "./clock";
 import "./SetFocus.css";
 
@@ -66,6 +66,7 @@ const maxTypedWeightKg = 1000;
 
 function WeightInput({ number, locale }: { number: FocusNumber; locale: "vi" | "en" }) {
   const [draft, setDraft] = useState<string>();
+  const value = String(draft ?? number.value);
 
   return (
     <input
@@ -73,7 +74,8 @@ function WeightInput({ number, locale }: { number: FocusNumber; locale: "vi" | "
       aria-label={locale === "vi" ? `Khối lượng (${number.label})` : `Weight (${number.label})`}
       inputMode="decimal"
       enterKeyHint="done"
-      value={draft ?? number.value}
+      style={{ "--weight-chars": Math.max(2, value.length) } as CSSProperties}
+      value={value}
       onChange={(event) => setDraft(event.currentTarget.value)}
       onBlur={(event) => {
         setDraft(undefined);

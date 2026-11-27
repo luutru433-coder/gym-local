@@ -443,8 +443,10 @@ describe("live workout editing", () => {
     const currentSet = () => useGymStore.getState().activeSession!.exercises[0].sets[0];
     const weight = focus.getByRole("textbox", { name: "Khối lượng (kg)" });
     expect(weight).toHaveAttribute("inputmode", "decimal");
+    expect(weight).toHaveStyle({ "--weight-chars": "2" });
     await user.clear(weight);
     await user.type(weight, "21,25");
+    expect(weight).toHaveStyle({ "--weight-chars": "5" });
     expect(currentSet().weightKg).toBe(20);
     await user.keyboard("{Enter}");
     expect(weight).toHaveValue("21.25");
