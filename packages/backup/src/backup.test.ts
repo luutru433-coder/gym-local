@@ -645,4 +645,22 @@ describe("backup", () => {
     sessions[0].exercises[0].sets[0] = timedSet("not a time");
     await expect(createBackup(emptyData({ sessions } as never))).rejects.toThrow();
   });
+  it("round-trips the pre-workout check-in and warm-up feel and rejects answers outside 1-5", async () => {
+    const name = { vi: "Đẩy ngực", en: "Chest press" };
+    const session = (soreness: number) => ({ id: "session_ready", startedAt: "2026-08-10T01:00:00.000Z", checkIn: { sleep: 2, energy: 4, soreness }, exercises: [{ id: "block_a", movementId: "chest_press", variantId: "chest_press__dumbbell", movementNameSnapshot: name, variantNameSnapshot: name, loadEntryModeSnapshot: "per_hand" as const, restSeconds: 90, warmupFeel: "worse" as const, sets: [] }] });
+
+    const restored = await readBackup(await createBackup(emptyData({ sessions: [session(5)] } as never)));
+    expect(restored.data.sessions[0].checkIn).toEqual({ sleep: 2, energy: 4, soreness: 5 });
+    expect(restored.data.sessions[0].exercises[0].warmupFeel).toBe("worse");
+
+    await expect(createBackup(emptyData({ sessions: [session(6)] } as never))).rejects.toThrow();
+  });
+  it("round-trips per-muscle soreness on a session and rejects a score outside 1-4", async () => {
+    const session = (chest: number) => ({ id: "session_sore", startedAt: "2026-08-10T01:00:00.000Z", finishedAt: "2026-08-10T02:00:00.000Z", soreness: { chest, triceps: 1 }, exercises: [] });
+
+    const restored = await readBackup(await createBackup(emptyData({ sessions: [session(4)] } as never)));
+    expect(restored.data.sessions[0].soreness).toEqual({ chest: 4, triceps: 1 });
+
+    await expect(createBackup(emptyData({ sessions: [session(5)] } as never))).rejects.toThrow();
+  });
 });

@@ -16,7 +16,7 @@ const budgets = {
   vendorChunkBytes: 500 * KIB,
   workerChunkBytes: 250 * KIB,
   initialGraphBytes: 650 * KIB,
-  precacheBytes: 3.5 * MIB,
+  precacheBytes: 3.75 * MIB,
   exerciseAnimationBytes: 16 * MIB
 };
 

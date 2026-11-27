@@ -20,6 +20,8 @@ export interface FocusSet {
   doneCount: number;
   targetLabel?: string;
   previousLabel?: string;
+  /** Engine advice for this set: load × reps, expected reps left and why. */
+  adviceLabel?: string;
   load?: FocusNumber;
   effort: FocusNumber;
 }
@@ -125,6 +127,7 @@ export function SetFocus({ locale, state, alertMuted, wakeLockSupported, onStart
             <p className="focus-eyebrow">{vi ? `Set ${state.set.setNumber}` : `Set ${state.set.setNumber}`}{state.set.targetLabel ? ` · ${vi ? "mục tiêu" : "target"} ${state.set.targetLabel}` : ""}</p>
             <Numbers set={state.set} locale={locale} />
             {state.set.previousLabel ? <p className="focus-hint">{vi ? "Lần trước" : "Last time"} <b>{state.set.previousLabel}</b></p> : null}
+            {state.set.adviceLabel ? <p className="focus-hint">{vi ? "Gợi ý hôm nay" : "Today's suggestion"} <b>{state.set.adviceLabel}</b></p> : null}
           </>
         ) : null}
 
@@ -160,6 +163,7 @@ export function SetFocus({ locale, state, alertMuted, wakeLockSupported, onStart
               <button type="button" aria-pressed={!alertMuted} aria-label={vi ? "Âm báo và rung khi hết giờ nghỉ" : "Sound and vibration when rest ends"} title={alertMuted ? (vi ? "Đang tắt âm báo" : "Alert is off") : (vi ? "Đang bật âm báo" : "Alert is on")} onClick={onToggleAlert}>{alertMuted ? <BellOff size={16} /> : <Bell size={16} />}</button>
               <button type="button" onClick={() => onRest(undefined)}>{vi ? "Bỏ qua" : "Skip"}</button>
             </div>
+            {state.next?.adviceLabel ? <p className="focus-hint">{vi ? `Gợi ý set ${state.next.setNumber}` : `Suggestion for set ${state.next.setNumber}`} <b>{state.next.adviceLabel}</b></p> : null}
             <p className="focus-note">{vi
               ? `Chuông chỉ kêu khi app đang mở trên màn hình và iPhone không gạt im lặng.${wakeLockSupported ? "" : " Máy này không giữ sáng màn hình được: hãy tăng thời gian tự khoá."}`
               : `The alert sounds only while the app is open on screen and the iPhone is not on silent.${wakeLockSupported ? "" : " This device cannot keep the screen awake: raise the auto-lock time."}`}</p>

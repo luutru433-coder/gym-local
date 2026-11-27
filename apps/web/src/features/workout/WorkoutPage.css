@@ -593,46 +593,48 @@
   flex: 1 1 160px;
 }
 
-/* The live workout is always dark with one accent, whatever the app theme (ADR 0020). */
-.workout-page {
-  color-scheme: dark;
-  --ink: #f4f4f2;
-  --ink-soft: #d9d9d5;
-  --paper: #0b0b0c;
-  --surface: #161618;
-  --surface-2: #232326;
-  --surface-3: #1b1b1e;
-  --line: #2c2c30;
-  --line-strong: #4a4a50;
-  --muted: #9a9aa0;
-  --faint: #6c6c73;
-  --danger: #ff8f78;
-  --panel: #232326;
-  --panel-2: #2c2c30;
-  --stage: #0b0b0c;
-  --lime: #ff5a1f;
-  --lime-dark: #d9450f;
-  --accent-bg: var(--lime);
-  --accent-bg-hover: #ff7440;
-  --on-accent: var(--ink-fixed);
-  --olive: #ff7a45;
-  --olive-deep: #ff8f61;
-  --lime-tint: #2b170f;
-  --lime-line: #b0401a;
-  --lime-line-soft: #6b2c16;
-  --sage: #1b1b1e;
-  --danger-bg: #3a1d17;
-  --danger-line: #6b3329;
-  --info-bg: #152a30;
-  --info-ink: #9fd6e2;
-  --warn-bg: #2f2711;
-  --warn-ink: #ecd08a;
-  --shadow: 0 12px 40px rgba(0, 0, 0, .5);
-}
-
 .workout-header { background: rgba(11, 11, 12, .93); }
 .workout-exercise { background: var(--surface); }
 .workout-exercise--expanded { background: var(--surface); }
 .workout-exercise__index { border-radius: 10px; font-family: inherit; }
 .set-row--running { box-shadow: inset 3px 0 0 var(--lime); background: color-mix(in srgb, var(--lime) 7%, transparent); }
 .set-time { display: block; margin-top: 2px; color: var(--faint); font-size: 10px; font-variant-numeric: tabular-nums; }
+
+.readiness-card,
+.readiness-summary,
+.warmup-feel {
+  margin: 0 0 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 13px;
+}
+.readiness-card header small,
+.readiness-card__row small,
+.warmup-feel small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.readiness-card__row,
+.warmup-feel { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+.readiness-card__row { margin-top: 12px; }
+.readiness-card__row > div,
+.warmup-feel > div,
+.readiness-card footer { display: flex; gap: 6px; }
+.readiness-card footer { margin-top: 14px; }
+.readiness-card button,
+.readiness-summary button,
+.warmup-feel button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-weight: 700;
+}
+.readiness-card button[aria-pressed="true"],
+.warmup-feel button[aria-pressed="true"],
+.readiness-card .readiness-card__save { color: var(--stage); background: var(--lime); border-color: var(--lime); }
+.readiness-summary { display: flex; gap: 10px; align-items: center; justify-content: space-between; color: var(--muted); }
+
+/* Above the set panel, so the fixed Start dock never covers the check-in. */
+.readiness-slot { width: calc(100% - 36px); max-width: 560px; margin: 0 auto; }

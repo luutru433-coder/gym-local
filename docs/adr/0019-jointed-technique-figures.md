@@ -25,3 +25,4 @@ The owner asked for form cues on a moving figure: setup position, per-phase cues
 - A technique record is shared by the equipment listed on it; equipment not listed (for example cable chest press) shows no Technique section until a record is written for it.
 - The remaining movements are added as further records in the same shape, with no contract change.
 - `packages/catalog/src/catalog.test.ts`, which `pnpm content:validate` runs, checks that every record points at an existing variant, is bilingual, resolves every pose and mark, and has wrong poses that differ from the right ones.
+- The technique records (about 90 KiB for 30 movements) are precached so they work offline. With the features merged since, that passes the 3.5 MiB app-shell precache budget by a few KiB, so the budget is raised to 3.75 MiB. The 220 KiB entry budget is unchanged.

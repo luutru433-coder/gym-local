@@ -295,6 +295,18 @@ export interface SetLog {
   restBeforeSeconds?: number;
 }
 
+/** Pre-workout answers (ADR 0025), 1-5 each; 3 is a normal day and soreness 5 means none. */
+export interface ReadinessCheckIn {
+  sleep: number;
+  energy: number;
+  soreness: number;
+}
+
+/** How sore a muscle got after a session (ADR 0026): 1 not sore, 2 sore but gone well before the next session, 3 gone just in time, 4 still sore at the next session. */
+export type SorenessScore = 1 | 2 | 3 | 4;
+
+export type WarmupFeel = "worse" | "expected" | "better";
+
 export interface SessionExercise {
   id: Id;
   movementId: Id;
@@ -307,6 +319,8 @@ export interface SessionExercise {
   restSeconds: number;
   note?: string;
   supersetGroup?: string;
+  /** How this exercise's warm-up felt against a normal day (ADR 0025). */
+  warmupFeel?: WarmupFeel;
 }
 
 export interface WorkoutSession {
@@ -321,6 +335,10 @@ export interface WorkoutSession {
   restTimerEndsAt?: string;
   exercises: SessionExercise[];
   notes?: string;
+  /** Answered at the start of the workout; absent when skipped (ADR 0025). */
+  checkIn?: ReadinessCheckIn;
+  /** Answered after the session, per muscle it trained; unanswered muscles are absent (ADR 0026). */
+  soreness?: Partial<Record<MuscleGroup, SorenessScore>>;
 }
 
 export interface NutrientProfile {

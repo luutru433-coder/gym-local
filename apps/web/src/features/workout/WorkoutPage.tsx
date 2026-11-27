@@ -39,6 +39,7 @@ import {
   updateSet
 } from "@gym/workouts";
 import { cancelRunningSet, lastFinishedSet, nextOpenSet, reopenSet, runningSeconds, runningSet, stampWorkSeconds, startSet, type SetRef } from "@gym/workouts/set-timer";
+import { adviseSet, buildAdviceContext, usesWarmupFeel, type SetAdvice } from "@gym/workouts/autoregulation-plan";
 import { advanceSuperset, linkSupersetWithNext, nextInSupersetRound, restingExercise, supersetMembers, unlinkSuperset } from "@gym/workouts/superset";
 import { latestVariantHistory, sessionRecordSets, type SessionRecordSet } from "@gym/progress";
 import { localize } from "../../lib/i18n";
@@ -49,6 +50,7 @@ import { isRestAlertMuted, setRestAlertMuted } from "@gym/storage/device";
 import { playRestAlert, primeRestAlert, useScreenWakeLock } from "./restAlert";
 import { recordKindsLabel } from "./recordLabels";
 import { WorkoutSummary } from "./WorkoutSummary";
+import { ReadinessCheckInCard, WarmupFeelPicker } from "./ReadinessCheckIn";
 import { clock } from "./clock";
 import { SetFocus, type FocusNumber, type FocusSet, type FocusState } from "./SetFocus";
 import "./WorkoutPage.css";
@@ -113,7 +115,8 @@ export function WorkoutPage() {
   const sessionSaveStatus = useGymStore((state) => state.sessionSaveStatus);
   const storeError = useGymStore((state) => state.error);
   const locale = profile.locale;
-  const [now, setNow] = useState(() => activeSession ? new Date(activeSession.startedAt).getTime() : 0);
+  // Starts at the real time: the session's start time made a reloaded rest timer show too much time left until the first tick.
+  const [now, setNow] = useState(() => Date.now());
   const [expandedId, setExpandedId] = useState(activeSession?.activeExerciseId);
   const [exercisePicker, setExercisePicker] = useState<ExercisePickerState>();
   const [exerciseQuery, setExerciseQuery] = useState("");
@@ -157,7 +160,30 @@ export function WorkoutPage() {
     [sessions, activeSession]
   );
 
+  // Finished history and muscle recovery as of the start of this workout; today's sets are read live.
+  const activeSessionId = activeSession?.id;
+  const activeSessionStartedAt = activeSession?.startedAt;
+  const adviceContext = useMemo(
+    () => activeSessionId && activeSessionStartedAt
+      ? buildAdviceContext(sessions.filter((session) => session.id !== activeSessionId), new Date(activeSessionStartedAt))
+      : undefined,
+    [sessions, activeSessionId, activeSessionStartedAt]
+  );
+  /** Engine advice when the exercise can be estimated, else the "same as last time" values. */
+  const suggestFor = (exercise: WorkoutSession["exercises"][number], set: SetLog, previous: SetSuggestion[]): { suggestion?: SetSuggestion; advice?: SetAdvice } => {
+    if (set.completedAt) return {};
+    const advice = adviceContext ? adviseSet(adviceContext, exercise, set.id, activeSession?.checkIn) : undefined;
+    return advice
+      ? { advice, suggestion: { weightKg: advice.weightKg, reps: advice.reps } }
+      : { suggestion: suggestSetValues(exercise, set.id, previous) };
+  };
+
   useScreenWakeLock(Boolean(activeSession));
+
+  // A workout opens at its top (check-in, then the set panel), not at the scroll position of the screen it came from.
+  useEffect(() => {
+    if (activeSessionId) document.documentElement.scrollTop = 0;
+  }, [activeSessionId]);
 
   useEffect(() => {
     // Sound unlocks only inside an activation gesture: touch release, click or key press.
@@ -392,7 +418,7 @@ export function WorkoutPage() {
       ?? trackingProfileForLoadMode(exercise.variantId, exercise.loadEntryModeSnapshot);
     const mode = tracking.effortKind === "distance_duration" ? "distance" as const : tracking.effortKind === "duration" ? "timed" as const : "reps" as const;
     const previous = latestVariantHistory(sessions.filter((session) => session.id !== activeSession.id), exercise.variantId);
-    const suggestion = set.completedAt ? undefined : suggestSetValues(exercise, set.id, previous);
+    const { suggestion, advice } = suggestFor(exercise, set, previous);
     const filled = { ...set, ...applySetSuggestion(set, suggestion) };
     const patch = (values: SetSuggestion & Pick<SetLog, "rir">) => set.completedAt
       // Correcting a finished set must not move the workout back to its block (supersets).
@@ -425,6 +451,11 @@ export function WorkoutPage() {
       doneCount: exercise.sets.filter((item) => item.completedAt).length,
       targetLabel: mode === "reps" ? (repRange ? `${repRange} ${locale === "vi" ? "lần" : "reps"}` : undefined) : set.targetDurationSeconds ? `${set.targetDurationSeconds}s` : undefined,
       previousLabel: prior ? (mode === "distance" ? `${prior.distanceMeters ?? "—"} m · ${prior.durationSeconds ?? "—"} s` : mode === "timed" ? `${prior.weightKg ? `${prior.weightKg} kg · ` : ""}${prior.durationSeconds ?? "—"} s` : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`) : undefined,
+      adviceLabel: advice?.tooHeavy
+        ? localize(advice.reason, locale)
+        : advice
+        ? `${advice.weightKg} × ${advice.reps} · ${locale === "vi" ? `còn khoảng ${Math.round(advice.expectedRir)} lần` : `about ${Math.round(advice.expectedRir)} left`} · ${localize(advice.reason, locale)}`
+        : undefined,
       load,
       effort
     };
@@ -514,6 +545,12 @@ export function WorkoutPage() {
           <AlertTriangle size={18} aria-hidden="true" />
           <span>{actionError}</span>
           <button type="button" aria-label={locale === "vi" ? "Đóng thông báo lỗi" : "Dismiss error"} onClick={() => setActionError(undefined)}><X size={17} /></button>
+        </div>
+      ) : null}
+
+      {activeSession.exercises.length > 0 && (activeSession.checkIn || progress.completed === 0) ? (
+        <div className="readiness-slot">
+          <ReadinessCheckInCard locale={locale} value={activeSession.checkIn} onChange={(checkIn) => save({ ...activeSession, checkIn })} />
         </div>
       ) : null}
 
@@ -628,6 +665,14 @@ export function WorkoutPage() {
                     </div>
                   </aside>
 
+                  {usesWarmupFeel(exercise) && exercise.sets.some((set) => set.type === "warmup" && set.completedAt) ? (
+                    <WarmupFeelPicker
+                      locale={locale}
+                      value={exercise.warmupFeel}
+                      onChange={(warmupFeel) => save({ ...activeSession, exercises: activeSession.exercises.map((item) => item.id === exercise.id ? { ...item, warmupFeel } : item) })}
+                    />
+                  ) : null}
+
                   {plateEligible ? (
                     <div className="plate-guide-config">
                       <label>
@@ -641,8 +686,8 @@ export function WorkoutPage() {
 
                   {previous.length > 0 ? (
                     <p className="set-suggestion-hint">{locale === "vi"
-                      ? "Số mờ là gợi ý từ lần trước của đúng biến thể này, hoặc từ set vừa xong. Chạm ✓ để ghi đúng số đó, hoặc nhập số mới."
-                      : "Greyed numbers come from last time on this exact variation, or from the set you just finished. Tap ✓ to log them as-is, or type new values."}</p>
+                      ? "Số mờ là gợi ý tính từ lịch sử của đúng biến thể này và các set vừa xong trong buổi. Chạm ✓ để ghi đúng số đó, hoặc nhập số mới."
+                      : "Greyed numbers are worked out from your history on this exact variation and the sets you just finished. Tap ✓ to log them as-is, or type new values."}</p>
                   ) : null}
 
                   <div className="set-table" role="group" aria-label={`${locale === "vi" ? "Các set của" : "Sets for"} ${localize(exercise.variantNameSnapshot, locale)}`}>
@@ -664,7 +709,7 @@ export function WorkoutPage() {
                             ? `${prior.weightKg ? `${prior.weightKg}kg · ` : ""}${prior.durationSeconds ?? "—"}s`
                             : `${prior.weightKg ?? "—"} × ${prior.reps ?? "—"}`)
                         : targetLabel;
-                      const suggestion = set.completedAt ? undefined : suggestSetValues(exercise, set.id, previous);
+                      const { suggestion } = suggestFor(exercise, set, previous);
                       const filled = { ...set, ...applySetSuggestion(set, suggestion) };
                       const canComplete = distanceMode
                         ? Boolean((filled.distanceMeters ?? 0) > 0 || (filled.durationSeconds ?? 0) > 0)

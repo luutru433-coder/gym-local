@@ -6,6 +6,53 @@
 - Each one shows a jointed figure that moves between positions, with numbered cues for setup (hands, feet, shoulder blades, back) and for each phase, joint angles measured from the figure, and common mistakes drawn as a wrong figure beside the right one with the fix. Vietnamese and English, offline.
 - The figure is a simple schematic; the existing drawings stay as the illustrative loop. Cue text and angle ranges are original guidance marked as draft until reviewed (ADR 0019).
 - No database or backup change; the section loads only when an exercise is opened.
+- The offline download budget for the app goes from 3.5 MiB to 3.75 MiB to fit the technique data; the 220 KiB startup budget is unchanged.
+
+## Unreleased — Weekly set changes, block weeks and deload in the next-session plan
+
+- The home screen's next-session plan now follows a 5-week block: each week you train in a row the target effort gets one rep closer to failure (about 4, 3, 2, then 1 reps left), and the fifth week is a deload with half the sets (ADR 0027). A week off restarts the block.
+- Set counts follow your feedback: a muscle you rated "not sore" or "gone early" and trained on target gets one more set next time; "still sore" takes one away; missed rep targets halve its sets for one session. Without a soreness answer the set count stays as it is.
+- For weight × reps exercises with history, the plan no longer prefills last time's weight on these sessions; the per-set suggestion picks weight and reps for the week's target effort. Other exercises are prefilled as before.
+- Two weeks of missed targets for the same muscle on the same equipment, or two muscles in one week, bring the deload forward.
+- Fixed: reopening a workout during a rest briefly showed too much rest time left (for example 1:53 of a 1:30 rest) until the next second; the rest itself was never extended.
+- These changes apply to the new session only, through the existing "apply adjustments on start" switch. Routines, history, the database and backups are unchanged.
+
+## Unreleased — Soreness feedback and one recovery estimate
+
+- The muscle recovery map on the home screen now asks how sore each main muscle of your last workout got: not sore, gone early, gone just in time, or still sore. Answering is optional and you can change or clear an answer (ADR 0026).
+- "Still sore" gives that muscle 10% longer to recover from then on; "not sore" 5% less. The other two answers change nothing.
+- The map now shows the same recovery estimate the workout screen uses for set suggestions: harder sets tire a muscle more, secondary muscles count half, and fatigue fades by the hour. It replaces the fixed 36 h + 4 h per set rule, so the map can look different for the same history.
+- A carry or other full-body exercise now tires every muscle a little on the map, as before, instead of none.
+- During a workout, if you type a weight that is too heavy for today's estimate, the suggestion line now says so and names a weight that fits the rep range, instead of showing last time's reps.
+- The pre-workout check-in now sits above the set panel, so the Start button no longer covers it.
+- Sessions gain an optional `soreness` field, kept in backups. Older backups and sessions without it work as before; no database migration.
+
+## Unreleased — Pre-workout check-in and warm-up feel
+
+- A workout now opens with three optional questions: last night's sleep, energy right now and muscle soreness, each 1-5 with 3 as a normal day. The answers move the suggested weights of that workout by at most 3% either way (ADR 0025). Skip it and nothing changes; you can answer, edit or clear it until the workout ends.
+- After a warm-up set of an exercise you can say whether it felt heavier, as usual or lighter. Lighter raises that exercise's suggested weights by 1.3%, heavier lowers them by 2.6%.
+- The reason under a suggestion now says which of these moved it. What you type still wins, and nothing is logged for you.
+- Sessions gain two optional fields (`checkIn`, and `warmupFeel` on an exercise), kept in backups. Older backups and sessions without them work as before; no database migration.
+
+## Unreleased — Set suggestions from today's estimated strength
+
+- During a workout, the suggested weight and reps for a set now come from your estimated strength today instead of repeating last time's numbers: your recent sessions of the exact variant, how recovered the main muscles are, and the sets you have already done in this workout (ADR 0024). After each set the next one is planned again; correcting a set's RIR during the rest updates it.
+- The focus panel shows the suggestion with about how many reps it should leave and why; during the rest it shows the plan for the next set.
+- It applies to exercises logged as weight × reps with a rep target, once the exact variant has history. Other exercises, and a first-ever exercise, keep the previous suggestion. What you type always wins, and nothing is logged for you.
+- A set with no RIR logged is read as 2 reps in reserve. Logging RIR makes the estimate follow you more closely.
+- No change to history, records, routines, the database or backups.
+
+## Unreleased — One look for the whole app, larger exercise movements
+
+- Every screen now uses the look of the workout screen: dark background, one orange accent. The cream and lime colours are gone, and so is the Appearance (light / dark / system) setting (ADR 0023).
+- Exercise pictures are easier to see: on a phone the movement fills the width of the exercise page and of the technique dialog during a workout, with the muscle map underneath.
+- All exercise pictures (built-in drawings and ExerciseDB GIFs) sit on the same white plate, so they stand out from the dark screen instead of sinking into it.
+- Only one filled orange button per screen; other buttons are tinted.
+
+## Unreleased — Autoregulation engine (not yet in the app)
+
+- New `@gym/workouts/autoregulation` module with the formulas for estimating strength on the day, fatigue within a session, muscle recovery, and weekly set changes (ADR 0024). Nothing in the app uses it yet, so workouts, suggestions, the database and backups are unchanged.
+- `pnpm autoregulation:sample` runs the engine against a simulated lifter and writes `docs/autoregulation-sample-run.md`.
 
 ## Unreleased — Add exercises from the downloaded ExerciseDB set
 

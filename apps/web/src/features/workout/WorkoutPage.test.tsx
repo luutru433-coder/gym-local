@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -199,6 +199,32 @@ describe("live workout editing", () => {
     await waitFor(() => expect(useGymStore.getState().activeSession?.exercises[0]?.sets[1]).toMatchObject({ weightKg: 40, reps: 9 }));
   });
 
+  it("suggests load and reps from today's estimated strength and re-plans after each set", async () => {
+    const user = userEvent.setup();
+    const target = { targetMinReps: 8, targetMaxReps: 12 };
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    live.exercises[0].sets = [{ id: "set-one", type: "working", ...target }, { id: "set-two", type: "working", ...target }];
+    const lastTime: WorkoutSession = { ...session(), id: "session-last", restTimerEndsAt: undefined, finishedAt: "2026-08-10T10:00:00.000Z" };
+    lastTime.exercises[0].sets = [
+      { id: "last-one", type: "working", ...target, weightKg: 40, reps: 10, completedAt: "2026-08-10T09:30:00.000Z" },
+      { id: "last-two", type: "working", ...target, weightKg: 40, reps: 9, completedAt: "2026-08-10T09:35:00.000Z" }
+    ];
+    arrange(live);
+    useGymStore.setState({ sessions: [live, lastTime] });
+
+    const hint = await screen.findByText("Gợi ý hôm nay");
+    expect(hint).toHaveTextContent("40 × 10 · còn khoảng 2 lần");
+
+    await user.click(screen.getByRole("button", { name: "Hoàn tất set 1 với 40 kg × 10" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.exercises[0]?.sets[0]).toMatchObject({ weightKg: 40, reps: 10 }));
+    // Last time set 2 was 40 × 9; the engine plans from today's set and the fatigue it caused instead.
+    const next = await screen.findByText("Gợi ý set 2");
+    expect(next).toHaveTextContent("40 × 8");
+    expect(next).toHaveTextContent("tính lại sau 1 set hôm nay");
+    expect(screen.getByRole("button", { name: "Hoàn tất set 2 với 40 kg × 8" })).toBeInTheDocument();
+  });
+
   it("keeps completion disabled when there is nothing to suggest", () => {
     arrange(session());
     expect(screen.getByRole("button", { name: "Set 1: nhập số lần, quãng đường hoặc thời gian trước" })).toBeDisabled();
@@ -297,5 +323,22 @@ describe("live workout editing", () => {
     const next = useGymStore.getState().activeSession!;
     expect(next.restTimerEndsAt).toBeUndefined();
     expect(next.exercises[0].sets[1].restBeforeSeconds).toBeGreaterThanOrEqual(0);
+  });
+  it("saves the pre-workout check-in on the session and lets it be skipped", async () => {
+    const user = userEvent.setup();
+    const live = session();
+    live.restTimerEndsAt = undefined;
+    arrange(live);
+
+    const energy = screen.getByRole("group", { name: "Năng lượng lúc này" });
+    await user.click(within(energy).getByRole("button", { name: "Năng lượng lúc này: 1" }));
+    await user.click(screen.getByRole("button", { name: "Lưu" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.checkIn).toEqual({ sleep: 3, energy: 1, soreness: 3 }));
+    expect(screen.getByText(/năng lượng 1\/5 · cơ hết mỏi 3\/5 · gợi ý tạ -1%/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Sửa" }));
+    await user.click(screen.getByRole("button", { name: "Xoá câu trả lời" }));
+    await waitFor(() => expect(useGymStore.getState().activeSession?.checkIn).toBeUndefined());
+    expect(screen.getByText("Chưa trả lời câu hỏi đầu buổi.")).toBeInTheDocument();
   });
 });
