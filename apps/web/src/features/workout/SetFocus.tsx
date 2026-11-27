@@ -1,4 +1,5 @@
 import { Bell, BellOff, Check, Minus, Play, Plus, Square, TimerReset } from "lucide-react";
+import { useState } from "react";
 import { clock } from "./clock";
 import "./SetFocus.css";
 
@@ -10,9 +11,11 @@ export interface FocusNumber {
   label: string;
   step?: number;
   onStep?: (delta: number) => void;
+  onValueChange?: (value: number) => void;
 }
 
 export interface FocusSet {
+  id: string;
   exerciseName: string;
   exercisePosition: string;
   setNumber: number;
@@ -59,12 +62,42 @@ function Stepper({ number, locale }: { number: FocusNumber; locale: "vi" | "en" 
   );
 }
 
+const maxTypedWeightKg = 1000;
+
+function WeightInput({ number, locale }: { number: FocusNumber; locale: "vi" | "en" }) {
+  const [draft, setDraft] = useState<string>();
+
+  return (
+    <input
+      className="focus-weight-input"
+      aria-label={locale === "vi" ? `Khối lượng (${number.label})` : `Weight (${number.label})`}
+      inputMode="decimal"
+      enterKeyHint="done"
+      value={draft ?? number.value}
+      onChange={(event) => setDraft(event.currentTarget.value)}
+      onBlur={(event) => {
+        setDraft(undefined);
+        if (draft === undefined) return;
+        const text = event.currentTarget.value.trim();
+        if (!/^(?:\d+(?:[.,]\d*)?|[.,]\d+)$/.test(text)) return;
+        const weight = Number(text.replace(",", "."));
+        if (weight <= maxTypedWeightKg) number.onValueChange?.(weight);
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" || event.nativeEvent.isComposing) return;
+        event.preventDefault();
+        event.currentTarget.blur();
+      }}
+    />
+  );
+}
+
 function Numbers({ set, locale, small }: { set: FocusSet; locale: "vi" | "en"; small?: boolean }) {
   return (
     <div className={small ? "focus-numbers focus-numbers--small" : "focus-numbers"}>
       {set.load ? (
         <>
-          <div className="focus-number"><b>{set.load.value}</b><small>{set.load.label}</small><Stepper number={set.load} locale={locale} /></div>
+          <div className="focus-number focus-number--load"><WeightInput key={set.id} number={set.load} locale={locale} /><small>{set.load.label}</small><Stepper number={set.load} locale={locale} /></div>
           <span className="focus-numbers__times" aria-hidden="true">×</span>
         </>
       ) : null}
@@ -177,7 +210,7 @@ export function SetFocus({ locale, state, alertMuted, wakeLockSupported, lockScr
                   {[state.done.load, state.done.effort, state.done.rir].map((number) => number ? (
                     <span className="focus-edit" key={number.label}>
                       {number.onStep && number.step ? <button type="button" aria-label={vi ? `Giảm ${number.label}` : `Decrease ${number.label}`} onClick={() => number.onStep?.(-number.step!)}><Minus size={15} /></button> : null}
-                      <b>{number.value}<i>{number.label}</i></b>
+                      <b>{number.onValueChange ? <WeightInput key={state.done?.id} number={number} locale={locale} /> : number.value}<i>{number.label}</i></b>
                       {number.onStep && number.step ? <button type="button" aria-label={vi ? `Tăng ${number.label}` : `Increase ${number.label}`} onClick={() => number.onStep?.(number.step!)}><Plus size={15} /></button> : null}
                     </span>
                   ) : null)}
