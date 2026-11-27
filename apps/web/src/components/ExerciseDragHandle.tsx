@@ -12,6 +12,7 @@ interface Drag {
   target: number;
   scroller: HTMLElement;
   frame?: number;
+  onEscape: (event: KeyboardEvent) => void;
 }
 
 const rowSelector = "[data-exercise-reorder-item]";
@@ -49,6 +50,7 @@ function scrollAtEdge(drag: Drag) {
 function resetDrag(drag: Drag | undefined) {
   if (!drag) return;
   if (drag.frame !== undefined) cancelAnimationFrame(drag.frame);
+  window.removeEventListener("keydown", drag.onEscape, true);
   delete drag.rows[drag.source].dataset.exerciseDragging;
   delete drag.rows[drag.target].dataset.exerciseDrop;
 }
@@ -65,7 +67,8 @@ export function ExerciseDragHandle({ locale, onMove }: { locale: Locale; onMove:
     const rows = Array.from(row.parentElement.children).filter((item): item is HTMLElement => item instanceof HTMLElement && item.matches(rowSelector));
     const source = rows.indexOf(row);
     if (source < 0 || rows.length < 2) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    const handle = event.currentTarget;
+    handle.setPointerCapture(event.pointerId);
     dragRef.current = {
       pointerId: event.pointerId,
       startY: event.clientY,
@@ -73,7 +76,16 @@ export function ExerciseDragHandle({ locale, onMove }: { locale: Locale; onMove:
       rows,
       source,
       target: source,
-      scroller: scrollContainer(row)
+      scroller: scrollContainer(row),
+      onEscape: (keyEvent) => {
+        if (keyEvent.key !== "Escape") return;
+        keyEvent.preventDefault();
+        keyEvent.stopPropagation();
+        const drag = dragRef.current;
+        resetDrag(drag);
+        dragRef.current = undefined;
+        if (drag && handle.hasPointerCapture(drag.pointerId)) handle.releasePointerCapture(drag.pointerId);
+      }
     };
   };
 
@@ -84,6 +96,7 @@ export function ExerciseDragHandle({ locale, onMove }: { locale: Locale; onMove:
     if (drag.frame === undefined) {
       if (Math.abs(drag.clientY - drag.startY) < 6) return;
       drag.rows[drag.source].dataset.exerciseDragging = "";
+      window.addEventListener("keydown", drag.onEscape, true);
       const scroll = () => {
         const before = drag.scroller.scrollTop;
         scrollAtEdge(drag);

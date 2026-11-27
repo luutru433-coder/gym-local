@@ -69,6 +69,56 @@ describe("RoutineEditor default set targets", () => {
 describe("RoutineEditor exercise order", () => {
   afterEach(cleanup);
 
+  it("cancels a drag on Escape without closing the editor or losing its draft", async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const routine: Routine = {
+      id: "routine",
+      name: { vi: "Lịch tập", en: "Routine" },
+      goal: profile.goal,
+      difficulty: profile.experience,
+      daysPerWeek: profile.daysPerWeek,
+      templateVersion: 1,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      items: ["one", "two"].map((id) => ({
+        id,
+        movementId: "plank",
+        preferredVariantId: "plank__bodyweight",
+        restSeconds: 90,
+        sets: [{ id: `set-${id}`, type: "working", durationSeconds: 30 }]
+      }))
+    };
+    render(<RoutineEditor routine={routine} profile={profile} onClose={onClose} onSave={vi.fn()} />);
+    const name = screen.getByLabelText("English name");
+    await user.type(name, " draft");
+
+    const rows = screen.getAllByRole("listitem");
+    rows.forEach((row, index) => {
+      row.getBoundingClientRect = () => new DOMRect(0, 100 + index * 100, 300, 90);
+    });
+    const [handle] = screen.getAllByTitle("Drag to reorder exercise");
+    handle.setPointerCapture = vi.fn();
+    handle.hasPointerCapture = vi.fn(() => true);
+    handle.releasePointerCapture = vi.fn();
+    const pointer = { pointerId: 1, isPrimary: true, pointerType: "mouse" };
+    fireEvent.pointerDown(handle, { ...pointer, clientY: 125 });
+    fireEvent.pointerMove(handle, { ...pointer, clientY: 260 });
+    expect(rows[1]).toHaveAttribute("data-exercise-drop", "after");
+
+    await user.keyboard("{Escape}");
+    expect(onClose).not.toHaveBeenCalled();
+    expect(rows[0]).not.toHaveAttribute("data-exercise-dragging");
+    expect(rows[1]).not.toHaveAttribute("data-exercise-drop");
+    expect(handle.releasePointerCapture).toHaveBeenCalledWith(1);
+    fireEvent.pointerUp(handle, { ...pointer, clientY: 260 });
+    expect(screen.getAllByRole("listitem")).toEqual(rows);
+    expect(name).toHaveValue("Routine draft");
+
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("saves a dragged exercise in its new position with its set targets intact", async () => {
     const user = userEvent.setup();
     const onSave = vi.fn<(routine: Routine) => Promise<void>>().mockResolvedValue(undefined);
