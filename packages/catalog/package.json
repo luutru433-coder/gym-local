@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./custom": "./src/custom-exercise.ts"
+    "./custom": "./src/custom-exercise.ts",
+    "./technique": "./src/technique/index.ts"
   }
 }

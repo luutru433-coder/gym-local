@@ -14,6 +14,9 @@ import {
   rankVariantsForEquipment,
   searchCatalog
 } from "./index";
+import { TECHNIQUE_GROUPS, blendPose, loadExerciseTechnique, measureAngle, resolvePose, shownAngle } from "./technique";
+import { EXERCISE_TECHNIQUES } from "./technique/records";
+import type { TechniqueFigure, TechniqueMark } from "@gym/contracts";
 
 describe("exercise catalog", () => {
   it("ships the agreed core breadth", () => {
@@ -113,5 +116,88 @@ describe("exercise catalog", () => {
     expect(ids("keo")).toEqual(ids("kéo"));
     expect(ids("day nguc")).toContain("chest_press");
     expect(ids("  pull-up ")).toContain("pull_up");
+  });
+});
+
+describe("exercise technique figures", () => {
+  const variantIds = new Set(EXERCISE_VARIANTS.map((variant) => variant.id));
+  const figuresOf = (technique: (typeof EXERCISE_TECHNIQUES)[number]): [TechniqueFigure, TechniqueMark[]][] => [
+    [technique.setup.figure, technique.setup.cues],
+    ...technique.phases.map((phase): [TechniqueFigure, TechniqueMark[]] => [phase.figure, phase.cues]),
+    ...technique.mistakes.flatMap((mistake): [TechniqueFigure, TechniqueMark[]][] => [
+      [mistake.wrong, mistake.mark ? [mistake.mark] : []],
+      [mistake.right, mistake.mark ? [mistake.mark] : []]
+    ])
+  ];
+
+  it("covers the 30 main movements and only existing variants, each once", async () => {
+    expect(new Set(EXERCISE_TECHNIQUES.map((technique) => technique.movementId)).size).toBeGreaterThanOrEqual(30);
+    const keys = EXERCISE_TECHNIQUES.flatMap((technique) => technique.equipment.map((equipment) => `${technique.movementId}__${equipment}`));
+    expect(new Set(keys).size).toBe(keys.length);
+    for (const key of keys) expect(variantIds.has(key), key).toBe(true);
+    expect(Object.keys(TECHNIQUE_GROUPS).sort()).toEqual([...new Set(EXERCISE_TECHNIQUES.map((technique) => technique.movementId))].sort());
+    for (const key of keys) expect((await loadExerciseTechnique(key))?.movementId, key).toBe(key.split("__")[0]);
+    expect(await loadExerciseTechnique("chest_press__cable")).toBeUndefined();
+    expect(await loadExerciseTechnique("custom-123")).toBeUndefined();
+  });
+
+  it("gives every technique bilingual setup, phase and wrong-versus-right content with a source", () => {
+    const sourceIds = new Set(CONTENT_SOURCES.map((source) => source.id));
+    for (const technique of EXERCISE_TECHNIQUES) {
+      const id = `${technique.movementId}/${technique.equipment[0]}`;
+      expect(sourceIds.has(technique.sourceId), id).toBe(true);
+      expect(technique.setup.cues.length, id).toBeGreaterThanOrEqual(3);
+      expect(technique.phases.length, id).toBeGreaterThanOrEqual(1);
+      expect(technique.mistakes.length, id).toBeGreaterThanOrEqual(2);
+      const texts = [
+        technique.setup.title,
+        ...technique.setup.cues.map((cue) => cue.text),
+        ...technique.phases.flatMap((phase) => [phase.title, ...phase.cues.map((cue) => cue.text)]),
+        ...technique.mistakes.flatMap((mistake) => [mistake.title, mistake.fix])
+      ];
+      for (const text of texts) {
+        expect(text.vi.trim().length, id).toBeGreaterThan(0);
+        expect(text.en.trim().length, id).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("resolves every pose and every mark to finite joint positions", () => {
+    for (const technique of EXERCISE_TECHNIQUES) {
+      for (const [figure, marks] of figuresOf(technique)) {
+        expect(figure.poses.length).toBeGreaterThanOrEqual(1);
+        const joints = figure.poses.map((pose) => resolvePose(pose, figure.view));
+        for (const resolved of joints) {
+          for (const point of Object.values(resolved)) expect(point.every(Number.isFinite), technique.movementId).toBe(true);
+        }
+        const last = joints[joints.length - 1];
+        for (const mark of marks) {
+          if (mark.at) expect(last[mark.at], `${technique.movementId} ${mark.at}`).toBeDefined();
+          if (mark.angle) {
+            expect(last[mark.angle[1]], `${technique.movementId} ${mark.angle[1]}`).toBeDefined();
+            expect(Number.isFinite(measureAngle(last, mark.angle)), `${technique.movementId} ${mark.angle.join("-")}`).toBe(true);
+          }
+        }
+      }
+    }
+  });
+
+  it("shows a wrong pose that differs from the right one", () => {
+    for (const technique of EXERCISE_TECHNIQUES) {
+      for (const mistake of technique.mistakes) {
+        expect(JSON.stringify(mistake.wrong), `${technique.movementId}: ${mistake.title.en}`).not.toBe(JSON.stringify(mistake.right));
+      }
+    }
+  });
+
+  it("measures angles from the pose instead of storing them", () => {
+    const straight = resolvePose({ hip: [100, 100], torso: 90, arm: [-90, -90], leg: [-90, -90] }, "side");
+    const bent = resolvePose({ hip: [100, 100], torso: 90, arm: [-90, 0], leg: [0, -90] }, "side");
+    expect(shownAngle(measureAngle(straight, ["shoulder", "elbow", "wrist"]))).toBe(180);
+    expect(shownAngle(measureAngle(bent, ["shoulder", "elbow", "wrist"]))).toBe(90);
+    expect(shownAngle(measureAngle(bent, ["hip", "knee", "ankle"]))).toBe(90);
+    const halfway = resolvePose(blendPose({ hip: [100, 100], torso: 90, arm: [-90, -90], leg: [-90, -90] }, { hip: [100, 100], torso: 90, arm: [-90, 0], leg: [0, -90] }, 0.5), "side");
+    expect(shownAngle(measureAngle(halfway, ["shoulder", "elbow", "wrist"]))).toBe(135);
+    expect(shownAngle(92.4)).toBe(90);
   });
 });

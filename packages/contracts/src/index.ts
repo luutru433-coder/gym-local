@@ -115,6 +115,73 @@ export interface ExerciseAnimation {
   reviewedAt: string;
 }
 
+export type TechniqueLimb = [number, number] | { to: [number, number]; bend?: 1 | -1 };
+
+/** Segment directions in degrees: 0 points right (the way the figure faces), 90 points up. */
+export interface TechniquePose {
+  hip?: [number, number];
+  pin?: [string, number, number];
+  torso?: number;
+  /** Side view only: degrees of spinal rounding (positive) or arching (negative). */
+  round?: number;
+  head?: number;
+  arm: TechniqueLimb;
+  leg: TechniqueLimb;
+  arm2?: TechniqueLimb;
+  leg2?: TechniqueLimb;
+  foot?: number;
+  foot2?: number;
+  scale?: { torso?: number; upper?: number; fore?: number; thigh?: number; shin?: number };
+}
+
+export interface TechniqueFigure {
+  view: "side" | "front" | "back" | "top";
+  poses: TechniquePose[];
+  grip?: { at?: string; offset?: [number, number]; kind?: "bar" | "dumbbell" | "handle" | "plate" | "none"; size?: number };
+  box?: [number, number, number, number];
+  floor?: number;
+  pads?: [number, number, number, number][];
+  lines?: [number, number, number, number][];
+  cable?: [number, number];
+}
+
+export interface TechniqueMark {
+  at?: string;
+  angle?: [string, string, string];
+  arrow?: number;
+  tag?: LocalizedText;
+  shift?: [number, number];
+}
+
+export interface TechniqueCue extends TechniqueMark {
+  text: LocalizedText;
+}
+
+export interface TechniqueStep {
+  title: LocalizedText;
+  figure: TechniqueFigure;
+  cues: TechniqueCue[];
+}
+
+export interface TechniqueMistake {
+  title: LocalizedText;
+  fix: LocalizedText;
+  wrong: TechniqueFigure;
+  right: TechniqueFigure;
+  mark?: TechniqueMark;
+}
+
+export interface ExerciseTechnique {
+  movementId: Id;
+  equipment: EquipmentType[];
+  setup: TechniqueStep;
+  phases: TechniqueStep[];
+  mistakes: TechniqueMistake[];
+  sourceId: Id;
+  reviewStatus: ReviewStatus;
+  reviewedAt: string;
+}
+
 export interface Movement {
   id: Id;
   name: LocalizedText;

@@ -20,6 +20,7 @@
     "paths": {
       "@gym/contracts": ["packages/contracts/src/index.ts"],
       "@gym/catalog/custom": ["packages/catalog/src/custom-exercise.ts"],
+      "@gym/catalog/technique": ["packages/catalog/src/technique/index.ts"],
       "@gym/catalog": ["packages/catalog/src/index.ts"],
       "@gym/workouts/autoregulation-plan": ["packages/workouts/src/autoregulation-plan.ts"],
       "@gym/workouts/autoregulation": ["packages/workouts/src/autoregulation.ts"],
