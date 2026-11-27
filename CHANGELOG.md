@@ -4,6 +4,11 @@
 
 - Drag the grip on an exercise to change its position in a routine or an active workout. The up and down buttons are still available if you prefer not to drag.
 
+## Unreleased — The next set starts from the set you just finished
+
+- On the workout screen the weight and reps offered for the next set now start from the set you just finished in this workout, so you only adjust up or down. Before, they could come from last time's workout, and a drop or failure set, or the first working set after a warm-up with no history, started from 0.
+- Order used: the set finished just above in this workout, then the same set last time, then last time's final set, then this workout's warm-up (weight and reps only). A value the finished set does not have, such as a weight you left empty, still comes from last time. Exact equipment variants still never share values, and anything you type is kept.
+
 ## Unreleased — Technique figures
 
 - Exercise pages have a new Technique section for 30 main movements (chest press, incline press, push-up, dip, chest fly, squat, leg press, split squat, lunge, deadlift, Romanian deadlift, hip thrust, leg curl, leg extension, calf raise, overhead press, lateral raise, rear delt fly, face pull, pull-up, lat pulldown, barbell/dumbbell row, one-arm row, biceps curl, hammer curl, triceps pushdown, overhead triceps extension, close-grip press, plank, crunch). Equipment variants without a record show no Technique section yet.

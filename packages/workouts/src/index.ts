@@ -327,8 +327,9 @@ function suggestionFrom(values: SetSuggestion | undefined): SetSuggestion | unde
 
 /**
  * Values to offer for an unfinished set. `lastTime` must hold the completed working sets of the
- * same exact variant, in order. Falls back to the closest earlier completed set of the same type
- * in this block, then to the final set from last time.
+ * same exact variant, in order. A working, drop or failure set starts from the closest set finished
+ * above it in this block, then from the same set last time, then the final set last time, then
+ * this block's warm-up; a warm-up only from a warm-up above it.
  */
 export function suggestSetValues(
   exercise: SessionExercise,
@@ -339,10 +340,16 @@ export function suggestSetValues(
   if (index < 0) return undefined;
   const set = exercise.sets[index];
   const earlier = exercise.sets.slice(0, index);
-  const sameSetAbove = suggestionFrom([...earlier].reverse().find((item) => item.completedAt && item.type === set.type));
-  if (set.type === "warmup") return sameSetAbove;
+  const doneAbove = (match: (item: SetLog) => boolean) => suggestionFrom([...earlier].reverse().find((item) => item.completedAt && match(item)));
+  if (set.type === "warmup") return doneAbove((item) => item.type === "warmup");
   const workingIndex = earlier.filter((item) => item.type !== "warmup").length;
-  return suggestionFrom(lastTime[workingIndex]) ?? sameSetAbove ?? suggestionFrom(lastTime.at(-1));
+  // The set just finished today comes first, so the next one is adjusted from it; a field it lacks comes from last time.
+  const above = doneAbove((item) => item.type !== "warmup");
+  const last = suggestionFrom(lastTime[workingIndex]) ?? suggestionFrom(lastTime.at(-1));
+  if (above || last) return { ...last, ...above };
+  // No working set to go by: start from today's warm-up load and reps rather than from nothing.
+  const warmup = doneAbove(() => true);
+  return suggestionFrom(warmup && { weightKg: warmup.weightKg, reps: warmup.reps });
 }
 
 /** Fills only the fields the user left empty, so typed values always win. */
