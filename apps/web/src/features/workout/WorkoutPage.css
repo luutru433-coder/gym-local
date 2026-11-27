@@ -596,6 +596,8 @@
 .workout-header { background: rgba(11, 11, 12, .93); }
 .workout-exercise { background: var(--surface); }
 .workout-exercise--expanded { background: var(--surface); }
+.workout-exercise__heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.workout-exercise__heading > .exercise-drag-handle { margin-inline-end: 12px; }
 .workout-exercise__index { border-radius: 10px; font-family: inherit; }
 .set-row--running { box-shadow: inset 3px 0 0 var(--lime); background: color-mix(in srgb, var(--lime) 7%, transparent); }
 .set-time { display: block; margin-top: 2px; color: var(--faint); font-size: 10px; font-variant-numeric: tabular-nums; }

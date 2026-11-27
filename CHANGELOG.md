@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Drag to reorder exercises
+
+- Drag the grip on an exercise to change its position in a routine or an active workout. The up and down buttons are still available if you prefer not to drag.
+
 ## Unreleased — Type a workout set's weight
 
 - Tap the weight in the workout focus panel to type an exact number, including decimals. The plus and minus buttons still work.
