@@ -106,7 +106,7 @@ function mockWorkoutMedia() {
     return Promise.resolve();
   });
   const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => { playing = false; });
-  const press = (action: MediaSessionAction) => act(() => handlers.get(action)?.({ action }));
+  const press = (action: MediaSessionAction, details?: Omit<MediaSessionActionDetails, "action">) => act(() => handlers.get(action)?.({ action, ...details }));
   return { media, handlers, play, pause, press };
 }
 
@@ -186,6 +186,33 @@ describe("lock-screen workout controls", () => {
     await act(async () => { fireEvent.click(screen.getByRole("region", { name: "Bộ đếm thời gian nghỉ" })); });
     expect(media.metadata?.title).toBe("Nghỉ 1:20");
     expect(media.setPositionState).toHaveBeenLastCalledWith({ duration: 90, playbackRate: 1, position: 10 });
+  });
+
+  it.each([
+    ["seekforward", true],
+    ["seekbackward", false]
+  ] as const)("routes %s during rest to the workout without seeking the carrier", async (action, startsNextSet) => {
+    vi.useFakeTimers();
+    const { handlers, play, press } = mockWorkoutMedia();
+    const seek = vi.spyOn(HTMLMediaElement.prototype, "currentTime", "set");
+    const live = session();
+    live.exercises[0].sets[0].completedAt = new Date().toISOString();
+    live.restTimerEndsAt = new Date(Date.now() + 90_000).toISOString();
+    setLockScreenTimerEnabled(true);
+    arrange(live);
+
+    await act(async () => { fireEvent.click(screen.getByRole("region", { name: "Bộ đếm thời gian nghỉ" })); });
+    expect(handlers.has("seekforward")).toBe(true);
+    expect(handlers.has("seekbackward")).toBe(true);
+    expect(handlers.has("seekto")).toBe(true);
+    press("seekto", { seekTime: 90 });
+    expect(useGymStore.getState().activeSession?.restTimerEndsAt).toBe(live.restTimerEndsAt);
+    press(action, { seekOffset: 10 });
+    const active = useGymStore.getState().activeSession;
+    expect(active?.restTimerEndsAt).toBeUndefined();
+    expect(Boolean(active?.exercises[0].sets[1].startedAt)).toBe(startsNextSet);
+    expect(seek).not.toHaveBeenCalled();
+    expect(play).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -109,6 +109,7 @@ export function WorkoutMedia({ locale, state, now, restEndsAt, plannedRest, onSt
         ["seekforward", () => advance()],
         ["previoustrack", () => skip()],
         ["seekbackward", () => skip()],
+        ["seekto", refresh],
         ["play", resume],
         ["pause", pause]
       ];
