@@ -2,7 +2,7 @@
 
 ## Unreleased — Food barcode camera startup
 
-- The barcode scanner shows the camera frame as soon as it starts and gives specific guidance for camera permission, availability, and preview problems. You can still enter the barcode manually.
+- The barcode scanner shows the camera frame as soon as it starts and gives specific guidance for camera permission, availability, and preview problems. Barcode lookup now accepts Open Food Facts v3 responses and suggests retrying or entering the food manually if lookup fails.
 
 ## Unreleased — Drag to reorder exercises
 

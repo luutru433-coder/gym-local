@@ -181,8 +181,8 @@ export function NutritionPage() {
           setLookupCandidate(undefined);
         }
       }
-    } catch (error) {
-      setLookupError(error instanceof Error ? error.message : "Lookup failed");
+    } catch {
+      setLookupError(locale === "vi" ? "Không thể tra cứu mã vạch. Hãy thử lại hoặc nhập thực phẩm thủ công." : "Barcode lookup failed. Try again or enter the food manually.");
     } finally {
       setLookupBusy(false);
     }

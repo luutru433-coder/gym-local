@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { FoodLookupCandidate } from "../index";
 
 const openFoodFactsSchema = z.object({
-  status: z.number().optional(),
+  status: z.union([z.number(), z.string()]).optional(),
   product: z.object({
     code: z.string().optional(),
     product_name: z.string().optional(),

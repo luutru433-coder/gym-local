@@ -55,6 +55,7 @@ beforeEach(() => {
     nutritionPackError: undefined,
     refreshNutritionPack: vi.fn().mockResolvedValue(undefined),
     installOfflineNutritionPack: vi.fn().mockResolvedValue(undefined),
+    lookupBarcodeFood: vi.fn().mockResolvedValue(undefined),
     saveUserRecipe: vi.fn().mockImplementation(async (recipe) => recipe),
     removeRecipe: vi.fn().mockResolvedValue(undefined),
     addMeal: vi.fn().mockResolvedValue(undefined),
@@ -173,6 +174,29 @@ describe("food barcode camera", () => {
     await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Đã cấp quyền camera nhưng không hiển thị được hình ảnh xem trước");
     expect(stopDecoder).toHaveBeenCalledOnce();
+  });
+});
+
+describe("food barcode lookup", () => {
+  it("shows a friendly failure and keeps a not-found result separate on retry", async () => {
+    const user = userEvent.setup();
+    const rawError = "Invalid input: expected number, received string";
+    const lookup = vi.mocked(useGymStore.getState().lookupBarcodeFood).mockRejectedValueOnce(new Error(rawError));
+    render(<NutritionPage />);
+
+    await user.click(screen.getByRole("button", { name: "Add lunch" }));
+    await user.type(screen.getByLabelText("Hoặc nhập mã vạch"), "3017620422003");
+    const submit = screen.getByRole("button", { name: "Tra cứu" });
+    await user.click(submit);
+
+    const failure = "Không thể tra cứu mã vạch. Hãy thử lại hoặc nhập thực phẩm thủ công.";
+    expect(await screen.findByText(failure)).toBeVisible();
+    expect(screen.queryByText(rawError)).not.toBeInTheDocument();
+
+    await user.click(submit);
+    expect(await screen.findByText("Không tìm thấy sản phẩm. Bạn có thể tạo thực phẩm thủ công.")).toBeVisible();
+    expect(screen.queryByText(failure)).not.toBeInTheDocument();
+    expect(lookup).toHaveBeenLastCalledWith("3017620422003");
   });
 });
 

@@ -99,6 +99,28 @@ describe("nutrition", () => {
     expect(candidate?.missingCoreNutrients).toEqual(["carbs"]);
   });
 
+  it("accepts the Open Food Facts v3 success status without relaxing product validation", async () => {
+    const product = {
+      code: "3017620422003",
+      product_name: "Nutella",
+      serving_quantity: 15,
+      nutriments: { "energy-kcal_100g": 539, proteins_100g: 6.3, carbohydrates_100g: 57.5, fat_100g: 30.9 }
+    };
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(Response.json({ status: "success", product }))
+      .mockResolvedValueOnce(Response.json({ status: "success", product: { ...product, serving_quantity: "15" } }));
+
+    await expect(lookupFoodByBarcode(product.code)).resolves.toMatchObject({
+      barcode: product.code,
+      name: { vi: "Nutella", en: "Nutella" },
+      servingGrams: 15,
+      missingCoreNutrients: []
+    });
+    await expect(lookupFoodByBarcode(product.code)).rejects.toMatchObject({
+      issues: [expect.objectContaining({ code: "invalid_type", path: ["product", "serving_quantity"] })]
+    });
+  });
+
   it("requires target confirmation again when estimate inputs change", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-08-13T08:00:00.000Z"));
