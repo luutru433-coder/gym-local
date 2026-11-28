@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FoodItem, NutritionPackManifest, Profile } from "@gym/contracts";
@@ -6,6 +6,17 @@ import { createMealEntry, createRecipe } from "@gym/nutrition";
 import { defaultSettings } from "@gym/storage";
 import { useGymStore } from "../../store/useGymStore";
 import { NutritionPage } from "./NutritionPage";
+
+const scanner = vi.hoisted(() => ({ decodeFromStream: vi.fn(), loadError: false }));
+
+vi.mock("@zxing/browser", () => ({
+  get BrowserMultiFormatReader() {
+    if (scanner.loadError) throw new Error("Scanner module unavailable");
+    return class {
+      decodeFromStream = scanner.decodeFromStream;
+    };
+  }
+}));
 
 const food: FoodItem = {
   id: "food-oats",
@@ -44,6 +55,7 @@ beforeEach(() => {
     nutritionPackError: undefined,
     refreshNutritionPack: vi.fn().mockResolvedValue(undefined),
     installOfflineNutritionPack: vi.fn().mockResolvedValue(undefined),
+    lookupBarcodeFood: vi.fn().mockResolvedValue(undefined),
     saveUserRecipe: vi.fn().mockImplementation(async (recipe) => recipe),
     removeRecipe: vi.fn().mockResolvedValue(undefined),
     addMeal: vi.fn().mockResolvedValue(undefined),
@@ -54,6 +66,139 @@ beforeEach(() => {
 });
 
 afterEach(cleanup);
+
+describe("food barcode camera", () => {
+  const getUserMedia = vi.fn();
+  const stopTrack = vi.fn();
+  const stopDecoder = vi.fn();
+  const stream = { getTracks: () => [{ stop: stopTrack }] };
+
+  beforeEach(() => {
+    getUserMedia.mockReset().mockResolvedValue(stream);
+    scanner.decodeFromStream.mockReset();
+    scanner.loadError = false;
+    stopTrack.mockClear();
+    stopDecoder.mockClear();
+    vi.stubGlobal("navigator", Object.create(navigator, { mediaDevices: { value: { getUserMedia } } }));
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  async function openScanner() {
+    const user = userEvent.setup();
+    render(<NutritionPage />);
+    await user.click(screen.getByRole("button", { name: "Quét mã vạch" }));
+    return { user, dialog: screen.getByRole("dialog", { name: "Quét mã vạch" }) };
+  }
+
+  it("shows the frame before permission resolves and stops scanning when closed", async () => {
+    let grantCamera!: (value: typeof stream) => void;
+    getUserMedia.mockReturnValue(new Promise<typeof stream>((resolve) => { grantCamera = resolve; }));
+    scanner.decodeFromStream.mockImplementation(async (_stream: unknown, video: HTMLVideoElement) => {
+      Object.defineProperty(video, "paused", { value: false });
+      return { stop: stopDecoder };
+    });
+
+    const { user, dialog } = await openScanner();
+    const video = dialog.querySelector("video");
+    expect(video?.parentElement).not.toHaveClass("scanner__viewport--active");
+    expect(getUserMedia).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
+    await waitFor(() => expect(getUserMedia).toHaveBeenCalledWith({ video: { facingMode: "environment" } }));
+    expect(video?.parentElement).toHaveClass("scanner__viewport--active");
+    expect(screen.getByRole("status")).toHaveTextContent("Đang mở camera");
+    expect(scanner.decodeFromStream).not.toHaveBeenCalled();
+
+    await act(async () => { grantCamera(stream); });
+    expect(scanner.decodeFromStream).toHaveBeenCalledWith(stream, video, expect.any(Function));
+    expect(screen.getByText("Đưa mã vạch vào giữa khung hình.")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(stopDecoder).toHaveBeenCalledOnce();
+    expect(screen.getByRole("button", { name: "Quét mã" })).toBeVisible();
+  });
+
+  it("releases the stream if permission resolves after the scanner closes", async () => {
+    let grantCamera!: (value: typeof stream) => void;
+    getUserMedia.mockReturnValue(new Promise<typeof stream>((resolve) => { grantCamera = resolve; }));
+    const { user } = await openScanner();
+    await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
+    await waitFor(() => expect(getUserMedia).toHaveBeenCalledOnce());
+    await user.click(screen.getByRole("button", { name: "Close" }));
+
+    await act(async () => { grantCamera(stream); });
+    expect(stopTrack).toHaveBeenCalledOnce();
+    expect(scanner.decodeFromStream).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["NotAllowedError", /Cài đặt → Safari .* → Camera/],
+    ["SecurityError", /đóng hẳn ứng dụng trên màn hình chính/],
+    ["NotFoundError", /Không tìm thấy camera phù hợp/],
+    ["OverconstrainedError", /Không tìm thấy camera phù hợp/],
+    ["NotReadableError", /Nếu ứng dụng hoặc tab khác đang dùng camera/],
+    ["AbortError", /Không thể kết nối với camera/]
+  ])("explains a %s camera request failure", async (name, message) => {
+    getUserMedia.mockRejectedValue(new DOMException("", name));
+    const { user } = await openScanner();
+    await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(message);
+    expect(scanner.decodeFromStream).not.toHaveBeenCalled();
+  });
+
+  it("explains when the browser has no camera API", async () => {
+    vi.stubGlobal("navigator", Object.create(navigator, { mediaDevices: { value: undefined } }));
+    const { user } = await openScanner();
+    await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("trình duyệt không hỗ trợ camera");
+  });
+
+  it("reports a scanner load failure before requesting the camera", async () => {
+    scanner.loadError = true;
+    const { user } = await openScanner();
+    await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Không tải được trình quét mã vạch");
+    expect(getUserMedia).not.toHaveBeenCalled();
+  });
+
+  it("reports a preview rejection after access is granted and releases the stream", async () => {
+    scanner.decodeFromStream.mockRejectedValue(false);
+    const { user } = await openScanner();
+    await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Đã cấp quyền camera nhưng không hiển thị được hình ảnh xem trước");
+    expect(stopTrack).toHaveBeenCalledOnce();
+  });
+
+  it("reports a preview that stays paused even when the decoder resolves", async () => {
+    scanner.decodeFromStream.mockResolvedValue({ stop: stopDecoder });
+    const { user } = await openScanner();
+    await user.click(screen.getByRole("button", { name: "Tiếp tục & xin quyền" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Đã cấp quyền camera nhưng không hiển thị được hình ảnh xem trước");
+    expect(stopDecoder).toHaveBeenCalledOnce();
+  });
+});
+
+describe("food barcode lookup", () => {
+  it("shows a friendly failure and keeps a not-found result separate on retry", async () => {
+    const user = userEvent.setup();
+    const rawError = "Invalid input: expected number, received string";
+    const lookup = vi.mocked(useGymStore.getState().lookupBarcodeFood).mockRejectedValueOnce(new Error(rawError));
+    render(<NutritionPage />);
+
+    await user.click(screen.getByRole("button", { name: "Add lunch" }));
+    await user.type(screen.getByLabelText("Hoặc nhập mã vạch"), "3017620422003");
+    const submit = screen.getByRole("button", { name: "Tra cứu" });
+    await user.click(submit);
+
+    const failure = "Không thể tra cứu mã vạch. Hãy thử lại hoặc nhập thực phẩm thủ công.";
+    expect(await screen.findByText(failure)).toBeVisible();
+    expect(screen.queryByText(rawError)).not.toBeInTheDocument();
+
+    await user.click(submit);
+    expect(await screen.findByText("Không tìm thấy sản phẩm. Bạn có thể tạo thực phẩm thủ công.")).toBeVisible();
+    expect(screen.queryByText(failure)).not.toBeInTheDocument();
+    expect(lookup).toHaveBeenLastCalledWith("3017620422003");
+  });
+});
 
 describe("nutrition recipe flows", () => {
   it("creates a serving-based recipe from saved foods", async () => {
