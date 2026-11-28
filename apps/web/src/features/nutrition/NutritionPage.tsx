@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { IScannerControls } from "@zxing/browser";
 import { Barcode, Camera, Check, ChevronRight, CookingPot, Copy, Database, Download, Droplets, Flame, Heart, Pencil, Plus, Salad, ScanLine, Search, ShieldCheck, Trash2, Utensils } from "lucide-react";
 import { Button, Card, EmptyState, Field, MetricRing, Modal, Notice, ProgressBar, SectionTitle } from "@gym/ui";
 import type { FoodItem, MealEntry, Recipe } from "@gym/contracts";
@@ -518,7 +517,7 @@ export function NutritionPage() {
         </aside>
       </div>
 
-      <Modal open={addOpen} title={`${editingMealId ? (locale === "vi" ? "Sửa món trong" : "Edit food in") : (locale === "vi" ? "Thêm vào" : "Add to")} ${mealLabels[mealType][locale].toLocaleLowerCase(locale)}`} onClose={() => { setAddOpen(false); setEditingMealId(undefined); }} className="modal--wide">
+      <Modal open={addOpen && !scannerOpen} title={`${editingMealId ? (locale === "vi" ? "Sửa món trong" : "Edit food in") : (locale === "vi" ? "Thêm vào" : "Add to")} ${mealLabels[mealType][locale].toLocaleLowerCase(locale)}`} onClose={() => { setAddOpen(false); setEditingMealId(undefined); }} className="modal--wide">
         <div className="food-picker">
           <div className="food-picker__tabs">
             <div className="search-box"><Search size={18} /><input value={foodQuery} type="search" enterKeyHint="search" autoComplete="off" aria-label="Tìm thực phẩm" onChange={(event) => { setFoodQuery(event.target.value); if (normalizeFoodSearchText(event.target.value).length < OFFLINE_SEARCH_MIN_LENGTH) setOfflineResults([]); }} placeholder={packReady ? "Gõ tên món, có dấu hoặc không dấu…" : "Tìm thực phẩm đã lưu…"} />{offlineSearchBusy ? <span className="search-box__status" role="status">Đang tìm…</span> : null}</div>
@@ -634,42 +633,118 @@ function NutrientDetails({ food, locale }: { food: FoodItem; locale: "vi" | "en"
   return <div className="nutrient-details"><header><strong>{locale === "vi" ? "Vi chất trên 100g" : "Micronutrients per 100g"}</strong><small>{food.dataQuality === "estimated_recipe" ? (locale === "vi" ? "Ước tính từ nguyên liệu USDA" : "Estimated from USDA ingredients") : food.source === "usda_fdc" ? "USDA FoodData Central · CC0" : (locale === "vi" ? "Có thể thiếu dữ liệu" : "Some values may be missing")}</small></header>{nutrients.length ? <div>{nutrients.map(([label, value, unit]) => <span key={label}><small>{label}</small><strong>{formatNumber(value, locale, value < 10 ? 2 : 1)} {unit}</strong></span>)}</div> : <p>{locale === "vi" ? "Nguồn này chưa cung cấp vi chất; không tự gán bằng 0." : "This source does not provide micronutrients; missing values are not shown as zero."}</p>}</div>;
 }
 
+const scannerErrors = {
+  library: {
+    vi: "Không tải được trình quét mã vạch. Hãy thử lại hoặc nhập mã thủ công.",
+    en: "The barcode scanner could not load. Try again or enter the barcode manually."
+  },
+  denied: {
+    vi: "Camera chưa được cấp quyền. Trên iPhone, vào Cài đặt → Safari (hoặc ứng dụng) → Camera để cấp quyền. Bạn cũng có thể đóng hẳn ứng dụng trên màn hình chính rồi mở lại và thử lại.",
+    en: "Camera access was denied. On iPhone, allow access in Settings → Safari (or the app) → Camera. You can also fully close and reopen the Home Screen app, then try again."
+  },
+  unavailable: {
+    vi: "Không tìm thấy camera phù hợp hoặc trình duyệt không hỗ trợ camera. Bạn có thể nhập mã thủ công.",
+    en: "No compatible camera was found, or this browser does not support camera access. You can enter the barcode manually."
+  },
+  busy: {
+    vi: "Không mở được camera. Nếu ứng dụng hoặc tab khác đang dùng camera, hãy đóng chúng rồi thử lại.",
+    en: "The camera could not be opened. If another app or tab is using it, close that app or tab and try again."
+  },
+  camera: {
+    vi: "Không thể kết nối với camera. Hãy thử lại hoặc nhập mã thủ công.",
+    en: "The scanner could not connect to the camera. Try again or enter the barcode manually."
+  },
+  preview: {
+    vi: "Đã cấp quyền camera nhưng không hiển thị được hình ảnh xem trước. Hãy thử lại hoặc nhập mã thủ công.",
+    en: "Camera access was granted, but the preview could not start. Try again or enter the barcode manually."
+  }
+};
+
+function cameraRequestError(error: unknown): keyof typeof scannerErrors {
+  const name = typeof error === "object" && error !== null && "name" in error ? error.name : undefined;
+  switch (name) {
+    case "NotAllowedError":
+    case "SecurityError": return "denied";
+    case "NotFoundError":
+    case "OverconstrainedError": return "unavailable";
+    case "NotReadableError": return "busy";
+    default: return "camera";
+  }
+}
+
 function BarcodeScanner({ locale, onClose, onResult }: { locale: "vi" | "en"; onClose: () => void; onResult: (value: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const controlsRef = useRef<IScannerControls | undefined>(undefined);
+  const cancelRef = useRef<(() => void) | undefined>(undefined);
   const [enabled, setEnabled] = useState(false);
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<keyof typeof scannerErrors>();
   const [starting, setStarting] = useState(false);
 
-  useEffect(() => () => controlsRef.current?.stop(), []);
+  useEffect(() => () => cancelRef.current?.(), []);
 
   const startCamera = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError("unavailable");
+      return;
+    }
+
     setStarting(true);
     setError(undefined);
+    let stage: "library" | "camera" | "preview" = "library";
+    let canceled = false;
+    let stop: (() => void) | undefined;
+    const cancel = () => {
+      if (canceled) return;
+      canceled = true;
+      stop?.();
+    };
+    cancelRef.current = cancel;
+
     try {
       const { BrowserMultiFormatReader } = await import("@zxing/browser");
+      if (canceled) return;
       const reader = new BrowserMultiFormatReader();
-      const controls = await reader.decodeFromVideoDevice(undefined, videoRef.current ?? undefined, (result) => {
-        if (!result) return;
-        controlsRef.current?.stop();
+
+      stage = "camera";
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      stop = () => stream.getTracks().forEach((track) => track.stop());
+      if (canceled) {
+        stop();
+        return;
+      }
+
+      stage = "preview";
+      const video = videoRef.current;
+      if (!video) throw new Error("Missing camera preview");
+      const controls = await reader.decodeFromStream(stream, video, (result) => {
+        if (!result || canceled) return;
+        cancel();
         onResult(result.getText());
       });
-      controlsRef.current = controls;
+      if (canceled) {
+        controls.stop();
+        return;
+      }
+      stop = () => controls.stop();
+      if (video.paused) throw new Error("Camera preview did not play");
       setEnabled(true);
-    } catch {
-      setError(locale === "vi" ? "Camera chưa được cấp quyền hoặc không khả dụng. Bạn vẫn có thể nhập mã thủ công." : "Camera permission was declined or unavailable. You can still enter the barcode manually.");
+    } catch (cause) {
+      if (canceled) return;
+      stop?.();
+      cancelRef.current = undefined;
+      setError(stage === "camera" ? cameraRequestError(cause) : stage);
     } finally {
-      setStarting(false);
+      if (!canceled) setStarting(false);
     }
   };
 
   return (
     <Modal open title={locale === "vi" ? "Quét mã vạch" : "Scan barcode"} onClose={onClose}>
       <div className="scanner">
-        {!enabled ? <div className="permission-gate"><span><Camera size={32} /></span><h3>{locale === "vi" ? "Cho phép dùng camera?" : "Allow camera access?"}</h3><p>{locale === "vi" ? "Camera chỉ dùng trực tiếp trong trình duyệt để đọc mã. App không chụp, tải lên hay lưu video." : "The camera is used in-browser only to read the code. No photo or video is captured, uploaded, or saved."}</p><Button disabled={starting} onClick={() => void startCamera()}><Camera size={17} />{starting ? (locale === "vi" ? "Đang mở…" : "Starting…") : (locale === "vi" ? "Tiếp tục & xin quyền" : "Continue & request access")}</Button><Button variant="ghost" onClick={onClose}>{locale === "vi" ? "Không dùng camera" : "Don't use camera"}</Button></div> : null}
-        <div className={enabled ? "scanner__viewport scanner__viewport--active" : "scanner__viewport"}><video ref={videoRef} muted playsInline /><span className="scanner__line" /></div>
+        {!enabled && !starting ? <div className="permission-gate"><span><Camera size={32} /></span><h3>{locale === "vi" ? "Cho phép dùng camera?" : "Allow camera access?"}</h3><p>{locale === "vi" ? "Camera chỉ dùng trực tiếp trong trình duyệt để đọc mã. App không chụp, tải lên hay lưu video." : "The camera is used in-browser only to read the code. No photo or video is captured, uploaded, or saved."}</p><Button onClick={() => void startCamera()}><Camera size={17} />{locale === "vi" ? "Tiếp tục & xin quyền" : "Continue & request access"}</Button><Button variant="ghost" onClick={onClose}>{locale === "vi" ? "Không dùng camera" : "Don't use camera"}</Button></div> : null}
+        <div className={starting || enabled ? "scanner__viewport scanner__viewport--active" : "scanner__viewport"}><video ref={videoRef} muted playsInline /><span className="scanner__line" /></div>
+        {starting ? <p role="status">{locale === "vi" ? "Đang mở camera…" : "Starting camera…"}</p> : null}
         {enabled ? <p><ScanLine size={16} />{locale === "vi" ? "Đưa mã vạch vào giữa khung hình." : "Center the barcode in the frame."}</p> : null}
-        {error ? <Notice tone="warning">{error}</Notice> : null}
+        {error ? <Notice tone="warning"><span role="alert">{scannerErrors[error][locale]}</span></Notice> : null}
       </div>
     </Modal>
   );

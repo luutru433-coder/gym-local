@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Food barcode camera startup
+
+- The barcode scanner shows the camera frame as soon as it starts and gives specific guidance for camera permission, availability, and preview problems. You can still enter the barcode manually.
+
 ## Unreleased — Drag to reorder exercises
 
 - Drag the grip on an exercise to change its position in a routine or an active workout. The up and down buttons are still available if you prefer not to drag.
